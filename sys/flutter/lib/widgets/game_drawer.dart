@@ -45,7 +45,6 @@ class _DrawerItemDef {
   final Color iconColor;
   final String title;
   final VoidCallback onTap;
-  final GlobalKey key = GlobalKey();
 
   _DrawerItemDef({
     required this.icon,
@@ -58,7 +57,12 @@ class _DrawerItemDef {
 class _GameDrawerContentState extends State<GameDrawerContent> {
   final FocusNode _focusNode = FocusNode();
   final ScrollController _scrollController = ScrollController();
+  final Map<int, GlobalKey> _itemKeys = {};
   int? _focusedIndex;
+
+  GlobalKey _getItemKey(int index) {
+    return _itemKeys.putIfAbsent(index, () => GlobalKey());
+  }
 
   @override
   void initState() {
@@ -247,7 +251,7 @@ class _GameDrawerContentState extends State<GameDrawerContent> {
           }
         });
         if (_focusedIndex != null) {
-          _scrollToItem(items[_focusedIndex!].key);
+          _scrollToItem(_getItemKey(_focusedIndex!));
         }
       }
       return KeyEventResult.handled;
@@ -268,7 +272,7 @@ class _GameDrawerContentState extends State<GameDrawerContent> {
           }
         });
         if (_focusedIndex != null) {
-          _scrollToItem(items[_focusedIndex!].key);
+          _scrollToItem(_getItemKey(_focusedIndex!));
         }
       }
       return KeyEventResult.handled;
@@ -280,7 +284,7 @@ class _GameDrawerContentState extends State<GameDrawerContent> {
         setState(() {
           _focusedIndex = 0;
         });
-        _scrollToItem(items[0].key);
+        _scrollToItem(_getItemKey(0));
       }
       return KeyEventResult.handled;
     }
@@ -291,7 +295,7 @@ class _GameDrawerContentState extends State<GameDrawerContent> {
         setState(() {
           _focusedIndex = items.length - 1;
         });
-        _scrollToItem(items[items.length - 1].key);
+        _scrollToItem(_getItemKey(items.length - 1));
       }
       return KeyEventResult.handled;
     }
@@ -383,7 +387,7 @@ class _GameDrawerContentState extends State<GameDrawerContent> {
                 if (showDividerBefore)
                   const Divider(color: Colors.white24, height: 1),
                 Padding(
-                  key: item.key,
+                  key: _getItemKey(index),
                   padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                   child: Material(
                     color: isFocused

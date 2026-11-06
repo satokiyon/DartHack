@@ -720,10 +720,17 @@ class HardwareKeyRouter {
       if (event.logicalKey == LogicalKeyboardKey.arrowUp) {
         return const TextScroll(-1);
       }
+      if (event.logicalKey == LogicalKeyboardKey.tab && !isAltPressed) {
+        return (event is KeyDownEvent)
+            ? TextOverlayTab(forward: !isShiftPressed)
+            : const SwallowKey();
+      }
       if (event.logicalKey == LogicalKeyboardKey.enter ||
           event.logicalKey == LogicalKeyboardKey.numpadEnter ||
           event.logicalKey == LogicalKeyboardKey.escape) {
-        return const DismissText();
+        return (event is KeyDownEvent)
+            ? const DismissText()
+            : const SwallowKey();
       }
 
       String? char = event.character;
@@ -784,11 +791,6 @@ class HardwareKeyRouter {
       return const TextOverlayPage(1);
     }
     if (event.logicalKey == LogicalKeyboardKey.tab && !isAltPressed) {
-      if (isExtCmdMenu && !isShiftPressed) {
-        return (event is KeyDownEvent)
-            ? const TextOverlayAutocomplete()
-            : const SwallowKey();
-      }
       return (event is KeyDownEvent)
           ? TextOverlayTab(forward: !isShiftPressed)
           : const SwallowKey();
@@ -893,14 +895,11 @@ class HardwareKeyRouter {
       return const SwallowKey();
     }
 
-    // Enter または Space: 既定値があればそれを送信、なければ誤爆防止のため何もしない (Swallow)
+    // Enter または Space: フォーカス中の項目または既定値を確定実行
     if (event.logicalKey == LogicalKeyboardKey.enter ||
         event.logicalKey == LogicalKeyboardKey.numpadEnter ||
         event.logicalKey == LogicalKeyboardKey.space) {
-      if (defaultChoice != 0) {
-        return SendYn(defaultChoice);
-      }
-      return const SwallowKey();
+      return const YnSubmit();
     }
 
     // 入力された文字の抽出

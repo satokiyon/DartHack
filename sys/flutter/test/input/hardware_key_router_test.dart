@@ -204,7 +204,7 @@ void main() {
         equals(const SendYn(27)),
       );
 
-      // Enter when defaultChoice is 'n' (110)
+      // Enter in YN mode triggers YnSubmit() to execute focused choice or fallback to defaultChoice
       final enterEvent = const KeyDownEvent(
         physicalKey: PhysicalKeyboardKey.enter,
         logicalKey: LogicalKeyboardKey.enter,
@@ -212,13 +212,13 @@ void main() {
       );
       expect(
         HardwareKeyRouter.route(event: enterEvent, context: KeyInputContext.yn, ynChoices: 'yn', ynDefault: 110),
-        equals(const SendYn(110)),
+        equals(const YnSubmit()),
       );
 
-      // Enter when defaultChoice is 0 (Swallow to prevent accidental yes/no)
+      // Enter when defaultChoice is 0 triggers YnSubmit (UI submit() handles no-op if no focus)
       expect(
         HardwareKeyRouter.route(event: enterEvent, context: KeyInputContext.yn, ynChoices: 'yn', ynDefault: 0),
-        equals(const SwallowKey()),
+        equals(const YnSubmit()),
       );
     });
 
@@ -404,7 +404,7 @@ void main() {
       );
       expect(
         HardwareKeyRouter.route(event: tabEvent, context: KeyInputContext.extCmdMenu),
-        equals(const TextOverlayAutocomplete()),
+        equals(const TextOverlayTab(forward: true)),
       );
 
       // Enter -> TextOverlaySubmit() (フォーカスレス時)

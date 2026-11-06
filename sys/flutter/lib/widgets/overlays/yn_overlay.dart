@@ -34,6 +34,8 @@ class YnOverlayState extends State<YnOverlay> {
   late final FocusNode _textFocusNode;
   String _currentFocusTarget = 'none';
 
+  String get currentFocusTarget => _currentFocusTarget;
+
   @override
   void initState() {
     super.initState();
@@ -141,9 +143,9 @@ class YnOverlayState extends State<YnOverlay> {
     final List<String> targets = ['none'];
     if (parsed.type == YnPromptType.countInput) {
       targets.add('input');
-      if (widget.recentMessages.isNotEmpty) targets.add('history');
       targets.add('cancel');
       targets.add('confirm');
+      targets.add('history');
     } else {
       for (final ch in parsed.quickChoices) {
         targets.add('choice:$ch');
@@ -152,7 +154,7 @@ class YnOverlayState extends State<YnOverlay> {
         targets.add('input');
       }
       targets.add('cancel');
-      if (widget.recentMessages.isNotEmpty) targets.add('history');
+      targets.add('history');
     }
 
     final currentIndex = targets.indexOf(_currentFocusTarget);
@@ -280,32 +282,39 @@ class YnOverlayState extends State<YnOverlay> {
       alignment: WrapAlignment.center,
       children: [
         for (final ch in parsed.quickChoices)
-          ElevatedButton(
-            onPressed: () => widget.onSelect(ch.codeUnitAt(0)),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: (ch.codeUnitAt(0) == parsed.defaultChoice)
-                  ? Colors.teal[500]
-                  : Colors.blueGrey[800],
-              foregroundColor: ch == 'a' ? Colors.amber[200] : Colors.white,
-              side: _currentFocusTarget == 'choice:$ch'
-                  ? const BorderSide(color: Colors.tealAccent, width: 2.0)
-                  : null,
-            ),
-            child: Text(
-              YnChoiceParser.resolveButtonLabel(
-                ch,
-                question: widget.question,
-                isJapanese: isJp,
-              ),
-            ),
+          Builder(
+            builder: (context) {
+              final isFocused = _currentFocusTarget == 'choice:$ch';
+              final isDefault = ch.codeUnitAt(0) == parsed.defaultChoice;
+              return ElevatedButton(
+                onPressed: () => widget.onSelect(ch.codeUnitAt(0)),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: isFocused
+                      ? (isDefault ? Colors.teal[400] : Colors.blueGrey[700])
+                      : (isDefault ? Colors.teal[600] : Colors.blueGrey[800]),
+                  foregroundColor: ch == 'a' ? Colors.amber[200] : Colors.white,
+                  elevation: isFocused ? 6 : 2,
+                  side: isFocused
+                      ? const BorderSide(color: Colors.amberAccent, width: 2.5)
+                      : null,
+                ),
+                child: Text(
+                  YnChoiceParser.resolveButtonLabel(
+                    ch,
+                    question: widget.question,
+                    isJapanese: isJp,
+                  ),
+                ),
+              );
+            },
           ),
         ElevatedButton(
           onPressed: () => widget.onSelect(27), // ESC
           style: ElevatedButton.styleFrom(
-            backgroundColor: Colors.black54,
-            foregroundColor: Colors.white70,
+            backgroundColor: _currentFocusTarget == 'cancel' ? Colors.black87 : Colors.black54,
+            foregroundColor: _currentFocusTarget == 'cancel' ? Colors.amberAccent : Colors.white70,
             side: _currentFocusTarget == 'cancel'
-                ? const BorderSide(color: Colors.tealAccent, width: 2.0)
+                ? const BorderSide(color: Colors.amberAccent, width: 2.5)
                 : null,
           ),
           child: Text(isJp ? 'Esc:${l10n.cancel}' : 'Esc: ${l10n.cancel}'),
@@ -315,11 +324,11 @@ class YnOverlayState extends State<YnOverlay> {
           icon: const Icon(Icons.history_rounded, size: 16),
           label: Text(l10n.history),
           style: ElevatedButton.styleFrom(
-            backgroundColor: Colors.blueGrey[900],
+            backgroundColor: _currentFocusTarget == 'history' ? Colors.blueGrey[700] : Colors.blueGrey[900],
             foregroundColor: Colors.amber[200],
             padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
             side: _currentFocusTarget == 'history'
-                ? const BorderSide(color: Colors.tealAccent, width: 2.0)
+                ? const BorderSide(color: Colors.amberAccent, width: 2.5)
                 : null,
           ),
         ),
@@ -577,11 +586,11 @@ class YnOverlayState extends State<YnOverlay> {
         ElevatedButton(
           onPressed: () => widget.onSelect(27), // ESC
           style: ElevatedButton.styleFrom(
-            backgroundColor: Colors.black54,
-            foregroundColor: Colors.white70,
+            backgroundColor: _currentFocusTarget == 'cancel' ? Colors.black87 : Colors.black54,
+            foregroundColor: _currentFocusTarget == 'cancel' ? Colors.amberAccent : Colors.white70,
             padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
             side: _currentFocusTarget == 'cancel'
-                ? const BorderSide(color: Colors.tealAccent, width: 2.0)
+                ? const BorderSide(color: Colors.amberAccent, width: 2.5)
                 : null,
           ),
           child: Text(l10n.cancel),
@@ -591,11 +600,11 @@ class YnOverlayState extends State<YnOverlay> {
           icon: const Icon(Icons.history_rounded, size: 16),
           label: Text(l10n.history),
           style: ElevatedButton.styleFrom(
-            backgroundColor: Colors.blueGrey[900],
+            backgroundColor: _currentFocusTarget == 'history' ? Colors.blueGrey[700] : Colors.blueGrey[900],
             foregroundColor: Colors.amber[200],
             padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
             side: _currentFocusTarget == 'history'
-                ? const BorderSide(color: Colors.tealAccent, width: 2.0)
+                ? const BorderSide(color: Colors.amberAccent, width: 2.5)
                 : null,
           ),
         ),

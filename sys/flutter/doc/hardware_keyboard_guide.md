@@ -17,6 +17,8 @@ NetHack 5.0 (日本語版 / 英語版) の Flutter ポートにおける、**物
    - [1.5 各種画面・ダイアログの快適プレイングテクニック](#15-各種画面ダイアログの快適プレイングテクニック)
      - [ドロワーメニュー (GameDrawer)](#ドロワーメニュー-gamedrawer)
      - [全体マップ (FullMapDialog)](#全体マップ-fullmapdialog)
+     - [情報表示・ダンジョン概要・死亡時一覧 (TextOverlay / #overview / 怪物・所持品一覧)](#情報表示ダンジョン概要死亡時一覧-textoverlay--overview--怪物所持品一覧)
+     - [墓石画面 (UniversalTombstoneWidget)](#墓石画面-universaltombstonewidget)
      - [スコアボード (ScoreboardDialog / TopTenWidget)](#スコアボード-scoreboarddialog--toptenwidget)
      - [ガイドブック・スポイラー閲覧＆目次検索 (Guidebook & Spoilers)](#ガイドブックスポイラー閲覧目次検索-guidebook--spoilers)
      - [詳細設定画面 (SettingsPage)](#詳細設定画面-settingspage)
@@ -124,7 +126,7 @@ NetHack 伝統のコマンドがすべてそのまま利用可能です。
 #### ドロワーメニュー (GameDrawer)
 ゲームのセーブ、中断、各種情報確認を行うメインメニューです。
 - **開いた直後は安全な状態**: 初期フォーカス非活性（`none`）のため、うっかり Enter を押しても誤爆しません。
-- **選択**: `↓` / `Tab` / `j` で下へ移動、`↑` / `Shift+Tab` / `k` で上へ移動。画面外の項目へも自動でスムーズスクロールします。
+- **選択と自動追従スクロール**: `↓` / `Tab` / `j` で下へ移動、`↑` / `Shift+Tab` / `k` で上へ移動。画面外にある項目へ移動した場合も、項目キーのキャッシュ管理により**確実に画面内へスムーズに自動追従スクロール**します。
 - **ジャンプ**: `Home` で先頭項目（セーブして終了）、`End` で末尾項目（アプリ設定）へ瞬時にジャンプ。
 - **ページ送り**: `PageDown` / `PageUp` でリストを大きく上下スクロール。
 - **実行**: `Enter`（テンキー含む）でハイライト中の項目を実行。
@@ -146,13 +148,32 @@ NetHack 伝統のコマンドがすべてそのまま利用可能です。
   - `Tab`: 右上の「閉じる（`×`）」ボタンにアンバー枠ハイライト。
   - `Escape`、`q`、`Space`、`Enter` のいずれでも瞬時にマップを閉じてゲームに戻れます。
 
+#### 情報表示・ダンジョン概要・死亡時一覧 (TextOverlay / #overview / 怪物・所持品一覧)
+`#overview` によるダンジョン階層構造表示、ゲーム中のメッセージ確認、および死亡時の「倒した怪物の一覧」「持ち物一覧」「能力一覧」などの長文テキスト表示画面です。
+- **スムーズなスクロール＆即時閉鎖**:
+  - `Space` / `PageDown`: 1 画面分下スクロール。**最下部に達した状態で `Space` を押す（または最初から 1 画面に収まる短い文章の場合）と、そのまま即座に画面が閉じます**。
+  - `Enter`: スクロール位置に関わらず、いつでも瞬時に画面を閉じて次へ進めます。もう Esc キーを何回も連打する必要はありません。
+  - `Shift+Space` / `PageUp`: 1 画面分上スクロール。
+  - `↑` / `↓` または Viキー `k` / `j`: 1 行ずつ細かく上下スクロール。
+  - `Home` / `End`: 最先頭 / 最末尾へ瞬時ジャンプ。
+- **Tab フォーカス循環**:
+  - `Tab` / `Shift+Tab`: `none` ↔ 下部の「OK」ボタン ↔「履歴」ボタン（履歴表示可能な場合）をアンバー枠で巡回。
+  - フォーカスされた状態で `Enter` を押すと、そのボタンのアクション（OK 決定、またはメッセージ履歴の表示）が実行されます。
+- **Esc 閉鎖**: `Escape` または `q` で即座に閉じることも可能です。
+
+#### 墓石画面 (UniversalTombstoneWidget)
+冒険の終了時（死亡時・昇天時）に表示される墓碑銘画面です。
+- **スクロールと快適な閉鎖**:
+  - スクロールビューが物理キーボードと完全連動しています。
+  - `Space` / `PageDown` やカーソルキー `↓` で墓石の下部までスムーズにスクロールできます。
+  - **最下部に到達した状態で `Space` を押すか、`Enter` または `Escape` を押すだけで、軽快に画面が閉じて次の情報やスコアボードへ進みます**。
+
 #### スコアボード (ScoreboardDialog / TopTenWidget)
 過去のハイスコア記録や今回の冒険の成績を確認する画面です。
 - **閲覧**: `↑` / `↓` または Viキー `k` / `j` で 1 行ずつスクロール。
 - **ページ送り**: `PageDown` / `>` または `Space` で 1 画面分スピーディーに下スクロール、`PageUp` / `<` または `Shift+Space` で上スクロール。
-- **スマート終了**: リストの最下部に達した状態で `Space` を押すと、そのままダイアログが閉じます。
+- **スマート終了**: リストの最下部に達した状態で `Space` を押すか、`Enter` / `Escape` / `q` を押せば即座に閉じます。
 - **Tab 循環**: `Tab` で下部の「閉じる」ボタンを強調枠表示。
-- **閉じる**: `Escape`、`q`、`Enter`、または最下部での `Space` で閉じます。
 
 #### ガイドブック・スポイラー閲覧＆目次検索 (Guidebook & Spoilers)
 ゲーム内からいつでも閲覧できる詳細マニュアルおよびスポイラーです。
@@ -186,13 +207,19 @@ NetHack 伝統のコマンドがすべてそのまま利用可能です。
   - **`@`（アットマーク）**: 現在の選択状態を**反転** (`menu_invert_all`)。
 - **ページジャンプ**: `^` / `Home` で先頭ページ、`|` / `End` で末尾ページへジャンプ。
 - **Tab 循環**: `Tab` で下部の「全選択」「選択解除」「反転」「決定」「閉じる」ボタンへ順番にフォーカス移動し、`Enter` で実行。
+- **閲覧専用メニューのスマート閉鎖**: アイテムの閲覧やスキル確認など選択不要なメニューでは、`Enter` または最下部での `Space` を押すだけで安全に画面を閉じることができます。
 
 #### 拡張コマンド一覧ダイアログ (# コマンド)
 マップ上で `#` キーを押して開く画面です。
 - **全件初期表示**: 最初からすべての拡張コマンド（58 個以上）が一覧表示されています。
 - **インクリメンタル検索**: 画面をタップする必要はありません。キーボードで文字（例: `p`, `r`）を打つだけで、即座に `#pray` などが絞り込まれます。
-- **上下移動と追従**: `↑` / `↓` で候補を移動すると、選択行が常に画面中央に見えるよう自動追従スクロール。
-- **実行**: `Enter` を押すとハイライトされている拡張コマンドが直ちに実行されます。
+- **Tab / Shift+Tab による巡回オートコンプリート**:
+  - 入力欄に `"over"` と打って `Tab` を押すと、即座に先頭候補の `"#overview"` が補完されます。
+  - さらに `Tab` を押すと次の候補へ、`Shift+Tab` で前の候補へと順送り・逆送りに巡回補完できます。
+  - 矢印キー `↑` / `↓` で候補一覧の特定項目をハイライトしている状態で `Tab` を押せば、その項目名が直接入力欄に補完されます。
+- **確実なコマンド実行**:
+  - 補完後または候補選択後にそのまま `Enter` を押すと、**プレフィックスの `#` が自動的に切除されて C コアへ送信され、コマンド（例: `overview`）が確実に実行されます**。
+- **上下移動と自動追従**: `↑` / `↓` で候補を移動すると、選択行が常に画面内に見えるよう自動追従スクロール。
 
 #### 一行テキスト入力 (願い・名前・フロアメモ)
 Cコアからの一行文字列入力要求ダイアログです。
@@ -202,8 +229,13 @@ Cコアからの一行文字列入力要求ダイアログです。
 - **Tab 循環**: `Tab` で「入力欄」→「決定ボタン」→「キャンセルボタン」を巡回。
 
 #### Y/N プロンプト (YnOverlay)
-アイテム拾得や危険な行動の確認プロンプトです。
+アイテム拾得、危険な行動の確認、および死亡時の各種情報確認（「持ち物を確認しますか」「能力を表示しますか」等）で表示されるプロンプトです。
 - **ダイレクト即答**: フォーカスを合わせる必要はなく、`y`（はい）、`n`（いいえ）、`q`（中断）、`Space`（デフォルト応答）、`Escape`（キャンセル）を押すだけで 1 キー即答できます。
+- **Tab キーによるボタンフォーカス循環**:
+  - `Tab` / `Shift+Tab` を押すと、「y:はい」「n:いいえ」などの各選択肢ボタンに加え、画面上の「履歴」ボタンも含めてアンバー枠のハイライトが順番に巡回します。
+- **フォーカス選択の優先実行**:
+  - Tab キーで「y:はい」にフォーカスを合わせた状態で `Enter` を押すと、**プロンプトの既定値（デフォルト 'n'）に誤爆することなく、フォーカスされている「y」が確実に決定・実行されます**。
+  - ボタンにフォーカスが当たっていない初期状態（`none`）で `Enter` または `Space` を押した場合は、NetHack 本来のデフォルト応答が安全に実行されます。
 
 ---
 
@@ -265,6 +297,26 @@ Cコアからの一行文字列入力要求ダイアログです。
 | `Tab` / `Shift + Tab` | `none` ↔ `目次ボタン` ↔ `閉じるボタン` のフォーカス循環 |
 | `Escape` / `q` | ガイドブック / スポイラーを閉じる |
 
+### 情報表示・ダンジョン概要・死亡時一覧 (TextOverlay / #overview / 怪物・所持品・能力一覧)
+
+| キー操作 | 動作内容 |
+| :--- | :--- |
+| `Space` / `PageDown` | 1 画面分下へスクロール（**最下部に達した状態、またはスクロール不要時は即座に閉じる**） |
+| `Shift + Space` / `PageUp` | 1 画面分上へスクロール |
+| `↑` / `↓` / `k` / `j` | 1 行ずつ上下スクロール |
+| `Home` / `End` | 最先頭 / 最末尾へジャンプ |
+| **`Enter`** | **スクロール位置に関わらず即座に閉じる（またはフォーカス中のボタンを実行）** |
+| `Tab` / `Shift + Tab` | `none` ↔「OK」ボタン ↔「履歴」ボタンのフォーカス循環 |
+| `Escape` / `q` | 画面を閉じる |
+
+### 墓石画面 (UniversalTombstoneWidget)
+
+| キー操作 | 動作内容 |
+| :--- | :--- |
+| `Space` / `PageDown` / `↓` | 墓碑銘の下部へスクロール（**最下部に達した状態で Space を押すと閉じる**） |
+| `PageUp` / `↑` | 上へスクロール |
+| **`Enter` / `Escape`** | **画面を閉じて次のスコアボード等へ進む** |
+
 ### スコアボード (ScoreboardDialog)
 
 | キー操作 | 動作内容 |
@@ -294,21 +346,24 @@ Cコアからの一行文字列入力要求ダイアログです。
 | | **`.`** (ピリオド) | **全選択** (`menu_select_all`) |
 | | **`-`** (ハイフン) | **選択解除** (`menu_deselect_all`) |
 | | **`@`** (アットマーク) | **選択反転** (`menu_invert_all`) |
-| | `Space` / `PageDown` | 1 画面分次へスクロール |
+| | `Space` / `PageDown` | 1 画面分次へスクロール（**閲覧画面では最下部で閉じる**） |
 | | `Shift+Space` / `PageUp`| 1 画面分前へスクロール |
 | | `^` / `Home` | 最先頭ページへジャンプ (`menu_first_page`) |
 | | `\|` / `End` | 最末尾ページへジャンプ (`menu_last_page`) |
 | | `Tab` / `Shift+Tab` | アクションボタン（全選択、解除、決定等）の巡回 |
-| | `Enter` | 確定送信 |
+| | `Enter` | 確定送信（**閲覧画面では安全に閉じる**） |
 | **拡張コマンドメニュー** | `文字入力` | フォーカスレスで候補をインクリメンタル絞り込み |
+| | **`Tab` / `Shift+Tab`** | **候補の順送り・逆送り巡回オートコンプリート** |
 | | `↑` / `↓` | 選択項目の上下移動（自動追従スクロール） |
-| | `Enter` | ハイライトされているコマンドを実行 |
+| | **`Enter`** | **ハイライト・補完されたコマンドを即座に実行（# は自動切除）** |
 | **テキスト入力 (`GetLine`)**| `A-Z, 0-9, 記号` | フォーカスレス文字入力 |
 | | `Backspace` | 1 文字削除 |
 | | `Delete` | 入力欄の全消去 |
 | | `Tab` | 入力欄 ↔ 決定ボタン ↔ キャンセルボタンの巡回 |
 | | `Enter` | 入力確定 |
 | **Y/N プロンプト** | `y` / `n` / `q` | 1 キー即答（はい / いいえ / 中断） |
+| | **`Tab` / `Shift+Tab`** | **全選択肢ボタン ↔「履歴」ボタンのフォーカス循環** |
+| | **`Enter`** | **フォーカス中の選択肢を優先実行（フォーカスなし時はデフォルト応答）** |
 | | `Space` / `Escape` | デフォルト応答 / キャンセル |
 
 ---
@@ -388,28 +443,41 @@ flowchart TD
 1. [`test/input/hardware_key_router_test.dart`](../test/input/hardware_key_router_test.dart):
    - テンキー移動（`number_pad` 0/1）、Ctrl キー、Alt/Meta キー（大文字/小文字）、全角半角正規化。
    - `.` / `-` / `@` のメニュー一括操作キー、`^` / `|` / `Home` / `End` の先頭・末尾ジャンプキー。
-   - `Tab` / `Shift+Tab` による各画面コンテキストでのフォーカスナビゲーションアクション。
+   - `Tab` / `Shift+Tab` による各画面コンテキストでのフォーカスナビゲーションアクション（YnSubmit、TextOverlayTab、GetLineTab 等）。
    - `Ctrl+M` / `F10` / `ContextMenu` によるドロワー起動ルーティング。
-2. [`test/widgets/game_drawer_keyboard_test.dart`](../test/widgets/game_drawer_keyboard_test.dart):
+2. [`test/game_drawer_keyboard_test.dart`](../test/game_drawer_keyboard_test.dart):
    - 初期フォーカス非活性（`none`）、`↓`/`Tab`/`j` および `↑`/`Shift+Tab`/`k` による循環選択。
+   - 画面外項目選択時の `Scrollable.ensureVisible` 自動追従スクロール検証。
    - `Home`/`End` ジャンプ、`PageDown`/`PageUp` スクロール、`Enter` 決定、`Escape`/`Ctrl+M`/`F10` 閉鎖の検証。
-3. [`test/widgets/scoreboard_dialog_keyboard_test.dart`](../test/widgets/scoreboard_dialog_keyboard_test.dart):
+3. [`test/ext_cmd_autocomplete_test.dart`](../test/ext_cmd_autocomplete_test.dart):
+   - 拡張コマンド一覧ダイアログでの `Tab` / `Shift+Tab` 順送り・逆送り巡回補完（オートコンプリート）。
+   - 矢印キー選択時の直接補完、および Enter 送信時の `#` プレフィックス自動切除・コマンド実行検証。
+4. [`test/yn_overlay_keyboard_focus_test.dart`](../test/yn_overlay_keyboard_focus_test.dart):
+   - Y/N プロンプトにおける `Tab` / `Shift+Tab` の選択肢ボタン・履歴ボタン巡回フォーカス。
+   - Tab 選択後の Enter 押下時に、デフォルト値ではなくフォーカス中の選択肢（`y` 等）が優先決定されることの検証。
+5. [`test/text_overlay_keyboard_test.dart`](../test/text_overlay_keyboard_test.dart):
+   - 長文テキスト画面における `Space` ページ送り、および最下部到達時（またはスクロール不要時）の `Space` 即時閉鎖検証。
+   - `Enter` キーによる任意位置からの即時閉鎖、`Tab` / `Shift+Tab` による OK / 履歴ボタンフォーカス循環と Enter 実行検証。
+6. [`test/tombstone_keyboard_test.dart`](../test/tombstone_keyboard_test.dart):
+   - 墓石表示画面（`UniversalTombstoneWidget`）におけるスクロールコントローラー接続の検証。
+   - `Space` / 矢印キーによる墓碑銘スクロール、および最下部での `Space` / `Enter` / `Escape` 閉鎖検証。
+7. [`test/widgets/scoreboard_dialog_keyboard_test.dart`](../test/widgets/scoreboard_dialog_keyboard_test.dart):
    - Tab 循環による閉じるボタンのハイライト枠切り替え。
    - 矢印キー・`j`/`k` スクロール、PageDown/PageUp、Space によるページ送りおよび最下部閉鎖。
    - `q` / `Escape` / `Enter` 閉鎖の検証。
-4. [`test/widgets/full_map_dialog_test.dart`](../test/widgets/full_map_dialog_test.dart):
+8. [`test/widgets/full_map_dialog_test.dart`](../test/widgets/full_map_dialog_test.dart):
    - `+` / `-` 段階的ズーム、`0` / `Home` リセット、`z` キーの 6 倍アニメーショントグル。
    - 矢印キーおよび 8 方向 Vi キー（`hjkl yubn`）によるパン移動、Tab フォーカス循環、`q`/`Escape`/`Space` 閉鎖の検証。
-5. [`test/widgets/guidebook_keyboard_test.dart`](../test/widgets/guidebook_keyboard_test.dart):
+9. [`test/widgets/guidebook_keyboard_test.dart`](../test/widgets/guidebook_keyboard_test.dart):
    - ガイドブックおよびスポイラーの Tab 循環（目次ボタン・閉じるボタン）、`t` キーによる目次モーダル起動。
    - 目次内での上下選択・文字入力インクリメンタル絞り込み・Enter ジャンプ、`q`/`Escape` 閉鎖の検証。
-6. [`test/widgets/settings_page_keyboard_test.dart`](../test/widgets/settings_page_keyboard_test.dart):
-   - `Escape` キーによる前画面復帰（保存連携）。
-   - `PageDown`/`PageUp`/`Home`/`End` による設定リスト高速スクロール、Tab キーによるコントロール間フォーカス移動の検証。
-7. [`test/widgets/getline_overlay_test.dart`](../test/widgets/getline_overlay_test.dart):
-   - `autofocus: false` の検証（IME 非表示保護）。
-   - フォーカスレス文字入力、Backspace、Enter 決定の検証。
-   - Tab キー循環（`none` → `TextField` → ボタン → `none`）の検証。
-8. [`test/widgets/menu_accelerator_test.dart`](../test/widgets/menu_accelerator_test.dart):
-   - 拡張コマンドメニューの全件初期表示とカーソル移動時の可視領域スクロール検証。
-   - 複数選択メニューにおける「`.:全選択`」「`-:選択解除`」「`@:選択反転`」ボタンのテキストおよびタップ・キー操作検証。
+10. [`test/widgets/settings_page_keyboard_test.dart`](../test/widgets/settings_page_keyboard_test.dart):
+    - `Escape` キーによる前画面復帰（保存連携）。
+    - `PageDown`/`PageUp`/`Home`/`End` による設定リスト高速スクロール、Tab キーによるコントロール間フォーカス移動の検証。
+11. [`test/widgets/getline_overlay_test.dart`](../test/widgets/getline_overlay_test.dart):
+    - `autofocus: false` の検証（IME 非表示保護）。
+    - フォーカスレス文字入力、Backspace、Enter 決定の検証。
+    - Tab キー循環（`none` → `TextField` → ボタン → `none`）の検証。
+12. [`test/widgets/menu_accelerator_test.dart`](../test/widgets/menu_accelerator_test.dart):
+    - 拡張コマンドメニューの全件初期表示とカーソル移動時の可視領域スクロール検証。
+    - 複数選択メニューにおける「`.:全選択`」「`-:選択解除`」「`@:選択反転`」ボタンのテキストおよびタップ・キー操作検証。

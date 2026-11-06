@@ -139,6 +139,7 @@ class MenuOverlayState extends State<MenuOverlay> {
   /// Space キーによる操作（スクロール余地ありなら1ページ下送り、最下部なら選択決定または閉鎖）
   void handleSpace() {
     if (_scrollController.hasClients &&
+        _scrollController.position.maxScrollExtent > 10.0 &&
         _scrollController.offset < _scrollController.position.maxScrollExtent - 5.0) {
       pageScroll(1);
       return;
@@ -318,9 +319,9 @@ class MenuOverlayState extends State<MenuOverlay> {
   /// Tab キーによるアクションボタンのフォーカス循環
   void cycleFocus([bool forward = true]) {
     final isExtCmd = isExtCmdMenuPrompt(widget.menuPrompt);
-    if (isExtCmd && forward) {
-      // 拡張コマンドメニュー画面では Tab は補完専用
-      autocompleteExtCmdCandidate();
+    if (isExtCmd) {
+      // 拡張コマンドメニュー画面では Tab / Shift+Tab は補完・順送り専用
+      autocompleteExtCmdCandidate(true, forward);
       return;
     }
 
@@ -559,28 +560,60 @@ class MenuOverlayState extends State<MenuOverlay> {
     }
   }
 
-  /// Tab キーによる拡張コマンド候補名の補完
-  void autocompleteExtCmdCandidate() {
+  /// Tab キーによる拡張コマンド候補名の補完（未選択なら先頭を選択、選択中ならその候補を補完、cycle=trueなら順送り巡回）
+  void autocompleteExtCmdCandidate([bool cycle = false, bool forward = true]) {
     final selectable = _getSelectableExtCmdItems(_getFilteredItems());
     if (selectable.isEmpty) return;
-    final idx = _selectedExtCmdIndex ?? (selectable.length == 1 ? 0 : null);
-    if (idx == null) return;
-    final targetIdx = idx.clamp(0, selectable.length - 1);
+
+    setState(() {
+      if (_selectedExtCmdIndex == null) {
+        _selectedExtCmdIndex = forward ? 0 : selectable.length - 1;
+      } else if (cycle) {
+        _selectedExtCmdIndex = forward
+            ? (_selectedExtCmdIndex! + 1) % selectable.length
+            : (_selectedExtCmdIndex! - 1 + selectable.length) % selectable.length;
+      }
+    });
+
+    final targetIdx = _selectedExtCmdIndex!.clamp(0, selectable.length - 1);
     final text = selectable[targetIdx].text.trim();
     final tabIdx = text.indexOf('\t');
     var cmd = (tabIdx >= 0 ? text.substring(0, tabIdx) : text).trim();
     if (cmd.startsWith('#')) {
       cmd = cmd.substring(1).trim();
     }
-    if (cmd.startsWith('(')) return; // "(すべて表示)" などは補完対象外
-    setState(() {
-      _filterQuery = cmd;
-      _selectedExtCmdIndex = null;
-      _filterController.value = TextEditingValue(
-        text: cmd,
-        selection: TextSelection.collapsed(offset: cmd.length),
-      );
-    });
+    if (cmd.startsWith('(')) return; // "(すべて表示)" などは入力欄補完の対象外
+
+    _filterController.value = TextEditingValue(
+      text: cmd,
+      selection: TextSelection.collapsed(offset: cmd.length),
+    );
+
+    // 選択項目が見える位置へスクロール追従
+    if (_scrollController.hasClients) {
+      final selectedItem = selectable[targetIdx];
+      final itemIndexInFiltered = _getFilteredItems().indexOf(selectedItem);
+      final index = itemIndexInFiltered >= 0 ? itemIndexInFiltered : targetIdx;
+      const itemHeight = 44.0;
+      final targetOffset = index * itemHeight;
+      final currentOffset = _scrollController.offset;
+      final viewportHeight = _scrollController.position.viewportDimension;
+      final maxScroll = _scrollController.position.maxScrollExtent;
+
+      if (targetOffset < currentOffset) {
+        _scrollController.animateTo(
+          targetOffset.clamp(0.0, maxScroll),
+          duration: const Duration(milliseconds: 100),
+          curve: Curves.easeOut,
+        );
+      } else if (targetOffset + itemHeight > currentOffset + viewportHeight) {
+        _scrollController.animateTo(
+          (targetOffset + itemHeight - viewportHeight).clamp(0.0, maxScroll),
+          duration: const Duration(milliseconds: 100),
+          curve: Curves.easeOut,
+        );
+      }
+    }
   }
 
   /// Enter キーによる拡張コマンド決定

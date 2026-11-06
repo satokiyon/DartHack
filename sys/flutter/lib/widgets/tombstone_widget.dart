@@ -5,12 +5,14 @@ class UniversalTombstoneWidget extends StatelessWidget {
   final TombstoneDisplayMode mode;
   final TombstoneData? data;
   final List<String>? lines;
+  final ScrollController? scrollController;
 
   const UniversalTombstoneWidget({
     super.key,
     this.mode = TombstoneDisplayMode.image,
     this.data,
     this.lines,
+    this.scrollController,
   }) : assert(
           mode == TombstoneDisplayMode.image ? data != null : lines != null,
           'image mode requires data, text mode requires lines',
@@ -35,6 +37,7 @@ class UniversalTombstoneWidget extends StatelessWidget {
         border: Border.all(color: Colors.white.withValues(alpha: 0.10)),
       ),
       child: SingleChildScrollView(
+        controller: scrollController,
         scrollDirection: Axis.vertical,
         child: SingleChildScrollView(
           scrollDirection: Axis.horizontal,
@@ -80,6 +83,7 @@ class UniversalTombstoneWidget extends StatelessWidget {
     final belowTombstoneText = belowTombstoneLines.join('\n');
 
     return SingleChildScrollView(
+      controller: scrollController,
       scrollDirection: Axis.vertical,
       child: Center(
         child: Container(

@@ -10,6 +10,13 @@ import '../topten_widget.dart';
 import '../menu_item_tile_painter.dart';
 import '../../services/font_manager.dart';
 
+/// TextOverlay での Tab キーフォーカス対象
+enum TextOverlayFocusTarget {
+  none,
+  ok,
+  history,
+}
+
 class TextOverlay extends StatefulWidget {
   final List<String> textLines;
   final List<int> textAttrs;
@@ -48,6 +55,10 @@ class TextOverlay extends StatefulWidget {
 
 class TextOverlayState extends State<TextOverlay> {
   late ScrollController _scrollController;
+  TextOverlayFocusTarget _currentFocusTarget = TextOverlayFocusTarget.none;
+
+  ScrollController get scrollController => _scrollController;
+  TextOverlayFocusTarget get currentFocusTarget => _currentFocusTarget;
 
   @override
   void initState() {
@@ -61,9 +72,39 @@ class TextOverlayState extends State<TextOverlay> {
     super.dispose();
   }
 
+  /// Tab キーによるフォーカス循環ナビゲーション
+  void cycleFocus([bool forward = true]) {
+    final targets = <TextOverlayFocusTarget>[
+      TextOverlayFocusTarget.none,
+      TextOverlayFocusTarget.ok,
+      TextOverlayFocusTarget.history,
+    ];
+
+    final currentIndex = targets.indexOf(_currentFocusTarget);
+    final safeIndex = currentIndex == -1 ? 0 : currentIndex;
+    final nextIndex = forward
+        ? (safeIndex + 1) % targets.length
+        : (safeIndex - 1 + targets.length) % targets.length;
+
+    setState(() {
+      _currentFocusTarget = targets[nextIndex];
+    });
+  }
+
+  /// Enter キーまたは決定操作による実行
+  void submit() {
+    if (_currentFocusTarget == TextOverlayFocusTarget.history) {
+      widget.onShowMsgHistory();
+      return;
+    }
+    // ok または none の時は即座に画面を閉じる
+    widget.onDismiss();
+  }
+
   /// Space キー処理: スクロール余地があれば1ページ下へ、最下部に達していれば閉じる
   void handleSpace() {
     if (_scrollController.hasClients &&
+        _scrollController.position.maxScrollExtent > 10.0 &&
         _scrollController.offset < _scrollController.position.maxScrollExtent - 5.0) {
       final viewport = _scrollController.position.viewportDimension;
       final step = viewport > 0 ? viewport * 0.85 : 320.0;
@@ -179,11 +220,13 @@ class TextOverlayState extends State<TextOverlay> {
                           mode: TombstoneDisplayMode.image,
                           data: data,
                           lines: widget.textLines,
+                          scrollController: _scrollController,
                         );
                       }
                       return UniversalTombstoneWidget(
                         mode: TombstoneDisplayMode.text,
                         lines: widget.textLines,
+                        scrollController: _scrollController,
                       );
                     }
 
@@ -329,21 +372,31 @@ class TextOverlayState extends State<TextOverlay> {
                         icon: const Icon(Icons.history_rounded, size: 16),
                         label: Text(l10n?.history ?? 'History'),
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.blueGrey[900],
+                          backgroundColor: _currentFocusTarget == TextOverlayFocusTarget.history
+                              ? Colors.blueGrey[700]
+                              : Colors.blueGrey[900],
                           foregroundColor: Colors.amber[200],
                           padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+                          side: _currentFocusTarget == TextOverlayFocusTarget.history
+                              ? const BorderSide(color: Colors.amberAccent, width: 2.5)
+                              : null,
                         ),
                       ),
                       const SizedBox(width: 12),
                       ElevatedButton(
                         onPressed: widget.onDismiss,
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.teal[500],
+                          backgroundColor: _currentFocusTarget == TextOverlayFocusTarget.ok
+                              ? Colors.teal[400]
+                              : Colors.teal[500],
                           foregroundColor: Colors.white,
                           padding: const EdgeInsets.symmetric(horizontal: 48, vertical: 12),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(8),
                           ),
+                          side: _currentFocusTarget == TextOverlayFocusTarget.ok
+                              ? const BorderSide(color: Colors.amberAccent, width: 2.5)
+                              : null,
                         ),
                         child: const Text(
                           "OK",

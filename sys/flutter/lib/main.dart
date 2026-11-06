@@ -1200,6 +1200,8 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
           _askNameOverlayKey.currentState?.cycleFocus(forward);
         } else if (_isYnVisible) {
           _ynOverlayKey.currentState?.cycleFocus(forward);
+        } else if (_screen.isTextWindowVisible) {
+          _textOverlayKey.currentState?.cycleFocus(forward);
         } else if (_screen.isMenuWindowVisible) {
           _menuOverlayKey.currentState?.cycleFocus(forward);
         }
@@ -1213,7 +1215,11 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
 
       case DismissText():
         if (_screen.isTextWindowVisible) {
-          _sendFfiKey(32, "Space");
+          if (_textOverlayKey.currentState != null) {
+            _textOverlayKey.currentState!.submit();
+          } else {
+            _sendFfiKey(32, "Space");
+          }
           return KeyEventResult.handled;
         }
         return KeyEventResult.handled;
@@ -1303,11 +1309,14 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
               _sendMenuSelection(-1);
               return KeyEventResult.handled;
             }
-            // PICK_ONE で事前選択項目（autopickup_exception の「x - このメニューを終了」等）がある場合はそれを確定し、無ければ閉じる
+            // autopickup_exception 等の特定メニューでのみ事前選択（「x - このメニューを終了」等）を実行し、
+            // 死亡時所持品一覧や通常の閲覧系メニューでは Enter で安全に画面を閉じる (-1 送信)
+            final isAutopickupMenu = _screen.menuPrompt.contains('autopickup') ||
+                _screen.menuPrompt.contains('自動拾い');
             final preselected = _menuSelectedCounts.entries
                 .where((e) => e.key != 0 && e.key != 4294967294)
                 .firstOrNull;
-            if (preselected != null) {
+            if (isAutopickupMenu && preselected != null) {
               _sendMenuSelection(preselected.key, preselected.value);
             } else {
               _sendMenuSelection(-1);

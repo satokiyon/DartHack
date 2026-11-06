@@ -122,13 +122,13 @@ void main() {
       await tester.pumpAndSettle();
       key.currentState!.autocompleteCandidate();
       await tester.pumpAndSettle();
-      expect(find.widgetWithText(TextField, 'annotate'), findsOneWidget);
-      expect(controller.text, equals('#annotate'));
+      expect(find.widgetWithText(TextField, 'annotate'), findsNWidgets(2));
+      expect(controller.text, equals('annotate'));
 
-      // Enter で決定
+      // Enter で決定 (Cコアへは先頭#なしの 'annotate' が送られる)
       key.currentState!.submit();
       await tester.pumpAndSettle();
-      expect(submitted, equals('#annotate'));
+      expect(submitted, equals('annotate'));
     });
 
     testWidgets('階層テレポートやOコマンドのオプション変更（autopickupの例外設定など）でもフォーカスレス文字入力・記号入力・Enter決定が動作すること', (tester) async {

@@ -210,34 +210,40 @@ class GetLineOverlayState extends State<GetLineOverlay> {
     );
   }
 
-  /// Tab キーによる候補名の自動補完
-  void autocompleteCandidate() {
+  /// Tab キーによる候補名の自動補完（未選択なら先頭を選択、選択中ならその候補を補完、cycle=trueなら順送り巡回）
+  void autocompleteCandidate([bool cycle = false, bool forward = true]) {
     if (!_isExtCmd || _filteredExtCmds.isEmpty) return;
-    // 候補が選択されている場合はその候補、未選択でも候補が1件のみならそれを補完
-    final idx = _selectedCandidateIndex ?? (_filteredExtCmds.length == 1 ? 0 : null);
-    if (idx == null) return;
 
-    final targetIdx = idx.clamp(0, _filteredExtCmds.length - 1);
-    var cmd = _filteredExtCmds[targetIdx].command.trim();
-    if (cmd.startsWith('#')) {
-      cmd = cmd.substring(1).trim();
-    }
+    setState(() {
+      if (_selectedCandidateIndex == null) {
+        _selectedCandidateIndex = forward ? 0 : _filteredExtCmds.length - 1;
+      } else if (cycle) {
+        _selectedCandidateIndex = forward
+            ? (_selectedCandidateIndex! + 1) % _filteredExtCmds.length
+            : (_selectedCandidateIndex! - 1 + _filteredExtCmds.length) % _filteredExtCmds.length;
+      }
+    });
+
+    final targetIdx = _selectedCandidateIndex!.clamp(0, _filteredExtCmds.length - 1);
+    var rawCmd = _filteredExtCmds[targetIdx].command.trim();
+    final cmd = rawCmd.startsWith('#') ? rawCmd.substring(1).trim() : rawCmd;
+
     _extCmdFilterController.value = TextEditingValue(
       text: cmd,
       selection: TextSelection.collapsed(offset: cmd.length),
     );
     widget.inputController.value = TextEditingValue(
-      text: _filteredExtCmds[targetIdx].command,
-      selection: TextSelection.collapsed(offset: _filteredExtCmds[targetIdx].command.length),
+      text: cmd,
+      selection: TextSelection.collapsed(offset: cmd.length),
     );
-    _updateFilteredExtCmds(cmd);
+    _scrollToSelectedCandidate();
   }
 
   /// Tab キーによるフォーカス循環ナビゲーション
   void cycleFocus([bool forward = true]) {
-    if (_isExtCmd && forward) {
-      // 候補リストが存在する拡張コマンド画面では Tab は補完専用
-      autocompleteCandidate();
+    if (_isExtCmd) {
+      // 候補リストが存在する拡張コマンド画面では Tab / Shift+Tab は補完・順送り専用
+      autocompleteCandidate(true, forward);
       return;
     }
 
@@ -272,6 +278,16 @@ class GetLineOverlayState extends State<GetLineOverlay> {
     }
   }
 
+  /// 先頭の '#' を確実に除去して C コアに送信
+  void _sendCleanExtCmd(String rawCmd) {
+    var cmd = rawCmd.trim();
+    if (cmd.startsWith('#')) {
+      cmd = cmd.substring(1).trim();
+    }
+    widget.inputController.text = cmd;
+    widget.onSubmit(cmd);
+  }
+
   /// Enter キーによる確定送信処理
   void submit() {
     // フォーカスが特定ボタンに当たっている場合はそのボタンを実行
@@ -289,9 +305,7 @@ class GetLineOverlayState extends State<GetLineOverlay> {
           _filteredExtCmds.isNotEmpty &&
           _selectedCandidateIndex! >= 0 &&
           _selectedCandidateIndex! < _filteredExtCmds.length) {
-        final cmd = _filteredExtCmds[_selectedCandidateIndex!].command;
-        widget.inputController.text = cmd;
-        widget.onSubmit(cmd);
+        _sendCleanExtCmd(_filteredExtCmds[_selectedCandidateIndex!].command);
         return;
       }
       _handleFilterSubmit(_extCmdFilterController.text);
@@ -310,11 +324,9 @@ class GetLineOverlayState extends State<GetLineOverlay> {
     if (q.isEmpty) {
       if (_selectedCandidateIndex != null && _filteredExtCmds.isNotEmpty) {
         final idx = _selectedCandidateIndex!.clamp(0, _filteredExtCmds.length - 1);
-        final cmd = _filteredExtCmds[idx].command;
-        widget.inputController.text = cmd;
-        widget.onSubmit(cmd);
+        _sendCleanExtCmd(_filteredExtCmds[idx].command);
       } else if (widget.inputController.text.trim().isNotEmpty) {
-        widget.onSubmit(widget.inputController.text);
+        _sendCleanExtCmd(widget.inputController.text);
       }
       return;
     }
@@ -323,8 +335,7 @@ class GetLineOverlayState extends State<GetLineOverlay> {
       var cmd = entry.command.trim().toLowerCase();
       if (cmd.startsWith('#')) cmd = cmd.substring(1).trim();
       if (cmd == q) {
-        widget.inputController.text = entry.command;
-        widget.onSubmit(entry.command);
+        _sendCleanExtCmd(entry.command);
         return;
       }
     }
@@ -333,18 +344,32 @@ class GetLineOverlayState extends State<GetLineOverlay> {
       var cmd = entry.command.trim().toLowerCase();
       if (cmd.startsWith('#')) cmd = cmd.substring(1).trim();
       if (cmd.startsWith(q)) {
-        widget.inputController.text = entry.command;
-        widget.onSubmit(entry.command);
+        _sendCleanExtCmd(entry.command);
         return;
       }
     }
-    // 3. 候補が絞り込まれており、明示的に選択されているならその候補を実行
+    // 3. 部分一致があるか検索
+    for (final entry in _filteredExtCmds) {
+      var cmd = entry.command.trim().toLowerCase();
+      if (cmd.startsWith('#')) cmd = cmd.substring(1).trim();
+      if (cmd.contains(q)) {
+        _sendCleanExtCmd(entry.command);
+        return;
+      }
+    }
+    // 4. 候補が絞り込まれており、明示的に選択されているならその候補を実行
     if (_filteredExtCmds.isNotEmpty && _selectedCandidateIndex != null) {
       final idx = _selectedCandidateIndex!.clamp(0, _filteredExtCmds.length - 1);
-      final cmd = _filteredExtCmds[idx].command;
-      widget.inputController.text = cmd;
-      widget.onSubmit(cmd);
+      _sendCleanExtCmd(_filteredExtCmds[idx].command);
+      return;
     }
+    // 5. 候補が残っている場合は先頭候補を実行
+    if (_filteredExtCmds.isNotEmpty) {
+      _sendCleanExtCmd(_filteredExtCmds.first.command);
+      return;
+    }
+    // フォールバック: 入力欄の文字列（#除去済み）を送信
+    _sendCleanExtCmd(query);
   }
 
   void _handleShowHistory() {
