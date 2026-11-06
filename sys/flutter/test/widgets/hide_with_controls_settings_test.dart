@@ -173,7 +173,7 @@ void main() {
                 return Center(
                   child: ElevatedButton(
                     onPressed: () async {
-                      bool isJp = true;
+                      final isJp = Localizations.localeOf(context).languageCode == 'ja';
                       final action = await showDialog<String>(
                         context: context,
                         builder: (dialogCtx) => AlertDialog(

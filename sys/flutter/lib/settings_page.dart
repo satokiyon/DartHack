@@ -39,6 +39,10 @@ class SettingsPage extends StatefulWidget {
 
 class _SettingsPageState extends State<SettingsPage> {
   final ScrollController _scrollController = ScrollController();
+  final FocusNode _rootFocusNode = FocusNode();
+  final FocusNode _backButtonFocusNode = FocusNode();
+  final FocusNode _firstItemFocusNode = FocusNode();
+  final FocusNode _lastItemFocusNode = FocusNode();
   String _appVersion = '';
   bool _useTiles = true;
   String _selectedLanguage = 'ja';
@@ -260,6 +264,10 @@ class _SettingsPageState extends State<SettingsPage> {
 
   @override
   void dispose() {
+    _rootFocusNode.dispose();
+    _backButtonFocusNode.dispose();
+    _firstItemFocusNode.dispose();
+    _lastItemFocusNode.dispose();
     _scrollController.dispose();
     super.dispose();
   }
@@ -629,14 +637,16 @@ class _SettingsPageState extends State<SettingsPage> {
     );
   }
 
-  Widget _buildSectionCard(Widget child) {
+  Widget _buildSectionCard(Widget child, {bool isFocused = false}) {
     return Card(
       color: const Color(0xFF25262E),
       margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-      elevation: 3,
+      elevation: isFocused ? 6 : 3,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(12),
-        side: const BorderSide(color: Colors.white12, width: 1.0),
+        side: isFocused
+            ? const BorderSide(color: Colors.amberAccent, width: 2.5)
+            : const BorderSide(color: Colors.white12, width: 1.0),
       ),
       clipBehavior: Clip.antiAlias,
       child: ExpansionTileTheme(
@@ -1358,10 +1368,16 @@ class _SettingsPageState extends State<SettingsPage> {
   Widget _buildTilesetSection() {
     final l10n = AppLocalizations.of(context)!;
     final isEn = _selectedLanguage == 'en';
-    return _buildSectionCard(
-      ExpansionTile(
-        leading: const Icon(Icons.palette, color: Colors.deepPurpleAccent),
-        title: Text(l10n.secTilesetTitle),
+    return Focus(
+      focusNode: _firstItemFocusNode,
+      child: AnimatedBuilder(
+        animation: _firstItemFocusNode,
+        builder: (context, child) {
+          final isFocused = _firstItemFocusNode.hasFocus;
+          return _buildSectionCard(
+            ExpansionTile(
+              leading: const Icon(Icons.palette, color: Colors.deepPurpleAccent),
+              title: Text(l10n.secTilesetTitle),
         children: _withDividers([
           SwitchListTile(
             title: Text(l10n.useTiles),
@@ -1479,7 +1495,11 @@ class _SettingsPageState extends State<SettingsPage> {
           ],
         ]),
       ),
+      isFocused: isFocused,
     );
+  },
+),
+);
   }
 
   Widget _buildUILayoutSection() {
@@ -3230,10 +3250,16 @@ class _SettingsPageState extends State<SettingsPage> {
 
   Widget _buildCreditsSection() {
     final l10n = AppLocalizations.of(context)!;
-    return _buildSectionCard(
-      ExpansionTile(
-        leading: const Icon(Icons.info_outline, color: Colors.pinkAccent),
-        title: Text(l10n.secCreditsTitle),
+    return Focus(
+      focusNode: _lastItemFocusNode,
+      child: AnimatedBuilder(
+        animation: _lastItemFocusNode,
+        builder: (context, child) {
+          final isFocused = _lastItemFocusNode.hasFocus;
+          return _buildSectionCard(
+            ExpansionTile(
+              leading: const Icon(Icons.info_outline, color: Colors.pinkAccent),
+              title: Text(l10n.secCreditsTitle),
         children: [
           Padding(
             padding: const EdgeInsets.all(16.0),
@@ -3364,7 +3390,11 @@ class _SettingsPageState extends State<SettingsPage> {
           ),
         ],
       ),
+      isFocused: isFocused,
     );
+  },
+),
+);
   }
 
   String _getPanelDisplayName(int index, String rawName) {
@@ -3500,7 +3530,109 @@ class _SettingsPageState extends State<SettingsPage> {
       return KeyEventResult.handled;
     }
 
+    // 上下カーソルキー (ArrowDown / ArrowUp)
+    if (key == LogicalKeyboardKey.arrowDown || key == LogicalKeyboardKey.arrowUp) {
+      if (!isDown) return KeyEventResult.handled;
+
+      final primaryFocus = FocusManager.instance.primaryFocus;
+      final isBackFocused = _backButtonFocusNode.hasPrimaryFocus;
+      final isFirstFocused = _firstItemFocusNode.hasPrimaryFocus;
+      final isLastFocused = _lastItemFocusNode.hasPrimaryFocus;
+
+      // 未選択状態: ルートFocusNodeにいるか、まだ具体的なコントロールにフォーカスがない
+      final isUnfocused = primaryFocus == null ||
+          primaryFocus == _rootFocusNode ||
+          primaryFocus.context == null;
+
+      if (key == LogicalKeyboardKey.arrowDown) {
+        if (isUnfocused) {
+          // 下カーソルキーを押した際は一番上の項目が選択され、最上部へスクロール
+          _firstItemFocusNode.requestFocus();
+          _scrollToTop();
+          return KeyEventResult.handled;
+        } else if (isLastFocused) {
+          // 一番下の項目から下へ -> AppBar戻るボタンへループ
+          _backButtonFocusNode.requestFocus();
+          _scrollToTop();
+          return KeyEventResult.handled;
+        } else if (isBackFocused) {
+          // AppBar戻るボタンから下へ -> 一番上の項目へ
+          _firstItemFocusNode.requestFocus();
+          _scrollToTop();
+          return KeyEventResult.handled;
+        } else {
+          // 通常の順送り
+          final moved = primaryFocus.nextFocus();
+          if (!moved) {
+            // 末尾に達した場合は AppBar戻るボタンへループ
+            _backButtonFocusNode.requestFocus();
+            _scrollToTop();
+          } else {
+            _ensureFocusedVisible();
+          }
+          return KeyEventResult.handled;
+        }
+      } else {
+        // key == LogicalKeyboardKey.arrowUp
+        if (isUnfocused) {
+          // 上カーソルキーを押した際は一番下の項目が選択され、最下部へスクロール
+          _lastItemFocusNode.requestFocus();
+          _scrollToBottom();
+          return KeyEventResult.handled;
+        } else if (isFirstFocused) {
+          // 一番上の項目から上へ -> AppBar戻るボタンへ
+          _backButtonFocusNode.requestFocus();
+          _scrollToTop();
+          return KeyEventResult.handled;
+        } else if (isBackFocused) {
+          // AppBar戻るボタンから上へ -> 一番下の項目へループ
+          _lastItemFocusNode.requestFocus();
+          _scrollToBottom();
+          return KeyEventResult.handled;
+        } else {
+          // 通常の逆送り
+          final moved = primaryFocus.previousFocus();
+          if (!moved) {
+            // 先頭に達した場合は AppBar戻るボタンへ
+            _backButtonFocusNode.requestFocus();
+            _scrollToTop();
+          } else {
+            _ensureFocusedVisible();
+          }
+          return KeyEventResult.handled;
+        }
+      }
+    }
+
     return KeyEventResult.ignored;
+  }
+
+  void _scrollToTop() {
+    if (_scrollController.hasClients) {
+      _scrollController.animateTo(0.0,
+          duration: const Duration(milliseconds: 200), curve: Curves.easeOut);
+    }
+  }
+
+  void _scrollToBottom() {
+    if (_scrollController.hasClients) {
+      _scrollController.animateTo(_scrollController.position.maxScrollExtent,
+          duration: const Duration(milliseconds: 200), curve: Curves.easeOut);
+    }
+  }
+
+  void _ensureFocusedVisible() {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final current = FocusManager.instance.primaryFocus;
+      if (current != null && current.context != null && mounted) {
+        Scrollable.ensureVisible(
+          current.context!,
+          alignment: 0.3,
+          duration: const Duration(milliseconds: 150),
+          curve: Curves.easeOut,
+        );
+      }
+    });
   }
 
   @override
@@ -3513,6 +3645,7 @@ class _SettingsPageState extends State<SettingsPage> {
         focusColor: Colors.amberAccent.withValues(alpha: 0.25),
       ),
       child: Focus(
+        focusNode: _rootFocusNode,
         autofocus: true,
         onKeyEvent: _onSettingsKeyEvent,
         child: FocusTraversalGroup(
@@ -3522,6 +3655,46 @@ class _SettingsPageState extends State<SettingsPage> {
             appBar: AppBar(
               title: Text(l10n.detailedSettings),
               backgroundColor: const Color(0xFF1A1A1E),
+              leading: Focus(
+                focusNode: _backButtonFocusNode,
+                onKeyEvent: (node, event) {
+                  if (event is KeyDownEvent &&
+                      (event.logicalKey == LogicalKeyboardKey.enter ||
+                       event.logicalKey == LogicalKeyboardKey.numpadEnter ||
+                       event.logicalKey == LogicalKeyboardKey.space)) {
+                    Navigator.maybePop(context);
+                    return KeyEventResult.handled;
+                  }
+                  return KeyEventResult.ignored;
+                },
+                child: AnimatedBuilder(
+                  animation: _backButtonFocusNode,
+                  builder: (context, child) {
+                    final isFocused = _backButtonFocusNode.hasFocus;
+                    return Container(
+                      margin: const EdgeInsets.all(8),
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        border: isFocused ? Border.all(color: Colors.amberAccent, width: 2.5) : null,
+                        boxShadow: isFocused
+                            ? [
+                                BoxShadow(
+                                  color: Colors.amberAccent.withValues(alpha: 0.8),
+                                  blurRadius: 8,
+                                  spreadRadius: 1,
+                                )
+                              ]
+                            : null,
+                      ),
+                      child: IconButton(
+                        icon: const Icon(Icons.arrow_back),
+                        onPressed: () => Navigator.maybePop(context),
+                        tooltip: MaterialLocalizations.of(context).backButtonTooltip,
+                      ),
+                    );
+                  },
+                ),
+              ),
             ),
             body: ListView(
               controller: _scrollController,
