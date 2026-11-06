@@ -58,6 +58,8 @@ enum _BlockKind {
 enum _SpoilerButtonFocus {
   none,
   search,
+  prevMatch,
+  nextMatch,
   peek,
   toc,
   close,
@@ -177,7 +179,8 @@ class _SpoilerDialogState extends State<SpoilerDialog> {
     }
     if (event.logicalKey == LogicalKeyboardKey.enter ||
         event.logicalKey == LogicalKeyboardKey.numpadEnter) {
-      _navigateSearchMatch(1);
+      final isShift = HardwareKeyboard.instance.isShiftPressed;
+      _navigateSearchMatch(isShift ? -1 : 1);
       return KeyEventResult.handled;
     }
     return KeyEventResult.ignored;
@@ -205,6 +208,14 @@ class _SpoilerDialogState extends State<SpoilerDialog> {
           next = _SpoilerButtonFocus.search;
           break;
         case _SpoilerButtonFocus.search:
+          next = _searchResults.isNotEmpty
+              ? _SpoilerButtonFocus.prevMatch
+              : _SpoilerButtonFocus.peek;
+          break;
+        case _SpoilerButtonFocus.prevMatch:
+          next = _SpoilerButtonFocus.nextMatch;
+          break;
+        case _SpoilerButtonFocus.nextMatch:
           next = _SpoilerButtonFocus.peek;
           break;
         case _SpoilerButtonFocus.peek:
@@ -233,6 +244,14 @@ class _SpoilerDialogState extends State<SpoilerDialog> {
           next = _SpoilerButtonFocus.peek;
           break;
         case _SpoilerButtonFocus.peek:
+          next = _searchResults.isNotEmpty
+              ? _SpoilerButtonFocus.nextMatch
+              : _SpoilerButtonFocus.search;
+          break;
+        case _SpoilerButtonFocus.nextMatch:
+          next = _SpoilerButtonFocus.prevMatch;
+          break;
+        case _SpoilerButtonFocus.prevMatch:
           next = _SpoilerButtonFocus.search;
           break;
         case _SpoilerButtonFocus.search:
@@ -681,7 +700,10 @@ class _SpoilerDialogState extends State<SpoilerDialog> {
         FocusManager.instance.primaryFocus?.context?.widget is EditableText;
     if (isTextFieldFocused) {
       if (key == LogicalKeyboardKey.enter || key == LogicalKeyboardKey.numpadEnter) {
-        if (isDown) _navigateSearchMatch(1);
+        if (isDown) {
+          final isShift = HardwareKeyboard.instance.isShiftPressed;
+          _navigateSearchMatch(isShift ? -1 : 1);
+        }
         return KeyEventResult.handled;
       }
       return KeyEventResult.ignored;
@@ -702,7 +724,7 @@ class _SpoilerDialogState extends State<SpoilerDialog> {
       return KeyEventResult.handled;
     }
 
-    // Tab / Shift+Tab によるボタンフォーカス循環 (none ↔ search ↔ peek ↔ toc ↔ close)
+    // Tab / Shift+Tab によるボタンフォーカス循環 (none ↔ search ↔ prevMatch ↔ nextMatch ↔ peek ↔ toc ↔ close)
     if (key == LogicalKeyboardKey.tab) {
       if (isDown) {
         _cycleButtonFocus(!isShift);
@@ -713,9 +735,18 @@ class _SpoilerDialogState extends State<SpoilerDialog> {
     // Enter / NumpadEnter / Space: ボタンフォーカス中の決定
     if (key == LogicalKeyboardKey.enter ||
         key == LogicalKeyboardKey.numpadEnter ||
-        (key == LogicalKeyboardKey.space && _buttonFocus == _SpoilerButtonFocus.peek)) {
+        (key == LogicalKeyboardKey.space &&
+            (_buttonFocus == _SpoilerButtonFocus.peek ||
+                _buttonFocus == _SpoilerButtonFocus.prevMatch ||
+                _buttonFocus == _SpoilerButtonFocus.nextMatch))) {
       if (isDown) {
-        if (_buttonFocus == _SpoilerButtonFocus.peek) {
+        if (_buttonFocus == _SpoilerButtonFocus.prevMatch) {
+          _navigateSearchMatch(-1);
+          return KeyEventResult.handled;
+        } else if (_buttonFocus == _SpoilerButtonFocus.nextMatch) {
+          _navigateSearchMatch(1);
+          return KeyEventResult.handled;
+        } else if (_buttonFocus == _SpoilerButtonFocus.peek) {
           setState(() {
             _isTapPeeking = true;
           });
@@ -732,6 +763,15 @@ class _SpoilerDialogState extends State<SpoilerDialog> {
         return KeyEventResult.handled;
       }
       return KeyEventResult.ignored;
+    }
+
+    // n / N (Shift+n): 次の一致 / 前の一致へジャンプ
+    if (key == LogicalKeyboardKey.keyN && !isCtrl) {
+      if (isDown) {
+        final isShift = HardwareKeyboard.instance.isShiftPressed;
+        _navigateSearchMatch(isShift ? -1 : 1);
+      }
+      return KeyEventResult.handled;
     }
 
     // q: 閉じる
@@ -908,6 +948,10 @@ class _SpoilerDialogState extends State<SpoilerDialog> {
       setState(() {
         _searchResults = [];
         _currentSearchMatchIndex = -1;
+        if (_buttonFocus == _SpoilerButtonFocus.prevMatch ||
+            _buttonFocus == _SpoilerButtonFocus.nextMatch) {
+          _buttonFocus = _SpoilerButtonFocus.search;
+        }
       });
       return;
     }
@@ -923,6 +967,11 @@ class _SpoilerDialogState extends State<SpoilerDialog> {
     setState(() {
       _searchResults = results;
       _currentSearchMatchIndex = results.isNotEmpty ? 0 : -1;
+      if (results.isEmpty &&
+          (_buttonFocus == _SpoilerButtonFocus.prevMatch ||
+              _buttonFocus == _SpoilerButtonFocus.nextMatch)) {
+        _buttonFocus = _SpoilerButtonFocus.search;
+      }
     });
 
     if (results.isNotEmpty) {
@@ -2001,21 +2050,50 @@ class _SpoilerDialogState extends State<SpoilerDialog> {
                                   color: Colors.amberAccent, fontSize: 11),
                             ),
                             const SizedBox(width: 2),
-                            IconButton(
-                              icon: const Icon(Icons.keyboard_arrow_up,
-                                  color: Colors.white70, size: 20),
-                              onPressed: () => _navigateSearchMatch(-1),
-                              tooltip: _isJp ? '前の一致' : 'Previous match',
-                              padding: EdgeInsets.zero,
-                              constraints: const BoxConstraints(),
+                            DecoratedBox(
+                              decoration: BoxDecoration(
+                                color: _buttonFocus == _SpoilerButtonFocus.prevMatch
+                                    ? Colors.amberAccent.withValues(alpha: 0.25)
+                                    : Colors.transparent,
+                                borderRadius: BorderRadius.circular(4),
+                                border: Border.all(
+                                  color: _buttonFocus == _SpoilerButtonFocus.prevMatch
+                                      ? Colors.amberAccent
+                                      : Colors.transparent,
+                                  width: 1.5,
+                                ),
+                              ),
+                              child: IconButton(
+                                icon: const Icon(Icons.keyboard_arrow_up,
+                                    color: Colors.white70, size: 20),
+                                onPressed: () => _navigateSearchMatch(-1),
+                                tooltip: _isJp ? '前の一致' : 'Previous match',
+                                padding: EdgeInsets.zero,
+                                constraints: const BoxConstraints(),
+                              ),
                             ),
-                            IconButton(
-                              icon: const Icon(Icons.keyboard_arrow_down,
-                                  color: Colors.white70, size: 20),
-                              onPressed: () => _navigateSearchMatch(1),
-                              tooltip: _isJp ? '次の一致' : 'Next match',
-                              padding: EdgeInsets.zero,
-                              constraints: const BoxConstraints(),
+                            const SizedBox(width: 2),
+                            DecoratedBox(
+                              decoration: BoxDecoration(
+                                color: _buttonFocus == _SpoilerButtonFocus.nextMatch
+                                    ? Colors.amberAccent.withValues(alpha: 0.25)
+                                    : Colors.transparent,
+                                borderRadius: BorderRadius.circular(4),
+                                border: Border.all(
+                                  color: _buttonFocus == _SpoilerButtonFocus.nextMatch
+                                      ? Colors.amberAccent
+                                      : Colors.transparent,
+                                  width: 1.5,
+                                ),
+                              ),
+                              child: IconButton(
+                                icon: const Icon(Icons.keyboard_arrow_down,
+                                    color: Colors.white70, size: 20),
+                                onPressed: () => _navigateSearchMatch(1),
+                                tooltip: _isJp ? '次の一致' : 'Next match',
+                                padding: EdgeInsets.zero,
+                                constraints: const BoxConstraints(),
+                              ),
                             ),
                           ],
                         ],

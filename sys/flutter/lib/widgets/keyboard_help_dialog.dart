@@ -403,13 +403,14 @@ class _KeyboardHelpDialogState extends State<KeyboardHelpDialog> {
       case KeyboardHelpContext.guidebook:
         return [
           _HelpItem('t', isJp ? '目次を開く（開いた直後に文字入力でリアルタイム絞り込み）' : 'Open Table of Contents (type to filter)'),
+          _HelpItem('n / N', isJp ? '次の一致 / 前の一致へジャンプ' : 'Jump to next / previous match'),
           _HelpItem('Space / PgDn / >', isJp ? 'ページ送り' : 'Page down'),
           _HelpItem('Shift+Space / PgUp / <', isJp ? 'ページ戻り' : 'Page up'),
           _HelpItem('Home / End', isJp ? '最先頭 / 最末尾へジャンプ' : 'Jump to top / bottom'),
           _HelpItem('↑ / ↓ (k / j)', isJp ? '本文を行単位でスクロール' : 'Scroll text lines up/down'),
           _HelpItem('← / →', isJp ? '表示中の表やコードブロックを横スクロール' : 'Horizontal scroll visible table/code block'),
           _HelpItem('Shift + ← / →', isJp ? '表を最左端 / 最右端へジャンプ' : 'Jump table to left / right edge'),
-          _HelpItem('Tab / Shift+Tab', isJp ? '検索欄 ↔ 透過 ↔ 目次 ↔ 閉じるボタンのフォーカス巡回' : 'Cycle Search, Peek, TOC, Close buttons'),
+          _HelpItem('Tab / Shift+Tab', isJp ? '検索欄 ↔ 前/次の一致 ↔ 透過 ↔ 目次 ↔ 閉じるボタンのフォーカス巡回' : 'Cycle Search, Prev/Next match, Peek, TOC, Close buttons'),
           _HelpItem('Esc / q', isJp ? 'ガイドブック / スポイラーを閉じる' : 'Close Guidebook / Spoilers'),
           _HelpItem('F1 / Alt-h', isJp ? '操作ヘルプの表示' : 'Show controls help'),
         ];

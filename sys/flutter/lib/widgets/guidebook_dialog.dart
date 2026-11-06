@@ -60,6 +60,8 @@ enum _BlockKind {
 enum _GuidebookButtonFocus {
   none,
   search,
+  prevMatch,
+  nextMatch,
   peek,
   toc,
   close,
@@ -185,7 +187,12 @@ class _GuidebookDialogState extends State<GuidebookDialog> {
     }
     if (event.logicalKey == LogicalKeyboardKey.enter ||
         event.logicalKey == LogicalKeyboardKey.numpadEnter) {
-      _searchNext();
+      final isShift = HardwareKeyboard.instance.isShiftPressed;
+      if (isShift) {
+        _searchPrev();
+      } else {
+        _searchNext();
+      }
       return KeyEventResult.handled;
     }
     return KeyEventResult.ignored;
@@ -213,6 +220,14 @@ class _GuidebookDialogState extends State<GuidebookDialog> {
           next = _GuidebookButtonFocus.search;
           break;
         case _GuidebookButtonFocus.search:
+          next = _searchResults.isNotEmpty
+              ? _GuidebookButtonFocus.prevMatch
+              : _GuidebookButtonFocus.peek;
+          break;
+        case _GuidebookButtonFocus.prevMatch:
+          next = _GuidebookButtonFocus.nextMatch;
+          break;
+        case _GuidebookButtonFocus.nextMatch:
           next = _GuidebookButtonFocus.peek;
           break;
         case _GuidebookButtonFocus.peek:
@@ -241,6 +256,14 @@ class _GuidebookDialogState extends State<GuidebookDialog> {
           next = _GuidebookButtonFocus.peek;
           break;
         case _GuidebookButtonFocus.peek:
+          next = _searchResults.isNotEmpty
+              ? _GuidebookButtonFocus.nextMatch
+              : _GuidebookButtonFocus.search;
+          break;
+        case _GuidebookButtonFocus.nextMatch:
+          next = _GuidebookButtonFocus.prevMatch;
+          break;
+        case _GuidebookButtonFocus.prevMatch:
           next = _GuidebookButtonFocus.search;
           break;
         case _GuidebookButtonFocus.search:
@@ -816,7 +839,13 @@ class _GuidebookDialogState extends State<GuidebookDialog> {
         FocusManager.instance.primaryFocus?.context?.widget is EditableText;
     if (isTextFieldFocused) {
       if (key == LogicalKeyboardKey.enter || key == LogicalKeyboardKey.numpadEnter) {
-        if (isDown) _searchNext();
+        if (isDown) {
+          if (isShift) {
+            _searchPrev();
+          } else {
+            _searchNext();
+          }
+        }
         return KeyEventResult.handled;
       }
       return KeyEventResult.ignored;
@@ -837,7 +866,7 @@ class _GuidebookDialogState extends State<GuidebookDialog> {
       return KeyEventResult.handled;
     }
 
-    // Tab / Shift+Tab によるボタンフォーカス循環 (none ↔ search ↔ peek ↔ toc ↔ close)
+    // Tab / Shift+Tab によるボタンフォーカス循環 (none ↔ search ↔ prevMatch ↔ nextMatch ↔ peek ↔ toc ↔ close)
     if (key == LogicalKeyboardKey.tab) {
       if (isDown) {
         _cycleButtonFocus(!isShift);
@@ -848,9 +877,18 @@ class _GuidebookDialogState extends State<GuidebookDialog> {
     // Enter / NumpadEnter / Space: ボタンフォーカス中の決定
     if (key == LogicalKeyboardKey.enter ||
         key == LogicalKeyboardKey.numpadEnter ||
-        (key == LogicalKeyboardKey.space && _buttonFocus == _GuidebookButtonFocus.peek)) {
+        (key == LogicalKeyboardKey.space &&
+            (_buttonFocus == _GuidebookButtonFocus.peek ||
+                _buttonFocus == _GuidebookButtonFocus.prevMatch ||
+                _buttonFocus == _GuidebookButtonFocus.nextMatch))) {
       if (isDown) {
-        if (_buttonFocus == _GuidebookButtonFocus.peek) {
+        if (_buttonFocus == _GuidebookButtonFocus.prevMatch) {
+          _searchPrev();
+          return KeyEventResult.handled;
+        } else if (_buttonFocus == _GuidebookButtonFocus.nextMatch) {
+          _searchNext();
+          return KeyEventResult.handled;
+        } else if (_buttonFocus == _GuidebookButtonFocus.peek) {
           setState(() {
             _isTapPeeking = true;
           });
@@ -867,6 +905,18 @@ class _GuidebookDialogState extends State<GuidebookDialog> {
         return KeyEventResult.handled;
       }
       return KeyEventResult.ignored;
+    }
+
+    // n / N (Shift+n): 次の一致 / 前の一致へジャンプ
+    if (key == LogicalKeyboardKey.keyN && !isCtrl) {
+      if (isDown) {
+        if (isShift) {
+          _searchPrev();
+        } else {
+          _searchNext();
+        }
+      }
+      return KeyEventResult.handled;
     }
 
     // q: 閉じる
@@ -1033,6 +1083,10 @@ class _GuidebookDialogState extends State<GuidebookDialog> {
       setState(() {
         _searchResults = [];
         _currentSearchMatchIndex = -1;
+        if (_buttonFocus == _GuidebookButtonFocus.prevMatch ||
+            _buttonFocus == _GuidebookButtonFocus.nextMatch) {
+          _buttonFocus = _GuidebookButtonFocus.search;
+        }
       });
       return;
     }
@@ -1048,6 +1102,11 @@ class _GuidebookDialogState extends State<GuidebookDialog> {
     setState(() {
       _searchResults = results;
       _currentSearchMatchIndex = results.isNotEmpty ? 0 : -1;
+      if (results.isEmpty &&
+          (_buttonFocus == _GuidebookButtonFocus.prevMatch ||
+              _buttonFocus == _GuidebookButtonFocus.nextMatch)) {
+        _buttonFocus = _GuidebookButtonFocus.search;
+      }
     });
 
     if (results.isNotEmpty) {
@@ -2175,15 +2234,6 @@ class _GuidebookDialogState extends State<GuidebookDialog> {
                       ),
                       child: Row(
                         children: [
-                          Icon(
-                            Icons.search,
-                            size: 18,
-                            color: (_buttonFocus == _GuidebookButtonFocus.search ||
-                                    _searchFocusNode.hasFocus)
-                                ? Colors.amberAccent
-                                : Colors.white54,
-                          ),
-                          const SizedBox(width: 8),
                           Expanded(
                             child: TextField(
                               controller: _searchController,
@@ -2198,46 +2248,89 @@ class _GuidebookDialogState extends State<GuidebookDialog> {
                                     : 'Search guidebook...',
                                 hintStyle: const TextStyle(
                                     color: Colors.white38, fontSize: 13),
-                                border: InputBorder.none,
+                                prefixIcon: Icon(Icons.search,
+                                    color: (_buttonFocus == _GuidebookButtonFocus.search ||
+                                            _searchFocusNode.hasFocus)
+                                        ? Colors.amberAccent
+                                        : Colors.white54,
+                                    size: 18),
+                                suffixIcon: _searchController.text.isNotEmpty
+                                    ? IconButton(
+                                        icon: const Icon(Icons.clear,
+                                            color: Colors.white54, size: 16),
+                                        onPressed: () {
+                                          _searchController.clear();
+                                          _onSearchChanged('');
+                                        },
+                                      )
+                                    : null,
+                                contentPadding: const EdgeInsets.symmetric(
+                                    horizontal: 10, vertical: 6),
                                 isDense: true,
-                                contentPadding: EdgeInsets.zero,
+                                filled: true,
+                                fillColor: const Color(0xFF242C3D),
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(8),
+                                  borderSide: BorderSide.none,
+                                ),
                               ),
                               onChanged: _onSearchChanged,
                             ),
                           ),
                           if (_searchResults.isNotEmpty) ...[
+                            const SizedBox(width: 6),
                             Text(
                               '${_currentSearchMatchIndex + 1}/${_searchResults.length}',
                               style: const TextStyle(
-                                  color: Colors.amberAccent, fontSize: 12),
+                                  color: Colors.amberAccent, fontSize: 11),
                             ),
-                            IconButton(
-                              icon: const Icon(Icons.arrow_upward,
-                                  size: 18, color: Colors.white70),
-                              padding: EdgeInsets.zero,
-                              constraints: const BoxConstraints(),
-                              onPressed: _searchPrev,
+                            const SizedBox(width: 2),
+                            DecoratedBox(
+                              decoration: BoxDecoration(
+                                color: _buttonFocus == _GuidebookButtonFocus.prevMatch
+                                    ? Colors.amberAccent.withValues(alpha: 0.25)
+                                    : Colors.transparent,
+                                borderRadius: BorderRadius.circular(4),
+                                border: Border.all(
+                                  color: _buttonFocus == _GuidebookButtonFocus.prevMatch
+                                      ? Colors.amberAccent
+                                      : Colors.transparent,
+                                  width: 1.5,
+                                ),
+                              ),
+                              child: IconButton(
+                                icon: const Icon(Icons.keyboard_arrow_up,
+                                    color: Colors.white70, size: 20),
+                                onPressed: _searchPrev,
+                                tooltip: _isJp ? '前の一致' : 'Previous match',
+                                padding: EdgeInsets.zero,
+                                constraints: const BoxConstraints(),
+                              ),
                             ),
-                            const SizedBox(width: 4),
-                            IconButton(
-                              icon: const Icon(Icons.arrow_downward,
-                                  size: 18, color: Colors.white70),
-                              padding: EdgeInsets.zero,
-                              constraints: const BoxConstraints(),
-                              onPressed: _searchNext,
+                            const SizedBox(width: 2),
+                            DecoratedBox(
+                              decoration: BoxDecoration(
+                                color: _buttonFocus == _GuidebookButtonFocus.nextMatch
+                                    ? Colors.amberAccent.withValues(alpha: 0.25)
+                                    : Colors.transparent,
+                                borderRadius: BorderRadius.circular(4),
+                                border: Border.all(
+                                  color: _buttonFocus == _GuidebookButtonFocus.nextMatch
+                                      ? Colors.amberAccent
+                                      : Colors.transparent,
+                                  width: 1.5,
+                                ),
+                              ),
+                              child: IconButton(
+                                icon: const Icon(Icons.keyboard_arrow_down,
+                                    color: Colors.white70, size: 20),
+                                onPressed: _searchNext,
+                                tooltip: _isJp ? '次の一致' : 'Next match',
+                                padding: EdgeInsets.zero,
+                                constraints: const BoxConstraints(),
+                              ),
                             ),
                           ],
-                          if (_searchController.text.isNotEmpty)
-                            IconButton(
-                              icon: const Icon(Icons.clear,
-                                  size: 18, color: Colors.white54),
-                              padding: EdgeInsets.zero,
-                              constraints: const BoxConstraints(),
-                              onPressed: () {
-                                _searchController.clear();
-                                _onSearchChanged('');
-                              },
-                            ),
                         ],
                       ),
                     ),
