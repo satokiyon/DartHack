@@ -115,6 +115,84 @@ void main() {
       final explicitCount = messageWithCount['count'] as int? ?? -1;
       expect(explicitCount, equals(10));
     });
+
+    testWidgets('単一選択メニュー（Eコマンド等）で "-" (指先) のアクセラレータを持つアイテムがタップまたは選択できること', (tester) async {
+      int? selectedIdent;
+
+      final items = [
+        MenuItemData(
+          ident: 45, // HANDS_SYM ('-')
+          accelerator: '-'.codeUnitAt(0),
+          groupacc: 0,
+          attr: 0,
+          color: 0,
+          tile: -1,
+          text: 'あなたの指先',
+          preselected: 0,
+        ),
+        MenuItemData(
+          ident: 1002,
+          accelerator: 'a'.codeUnitAt(0),
+          groupacc: 0,
+          attr: 0,
+          color: 0,
+          tile: 0,
+          text: 'つるはし',
+          preselected: 0,
+        ),
+      ];
+
+      await tester.pumpWidget(
+        buildTestWidget(
+          items: items,
+          menuHow: 1, // PICK_ONE
+          onSingleSelect: (id) => selectedIdent = id,
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      // 指先アイテムが表示されていることを確認
+      expect(find.text('- - あなたの指先'), findsOneWidget);
+
+      // 指先アイテムをタップ
+      await tester.tap(find.text('- - あなたの指先'));
+      await tester.pumpAndSettle();
+
+      expect(selectedIdent, equals(45));
+    });
+
+    test('単一選択メニュー（PICK_ONE）で "-" アイテムが存在する場合、MenuDeselectAllはアイテム選択として判定されること', () {
+      final items = [
+        MenuItemData(
+          ident: 45, // HANDS_SYM ('-')
+          accelerator: '-'.codeUnitAt(0),
+          groupacc: 0,
+          attr: 0,
+          color: 0,
+          tile: -1,
+          text: '- あなたの指先',
+          preselected: 0,
+        ),
+        MenuItemData(
+          ident: 1002,
+          accelerator: 'a'.codeUnitAt(0),
+          groupacc: 0,
+          attr: 0,
+          color: 0,
+          tile: 0,
+          text: 'a - つるはし',
+          preselected: 0,
+        ),
+      ];
+
+      // main.dart と同等のアクセラレータ検索判定ロジックを検証
+      final dashItem = items.cast<MenuItemData?>().firstWhere(
+            (i) => i != null && i.accelerator == 45 && i.ident != 0 && i.ident != 4294967294,
+            orElse: () => null,
+          );
+      expect(dashItem, isNotNull);
+      expect(dashItem!.ident, equals(45));
+    });
   });
 }
 

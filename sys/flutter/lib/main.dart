@@ -1394,6 +1394,13 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
 
       case MenuSelectAll():
         if (_screen.isMenuWindowVisible) {
+          final dotItem = _findMenuItemByAccelerator(46 /* '.' */);
+          if (dotItem != null || _screen.menuHow == 1 /* PICK_ONE */) {
+            if (dotItem != null) {
+              _executeMenuItemSelection(dotItem);
+            }
+            return KeyEventResult.handled;
+          }
           _menuOverlayKey.currentState?.handleSelectAll();
           return KeyEventResult.handled;
         }
@@ -1401,6 +1408,13 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
 
       case MenuDeselectAll():
         if (_screen.isMenuWindowVisible) {
+          final dashItem = _findMenuItemByAccelerator(45 /* '-' */);
+          if (dashItem != null || _screen.menuHow == 1 /* PICK_ONE */) {
+            if (dashItem != null) {
+              _executeMenuItemSelection(dashItem);
+            }
+            return KeyEventResult.handled;
+          }
           _menuOverlayKey.currentState?.handleDeselectAll();
           return KeyEventResult.handled;
         }
@@ -1408,6 +1422,13 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
 
       case MenuInvertAll():
         if (_screen.isMenuWindowVisible) {
+          final atItem = _findMenuItemByAccelerator(64 /* '@' */);
+          if (atItem != null || _screen.menuHow == 1 /* PICK_ONE */) {
+            if (atItem != null) {
+              _executeMenuItemSelection(atItem);
+            }
+            return KeyEventResult.handled;
+          }
           _menuOverlayKey.currentState?.handleInvertAll();
           return KeyEventResult.handled;
         }
@@ -1415,6 +1436,11 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
 
       case MenuJumpEdge(:final toTop):
         if (_screen.isMenuWindowVisible) {
+          final edgeItem = _findMenuItemByAccelerator(toTop ? 94 /* '^' */ : 124 /* '|' */);
+          if (edgeItem != null && _screen.menuHow == 1 /* PICK_ONE */) {
+            _executeMenuItemSelection(edgeItem);
+            return KeyEventResult.handled;
+          }
           _menuOverlayKey.currentState?.jumpToEdge(toTop);
           return KeyEventResult.handled;
         }
@@ -1451,31 +1477,9 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
 
       case MenuAccelerator(:final code):
         if (_screen.isMenuWindowVisible) {
-          if (_screen.menuHow == 0 /* PICK_NONE */) {
-            return KeyEventResult.handled;
-          }
-          final item = _screen.menuItems.cast<MenuItemData?>().firstWhere(
-                (i) => i != null && i.accelerator == code && i.ident != 0 && i.ident != 4294967294,
-                orElse: () => null,
-              );
+          final item = _findMenuItemByAccelerator(code);
           if (item != null) {
-            final pendingCount = _menuPendingCount;
-            setState(() {
-              _menuPendingCount = null;
-            });
-            if (_screen.menuHow == 1 /* PICK_ONE */) {
-              // 数量未指定時は -1（全量ドロップ）、指定時は指定数量を送信
-              _sendMenuSelection(item.ident, pendingCount ?? -1);
-            } else {
-              if (pendingCount != null && pendingCount > 0) {
-                setState(() {
-                  _menuSelectedCounts[item.ident] = pendingCount;
-                });
-                _menuOverlayKey.currentState?.setSelectedCount(item.ident, pendingCount);
-              } else {
-                _menuOverlayKey.currentState?.toggleSelectionById(item.ident);
-              }
-            }
+            _executeMenuItemSelection(item);
           }
           return KeyEventResult.handled;
         }
@@ -1544,6 +1548,11 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
 
       case MenuPage(:final direction):
         if (_screen.isMenuWindowVisible) {
+          final pageItem = _findMenuItemByAccelerator(direction > 0 ? 62 /* '>' */ : 60 /* '<' */);
+          if (pageItem != null && _screen.menuHow == 1 /* PICK_ONE */) {
+            _executeMenuItemSelection(pageItem);
+            return KeyEventResult.handled;
+          }
           _menuOverlayKey.currentState?.pageScroll(direction);
           return KeyEventResult.handled;
         }
@@ -1617,6 +1626,36 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
 
     if (action != 0) {
       _sendFfiKey(action, "PhysicalKey($key)");
+    }
+  }
+
+  MenuItemData? _findMenuItemByAccelerator(int code) {
+    return _screen.menuItems.cast<MenuItemData?>().firstWhere(
+          (i) => i != null && i.accelerator == code && i.ident != 0 && i.ident != 4294967294,
+          orElse: () => null,
+        );
+  }
+
+  void _executeMenuItemSelection(MenuItemData item) {
+    if (_screen.menuHow == 0 /* PICK_NONE */) {
+      return;
+    }
+    final pendingCount = _menuPendingCount;
+    setState(() {
+      _menuPendingCount = null;
+    });
+    if (_screen.menuHow == 1 /* PICK_ONE */) {
+      // 数量未指定時は -1（全量ドロップ）、指定時は指定数量を送信
+      _sendMenuSelection(item.ident, pendingCount ?? -1);
+    } else {
+      if (pendingCount != null && pendingCount > 0) {
+        setState(() {
+          _menuSelectedCounts[item.ident] = pendingCount;
+        });
+        _menuOverlayKey.currentState?.setSelectedCount(item.ident, pendingCount);
+      } else {
+        _menuOverlayKey.currentState?.toggleSelectionById(item.ident);
+      }
     }
   }
 

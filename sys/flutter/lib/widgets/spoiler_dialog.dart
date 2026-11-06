@@ -56,6 +56,8 @@ enum _BlockKind {
 
 enum _SpoilerButtonFocus {
   none,
+  search,
+  peek,
   toc,
   close,
 }
@@ -106,6 +108,8 @@ class _SpoilerDialogState extends State<SpoilerDialog> {
   final ItemScrollController _itemScrollController = ItemScrollController();
   final ItemPositionsListener _itemPositionsListener = ItemPositionsListener.create();
   final TextEditingController _searchController = TextEditingController();
+  final FocusNode _searchFocusNode = FocusNode();
+  final FocusNode _mainFocusNode = FocusNode();
 
   List<int> _searchResults = [];
   int _currentSearchMatchIndex = -1;
@@ -122,16 +126,103 @@ class _SpoilerDialogState extends State<SpoilerDialog> {
   @override
   void initState() {
     super.initState();
+    _searchFocusNode.onKeyEvent = _handleSearchKeyEvent;
     _itemPositionsListener.itemPositions.addListener(_onItemPositionsChanged);
     _loadSpoilers();
   }
 
   @override
   void dispose() {
+    _mainFocusNode.dispose();
+    _searchFocusNode.dispose();
     _itemPositionsListener.itemPositions.removeListener(_onItemPositionsChanged);
     _flashTimer?.cancel();
     _searchController.dispose();
     super.dispose();
+  }
+
+  KeyEventResult _handleSearchKeyEvent(FocusNode node, KeyEvent event) {
+    if (event is! KeyDownEvent) return KeyEventResult.ignored;
+    if (event.logicalKey == LogicalKeyboardKey.tab) {
+      final isShift = HardwareKeyboard.instance.isShiftPressed;
+      _cycleButtonFocus(!isShift);
+      return KeyEventResult.handled;
+    }
+    if (event.logicalKey == LogicalKeyboardKey.escape) {
+      if (_searchController.text.isNotEmpty) {
+        _searchController.clear();
+        _onSearchChanged('');
+      } else {
+        _setButtonFocus(_SpoilerButtonFocus.none);
+      }
+      return KeyEventResult.handled;
+    }
+    if (event.logicalKey == LogicalKeyboardKey.enter ||
+        event.logicalKey == LogicalKeyboardKey.numpadEnter) {
+      _navigateSearchMatch(1);
+      return KeyEventResult.handled;
+    }
+    return KeyEventResult.ignored;
+  }
+
+  void _setButtonFocus(_SpoilerButtonFocus focus) {
+    setState(() {
+      _buttonFocus = focus;
+      if (focus == _SpoilerButtonFocus.search) {
+        _searchFocusNode.requestFocus();
+      } else {
+        if (_searchFocusNode.hasFocus) {
+          _searchFocusNode.unfocus();
+        }
+        _mainFocusNode.requestFocus();
+      }
+    });
+  }
+
+  void _cycleButtonFocus(bool forward) {
+    _SpoilerButtonFocus next;
+    if (forward) {
+      switch (_buttonFocus) {
+        case _SpoilerButtonFocus.none:
+          next = _SpoilerButtonFocus.search;
+          break;
+        case _SpoilerButtonFocus.search:
+          next = _SpoilerButtonFocus.peek;
+          break;
+        case _SpoilerButtonFocus.peek:
+          next = _sections.isNotEmpty
+              ? _SpoilerButtonFocus.toc
+              : _SpoilerButtonFocus.close;
+          break;
+        case _SpoilerButtonFocus.toc:
+          next = _SpoilerButtonFocus.close;
+          break;
+        case _SpoilerButtonFocus.close:
+          next = _SpoilerButtonFocus.none;
+          break;
+      }
+    } else {
+      switch (_buttonFocus) {
+        case _SpoilerButtonFocus.none:
+          next = _SpoilerButtonFocus.close;
+          break;
+        case _SpoilerButtonFocus.close:
+          next = _sections.isNotEmpty
+              ? _SpoilerButtonFocus.toc
+              : _SpoilerButtonFocus.peek;
+          break;
+        case _SpoilerButtonFocus.toc:
+          next = _SpoilerButtonFocus.peek;
+          break;
+        case _SpoilerButtonFocus.peek:
+          next = _SpoilerButtonFocus.search;
+          break;
+        case _SpoilerButtonFocus.search:
+          next = _SpoilerButtonFocus.none;
+          break;
+      }
+    }
+    _setButtonFocus(next);
   }
 
   void _onItemPositionsChanged() {
@@ -511,12 +602,22 @@ class _SpoilerDialogState extends State<SpoilerDialog> {
     final isShift = HardwareKeyboard.instance.isShiftPressed;
     final isCtrl = HardwareKeyboard.instance.isControlPressed;
 
+    // 透過状態のときはどのキーを押しても透過解除のみを行い、キー本来の動作は消費して元に戻る
+    if (_isTapPeeking) {
+      if (isDown) {
+        setState(() {
+          _isTapPeeking = false;
+        });
+      }
+      return KeyEventResult.handled;
+    }
+
     if (key == LogicalKeyboardKey.escape) {
       if (isDown) Navigator.pop(context);
       return KeyEventResult.handled;
     }
 
-    final isTextFieldFocused =
+    final isTextFieldFocused = _searchFocusNode.hasFocus ||
         FocusManager.instance.primaryFocus?.context?.widget is EditableText;
     if (isTextFieldFocused) {
       if (key == LogicalKeyboardKey.enter || key == LogicalKeyboardKey.numpadEnter) {
@@ -526,54 +627,34 @@ class _SpoilerDialogState extends State<SpoilerDialog> {
       return KeyEventResult.ignored;
     }
 
-    // Tab / Shift+Tab によるボタンフォーカス循環 (none ↔ toc ↔ close)
+    // Tab / Shift+Tab によるボタンフォーカス循環 (none ↔ search ↔ peek ↔ toc ↔ close)
     if (key == LogicalKeyboardKey.tab) {
       if (isDown) {
-        setState(() {
-          if (isShift) {
-            switch (_buttonFocus) {
-              case _SpoilerButtonFocus.none:
-                _buttonFocus = _SpoilerButtonFocus.close;
-                break;
-              case _SpoilerButtonFocus.close:
-                _buttonFocus = _sections.isNotEmpty
-                    ? _SpoilerButtonFocus.toc
-                    : _SpoilerButtonFocus.none;
-                break;
-              case _SpoilerButtonFocus.toc:
-                _buttonFocus = _SpoilerButtonFocus.none;
-                break;
-            }
-          } else {
-            switch (_buttonFocus) {
-              case _SpoilerButtonFocus.none:
-                _buttonFocus = _sections.isNotEmpty
-                    ? _SpoilerButtonFocus.toc
-                    : _SpoilerButtonFocus.close;
-                break;
-              case _SpoilerButtonFocus.toc:
-                _buttonFocus = _SpoilerButtonFocus.close;
-                break;
-              case _SpoilerButtonFocus.close:
-                _buttonFocus = _SpoilerButtonFocus.none;
-                break;
-            }
-          }
-        });
+        _cycleButtonFocus(!isShift);
       }
       return KeyEventResult.handled;
     }
 
-    // Enter / NumpadEnter: ボタンフォーカス中の決定
-    if (key == LogicalKeyboardKey.enter || key == LogicalKeyboardKey.numpadEnter) {
+    // Enter / NumpadEnter / Space: ボタンフォーカス中の決定
+    if (key == LogicalKeyboardKey.enter ||
+        key == LogicalKeyboardKey.numpadEnter ||
+        (key == LogicalKeyboardKey.space && _buttonFocus == _SpoilerButtonFocus.peek)) {
       if (isDown) {
-        if (_buttonFocus == _SpoilerButtonFocus.toc) {
+        if (_buttonFocus == _SpoilerButtonFocus.peek) {
+          setState(() {
+            _isTapPeeking = true;
+          });
+          return KeyEventResult.handled;
+        } else if (_buttonFocus == _SpoilerButtonFocus.toc) {
           _showTOCModal();
           return KeyEventResult.handled;
         } else if (_buttonFocus == _SpoilerButtonFocus.close) {
           Navigator.pop(context);
           return KeyEventResult.handled;
         }
+      }
+      if (_buttonFocus != _SpoilerButtonFocus.none) {
+        return KeyEventResult.handled;
       }
       return KeyEventResult.ignored;
     }
@@ -1582,6 +1663,7 @@ class _SpoilerDialogState extends State<SpoilerDialog> {
         canRestoreScroll ? SpoilerDialog._savedScrollAlignment : 0.0;
 
     return Focus(
+      focusNode: _mainFocusNode,
       autofocus: true,
       onKeyEvent: _handleKeyEvent,
       child: Stack(
@@ -1671,25 +1753,39 @@ class _SpoilerDialogState extends State<SpoilerDialog> {
                               ),
                             ),
                           ),
-                          _buildHoldPeekDetector(
-                            child: IconButton(
-                              icon: const Icon(
-                                Icons.visibility_outlined,
-                                color: Colors.amberAccent,
-                                size: 22,
+                          DecoratedBox(
+                            decoration: BoxDecoration(
+                              color: _buttonFocus == _SpoilerButtonFocus.peek
+                                  ? Colors.amberAccent.withValues(alpha: 0.25)
+                                  : Colors.transparent,
+                              borderRadius: BorderRadius.circular(4),
+                              border: Border.all(
+                                color: _buttonFocus == _SpoilerButtonFocus.peek
+                                    ? Colors.amberAccent
+                                    : Colors.transparent,
+                                width: 1.5,
                               ),
-                              onPressed: () {
-                                if (_isHoldPeeking) return;
-                                FocusManager.instance.primaryFocus?.unfocus();
-                                setState(() {
-                                  _isTapPeeking = true;
-                                });
-                              },
-                              tooltip: _isJp
-                                  ? 'ゲーム画面を確認（タップで維持 / 長押しで一時透過）'
-                                  : 'Peek at game screen (Tap to hold / Long-press to peek)',
-                              padding: const EdgeInsets.all(6),
-                              constraints: const BoxConstraints(),
+                            ),
+                            child: _buildHoldPeekDetector(
+                              child: IconButton(
+                                icon: const Icon(
+                                  Icons.visibility_outlined,
+                                  color: Colors.amberAccent,
+                                  size: 22,
+                                ),
+                                onPressed: () {
+                                  if (_isHoldPeeking) return;
+                                  FocusManager.instance.primaryFocus?.unfocus();
+                                  setState(() {
+                                    _isTapPeeking = true;
+                                  });
+                                },
+                                tooltip: _isJp
+                                    ? 'ゲーム画面を確認（タップで維持 / 長押しで一時透過）'
+                                    : 'Peek at game screen (Tap to hold / Long-press to peek)',
+                                padding: const EdgeInsets.all(6),
+                                constraints: const BoxConstraints(),
+                              ),
                             ),
                           ),
                           const SizedBox(width: 4),
@@ -1750,13 +1846,24 @@ class _SpoilerDialogState extends State<SpoilerDialog> {
                     Container(
                       padding: const EdgeInsets.symmetric(
                           horizontal: 12, vertical: 6),
-                      color: const Color(0xFF181E29),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFF181E29),
+                        border: Border.all(
+                          color: (_buttonFocus == _SpoilerButtonFocus.search ||
+                                  _searchFocusNode.hasFocus)
+                              ? Colors.amberAccent
+                              : Colors.transparent,
+                          width: 1.5,
+                        ),
+                      ),
                       child: Row(
                         children: [
                           Expanded(
                             child: TextField(
                               controller: _searchController,
+                              focusNode: _searchFocusNode,
                               autofocus: false,
+                              onTap: () => _setButtonFocus(_SpoilerButtonFocus.search),
                               style: const TextStyle(
                                   color: Colors.white, fontSize: 13),
                               decoration: InputDecoration(
@@ -1764,8 +1871,12 @@ class _SpoilerDialogState extends State<SpoilerDialog> {
                                     'Search Spoilers...',
                                 hintStyle: const TextStyle(
                                     color: Colors.white38, fontSize: 13),
-                                prefixIcon: const Icon(Icons.search,
-                                    color: Colors.white54, size: 18),
+                                prefixIcon: Icon(Icons.search,
+                                    color: (_buttonFocus == _SpoilerButtonFocus.search ||
+                                            _searchFocusNode.hasFocus)
+                                        ? Colors.amberAccent
+                                        : Colors.white54,
+                                    size: 18),
                                 suffixIcon: _searchController.text.isNotEmpty
                                     ? IconButton(
                                         icon: const Icon(Icons.clear,

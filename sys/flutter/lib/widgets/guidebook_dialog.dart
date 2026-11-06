@@ -58,6 +58,8 @@ enum _BlockKind {
 
 enum _GuidebookButtonFocus {
   none,
+  search,
+  peek,
   toc,
   close,
 }
@@ -113,6 +115,8 @@ class _GuidebookDialogState extends State<GuidebookDialog> {
   final ItemPositionsListener _itemPositionsListener =
       ItemPositionsListener.create();
   final TextEditingController _searchController = TextEditingController();
+  final FocusNode _searchFocusNode = FocusNode();
+  final FocusNode _mainFocusNode = FocusNode();
 
   List<int> _searchResults = [];
   int _currentSearchMatchIndex = -1;
@@ -129,17 +133,104 @@ class _GuidebookDialogState extends State<GuidebookDialog> {
   @override
   void initState() {
     super.initState();
+    _searchFocusNode.onKeyEvent = _handleSearchKeyEvent;
     _itemPositionsListener.itemPositions.addListener(_onItemPositionsChanged);
     _loadGuidebook();
   }
 
   @override
   void dispose() {
+    _mainFocusNode.dispose();
+    _searchFocusNode.dispose();
     _itemPositionsListener.itemPositions
         .removeListener(_onItemPositionsChanged);
     _flashTimer?.cancel();
     _searchController.dispose();
     super.dispose();
+  }
+
+  KeyEventResult _handleSearchKeyEvent(FocusNode node, KeyEvent event) {
+    if (event is! KeyDownEvent) return KeyEventResult.ignored;
+    if (event.logicalKey == LogicalKeyboardKey.tab) {
+      final isShift = HardwareKeyboard.instance.isShiftPressed;
+      _cycleButtonFocus(!isShift);
+      return KeyEventResult.handled;
+    }
+    if (event.logicalKey == LogicalKeyboardKey.escape) {
+      if (_searchController.text.isNotEmpty) {
+        _searchController.clear();
+        _onSearchChanged('');
+      } else {
+        _setButtonFocus(_GuidebookButtonFocus.none);
+      }
+      return KeyEventResult.handled;
+    }
+    if (event.logicalKey == LogicalKeyboardKey.enter ||
+        event.logicalKey == LogicalKeyboardKey.numpadEnter) {
+      _searchNext();
+      return KeyEventResult.handled;
+    }
+    return KeyEventResult.ignored;
+  }
+
+  void _setButtonFocus(_GuidebookButtonFocus focus) {
+    setState(() {
+      _buttonFocus = focus;
+      if (focus == _GuidebookButtonFocus.search) {
+        _searchFocusNode.requestFocus();
+      } else {
+        if (_searchFocusNode.hasFocus) {
+          _searchFocusNode.unfocus();
+        }
+        _mainFocusNode.requestFocus();
+      }
+    });
+  }
+
+  void _cycleButtonFocus(bool forward) {
+    _GuidebookButtonFocus next;
+    if (forward) {
+      switch (_buttonFocus) {
+        case _GuidebookButtonFocus.none:
+          next = _GuidebookButtonFocus.search;
+          break;
+        case _GuidebookButtonFocus.search:
+          next = _GuidebookButtonFocus.peek;
+          break;
+        case _GuidebookButtonFocus.peek:
+          next = _sections.isNotEmpty
+              ? _GuidebookButtonFocus.toc
+              : _GuidebookButtonFocus.close;
+          break;
+        case _GuidebookButtonFocus.toc:
+          next = _GuidebookButtonFocus.close;
+          break;
+        case _GuidebookButtonFocus.close:
+          next = _GuidebookButtonFocus.none;
+          break;
+      }
+    } else {
+      switch (_buttonFocus) {
+        case _GuidebookButtonFocus.none:
+          next = _GuidebookButtonFocus.close;
+          break;
+        case _GuidebookButtonFocus.close:
+          next = _sections.isNotEmpty
+              ? _GuidebookButtonFocus.toc
+              : _GuidebookButtonFocus.peek;
+          break;
+        case _GuidebookButtonFocus.toc:
+          next = _GuidebookButtonFocus.peek;
+          break;
+        case _GuidebookButtonFocus.peek:
+          next = _GuidebookButtonFocus.search;
+          break;
+        case _GuidebookButtonFocus.search:
+          next = _GuidebookButtonFocus.none;
+          break;
+      }
+    }
+    _setButtonFocus(next);
   }
 
   void _onItemPositionsChanged() {
@@ -646,12 +737,22 @@ class _GuidebookDialogState extends State<GuidebookDialog> {
     final isShift = HardwareKeyboard.instance.isShiftPressed;
     final isCtrl = HardwareKeyboard.instance.isControlPressed;
 
+    // 透過状態のときはどのキーを押しても透過解除のみを行い、キー本来の動作は消費して元に戻る
+    if (_isTapPeeking) {
+      if (isDown) {
+        setState(() {
+          _isTapPeeking = false;
+        });
+      }
+      return KeyEventResult.handled;
+    }
+
     if (key == LogicalKeyboardKey.escape) {
       if (isDown) Navigator.pop(context);
       return KeyEventResult.handled;
     }
 
-    final isTextFieldFocused =
+    final isTextFieldFocused = _searchFocusNode.hasFocus ||
         FocusManager.instance.primaryFocus?.context?.widget is EditableText;
     if (isTextFieldFocused) {
       if (key == LogicalKeyboardKey.enter || key == LogicalKeyboardKey.numpadEnter) {
@@ -661,54 +762,34 @@ class _GuidebookDialogState extends State<GuidebookDialog> {
       return KeyEventResult.ignored;
     }
 
-    // Tab / Shift+Tab によるボタンフォーカス循環 (none ↔ toc ↔ close)
+    // Tab / Shift+Tab によるボタンフォーカス循環 (none ↔ search ↔ peek ↔ toc ↔ close)
     if (key == LogicalKeyboardKey.tab) {
       if (isDown) {
-        setState(() {
-          if (isShift) {
-            switch (_buttonFocus) {
-              case _GuidebookButtonFocus.none:
-                _buttonFocus = _GuidebookButtonFocus.close;
-                break;
-              case _GuidebookButtonFocus.close:
-                _buttonFocus = _sections.isNotEmpty
-                    ? _GuidebookButtonFocus.toc
-                    : _GuidebookButtonFocus.none;
-                break;
-              case _GuidebookButtonFocus.toc:
-                _buttonFocus = _GuidebookButtonFocus.none;
-                break;
-            }
-          } else {
-            switch (_buttonFocus) {
-              case _GuidebookButtonFocus.none:
-                _buttonFocus = _sections.isNotEmpty
-                    ? _GuidebookButtonFocus.toc
-                    : _GuidebookButtonFocus.close;
-                break;
-              case _GuidebookButtonFocus.toc:
-                _buttonFocus = _GuidebookButtonFocus.close;
-                break;
-              case _GuidebookButtonFocus.close:
-                _buttonFocus = _GuidebookButtonFocus.none;
-                break;
-            }
-          }
-        });
+        _cycleButtonFocus(!isShift);
       }
       return KeyEventResult.handled;
     }
 
-    // Enter / NumpadEnter: ボタンフォーカス中の決定
-    if (key == LogicalKeyboardKey.enter || key == LogicalKeyboardKey.numpadEnter) {
+    // Enter / NumpadEnter / Space: ボタンフォーカス中の決定
+    if (key == LogicalKeyboardKey.enter ||
+        key == LogicalKeyboardKey.numpadEnter ||
+        (key == LogicalKeyboardKey.space && _buttonFocus == _GuidebookButtonFocus.peek)) {
       if (isDown) {
-        if (_buttonFocus == _GuidebookButtonFocus.toc) {
+        if (_buttonFocus == _GuidebookButtonFocus.peek) {
+          setState(() {
+            _isTapPeeking = true;
+          });
+          return KeyEventResult.handled;
+        } else if (_buttonFocus == _GuidebookButtonFocus.toc) {
           _showTOCModal();
           return KeyEventResult.handled;
         } else if (_buttonFocus == _GuidebookButtonFocus.close) {
           Navigator.pop(context);
           return KeyEventResult.handled;
         }
+      }
+      if (_buttonFocus != _GuidebookButtonFocus.none) {
+        return KeyEventResult.handled;
       }
       return KeyEventResult.ignored;
     }
@@ -1812,6 +1893,7 @@ class _GuidebookDialogState extends State<GuidebookDialog> {
         canRestoreScroll ? GuidebookDialog._savedScrollAlignment : 0.0;
 
     return Focus(
+      focusNode: _mainFocusNode,
       autofocus: true,
       onKeyEvent: _handleKeyEvent,
       child: Stack(
@@ -1902,23 +1984,37 @@ class _GuidebookDialogState extends State<GuidebookDialog> {
                               ),
                             ),
                           ),
-                          _buildHoldPeekDetector(
-                            child: IconButton(
-                              icon: const Icon(
-                                Icons.visibility_outlined,
-                                color: Colors.amberAccent,
-                                size: 22,
+                          DecoratedBox(
+                            decoration: BoxDecoration(
+                              color: _buttonFocus == _GuidebookButtonFocus.peek
+                                  ? Colors.amberAccent.withValues(alpha: 0.25)
+                                  : Colors.transparent,
+                              borderRadius: BorderRadius.circular(4),
+                              border: Border.all(
+                                color: _buttonFocus == _GuidebookButtonFocus.peek
+                                    ? Colors.amberAccent
+                                    : Colors.transparent,
+                                width: 1.5,
                               ),
-                              onPressed: () {
-                                if (_isHoldPeeking) return;
-                                FocusManager.instance.primaryFocus?.unfocus();
-                                setState(() {
-                                  _isTapPeeking = true;
-                                });
-                              },
-                              tooltip: _isJp
-                                  ? '一時透過 (長押しでも可)'
-                                  : 'Peek (Hold to peek)',
+                            ),
+                            child: _buildHoldPeekDetector(
+                              child: IconButton(
+                                icon: const Icon(
+                                  Icons.visibility_outlined,
+                                  color: Colors.amberAccent,
+                                  size: 22,
+                                ),
+                                onPressed: () {
+                                  if (_isHoldPeeking) return;
+                                  FocusManager.instance.primaryFocus?.unfocus();
+                                  setState(() {
+                                    _isTapPeeking = true;
+                                  });
+                                },
+                                tooltip: _isJp
+                                    ? '一時透過 (長押しでも可)'
+                                    : 'Peek (Hold to peek)',
+                              ),
                             ),
                           ),
                           // 目次ボタン
@@ -1974,16 +2070,33 @@ class _GuidebookDialogState extends State<GuidebookDialog> {
                     Container(
                       padding: const EdgeInsets.symmetric(
                           horizontal: 12, vertical: 6),
-                      color: const Color(0xFF161B24),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFF161B24),
+                        border: Border.all(
+                          color: (_buttonFocus == _GuidebookButtonFocus.search ||
+                                  _searchFocusNode.hasFocus)
+                              ? Colors.amberAccent
+                              : Colors.transparent,
+                          width: 1.5,
+                        ),
+                      ),
                       child: Row(
                         children: [
-                          const Icon(Icons.search,
-                              size: 18, color: Colors.white54),
+                          Icon(
+                            Icons.search,
+                            size: 18,
+                            color: (_buttonFocus == _GuidebookButtonFocus.search ||
+                                    _searchFocusNode.hasFocus)
+                                ? Colors.amberAccent
+                                : Colors.white54,
+                          ),
                           const SizedBox(width: 8),
                           Expanded(
                             child: TextField(
                               controller: _searchController,
+                              focusNode: _searchFocusNode,
                               autofocus: false,
+                              onTap: () => _setButtonFocus(_GuidebookButtonFocus.search),
                               style: const TextStyle(
                                   color: Colors.white, fontSize: 13),
                               decoration: InputDecoration(

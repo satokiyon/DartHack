@@ -32,7 +32,7 @@ void main() {
   }
 
   group('GuidebookDialog & SpoilerDialog Keyboard Navigation Tests', () {
-    testWidgets('Guidebook: Tab cycles buttons, t opens TOC, Escape / q closes dialog', (tester) async {
+    testWidgets('Guidebook: Tab cycles search, peek, toc, close and any key dismisses peek', (tester) async {
       await tester.pumpWidget(
         buildTestApp(
           GuidebookDialog(
@@ -45,15 +45,56 @@ void main() {
 
       expect(find.byType(GuidebookDialog), findsOneWidget);
 
-      // Tabキーを押下 -> 目次ボタンがフォーカス状態になる
+      final searchTextFieldFinder = find.byType(TextField);
+      expect(searchTextFieldFinder, findsOneWidget);
+
+      // 1回目の Tab -> 検索欄にフォーカスが当たる
+      await tester.sendKeyEvent(LogicalKeyboardKey.tab);
+      await tester.pumpAndSettle();
+      final textField = tester.widget<TextField>(searchTextFieldFinder);
+      expect(textField.focusNode?.hasFocus, isTrue);
+
+      // 2回目の Tab -> 透過アイコン（peek）にフォーカス
+      await tester.sendKeyEvent(LogicalKeyboardKey.tab);
+      await tester.pumpAndSettle();
+      expect(textField.focusNode?.hasFocus, isFalse);
+
+      // 透過アイコンで Enter を押下 -> 透過モード（opacity: 0.0）になる
+      final dialogOpacityFinder = find.ancestor(
+        of: find.byType(Dialog),
+        matching: find.byType(AnimatedOpacity),
+      );
+      expect(
+        tester.widget<AnimatedOpacity>(dialogOpacityFinder.first).opacity,
+        1.0,
+      );
+
+      await tester.sendKeyEvent(LogicalKeyboardKey.enter);
+      await tester.pumpAndSettle();
+
+      expect(
+        tester.widget<AnimatedOpacity>(dialogOpacityFinder.first).opacity,
+        0.0,
+      );
+
+      // 透過状態のときに任意のキー（例: 矢印キーやスペースキー）を押下 -> 透過解除して元の表示に戻る
+      await tester.sendKeyEvent(LogicalKeyboardKey.arrowDown);
+      await tester.pumpAndSettle();
+
+      expect(
+        tester.widget<AnimatedOpacity>(dialogOpacityFinder.first).opacity,
+        1.0,
+      );
+
+      // 3回目の Tab -> 目次ボタンがフォーカス状態になる
       await tester.sendKeyEvent(LogicalKeyboardKey.tab);
       await tester.pumpAndSettle();
 
-      // もう一度Tabキーを押下 -> 閉じるボタンがフォーカス状態になる
+      // 4回目の Tab -> 閉じるボタンがフォーカス状態になる
       await tester.sendKeyEvent(LogicalKeyboardKey.tab);
       await tester.pumpAndSettle();
 
-      // もう一度Tabキーを押下 -> noneに戻る
+      // 5回目の Tab -> none に戻る
       await tester.sendKeyEvent(LogicalKeyboardKey.tab);
       await tester.pumpAndSettle();
 
@@ -120,6 +161,73 @@ void main() {
       await tester.sendKeyEvent(LogicalKeyboardKey.escape);
       await tester.pumpAndSettle();
       expect(find.byType(GuidebookDialog), findsNothing);
+    });
+
+    testWidgets('SpoilerDialog: Tab cycles search, peek, toc, close and any key dismisses peek', (tester) async {
+      await tester.pumpWidget(
+        buildTestApp(
+          SpoilerDialog(
+            initialMarkdown: sampleGuidebookMarkdown,
+            initialIsJp: true,
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      expect(find.byType(SpoilerDialog), findsOneWidget);
+
+      final searchTextFieldFinder = find.byType(TextField);
+      expect(searchTextFieldFinder, findsOneWidget);
+
+      // 1回目の Tab -> 検索欄にフォーカス
+      await tester.sendKeyEvent(LogicalKeyboardKey.tab);
+      await tester.pumpAndSettle();
+      final textField = tester.widget<TextField>(searchTextFieldFinder);
+      expect(textField.focusNode?.hasFocus, isTrue);
+
+      // 2回目の Tab -> 透過アイコン（peek）にフォーカス
+      await tester.sendKeyEvent(LogicalKeyboardKey.tab);
+      await tester.pumpAndSettle();
+      expect(textField.focusNode?.hasFocus, isFalse);
+
+      // 透過アイコンで Enter を押下 -> 透過モード（opacity: 0.0）
+      final dialogOpacityFinder = find.ancestor(
+        of: find.byType(Dialog),
+        matching: find.byType(AnimatedOpacity),
+      );
+      expect(
+        tester.widget<AnimatedOpacity>(dialogOpacityFinder.first).opacity,
+        1.0,
+      );
+
+      await tester.sendKeyEvent(LogicalKeyboardKey.enter);
+      await tester.pumpAndSettle();
+
+      expect(
+        tester.widget<AnimatedOpacity>(dialogOpacityFinder.first).opacity,
+        0.0,
+      );
+
+      // 透過状態のときに任意のキー（Space 等）を押下 -> 透過解除して元の表示に戻る
+      await tester.sendKeyEvent(LogicalKeyboardKey.space);
+      await tester.pumpAndSettle();
+
+      expect(
+        tester.widget<AnimatedOpacity>(dialogOpacityFinder.first).opacity,
+        1.0,
+      );
+
+      // 3回目の Tab -> 目次ボタンがフォーカス状態になる
+      await tester.sendKeyEvent(LogicalKeyboardKey.tab);
+      await tester.pumpAndSettle();
+
+      // 4回目の Tab -> 閉じるボタンがフォーカス状態になる
+      await tester.sendKeyEvent(LogicalKeyboardKey.tab);
+      await tester.pumpAndSettle();
+
+      // 5回目の Tab -> none に戻る
+      await tester.sendKeyEvent(LogicalKeyboardKey.tab);
+      await tester.pumpAndSettle();
     });
 
     testWidgets('SpoilerDialog: t opens TOC, Down/Up navigates items, Enter jumps, q closes', (tester) async {
