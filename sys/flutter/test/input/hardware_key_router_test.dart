@@ -156,6 +156,28 @@ void main() {
       );
     });
 
+    test('Game mode FullMap triggers (F9, Alt+z / M-z)', () {
+      final f9Event = const KeyDownEvent(
+        physicalKey: PhysicalKeyboardKey.f9,
+        logicalKey: LogicalKeyboardKey.f9,
+        timeStamp: Duration.zero,
+      );
+      expect(
+        HardwareKeyRouter.route(event: f9Event, context: KeyInputContext.game),
+        equals(const OpenFullMap()),
+      );
+
+      final altZEvent = const KeyDownEvent(
+        physicalKey: PhysicalKeyboardKey.keyZ,
+        logicalKey: LogicalKeyboardKey.keyZ,
+        timeStamp: Duration.zero,
+      );
+      expect(
+        HardwareKeyRouter.route(event: altZEvent, context: KeyInputContext.game, isAltPressed: true),
+        equals(const OpenFullMap()),
+      );
+    });
+
     test('YN Prompt handling', () {
       // 'y' in 'yn'
       final yEvent = const KeyDownEvent(

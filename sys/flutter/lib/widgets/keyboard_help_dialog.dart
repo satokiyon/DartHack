@@ -9,10 +9,14 @@ enum KeyboardHelpContext {
   guidebook,
   titleScreen,
   settings,
+  textInput,  // 一行テキスト入力 (願い・名前・フロアメモ等)
+  extCmd,     // 拡張コマンド一覧 (# コマンド)
+  askName,    // キャラ作成・お名前入力画面
+  textWindow, // 長文テキスト (概要、怪物・所持品一覧、墓石、スコア等)
 }
 
 /// キーボード操作ヘルプダイアログ
-class KeyboardHelpDialog extends StatelessWidget {
+class KeyboardHelpDialog extends StatefulWidget {
   final KeyboardHelpContext helpContext;
   final int menuHow; // menu 時: 0 = PICK_NONE (閲覧), 1 = PICK_ONE (単一選択), 2 = PICK_ANY (複数選択)
   final bool isJapanese;
@@ -43,31 +47,148 @@ class KeyboardHelpDialog extends StatelessWidget {
   }
 
   @override
+  State<KeyboardHelpDialog> createState() => _KeyboardHelpDialogState();
+}
+
+class _KeyboardHelpDialogState extends State<KeyboardHelpDialog> {
+  final ScrollController _scrollController = ScrollController();
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
+  }
+
+  void _scroll(double delta) {
+    if (!_scrollController.hasClients) return;
+    final next = (_scrollController.offset + delta)
+        .clamp(0.0, _scrollController.position.maxScrollExtent);
+    _scrollController.animateTo(
+      next,
+      duration: const Duration(milliseconds: 100),
+      curve: Curves.easeOut,
+    );
+  }
+
+  void _pageScroll(int direction) {
+    if (!_scrollController.hasClients) return;
+    final viewport = _scrollController.position.viewportDimension;
+    final step = viewport > 0 ? viewport * 0.85 : 320.0;
+    final next = (_scrollController.offset + direction * step)
+        .clamp(0.0, _scrollController.position.maxScrollExtent);
+    _scrollController.animateTo(
+      next,
+      duration: const Duration(milliseconds: 150),
+      curve: Curves.easeOut,
+    );
+  }
+
+  void _jumpToEdge(bool toTop) {
+    if (!_scrollController.hasClients) return;
+    final target = toTop ? 0.0 : _scrollController.position.maxScrollExtent;
+    _scrollController.animateTo(
+      target,
+      duration: const Duration(milliseconds: 150),
+      curve: Curves.easeOut,
+    );
+  }
+
+  void _handleSpace() {
+    // スクロール不要（全体が1画面に収まる）か、最下部に到達している場合は閉じる
+    if (_scrollController.hasClients &&
+        _scrollController.position.maxScrollExtent > 10.0 &&
+        _scrollController.offset < _scrollController.position.maxScrollExtent - 5.0) {
+      _pageScroll(1);
+    } else {
+      Navigator.of(context).pop();
+    }
+  }
+
+  KeyEventResult _handleKeyEvent(FocusNode node, KeyEvent event) {
+    if (event is! KeyDownEvent && event is! KeyRepeatEvent) {
+      return KeyEventResult.ignored;
+    }
+
+    final isDown = event is KeyDownEvent;
+    final key = event.logicalKey;
+    final isShift = HardwareKeyboard.instance.isShiftPressed;
+    final isAlt = HardwareKeyboard.instance.isAltPressed;
+    final isHelpCloseKey = key == LogicalKeyboardKey.f1 ||
+        (isAlt && key == LogicalKeyboardKey.keyH);
+
+    // Escape / Enter / F1 / Alt-h: 任意の位置から即座に閉じる
+    if (key == LogicalKeyboardKey.escape ||
+        isHelpCloseKey ||
+        key == LogicalKeyboardKey.enter ||
+        key == LogicalKeyboardKey.numpadEnter) {
+      if (isDown) Navigator.of(context).pop();
+      return KeyEventResult.handled;
+    }
+
+    // Space: Shift+Space でページ戻り、通常 Space でページ送り（最下部到達時またはスクロール不要時は閉じる）
+    if (key == LogicalKeyboardKey.space) {
+      if (isDown) {
+        if (isShift) {
+          _pageScroll(-1);
+        } else {
+          _handleSpace();
+        }
+      }
+      return KeyEventResult.handled;
+    }
+
+    // PageDown / > (Shift + Period / NumpadDecimal)
+    final isGreater = isShift &&
+        (key == LogicalKeyboardKey.period || key == LogicalKeyboardKey.numpadDecimal);
+    if (key == LogicalKeyboardKey.pageDown || isGreater) {
+      if (isDown) _pageScroll(1);
+      return KeyEventResult.handled;
+    }
+
+    // PageUp / < (Shift + Comma / Less)
+    final isLess = (isShift && key == LogicalKeyboardKey.comma) ||
+        key == LogicalKeyboardKey.less;
+    if (key == LogicalKeyboardKey.pageUp || isLess) {
+      if (isDown) _pageScroll(-1);
+      return KeyEventResult.handled;
+    }
+
+    // ArrowDown / j: 1行下スクロール
+    if (key == LogicalKeyboardKey.arrowDown || key == LogicalKeyboardKey.keyJ) {
+      _scroll(40.0);
+      return KeyEventResult.handled;
+    }
+
+    // ArrowUp / k: 1行上スクロール
+    if (key == LogicalKeyboardKey.arrowUp || key == LogicalKeyboardKey.keyK) {
+      _scroll(-40.0);
+      return KeyEventResult.handled;
+    }
+
+    // Home / End
+    if (key == LogicalKeyboardKey.home) {
+      if (isDown) _jumpToEdge(true);
+      return KeyEventResult.handled;
+    }
+    if (key == LogicalKeyboardKey.end) {
+      if (isDown) _jumpToEdge(false);
+      return KeyEventResult.handled;
+    }
+
+    return KeyEventResult.ignored;
+  }
+
+  @override
   Widget build(BuildContext context) {
-    final title = isJapanese ? 'キーボード操作ガイド' : 'Keyboard Controls Guide';
+    final title = widget.isJapanese ? 'キーボード操作ガイド' : 'Keyboard Controls Guide';
     final items = _buildHelpItems();
 
     return Focus(
       autofocus: true,
-      onKeyEvent: (node, event) {
-        if (event is! KeyDownEvent) return KeyEventResult.ignored;
-        final isAlt = HardwareKeyboard.instance.isAltPressed;
-        final isHelpCloseKey = event.logicalKey == LogicalKeyboardKey.f1 ||
-            (isAlt && event.logicalKey == LogicalKeyboardKey.keyH);
-        // 任意の主要キー（Esc, F1, Alt-h, Enter, Space等）で安全に閉じる
-        if (event.logicalKey == LogicalKeyboardKey.escape ||
-            isHelpCloseKey ||
-            event.logicalKey == LogicalKeyboardKey.enter ||
-            event.logicalKey == LogicalKeyboardKey.numpadEnter ||
-            event.logicalKey == LogicalKeyboardKey.space) {
-          Navigator.of(context).pop();
-          return KeyEventResult.handled;
-        }
-        return KeyEventResult.ignored;
-      },
+      onKeyEvent: _handleKeyEvent,
       child: Center(
         child: ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: 540, maxHeight: 600),
+          constraints: const BoxConstraints(maxWidth: 560, maxHeight: 600),
           child: Material(
             color: Colors.transparent,
             child: Container(
@@ -109,7 +230,7 @@ class KeyboardHelpDialog extends StatelessWidget {
                         IconButton(
                           icon: const Icon(Icons.close_rounded, color: Colors.white70, size: 20),
                           onPressed: () => Navigator.of(context).pop(),
-                          tooltip: isJapanese ? '閉じる (Esc)' : 'Close (Esc)',
+                          tooltip: widget.isJapanese ? '閉じる (Esc)' : 'Close (Esc)',
                           padding: EdgeInsets.zero,
                           constraints: const BoxConstraints(),
                         ),
@@ -120,6 +241,7 @@ class KeyboardHelpDialog extends StatelessWidget {
                   // 操作一覧リスト
                   Flexible(
                     child: SingleChildScrollView(
+                      controller: _scrollController,
                       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                       child: Table(
                         columnWidths: const {
@@ -176,7 +298,9 @@ class KeyboardHelpDialog extends StatelessWidget {
                     ),
                     alignment: Alignment.centerRight,
                     child: Text(
-                      isJapanese ? 'F1 / Alt-h / Esc / Space で閉じる' : 'Press F1 / Alt-h / Esc / Space to close',
+                      widget.isJapanese
+                          ? 'Spaceでスクロール（最下部で閉じる） / Esc・Enterで終了'
+                          : 'Space: Scroll (closes at bottom) / Esc, Enter: Close',
                       style: const TextStyle(color: Colors.white54, fontSize: 11),
                     ),
                   ),
@@ -190,113 +314,170 @@ class KeyboardHelpDialog extends StatelessWidget {
   }
 
   List<_HelpItem> _buildHelpItems() {
-    switch (helpContext) {
+    final isJp = widget.isJapanese;
+    switch (widget.helpContext) {
       case KeyboardHelpContext.menu:
         final list = <_HelpItem>[];
         // 選択・ドロップメニュー (menuHow >= 1) の時のみ数量指定を案内
-        if (menuHow >= 1) {
+        if (widget.menuHow >= 1) {
           list.addAll([
             _HelpItem(
               '0 〜 9',
-              isJapanese
-                  ? '数量指定（数字入力後にアイテム文字を押すと個数を指定して選択）'
+              isJp
+                  ? '数量指定（数字入力後にアイテム文字を押して選択）'
                   : 'Specify quantity (type numbers then press item key)',
             ),
             _HelpItem(
               'BackSpace',
-              isJapanese ? '入力中の数量の末尾1桁を削除' : 'Delete last digit of quantity',
+              isJp ? '数量の末尾1桁を削除' : 'Delete last digit of quantity',
             ),
             _HelpItem(
               'Escape',
-              isJapanese
-                  ? '数量入力をクリア（数量なし時はメニューを閉じる）'
+              isJp
+                  ? '数量入力をクリア（数量未入力時はメニュー終了）'
                   : 'Clear quantity (or close menu if no quantity)',
             ),
-            _HelpItem(
-              'a〜z / A〜Z',
-              isJapanese ? 'アイテムの選択・トグル（未指定時は全量）' : 'Select item (all if no count specified)',
-            ),
           ]);
         }
 
-        // 共通メニュー操作
         list.addAll([
-          _HelpItem('Tab', isJapanese ? '下部ボタン（全選択、解除、閉じる等）を巡回' : 'Cycle bottom action buttons'),
-          _HelpItem('Space / PgDn', isJapanese ? '1ページ下へスクロール（閲覧時は最下部で閉じる）' : 'Page down (closes at bottom on view-only)'),
-          _HelpItem('↑ / ↓ (k / j)', isJapanese ? '項目を1行スクロール' : 'Scroll 1 line up/down'),
-          _HelpItem('← / →', isJapanese ? 'オプション一覧・呪文一覧等の横スクロール' : 'Horizontal scroll (e.g. options, spells)'),
-          _HelpItem('Shift + ← / →', isJapanese ? 'メニューを最左端 / 最右端へジャンプ' : 'Jump to left / right edge'),
+          _HelpItem(
+            'a〜z / A〜Z',
+            isJp
+                ? 'アイテムの選択・トグル（数量未指定時は全量）'
+                : 'Select item (all if no count specified)',
+          ),
         ]);
 
-        if (menuHow == 2) {
+        if (widget.menuHow == 2) {
           list.addAll([
-            _HelpItem('.', isJapanese ? '全選択 (menu_select_all)' : 'Select all'),
-            _HelpItem('-', isJapanese ? '全選択解除 (menu_deselect_all)' : 'Deselect all'),
-            _HelpItem('@', isJapanese ? '選択反転 (menu_invert_all)' : 'Invert selection'),
+            _HelpItem('.', isJp ? '全選択 (menu_select_all)' : 'Select all'),
+            _HelpItem('-', isJp ? '全選択解除 (menu_deselect_all)' : 'Deselect all'),
+            _HelpItem('@', isJp ? '選択反転 (menu_invert_all)' : 'Invert selection'),
           ]);
         }
 
         list.addAll([
-          _HelpItem('Enter', isJapanese ? '選択決定（閲覧画面では安全に閉じる）' : 'Confirm selection (or close on view-only)'),
-          _HelpItem('Esc', isJapanese ? 'メニューを閉じる / キャンセル' : 'Close menu / Cancel'),
+          _HelpItem(
+            'Space / PgDn / >',
+            isJp
+                ? 'ページ送り（閲覧メニュー時は最下部で閉じる）'
+                : 'Page down (closes at bottom on view-only)',
+          ),
+          _HelpItem('Shift+Space / PgUp / <', isJp ? 'ページ戻り' : 'Page up'),
+          _HelpItem('^ / | (Home / End)', isJp ? '最先頭 / 最末尾へジャンプ' : 'Jump to top / bottom'),
+          _HelpItem('← / →', isJp ? '呪文一覧・オプション等の横スクロール' : 'Horizontal scroll'),
+          _HelpItem('Shift + ← / →', isJp ? '最左端 / 最右端へジャンプ' : 'Jump to left / right edge'),
+          _HelpItem('↑ / ↓ (k / j)', isJp ? '1行スクロール' : 'Scroll 1 line up/down'),
+          _HelpItem('Tab / Shift+Tab', isJp ? '下部アクションボタンのフォーカス循環' : 'Cycle bottom action buttons'),
+          _HelpItem('Enter', isJp ? '選択決定（閲覧画面では閉じる）' : 'Confirm selection (or close on view-only)'),
+          _HelpItem('Esc', isJp ? 'メニューを閉じる / キャンセル' : 'Close menu / Cancel'),
+          _HelpItem('F1 / Alt-h', isJp ? '操作ヘルプの表示' : 'Show controls help'),
         ]);
         return list;
 
+      case KeyboardHelpContext.game:
+        return [
+          _HelpItem('矢印 / テンキー / hjkl', isJp ? '8方向移動（. で待機）' : '8-direction movement (. to wait)'),
+          _HelpItem('Shift + 移動', isJp ? '障害物に当たるまでダッシュ移動' : 'Run until obstacle'),
+          _HelpItem('Ctrl + 移動', isJp ? '指定方向の探査・移動' : 'Move / search towards direction'),
+          _HelpItem('Ctrl+P', isJp ? '直前のメッセージ履歴を再表示' : 'Show previous message history'),
+          _HelpItem('Ctrl+M / F10', isJp ? 'ドロワーメニューを一発起動' : 'Open drawer menu directly'),
+          _HelpItem('F9 / Alt-z', isJp ? '階層の全体地図を表示' : 'Show full level map'),
+          _HelpItem('Tab', isJp ? '半透明ボタン（メニュー／全体マップ）のフォーカス' : 'Focus floating buttons'),
+          _HelpItem('#', isJp ? '拡張コマンド一覧を開く' : 'Open extended commands'),
+          _HelpItem('Esc', isJp ? '現在のアクションを中断 / キャンセル' : 'Cancel current action'),
+          _HelpItem('F1 / Alt-h', isJp ? '操作ヘルプの表示' : 'Show controls help'),
+        ];
+
       case KeyboardHelpContext.yn:
         return [
-          _HelpItem('y / n', isJapanese ? '「はい」 / 「いいえ」を実行' : 'Yes / No'),
-          _HelpItem('a', isJapanese ? '「すべて」 / 「おまかせ」を実行' : 'All / Pick all'),
-          _HelpItem('q', isJapanese ? '「中断」を実行' : 'Quit'),
-          _HelpItem('Tab / Shift+Tab', isJapanese ? '選択肢ボタン ↔ 履歴ボタンのフォーカス循環' : 'Cycle choice buttons and History'),
-          _HelpItem('Enter', isJapanese ? 'フォーカス中の選択肢を実行（フォーカスなし時は既定値）' : 'Execute focused button (or default)'),
-          _HelpItem('Esc', isJapanese ? 'キャンセル / 既定値で終了' : 'Cancel / Dismiss'),
+          _HelpItem('y / n', isJp ? '「はい」 / 「いいえ」を実行' : 'Yes / No'),
+          _HelpItem('a / q', isJp ? '「すべて」 / 「中断」を実行' : 'All / Quit'),
+          _HelpItem('Tab / Shift+Tab', isJp ? '選択肢ボタン ↔ 履歴ボタンのフォーカス循環' : 'Cycle choice buttons and History'),
+          _HelpItem('Enter', isJp ? 'フォーカス中の選択肢を実行（未選択時は既定値）' : 'Execute focused button (or default)'),
+          _HelpItem('Space / Esc', isJp ? '既定値で応答 / キャンセル' : 'Default response / Cancel'),
+          _HelpItem('F1 / Alt-h', isJp ? '操作ヘルプの表示' : 'Show controls help'),
         ];
 
       case KeyboardHelpContext.guidebook:
         return [
-          _HelpItem('t', isJapanese ? '目次モーダルを開く（目次内で文字入力するとリアルタイム絞り込み）' : 'Open Table of Contents (type to filter)'),
-          _HelpItem('Tab / Shift+Tab', isJapanese ? '検索欄 ↔ 透過 ↔ 目次 ↔ 閉じるボタンのフォーカス巡回' : 'Cycle Search, Peek, TOC, Close buttons'),
-          _HelpItem('↑ / ↓ (k / j)', isJapanese ? '本文を行単位で上下スクロール' : 'Scroll text lines up/down'),
-          _HelpItem('← / →', isJapanese ? '表示中の表（テーブル）やコードブロックを横スクロール' : 'Horizontal scroll visible table/code block'),
-          _HelpItem('Shift + ← / →', isJapanese ? '表を最左端 / 最右端へ瞬時ジャンプ' : 'Jump table to left / right edge'),
-          _HelpItem('Space / PgDn', isJapanese ? '1画面分下へスクロール' : 'Page down'),
-          _HelpItem('Home / End', isJapanese ? 'ドキュメント最先頭 / 最末尾へジャンプ' : 'Jump to top / bottom'),
-          _HelpItem('Esc / q', isJapanese ? 'ガイドブック / スポイラーを閉じる' : 'Close Guidebook / Spoilers'),
-        ];
-
-      case KeyboardHelpContext.game:
-        return [
-          _HelpItem('矢印 / テンキー / hjkl', isJapanese ? '8方向移動' : '8-direction movement'),
-          _HelpItem('Shift + 移動', isJapanese ? '障害物に当たるまでダッシュ移動' : 'Run until obstacle'),
-          _HelpItem('Ctrl + 移動', isJapanese ? 'その方向の扉・罠の探査や移動' : 'Move / search towards direction'),
-          _HelpItem('Esc', isJapanese ? '現在のアクションを中断 / キャンセル' : 'Cancel current action'),
-          _HelpItem('Tab', isJapanese ? '画面ボタン（メニュー／全体マップ）のフォーカス' : 'Focus map buttons'),
-          _HelpItem('Ctrl+M / F10', isJapanese ? 'ドロワーメニューを一発起動' : 'Open drawer menu directly'),
-          _HelpItem('#', isJapanese ? '拡張コマンド一覧を開く' : 'Open extended commands'),
-          _HelpItem('F1 / Alt-h', isJapanese ? '操作ヘルプの表示' : 'Show controls help'),
+          _HelpItem('t', isJp ? '目次を開く（開いた直後に文字入力でリアルタイム絞り込み）' : 'Open Table of Contents (type to filter)'),
+          _HelpItem('Space / PgDn / >', isJp ? 'ページ送り' : 'Page down'),
+          _HelpItem('Shift+Space / PgUp / <', isJp ? 'ページ戻り' : 'Page up'),
+          _HelpItem('Home / End', isJp ? '最先頭 / 最末尾へジャンプ' : 'Jump to top / bottom'),
+          _HelpItem('↑ / ↓ (k / j)', isJp ? '本文を行単位でスクロール' : 'Scroll text lines up/down'),
+          _HelpItem('← / →', isJp ? '表示中の表やコードブロックを横スクロール' : 'Horizontal scroll visible table/code block'),
+          _HelpItem('Shift + ← / →', isJp ? '表を最左端 / 最右端へジャンプ' : 'Jump table to left / right edge'),
+          _HelpItem('Tab / Shift+Tab', isJp ? '検索欄 ↔ 透過 ↔ 目次 ↔ 閉じるボタンのフォーカス巡回' : 'Cycle Search, Peek, TOC, Close buttons'),
+          _HelpItem('Esc / q', isJp ? 'ガイドブック / スポイラーを閉じる' : 'Close Guidebook / Spoilers'),
+          _HelpItem('F1 / Alt-h', isJp ? '操作ヘルプの表示' : 'Show controls help'),
         ];
 
       case KeyboardHelpContext.titleScreen:
         return [
-          _HelpItem('Enter', isJapanese ? '冒険を始める（フォーカス未選択時も即時実行可能）' : 'Start Adventure (immediate from unfocused)'),
-          _HelpItem('Tab / Shift+Tab', isJapanese ? '言語切替 ↔ 開始 ↔ 設定 ↔ ヘルプボタン等のフォーカス循環' : 'Cycle Language, Start, Settings, Help buttons'),
-          _HelpItem('Space', isJapanese ? '言語切り替え（言語フォーカス時）、または選択ボタンを実行' : 'Toggle language or execute focused button'),
-          _HelpItem('← / →', isJapanese ? '言語を直接選択（←: 日本語, →: English）' : 'Select language (←: Japanese, →: English)'),
-          _HelpItem('Esc', isJapanese ? 'フォーカス枠を解除して初期状態にリセット' : 'Clear focus highlight'),
-          _HelpItem('F1 / Alt-h', isJapanese ? '操作ヘルプの表示' : 'Show controls help'),
+          _HelpItem('Enter', isJp ? '冒険を始める（フォーカス未選択時も即時実行可能）' : 'Start Adventure (immediate from unfocused)'),
+          _HelpItem('Tab / Shift+Tab', isJp ? '各ボタンのフォーカス循環' : 'Cycle buttons'),
+          _HelpItem('Space', isJp ? '言語切り替え（言語選択時）、または選択ボタンを実行' : 'Toggle language or execute focused button'),
+          _HelpItem('← / →', isJp ? '言語直接選択（←: 日本語, →: English）' : 'Select language (←: Japanese, →: English)'),
+          _HelpItem('Esc', isJp ? 'フォーカス枠を解除して初期状態にリセット' : 'Clear focus highlight'),
+          _HelpItem('F1 / Alt-h', isJp ? '操作ヘルプの表示' : 'Show controls help'),
         ];
 
       case KeyboardHelpContext.settings:
         return [
-          _HelpItem('↓ (初期状態)', isJapanese ? '一番上の項目（タイル設定）を選択＆最上部へスクロール' : 'Select first setting and scroll to top'),
-          _HelpItem('↑ (初期状態)', isJapanese ? '一番下の項目（クレジット）を選択＆最下部へスクロール' : 'Select last setting and scroll to bottom'),
-          _HelpItem('↑ / ↓', isJapanese ? '項目間の順送り・逆送り移動（端到達時は AppBar 戻るボタン経由で循環ループ）' : 'Move between settings (cycles via Back button)'),
-          _HelpItem('Space / Enter', isJapanese ? 'スイッチのトグル反転・選択肢の決定（戻るボタン時は前画面へ戻る）' : 'Toggle switch / confirm selection / Back'),
-          _HelpItem('Tab / Shift+Tab', isJapanese ? '全設定項目間を標準フォーカス移動' : 'Standard focus traversal'),
-          _HelpItem('PgDn / PgUp', isJapanese ? '1画面分上下スクロール' : 'Page down / up'),
-          _HelpItem('Home / End', isJapanese ? '設定画面の最先頭 / 最末尾へジャンプ' : 'Jump to top / bottom'),
-          _HelpItem('Esc', isJapanese ? '設定を安全に保存して前画面へ戻る' : 'Save settings and return'),
-          _HelpItem('F1 / Alt-h', isJapanese ? '操作ヘルプの表示' : 'Show controls help'),
+          _HelpItem('↑ / ↓', isJp ? '項目の移動・選択（端到達時は AppBar 戻るボタン経由で循環ループ）' : 'Move / select item (cycles via Back button)'),
+          _HelpItem('Space / Enter', isJp ? 'トグル切り替え / 決定（戻るボタン時は前画面へ戻る）' : 'Toggle / Confirm (or Back)'),
+          _HelpItem('Tab / Shift+Tab', isJp ? 'フォーカス移動' : 'Move focus'),
+          _HelpItem('PgDn / PgUp', isJp ? 'ページスクロール' : 'Scroll page'),
+          _HelpItem('Home / End', isJp ? '最先頭 / 最末尾へ移動' : 'Jump to top / bottom'),
+          _HelpItem('Esc', isJp ? '保存して戻る' : 'Save and return'),
+          _HelpItem('F1 / Alt-h', isJp ? '操作ヘルプの表示' : 'Show controls help'),
+        ];
+
+      case KeyboardHelpContext.textInput:
+        return [
+          _HelpItem('文字入力', isJp ? '初期状態（未フォーカス）のままでも英数字・記号を直接入力可能' : 'Type letters/digits directly without focusing'),
+          _HelpItem('Tab', isJp ? '入力欄にフォーカスを当てて日本語 IME（ローマ字かな変換・キャレット）を有効化' : 'Focus text field to enable Japanese IME & caret'),
+          _HelpItem('Backspace', isJp ? '直前の1文字を削除' : 'Delete character'),
+          _HelpItem('Delete', isJp ? '入力欄の全文字を消去' : 'Clear entire input'),
+          _HelpItem('Enter', isJp ? '入力を確定して送信' : 'Confirm and submit input'),
+          _HelpItem('Esc', isJp ? '入力をキャンセルして閉じる' : 'Cancel and close'),
+          _HelpItem('Tab / Shift+Tab', isJp ? '入力欄 ↔ 決定ボタン ↔ キャンセルボタンのフォーカス循環' : 'Cycle input field and buttons'),
+          _HelpItem('F1 / Alt-h', isJp ? '操作ヘルプの表示' : 'Show controls help'),
+        ];
+
+      case KeyboardHelpContext.extCmd:
+        return [
+          _HelpItem('文字入力', isJp ? '初期状態のままでも直接打鍵して候補をインクリメンタル絞り込み' : 'Type letters directly to filter commands'),
+          _HelpItem('Tab / Shift+Tab', isJp ? '候補の順送り・逆送り巡回オートコンプリート' : 'Cycle autocompletion forward / backward'),
+          _HelpItem('↑ / ↓', isJp ? '候補リストの選択移動（自動追従スクロール）' : 'Navigate candidates list'),
+          _HelpItem('Enter', isJp ? 'ハイライト・補完されたコマンドを即座に実行（# は自動切除）' : 'Execute highlighted command (# trimmed)'),
+          _HelpItem('Esc', isJp ? 'キャンセルして閉じる' : 'Cancel and close'),
+          _HelpItem('F1 / Alt-h', isJp ? '操作ヘルプの表示' : 'Show controls help'),
+        ];
+
+      case KeyboardHelpContext.askName:
+        return [
+          _HelpItem('文字入力', isJp ? '初期状態のままでも名前入力欄に英数字を直接入力可能' : 'Type name letters directly without focusing'),
+          _HelpItem('Tab / Shift+Tab', isJp ? '名前欄 ↔ セーブ一覧 ↔ プレイモード ↔ キャンセル ↔ 開始の循環' : 'Cycle name, saves, mode, and buttons'),
+          _HelpItem('← / → / Space', isJp ? 'プレイモード切り替え（通常 ↔ 探索 ↔ ウィザード）※モード選択時' : 'Toggle game mode (Normal / Explore / Wizard)'),
+          _HelpItem('↑ / ↓', isJp ? 'セーブデータ一覧の上下選択（名前自動入力）※セーブ一覧選択時' : 'Select saved games (auto-fills name)'),
+          _HelpItem('Enter', isJp ? '冒険を開始（またはフォーカス中のボタンを実行）' : 'Start adventure or execute focused button'),
+          _HelpItem('Esc', isJp ? '前画面へ戻る' : 'Return to previous screen'),
+          _HelpItem('F1 / Alt-h', isJp ? '操作ヘルプの表示' : 'Show controls help'),
+        ];
+
+      case KeyboardHelpContext.textWindow:
+        return [
+          _HelpItem('Space / PgDn / >', isJp ? 'ページ送り（最下部で押すと画面を閉じる）' : 'Page down (closes at bottom)'),
+          _HelpItem('Shift+Space / PgUp / <', isJp ? 'ページ戻り' : 'Page up'),
+          _HelpItem('↑ / ↓ (k / j)', isJp ? '1行ずつ上下スクロール' : 'Scroll 1 line up/down'),
+          _HelpItem('Home / End', isJp ? '最先頭 / 最末尾へジャンプ' : 'Jump to top / bottom'),
+          _HelpItem('Enter', isJp ? '任意の位置から即座に閉じる（または選択ボタン実行）' : 'Close immediately from any position'),
+          _HelpItem('Tab / Shift+Tab', isJp ? '下部ボタン（OK、履歴等）のフォーカス巡回' : 'Cycle bottom action buttons'),
+          _HelpItem('Esc / q', isJp ? '画面を閉じる' : 'Close window'),
+          _HelpItem('F1 / Alt-h', isJp ? '操作ヘルプの表示' : 'Show controls help'),
         ];
     }
   }
@@ -307,4 +488,3 @@ class _HelpItem {
   final String desc;
   const _HelpItem(this.key, this.desc);
 }
-

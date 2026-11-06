@@ -722,6 +722,21 @@ class OpenDrawerMenu extends KeyAction {
   int get hashCode => runtimeType.hashCode;
 }
 
+/// 階層の全体地図を開くアクション（F9, Alt+z / M-z）
+class OpenFullMap extends KeyAction {
+  const OpenFullMap();
+
+  @override
+  String toString() => 'OpenFullMap()';
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) || other is OpenFullMap;
+
+  @override
+  int get hashCode => runtimeType.hashCode;
+}
+
 /// タイトル画面でのフォーカス循環 (Tab / Shift+Tab)
 class TitleTab extends KeyAction {
   final bool forward;
@@ -1416,6 +1431,14 @@ class HardwareKeyRouter {
         (isControlPressed && event.logicalKey == LogicalKeyboardKey.keyM)) {
       return (event is KeyDownEvent)
           ? const OpenDrawerMenu()
+          : const SwallowKey();
+    }
+
+    // 0-1. 階層の全体地図起動キー（F9, Alt+z / M-z）
+    if (event.logicalKey == LogicalKeyboardKey.f9 ||
+        (isAltPressed && event.logicalKey == LogicalKeyboardKey.keyZ)) {
+      return (event is KeyDownEvent)
+          ? const OpenFullMap()
           : const SwallowKey();
     }
 

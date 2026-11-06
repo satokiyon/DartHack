@@ -100,7 +100,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get gameOptions => 'Game Options ( O )';
 
   @override
-  String get showFullMap => 'Show Full Level Map';
+  String get showFullMap => 'Show Full Level Map (F9 / M-z)';
 
   @override
   String get hideKeyboard => 'Hide Controls';
@@ -1621,5 +1621,5 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get usePhysicalKeyboardNotationSub =>
-      'Show shortcut keys (y:, n:, Esc:, etc.) on buttons. When ON, press F1 to display controls help';
+      'Show shortcut keys (y:, n:, Esc:, etc.) on buttons. When ON, press F1 or M-h (Alt-h) to display controls help';
 }

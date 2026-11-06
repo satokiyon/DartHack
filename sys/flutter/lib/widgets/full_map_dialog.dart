@@ -195,11 +195,14 @@ class _FullMapDialogContentState extends State<_FullMapDialogContent>
     final key = event.logicalKey;
     final isShift = HardwareKeyboard.instance.isShiftPressed;
     final isCtrl = HardwareKeyboard.instance.isControlPressed;
+    final isAlt = HardwareKeyboard.instance.isAltPressed;
 
-    // 閉じる: Escape / q / Space
+    // 閉じる: Escape / q / Space / F9 / Alt+z
     if (key == LogicalKeyboardKey.escape ||
         (key == LogicalKeyboardKey.keyQ && !isCtrl) ||
-        key == LogicalKeyboardKey.space) {
+        key == LogicalKeyboardKey.space ||
+        key == LogicalKeyboardKey.f9 ||
+        (key == LogicalKeyboardKey.keyZ && isAlt)) {
       if (isDown) Navigator.of(context).pop();
       return KeyEventResult.handled;
     }
@@ -228,8 +231,8 @@ class _FullMapDialogContentState extends State<_FullMapDialogContent>
       return KeyEventResult.handled;
     }
 
-    // 拡大トグル: z
-    if (key == LogicalKeyboardKey.keyZ && !isCtrl) {
+    // 拡大トグル: z (Altなし)
+    if (key == LogicalKeyboardKey.keyZ && !isCtrl && !isAlt) {
       if (isDown) _toggleZoom();
       return KeyEventResult.handled;
     }

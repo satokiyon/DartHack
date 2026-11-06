@@ -281,7 +281,7 @@ abstract class AppLocalizations {
   /// No description provided for @showFullMap.
   ///
   /// In ja, this message translates to:
-  /// **'階層の全体地図を表示'**
+  /// **'階層の全体地図を表示 (F9 / M-z)'**
   String get showFullMap;
 
   /// No description provided for @hideKeyboard.
@@ -3083,7 +3083,7 @@ abstract class AppLocalizations {
   /// No description provided for @usePhysicalKeyboardNotationSub.
   ///
   /// In ja, this message translates to:
-  /// **'ボタンに割り当てキー（y:、n:、Esc:等）を表示します。ON時はF1キーで操作ヘルプを表示できます'**
+  /// **'ボタンに割り当てキー（y:、n:、Esc:等）を表示します。ON時はF1またはM-h (Alt-h)キーで操作ヘルプを表示できます'**
   String get usePhysicalKeyboardNotationSub;
 }
 

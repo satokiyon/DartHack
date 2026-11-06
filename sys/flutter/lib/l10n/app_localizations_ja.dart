@@ -99,7 +99,7 @@ class AppLocalizationsJa extends AppLocalizations {
   String get gameOptions => 'オプション設定 ( O )';
 
   @override
-  String get showFullMap => '階層の全体地図を表示';
+  String get showFullMap => '階層の全体地図を表示 (F9 / M-z)';
 
   @override
   String get hideKeyboard => '操作ボタンを非表示';
@@ -1584,5 +1584,5 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get usePhysicalKeyboardNotationSub =>
-      'ボタンに割り当てキー（y:、n:、Esc:等）を表示します。ON時はF1キーで操作ヘルプを表示できます';
+      'ボタンに割り当てキー（y:、n:、Esc:等）を表示します。ON時はF1またはM-h (Alt-h)キーで操作ヘルプを表示できます';
 }

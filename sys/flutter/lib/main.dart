@@ -1168,6 +1168,10 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
         }
         return KeyEventResult.handled;
 
+      case OpenFullMap():
+        _showFullMapDialog();
+        return KeyEventResult.handled;
+
       case GameTab(:final forward):
         final available = <MapButtonFocus>[
           if (_isMenuButtonVisible) MapButtonFocus.menu,
@@ -1599,9 +1603,27 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
   void _showKeyboardHelp() {
     KeyboardHelpContext helpContext;
     if (!_isGameRunning) {
-      helpContext = KeyboardHelpContext.titleScreen;
+      if (_isAskNameVisible) {
+        helpContext = KeyboardHelpContext.askName;
+      } else {
+        helpContext = KeyboardHelpContext.titleScreen;
+      }
+    } else if (_isAskNameVisible) {
+      helpContext = KeyboardHelpContext.askName;
+    } else if (_isGetLineVisible) {
+      if (_extCmdList.isNotEmpty) {
+        helpContext = KeyboardHelpContext.extCmd;
+      } else {
+        helpContext = KeyboardHelpContext.textInput;
+      }
     } else if (_screen.isMenuWindowVisible) {
-      helpContext = KeyboardHelpContext.menu;
+      if (isExtCmdMenuPrompt(_screen.menuPrompt)) {
+        helpContext = KeyboardHelpContext.extCmd;
+      } else {
+        helpContext = KeyboardHelpContext.menu;
+      }
+    } else if (_screen.isTextWindowVisible) {
+      helpContext = KeyboardHelpContext.textWindow;
     } else if (_isYnVisible) {
       helpContext = KeyboardHelpContext.yn;
     } else {

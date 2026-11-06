@@ -133,6 +133,20 @@ void main() {
       expect(find.byType(KeyboardHelpDialog), findsNothing);
     });
 
+    testWidgets('game コンテキストで全体地図およびドロワー起動のヘルプが表示されること', (tester) async {
+      await tester.pumpWidget(buildTestWidget(
+        helpContext: KeyboardHelpContext.game,
+      ));
+
+      await tester.tap(find.text('Open Help'));
+      await tester.pumpAndSettle();
+
+      expect(find.byType(KeyboardHelpDialog), findsOneWidget);
+      expect(find.textContaining('F9 / Alt-z'), findsOneWidget);
+      expect(find.textContaining('階層の全体地図を表示'), findsOneWidget);
+      expect(find.textContaining('Ctrl+M / F10'), findsOneWidget);
+    });
+
     testWidgets('titleScreen コンテキストでタイトル画面向け操作ヘルプが表示されること', (tester) async {
       await tester.pumpWidget(buildTestWidget(
         helpContext: KeyboardHelpContext.titleScreen,

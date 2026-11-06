@@ -783,6 +783,15 @@ class _SettingsPageState extends State<SettingsPage> {
               }
             },
           ),
+          SwitchListTile(
+            title: Text(l10n.usePhysicalKeyboardNotation),
+            subtitle: Text(l10n.usePhysicalKeyboardNotationSub),
+            value: _usePhysicalKeyboardNotation,
+            onChanged: (val) {
+              setState(() => _usePhysicalKeyboardNotation = val);
+              _saveSetting('use_physical_keyboard_notation', val);
+            },
+          ),
           _buildDropdownSettingTile<String>(
             title: l10n.cameraFollowMode,
             value: _cameraFollowMode,
@@ -899,15 +908,6 @@ class _SettingsPageState extends State<SettingsPage> {
                     _saveSetting('map_fixed_msg_avoid_flip', val);
                   }
                 : null,
-          ),
-          SwitchListTile(
-            title: Text(l10n.usePhysicalKeyboardNotation),
-            subtitle: Text(l10n.usePhysicalKeyboardNotationSub),
-            value: _usePhysicalKeyboardNotation,
-            onChanged: (val) {
-              setState(() => _usePhysicalKeyboardNotation = val);
-              _saveSetting('use_physical_keyboard_notation', val);
-            },
           ),
         ]),
       ),

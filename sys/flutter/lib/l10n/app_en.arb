@@ -32,7 +32,7 @@
   "showHelp": "Show Help (?)",
   "dbSearch": "Database Search ( /? )",
   "gameOptions": "Game Options ( O )",
-  "showFullMap": "Show Full Level Map",
+  "showFullMap": "Show Full Level Map (F9 / M-z)",
   "hideKeyboard": "Hide Controls",
   "showKeyboard": "Show Controls",
   "openSettings": "Open Game Settings",
@@ -598,5 +598,5 @@
   "optAdFeatureExitHighlightSub": "Display run highlights with banner ad when the game ends",
   "gameEndDialogTitle": "Game Over",
   "usePhysicalKeyboardNotation": "Use Physical Keyboard Notation",
-  "usePhysicalKeyboardNotationSub": "Show shortcut keys (y:, n:, Esc:, etc.) on buttons. When ON, press F1 to display controls help"
+  "usePhysicalKeyboardNotationSub": "Show shortcut keys (y:, n:, Esc:, etc.) on buttons. When ON, press F1 or M-h (Alt-h) to display controls help"
 }
