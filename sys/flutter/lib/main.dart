@@ -1060,6 +1060,9 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
     final isAlt = HardwareKeyboard.instance.isAltPressed;
     final isTextFieldFocused =
         FocusManager.instance.primaryFocus?.context?.widget is EditableText;
+    final isAnyKeyButtonFocused = _isAnyKeyVisible &&
+        _anyKeyOverlayKey.currentState != null &&
+        _anyKeyOverlayKey.currentState!.focusTarget != AnyKeyFocusTarget.none;
 
     final action = HardwareKeyRouter.route(
       event: event,
@@ -1072,6 +1075,7 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
       isControlPressed: isCtrl,
       isAltPressed: isAlt,
       isTextFieldFocused: isTextFieldFocused,
+      isAnyKeyButtonFocused: isAnyKeyButtonFocused,
     );
 
     switch (action) {
@@ -1199,6 +1203,14 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
           }
         }
         setState(() => _mapButtonFocus = nextFocus);
+        return KeyEventResult.handled;
+
+      case AnyKeyTab(:final forward):
+        _anyKeyOverlayKey.currentState?.cycleFocus(forward);
+        return KeyEventResult.handled;
+
+      case AnyKeySubmit():
+        _anyKeyOverlayKey.currentState?.submitFocused();
         return KeyEventResult.handled;
 
       case SendKey(:final code, :final label):
@@ -1626,6 +1638,8 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
       }
     } else if (_screen.isTextWindowVisible) {
       helpContext = KeyboardHelpContext.textWindow;
+    } else if (_isAnyKeyVisible) {
+      helpContext = KeyboardHelpContext.anyKey;
     } else if (_isYnVisible) {
       helpContext = KeyboardHelpContext.yn;
     } else {

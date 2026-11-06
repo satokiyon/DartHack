@@ -737,6 +737,40 @@ class OpenFullMap extends KeyAction {
   int get hashCode => runtimeType.hashCode;
 }
 
+/// 1文字コマンド説明画面（AnyKeyOverlay）でのフォーカス循環 (Tab / Shift+Tab)
+class AnyKeyTab extends KeyAction {
+  final bool forward;
+  const AnyKeyTab({this.forward = true});
+
+  @override
+  String toString() => 'AnyKeyTab(forward: $forward)';
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is AnyKeyTab &&
+          runtimeType == other.runtimeType &&
+          forward == other.forward;
+
+  @override
+  int get hashCode => forward.hashCode;
+}
+
+/// 1文字コマンド説明画面（AnyKeyOverlay）でのボタン決定操作 (Enter / Space)
+class AnyKeySubmit extends KeyAction {
+  const AnyKeySubmit();
+
+  @override
+  String toString() => 'AnyKeySubmit()';
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) || other is AnyKeySubmit;
+
+  @override
+  int get hashCode => runtimeType.hashCode;
+}
+
 /// タイトル画面でのフォーカス循環 (Tab / Shift+Tab)
 class TitleTab extends KeyAction {
   final bool forward;
@@ -862,6 +896,7 @@ class HardwareKeyRouter {
     bool isControlPressed = false,
     bool isAltPressed = false,
     bool isTextFieldFocused = false,
+    bool isAnyKeyButtonFocused = false,
   }) {
     // KeyDownEvent または KeyRepeatEvent のみを処理（KeyUp は無視）
     if (event is! KeyDownEvent && event is! KeyRepeatEvent) {
@@ -886,10 +921,21 @@ class HardwareKeyRouter {
       return _routeTitleScreen(event, isShiftPressed: isShiftPressed);
     }
 
-    // 1a. 1文字コマンド説明検索（AnyKeyOverlay: `?` コマンド説明）
+    // 1a. 1文字コマンド説明検索（AnyKeyOverlay: `&` コマンド説明）
     if (context == KeyInputContext.anyKeyOverlay) {
       if (event.logicalKey == LogicalKeyboardKey.escape) {
         return const SendKey(27, 'ESC');
+      }
+      if (event.logicalKey == LogicalKeyboardKey.tab) {
+        return AnyKeyTab(forward: !isShiftPressed);
+      }
+      if (isAnyKeyButtonFocused &&
+          (event.logicalKey == LogicalKeyboardKey.enter ||
+              event.logicalKey == LogicalKeyboardKey.numpadEnter ||
+              event.logicalKey == LogicalKeyboardKey.space)) {
+        return (event is KeyDownEvent)
+            ? const AnyKeySubmit()
+            : const SwallowKey();
       }
       if (isTextFieldFocused) {
         return const IgnoreKey();

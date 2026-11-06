@@ -13,6 +13,7 @@ enum KeyboardHelpContext {
   extCmd,     // 拡張コマンド一覧 (# コマンド)
   askName,    // キャラ作成・お名前入力画面
   textWindow, // 長文テキスト (概要、怪物・所持品一覧、墓石、スコア等)
+  anyKey,     // 1文字コマンド説明 (「&」コマンド / AnyKeyOverlay)
 }
 
 /// キーボード操作ヘルプダイアログ
@@ -478,6 +479,16 @@ class _KeyboardHelpDialogState extends State<KeyboardHelpDialog> {
           _HelpItem('Enter', isJp ? '任意の位置から即座に閉じる（または選択ボタン実行）' : 'Close immediately from any position'),
           _HelpItem('Tab / Shift+Tab', isJp ? '下部ボタン（OK、履歴等）のフォーカス巡回' : 'Cycle bottom action buttons'),
           _HelpItem('Esc / q', isJp ? '画面を閉じる' : 'Close window'),
+          _HelpItem('F1 / Alt-h', isJp ? '操作ヘルプの表示' : 'Show controls help'),
+        ];
+
+      case KeyboardHelpContext.anyKey:
+        return [
+          _HelpItem('キー入力', isJp ? '調べたいキーを押してコマンドの働きを説明' : 'Press any key to explain command'),
+          _HelpItem('Space / Enter', isJp ? 'Space / Enter 自体のコマンド説明を表示（未選択時）' : 'Explain Space / Enter command (when unfocused)'),
+          _HelpItem('Tab / Shift+Tab', isJp ? 'none ↔「閉じる」↔「履歴」ボタンのフォーカス循環' : 'Cycle none, Close, History buttons'),
+          _HelpItem('Enter / Space', isJp ? 'フォーカス中のボタンを実行（閉じる / 履歴）' : 'Execute focused button (Close / History)'),
+          _HelpItem('Esc', isJp ? '画面を閉じる' : 'Close overlay'),
           _HelpItem('F1 / Alt-h', isJp ? '操作ヘルプの表示' : 'Show controls help'),
         ];
     }

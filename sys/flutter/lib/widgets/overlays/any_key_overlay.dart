@@ -2,6 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import '../../l10n/app_localizations.dart';
 
+/// AnyKeyOverlay での Tab キーフォーカス対象
+enum AnyKeyFocusTarget {
+  none,
+  close,
+  history,
+}
+
 class AnyKeyOverlay extends StatefulWidget {
   final String question;
   final int defaultChoice;
@@ -39,6 +46,42 @@ class AnyKeyOverlayState extends State<AnyKeyOverlay> {
 
   // クイックキーパッドの表示モード (false = ABC文字, true = 全記号 32種)
   bool _showSymbolsPad = false;
+
+  // 物理キーボード Tab フォーカス対象 (none ↔ close ↔ history)
+  AnyKeyFocusTarget _focusTarget = AnyKeyFocusTarget.none;
+  AnyKeyFocusTarget get focusTarget => _focusTarget;
+
+  void cycleFocus([bool forward = true]) {
+    final targets = <AnyKeyFocusTarget>[
+      AnyKeyFocusTarget.none,
+      AnyKeyFocusTarget.close,
+      AnyKeyFocusTarget.history,
+    ];
+    final currentIndex = targets.indexOf(_focusTarget);
+    final safeIndex = currentIndex == -1 ? 0 : currentIndex;
+    final nextIndex = forward
+        ? (safeIndex + 1) % targets.length
+        : (safeIndex - 1 + targets.length) % targets.length;
+    setState(() {
+      _focusTarget = targets[nextIndex];
+    });
+  }
+
+  void submitFocused() {
+    if (_focusTarget == AnyKeyFocusTarget.close) {
+      widget.onClose();
+    } else if (_focusTarget == AnyKeyFocusTarget.history) {
+      widget.onShowMsgHistory();
+    }
+  }
+
+  void resetFocus() {
+    if (_focusTarget != AnyKeyFocusTarget.none) {
+      setState(() {
+        _focusTarget = AnyKeyFocusTarget.none;
+      });
+    }
+  }
 
   @override
   void dispose() {
@@ -277,25 +320,65 @@ class AnyKeyOverlayState extends State<AnyKeyOverlay> {
                         Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            ElevatedButton.icon(
-                              onPressed: widget.onClose,
-                              icon: const Icon(Icons.close_rounded, size: 16),
-                              label: Text(l10n.close),
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: Colors.red.shade900.withValues(alpha: 0.8),
-                                foregroundColor: Colors.white,
-                                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                            DecoratedBox(
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(24),
+                                border: Border.all(
+                                  color: _focusTarget == AnyKeyFocusTarget.close
+                                      ? Colors.amberAccent
+                                      : Colors.transparent,
+                                  width: 2.0,
+                                ),
+                                boxShadow: _focusTarget == AnyKeyFocusTarget.close
+                                    ? [
+                                        BoxShadow(
+                                          color: Colors.amberAccent.withValues(alpha: 0.4),
+                                          blurRadius: 8,
+                                          spreadRadius: 1,
+                                        ),
+                                      ]
+                                    : null,
+                              ),
+                              child: ElevatedButton.icon(
+                                onPressed: widget.onClose,
+                                icon: const Icon(Icons.close_rounded, size: 16),
+                                label: Text(l10n.close),
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: Colors.red.shade900.withValues(alpha: 0.8),
+                                  foregroundColor: Colors.white,
+                                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                                ),
                               ),
                             ),
                             const SizedBox(width: 12),
-                            ElevatedButton.icon(
-                              onPressed: widget.onShowMsgHistory,
-                              icon: const Icon(Icons.history_rounded, size: 16),
-                              label: Text(l10n.history),
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: Colors.blueGrey[900],
-                                foregroundColor: Colors.amber[200],
-                                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                            DecoratedBox(
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(24),
+                                border: Border.all(
+                                  color: _focusTarget == AnyKeyFocusTarget.history
+                                      ? Colors.amberAccent
+                                      : Colors.transparent,
+                                  width: 2.0,
+                                ),
+                                boxShadow: _focusTarget == AnyKeyFocusTarget.history
+                                    ? [
+                                        BoxShadow(
+                                          color: Colors.amberAccent.withValues(alpha: 0.4),
+                                          blurRadius: 8,
+                                          spreadRadius: 1,
+                                        ),
+                                      ]
+                                    : null,
+                              ),
+                              child: ElevatedButton.icon(
+                                onPressed: widget.onShowMsgHistory,
+                                icon: const Icon(Icons.history_rounded, size: 16),
+                                label: Text(l10n.history),
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: Colors.blueGrey[900],
+                                  foregroundColor: Colors.amber[200],
+                                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                                ),
                               ),
                             ),
                           ],
