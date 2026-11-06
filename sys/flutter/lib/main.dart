@@ -29,6 +29,7 @@ import 'dart:convert';
 import 'package:ffi/ffi.dart';
 import 'widgets/exit_highlight_dialog.dart';
 import 'widgets/standard_exit_dialog.dart';
+import 'widgets/new_level_rest_dialog.dart';
 import 'utils/rewarded_ad_manager.dart';
 import 'utils/yn_choice_parser.dart';
 
@@ -2540,64 +2541,8 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
       context: context,
       barrierDismissible: false,
       builder: (BuildContext dialogContext) {
-        return AlertDialog(
-          backgroundColor: Colors.grey[950],
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(16),
-          ),
-          title: Row(
-            children: [
-              const Icon(Icons.explore_rounded, color: Colors.amber),
-              const SizedBox(width: 8),
-              Text(isJp ? '未知の階層に到達' : 'Reached New Floor'),
-            ],
-          ),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              Text(
-                isJp ? '新しい階層に足を踏み入れた。\n広告を見て少し休息しますか？' : 'Stepped onto a new floor.\nWould you like to rest briefly by watching an ad?',
-                style: const TextStyle(fontSize: 14, height: 1.4),
-              ),
-              const SizedBox(height: 20),
-              ElevatedButton.icon(
-                icon: const Icon(Icons.play_circle_fill_rounded, size: 22),
-                label: Text(
-                  isJp ? '広告を見て休む (体力か魔力を回復)' : 'Rest by watching ad (Restore HP/PW)',
-                  style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
-                ),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.deepPurple.shade700,
-                  foregroundColor: Colors.white,
-                  padding: const EdgeInsets.symmetric(vertical: 14),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  elevation: 4,
-                ),
-                onPressed: () {
-                  Navigator.of(dialogContext).pop(true);
-                },
-              ),
-              const SizedBox(height: 10),
-              OutlinedButton.icon(
-                icon: const Icon(Icons.arrow_forward_rounded, size: 20),
-                label: Text(isJp ? 'そのまま進む' : 'Proceed as is'),
-                style: OutlinedButton.styleFrom(
-                  foregroundColor: Colors.white70,
-                  side: const BorderSide(color: Colors.white38),
-                  padding: const EdgeInsets.symmetric(vertical: 12),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                ),
-                onPressed: () {
-                  Navigator.of(dialogContext).pop(false);
-                },
-              ),
-            ],
-          ),
+        return NewLevelRestDialog(
+          isJapanese: isJp,
         );
       },
     );
