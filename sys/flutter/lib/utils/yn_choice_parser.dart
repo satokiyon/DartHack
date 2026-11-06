@@ -256,8 +256,16 @@ class YnChoiceParser {
     String keyChar, {
     required String question,
     required bool isJapanese,
+    bool useKeyboardNotation = false,
   }) {
     final lowerQ = question.toLowerCase();
+
+    String formatLabel(String prefix, String jpText, String enText) {
+      if (!useKeyboardNotation) {
+        return isJapanese ? jpText : enText;
+      }
+      return isJapanese ? '$prefix:$jpText' : '$prefix: $enText';
+    }
 
     // 1. 'a' キーの場合
     if (keyChar == 'a') {
@@ -268,46 +276,46 @@ class YnChoiceParser {
           lowerQ.contains('creatures vanquished') ||
           lowerQ.contains('genocided') ||
           lowerQ.contains('extinct')) {
-        return isJapanese ? 'a:並び順を指定' : 'a: Sort order';
+        return formatLabel('a', '並び順を指定', 'Sort order');
       }
 
       // (2) キャラメイクおまかせ
       if (question.contains('おまかせで') ||
           question.contains('キャラクターの種族') ||
           lowerQ.contains('shall i pick')) {
-        return isJapanese ? 'a:すべておまかせ' : 'a: Pick all';
+        return formatLabel('a', 'すべておまかせ', 'Pick all');
       }
 
       // (3) アイテム連続処理または汎用 All
-      return isJapanese ? 'a:すべて' : 'a: All';
+      return formatLabel('a', 'すべて', 'All');
     }
 
     // 2. 'y', 'n', 'N', 'q' の基本キー
     if (keyChar == 'y') {
-      return isJapanese ? 'y:はい' : 'y: Yes';
+      return formatLabel('y', 'はい', 'Yes');
     }
     if (keyChar == 'n') {
-      return isJapanese ? 'n:いいえ' : 'n: No';
+      return formatLabel('n', 'いいえ', 'No');
     }
     if (keyChar == 'N') {
-      return isJapanese ? 'N:全ていいえ' : 'N: No to all';
+      return formatLabel('N', '全ていいえ', 'No to all');
     }
     if (keyChar == 'q') {
-      return isJapanese ? 'q:中断' : 'q: Quit';
+      return formatLabel('q', '中断', 'Quit');
     }
 
     // 3. 特殊な2択プロンプト
     if (keyChar == 'h' && (question.contains('隠れる') || lowerQ.contains('hide'))) {
-      return isJapanese ? 'h:隠れる' : 'h: Hide';
+      return formatLabel('h', '隠れる', 'Hide');
     }
     if (keyChar == 's' && (question.contains('クモの巣') || lowerQ.contains('spin web'))) {
-      return isJapanese ? 's:クモの巣' : 's: Spin web';
+      return formatLabel('s', 'クモの巣', 'Spin web');
     }
     if (keyChar == 'r' && (question.contains('指') || lowerQ.contains('ring') || lowerQ.contains('hand'))) {
-      return isJapanese ? 'r:右' : 'r: Right';
+      return formatLabel('r', '右', 'Right');
     }
     if (keyChar == 'l' && (question.contains('指') || lowerQ.contains('ring') || lowerQ.contains('hand'))) {
-      return isJapanese ? 'l:左' : 'l: Left';
+      return formatLabel('l', '左', 'Left');
     }
 
     // 4. それ以外の汎用文字

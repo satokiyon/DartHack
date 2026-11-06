@@ -597,5 +597,7 @@
   "optAdFeatureNewLevelRestSub": "新しい階層到達時に広告視聴で休息するか確認します",
   "optAdFeatureExitHighlightTitle": "ゲーム終了時のハイライト表示",
   "optAdFeatureExitHighlightSub": "ゲーム終了時に今回の冒険のハイライトを表示します",
-  "gameEndDialogTitle": "ゲーム終了"
+  "gameEndDialogTitle": "ゲーム終了",
+  "usePhysicalKeyboardNotation": "物理キーボード用の表記を使用",
+  "usePhysicalKeyboardNotationSub": "ボタンに割り当てキー（y:、n:、Esc:等）を表示します。ON時はF1キーで操作ヘルプを表示できます"
 }

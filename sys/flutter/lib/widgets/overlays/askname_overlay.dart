@@ -23,6 +23,7 @@ class AskNameOverlay extends StatefulWidget {
   final PlayMode initialPlayMode;
   final Function(PlayMode mode, String? name) onSubmit;
   final double bottomInset;
+  final bool usePhysicalKeyboardNotation;
 
   const AskNameOverlay({
     super.key,
@@ -32,6 +33,7 @@ class AskNameOverlay extends StatefulWidget {
     required this.initialPlayMode,
     required this.onSubmit,
     required this.bottomInset,
+    this.usePhysicalKeyboardNotation = false,
   });
 
   @override
@@ -524,7 +526,11 @@ class AskNameOverlayState extends State<AskNameOverlay> {
                                     ? const BorderSide(color: Colors.amberAccent, width: 2.5)
                                     : null,
                               ),
-                              child: Text(l10n.cancel),
+                              child: Text(widget.usePhysicalKeyboardNotation
+                                  ? (Localizations.localeOf(context).languageCode == 'ja'
+                                      ? 'Esc:${l10n.cancel}'
+                                      : 'Esc: ${l10n.cancel}')
+                                  : l10n.cancel),
                             ),
                             const SizedBox(width: 8),
                             ElevatedButton(

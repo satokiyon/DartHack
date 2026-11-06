@@ -9,6 +9,7 @@ void main() {
     String choices = '',
     int defaultChoice = 0,
     Locale locale = const Locale('ja'),
+    bool usePhysicalKeyboardNotation = false,
     required Function(int) onSelect,
     Function(String)? onSelectText,
   }) {
@@ -24,6 +25,7 @@ void main() {
               question: question,
               choices: choices,
               defaultChoice: defaultChoice,
+              usePhysicalKeyboardNotation: usePhysicalKeyboardNotation,
               onSelect: onSelect,
               onSelectText: onSelectText,
               onShowMsgHistory: () {},
@@ -36,11 +38,31 @@ void main() {
   }
 
   group('YnOverlay Widget Tests', () {
-    testWidgets('標準 YN プロンプトで y:はい / n:いいえ ボタンが表示されタップできること', (tester) async {
+    testWidgets('標準 YN プロンプトで はい / いいえ ボタンが表示されタップできること (デフォルト: 表記なし)', (tester) async {
       int? selected;
       await tester.pumpWidget(
         buildTestWidget(
           question: '本当にゲームを終了しますか? [y/n]',
+          onSelect: (code) => selected = code,
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      expect(find.text('はい'), findsOneWidget);
+      expect(find.text('いいえ'), findsOneWidget);
+
+      await tester.tap(find.text('はい'));
+      await tester.pumpAndSettle();
+
+      expect(selected, equals('y'.codeUnitAt(0)));
+    });
+
+    testWidgets('標準 YN プロンプトで usePhysicalKeyboardNotation: true 時に y:はい / n:いいえ が表示されること', (tester) async {
+      int? selected;
+      await tester.pumpWidget(
+        buildTestWidget(
+          question: '本当にゲームを終了しますか? [y/n]',
+          usePhysicalKeyboardNotation: true,
           onSelect: (code) => selected = code,
         ),
       );
@@ -55,12 +77,35 @@ void main() {
       expect(selected, equals('y'.codeUnitAt(0)));
     });
 
-    testWidgets('討伐怪物一覧プロンプトで a:並び順を指定 ボタンが表示されタップできること', (tester) async {
+    testWidgets('討伐怪物一覧プロンプトで 並び順を指定 ボタンが表示されタップできること (デフォルト: 表記なし)', (tester) async {
       int? selected;
       await tester.pumpWidget(
         buildTestWidget(
           question: '倒した怪物の一覧を表示しますか?',
           choices: 'ynaq',
+          onSelect: (code) => selected = code,
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      expect(find.text('はい'), findsOneWidget);
+      expect(find.text('いいえ'), findsOneWidget);
+      expect(find.text('並び順を指定'), findsOneWidget);
+      expect(find.text('中断'), findsOneWidget);
+
+      await tester.tap(find.text('並び順を指定'));
+      await tester.pumpAndSettle();
+
+      expect(selected, equals('a'.codeUnitAt(0)));
+    });
+
+    testWidgets('討伐怪物一覧プロンプトで usePhysicalKeyboardNotation: true 時に a:並び順を指定 が表示されること', (tester) async {
+      int? selected;
+      await tester.pumpWidget(
+        buildTestWidget(
+          question: '倒した怪物の一覧を表示しますか?',
+          choices: 'ynaq',
+          usePhysicalKeyboardNotation: true,
           onSelect: (code) => selected = code,
         ),
       );
@@ -77,13 +122,37 @@ void main() {
       expect(selected, equals('a'.codeUnitAt(0)));
     });
 
-    testWidgets('英語モードで y: Yes / n: No / a: Sort order が表示されること', (tester) async {
+    testWidgets('英語モードで Yes / No / Sort order が表示されること (デフォルト: 表記なし)', (tester) async {
       int? selected;
       await tester.pumpWidget(
         buildTestWidget(
           question: 'Do you want an account of creatures vanquished?',
           choices: 'ynaq',
           locale: const Locale('en'),
+          onSelect: (code) => selected = code,
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      expect(find.text('Yes'), findsOneWidget);
+      expect(find.text('No'), findsOneWidget);
+      expect(find.text('Sort order'), findsOneWidget);
+      expect(find.text('Quit'), findsOneWidget);
+
+      await tester.tap(find.text('Sort order'));
+      await tester.pumpAndSettle();
+
+      expect(selected, equals('a'.codeUnitAt(0)));
+    });
+
+    testWidgets('英語モードで usePhysicalKeyboardNotation: true 時に y: Yes / n: No / a: Sort order が表示されること', (tester) async {
+      int? selected;
+      await tester.pumpWidget(
+        buildTestWidget(
+          question: 'Do you want an account of creatures vanquished?',
+          choices: 'ynaq',
+          locale: const Locale('en'),
+          usePhysicalKeyboardNotation: true,
           onSelect: (code) => selected = code,
         ),
       );
@@ -100,7 +169,7 @@ void main() {
       expect(selected, equals('a'.codeUnitAt(0)));
     });
 
-    testWidgets('#adjust スロット選択でチップと?ボタンが表示されタップできること', (tester) async {
+    testWidgets('#adjust スロット選択でチップと使用中スロットボタンが表示されタップできること', (tester) async {
       int? selected;
       await tester.pumpWidget(
         buildTestWidget(
@@ -119,7 +188,20 @@ void main() {
       await tester.pumpAndSettle();
       expect(selected, equals('c'.codeUnitAt(0)));
 
-      // '? 使用中スロット' ボタンが存在すること
+      // '使用中スロット' ボタンが存在すること (デフォルト: 表記なし)
+      expect(find.text('使用中スロット'), findsOneWidget);
+    });
+
+    testWidgets('#adjust スロット選択で usePhysicalKeyboardNotation: true 時に ? 使用中スロット が表示されること', (tester) async {
+      await tester.pumpWidget(
+        buildTestWidget(
+          question: 'スロット文字を調整 移動先はどこにしますか [c-z]? (?で使用中の文字を表示)',
+          usePhysicalKeyboardNotation: true,
+          onSelect: (_) {},
+        ),
+      );
+      await tester.pumpAndSettle();
+
       expect(find.text('? 使用中スロット'), findsOneWidget);
     });
 
@@ -191,11 +273,26 @@ void main() {
       expect(selected, equals('\$'.codeUnitAt(0)));
     });
 
-    testWidgets('英語モード時に英語ラベル (OK, ? Used Slots, All) が表示されること', (tester) async {
+    testWidgets('英語モード時に英語ラベル (OK, Used Slots, All) が表示されること', (tester) async {
       await tester.pumpWidget(
         buildTestWidget(
           locale: const Locale('en'),
           question: 'Adjust letter to what [c-z]? (? to see used letters)',
+          onSelect: (_) {},
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      expect(find.text('Used Slots'), findsOneWidget);
+      expect(find.text('OK'), findsOneWidget);
+    });
+
+    testWidgets('英語モード時に usePhysicalKeyboardNotation: true で ? Used Slots が表示されること', (tester) async {
+      await tester.pumpWidget(
+        buildTestWidget(
+          locale: const Locale('en'),
+          question: 'Adjust letter to what [c-z]? (? to see used letters)',
+          usePhysicalKeyboardNotation: true,
           onSelect: (_) {},
         ),
       );

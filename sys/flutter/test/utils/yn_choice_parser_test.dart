@@ -151,62 +151,92 @@ void main() {
   });
 
   group('YnChoiceParser.resolveButtonLabel', () {
-    test('討伐怪物一覧プロンプトで a が並び順指定になる (日本語・英語)', () {
+    test('討伐怪物一覧プロンプトで a が並び順指定になる (デフォルト: キー表記なし)', () {
       const qJp = '倒した怪物の一覧を表示しますか?';
-      expect(YnChoiceParser.resolveButtonLabel('a', question: qJp, isJapanese: true), 'a:並び順を指定');
-      expect(YnChoiceParser.resolveButtonLabel('y', question: qJp, isJapanese: true), 'y:はい');
-      expect(YnChoiceParser.resolveButtonLabel('n', question: qJp, isJapanese: true), 'n:いいえ');
-      expect(YnChoiceParser.resolveButtonLabel('q', question: qJp, isJapanese: true), 'q:中断');
+      expect(YnChoiceParser.resolveButtonLabel('a', question: qJp, isJapanese: true), '並び順を指定');
+      expect(YnChoiceParser.resolveButtonLabel('y', question: qJp, isJapanese: true), 'はい');
+      expect(YnChoiceParser.resolveButtonLabel('n', question: qJp, isJapanese: true), 'いいえ');
+      expect(YnChoiceParser.resolveButtonLabel('q', question: qJp, isJapanese: true), '中断');
 
       const qEn = 'Do you want an account of creatures vanquished?';
-      expect(YnChoiceParser.resolveButtonLabel('a', question: qEn, isJapanese: false), 'a: Sort order');
-      expect(YnChoiceParser.resolveButtonLabel('y', question: qEn, isJapanese: false), 'y: Yes');
-      expect(YnChoiceParser.resolveButtonLabel('n', question: qEn, isJapanese: false), 'n: No');
-      expect(YnChoiceParser.resolveButtonLabel('q', question: qEn, isJapanese: false), 'q: Quit');
+      expect(YnChoiceParser.resolveButtonLabel('a', question: qEn, isJapanese: false), 'Sort order');
+      expect(YnChoiceParser.resolveButtonLabel('y', question: qEn, isJapanese: false), 'Yes');
+      expect(YnChoiceParser.resolveButtonLabel('n', question: qEn, isJapanese: false), 'No');
+      expect(YnChoiceParser.resolveButtonLabel('q', question: qEn, isJapanese: false), 'Quit');
+    });
+
+    test('討伐怪物一覧プロンプトで useKeyboardNotation: true の場合はキー表記が付くこと', () {
+      const qJp = '倒した怪物の一覧を表示しますか?';
+      expect(YnChoiceParser.resolveButtonLabel('a', question: qJp, isJapanese: true, useKeyboardNotation: true), 'a:並び順を指定');
+      expect(YnChoiceParser.resolveButtonLabel('y', question: qJp, isJapanese: true, useKeyboardNotation: true), 'y:はい');
+      expect(YnChoiceParser.resolveButtonLabel('n', question: qJp, isJapanese: true, useKeyboardNotation: true), 'n:いいえ');
+      expect(YnChoiceParser.resolveButtonLabel('q', question: qJp, isJapanese: true, useKeyboardNotation: true), 'q:中断');
+
+      const qEn = 'Do you want an account of creatures vanquished?';
+      expect(YnChoiceParser.resolveButtonLabel('a', question: qEn, isJapanese: false, useKeyboardNotation: true), 'a: Sort order');
+      expect(YnChoiceParser.resolveButtonLabel('y', question: qEn, isJapanese: false, useKeyboardNotation: true), 'y: Yes');
+      expect(YnChoiceParser.resolveButtonLabel('n', question: qEn, isJapanese: false, useKeyboardNotation: true), 'n: No');
+      expect(YnChoiceParser.resolveButtonLabel('q', question: qEn, isJapanese: false, useKeyboardNotation: true), 'q: Quit');
     });
 
     test('虐殺・絶滅怪物一覧プロンプトで a が並び順指定になる', () {
       const qJp = '虐殺・絶滅した怪物種の一覧を表示しますか?';
-      expect(YnChoiceParser.resolveButtonLabel('a', question: qJp, isJapanese: true), 'a:並び順を指定');
+      expect(YnChoiceParser.resolveButtonLabel('a', question: qJp, isJapanese: true), '並び順を指定');
+      expect(YnChoiceParser.resolveButtonLabel('a', question: qJp, isJapanese: true, useKeyboardNotation: true), 'a:並び順を指定');
 
       const qEn = 'Do you want to see a list of genocided species?';
-      expect(YnChoiceParser.resolveButtonLabel('a', question: qEn, isJapanese: false), 'a: Sort order');
+      expect(YnChoiceParser.resolveButtonLabel('a', question: qEn, isJapanese: false), 'Sort order');
+      expect(YnChoiceParser.resolveButtonLabel('a', question: qEn, isJapanese: false, useKeyboardNotation: true), 'a: Sort order');
     });
 
     test('キャラメイクおまかせプロンプトで a がすべておまかせ / Pick all になる', () {
       const qJp = 'おまかせでキャラクターの種族、役割、性別、属性を選びますか? [ynaq]';
-      expect(YnChoiceParser.resolveButtonLabel('a', question: qJp, isJapanese: true), 'a:すべておまかせ');
+      expect(YnChoiceParser.resolveButtonLabel('a', question: qJp, isJapanese: true), 'すべておまかせ');
+      expect(YnChoiceParser.resolveButtonLabel('a', question: qJp, isJapanese: true, useKeyboardNotation: true), 'a:すべておまかせ');
 
       const qEn = "Shall I pick a character's race, role, gender and alignment for you? [ynaq]";
-      expect(YnChoiceParser.resolveButtonLabel('a', question: qEn, isJapanese: false), 'a: Pick all');
+      expect(YnChoiceParser.resolveButtonLabel('a', question: qEn, isJapanese: false), 'Pick all');
+      expect(YnChoiceParser.resolveButtonLabel('a', question: qEn, isJapanese: false, useKeyboardNotation: true), 'a: Pick all');
     });
 
     test('アイテム連続処理プロンプトで a がすべて / All になり、大文字Nが全ていいえになる', () {
       const qJp = '大きな箱を取り出しますか?';
-      expect(YnChoiceParser.resolveButtonLabel('a', question: qJp, isJapanese: true), 'a:すべて');
-      expect(YnChoiceParser.resolveButtonLabel('N', question: qJp, isJapanese: true), 'N:全ていいえ');
+      expect(YnChoiceParser.resolveButtonLabel('a', question: qJp, isJapanese: true), 'すべて');
+      expect(YnChoiceParser.resolveButtonLabel('N', question: qJp, isJapanese: true), '全ていいえ');
+      expect(YnChoiceParser.resolveButtonLabel('a', question: qJp, isJapanese: true, useKeyboardNotation: true), 'a:すべて');
+      expect(YnChoiceParser.resolveButtonLabel('N', question: qJp, isJapanese: true, useKeyboardNotation: true), 'N:全ていいえ');
 
       const qEn = 'Drop an uncursed dagger?';
-      expect(YnChoiceParser.resolveButtonLabel('a', question: qEn, isJapanese: false), 'a: All');
-      expect(YnChoiceParser.resolveButtonLabel('N', question: qEn, isJapanese: false), 'N: No to all');
+      expect(YnChoiceParser.resolveButtonLabel('a', question: qEn, isJapanese: false), 'All');
+      expect(YnChoiceParser.resolveButtonLabel('N', question: qEn, isJapanese: false), 'No to all');
+      expect(YnChoiceParser.resolveButtonLabel('a', question: qEn, isJapanese: false, useKeyboardNotation: true), 'a: All');
+      expect(YnChoiceParser.resolveButtonLabel('N', question: qEn, isJapanese: false, useKeyboardNotation: true), 'N: No to all');
     });
 
     test('特殊な2択プロンプト (隠れる/クモの巣、指輪の左右) のラベル解決', () {
       const qWeb = '隠れる [h] か、クモの巣を張る [s] か、どちらにしますか?';
-      expect(YnChoiceParser.resolveButtonLabel('h', question: qWeb, isJapanese: true), 'h:隠れる');
-      expect(YnChoiceParser.resolveButtonLabel('s', question: qWeb, isJapanese: true), 's:クモの巣');
+      expect(YnChoiceParser.resolveButtonLabel('h', question: qWeb, isJapanese: true), '隠れる');
+      expect(YnChoiceParser.resolveButtonLabel('s', question: qWeb, isJapanese: true), 'クモの巣');
+      expect(YnChoiceParser.resolveButtonLabel('h', question: qWeb, isJapanese: true, useKeyboardNotation: true), 'h:隠れる');
+      expect(YnChoiceParser.resolveButtonLabel('s', question: qWeb, isJapanese: true, useKeyboardNotation: true), 's:クモの巣');
 
       const qWebEn = 'hide in web [h] or spin web [s]?';
-      expect(YnChoiceParser.resolveButtonLabel('h', question: qWebEn, isJapanese: false), 'h: Hide');
-      expect(YnChoiceParser.resolveButtonLabel('s', question: qWebEn, isJapanese: false), 's: Spin web');
+      expect(YnChoiceParser.resolveButtonLabel('h', question: qWebEn, isJapanese: false), 'Hide');
+      expect(YnChoiceParser.resolveButtonLabel('s', question: qWebEn, isJapanese: false), 'Spin web');
+      expect(YnChoiceParser.resolveButtonLabel('h', question: qWebEn, isJapanese: false, useKeyboardNotation: true), 'h: Hide');
+      expect(YnChoiceParser.resolveButtonLabel('s', question: qWebEn, isJapanese: false, useKeyboardNotation: true), 's: Spin web');
 
       const qRing = 'どちらの指にはめますか? [r/l]';
-      expect(YnChoiceParser.resolveButtonLabel('r', question: qRing, isJapanese: true), 'r:右');
-      expect(YnChoiceParser.resolveButtonLabel('l', question: qRing, isJapanese: true), 'l:左');
+      expect(YnChoiceParser.resolveButtonLabel('r', question: qRing, isJapanese: true), '右');
+      expect(YnChoiceParser.resolveButtonLabel('l', question: qRing, isJapanese: true), '左');
+      expect(YnChoiceParser.resolveButtonLabel('r', question: qRing, isJapanese: true, useKeyboardNotation: true), 'r:右');
+      expect(YnChoiceParser.resolveButtonLabel('l', question: qRing, isJapanese: true, useKeyboardNotation: true), 'l:左');
 
       const qRingEn = 'Which ring finger, right or left? [r/l]';
-      expect(YnChoiceParser.resolveButtonLabel('r', question: qRingEn, isJapanese: false), 'r: Right');
-      expect(YnChoiceParser.resolveButtonLabel('l', question: qRingEn, isJapanese: false), 'l: Left');
+      expect(YnChoiceParser.resolveButtonLabel('r', question: qRingEn, isJapanese: false), 'Right');
+      expect(YnChoiceParser.resolveButtonLabel('l', question: qRingEn, isJapanese: false), 'Left');
+      expect(YnChoiceParser.resolveButtonLabel('r', question: qRingEn, isJapanese: false, useKeyboardNotation: true), 'r: Right');
+      expect(YnChoiceParser.resolveButtonLabel('l', question: qRingEn, isJapanese: false, useKeyboardNotation: true), 'l: Left');
     });
 
     test('未知の文字キーはキー文字単体でフォールバックする', () {

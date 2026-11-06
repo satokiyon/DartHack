@@ -13,6 +13,7 @@ class YnOverlay extends StatefulWidget {
   final VoidCallback onShowMsgHistory;
   final double bottomInset;
   final List<String> recentMessages;
+  final bool usePhysicalKeyboardNotation;
 
   const YnOverlay({
     super.key,
@@ -24,6 +25,7 @@ class YnOverlay extends StatefulWidget {
     required this.onShowMsgHistory,
     required this.bottomInset,
     this.recentMessages = const [],
+    this.usePhysicalKeyboardNotation = false,
   });
 
   @override
@@ -332,6 +334,7 @@ class YnOverlayState extends State<YnOverlay> {
                       ch,
                       question: widget.question,
                       isJapanese: isJp,
+                      useKeyboardNotation: widget.usePhysicalKeyboardNotation,
                     ),
                   ),
                 );
@@ -346,7 +349,9 @@ class YnOverlayState extends State<YnOverlay> {
                   ? const BorderSide(color: Colors.amberAccent, width: 2.5)
                   : null,
             ),
-            child: Text(isJp ? 'Esc:${l10n.cancel}' : 'Esc: ${l10n.cancel}'),
+            child: Text(widget.usePhysicalKeyboardNotation
+                ? (isJp ? 'Esc:${l10n.cancel}' : 'Esc: ${l10n.cancel}')
+                : l10n.cancel),
           ),
           ElevatedButton.icon(
             onPressed: widget.onShowMsgHistory,
@@ -609,6 +614,7 @@ class YnOverlayState extends State<YnOverlay> {
 
   /// 補助アクション (使用中一覧 ?, キャンセル ESC, 履歴)
   Widget _buildAuxiliaryActions(BuildContext context, ParsedYnPrompt parsed, AppLocalizations l10n) {
+    final isJp = Localizations.localeOf(context).languageCode == 'ja';
     return ExcludeFocus(
       excluding: true,
       child: Wrap(
@@ -620,7 +626,9 @@ class YnOverlayState extends State<YnOverlay> {
             ElevatedButton.icon(
               onPressed: () => widget.onSelect('?'.codeUnitAt(0)),
               icon: const Icon(Icons.list_alt_rounded, size: 16),
-              label: Text(Localizations.localeOf(context).languageCode == 'ja' ? '? 使用中スロット' : '? Used Slots'),
+              label: Text(widget.usePhysicalKeyboardNotation
+                  ? (isJp ? '? 使用中スロット' : '? Used Slots')
+                  : (isJp ? '使用中スロット' : 'Used Slots')),
               style: ElevatedButton.styleFrom(
                 backgroundColor: const Color(0xFF1E2836),
                 foregroundColor: Colors.amber[300],
@@ -637,7 +645,9 @@ class YnOverlayState extends State<YnOverlay> {
                   ? const BorderSide(color: Colors.amberAccent, width: 2.5)
                   : null,
             ),
-            child: Text(l10n.cancel),
+            child: Text(widget.usePhysicalKeyboardNotation
+                ? (isJp ? 'Esc:${l10n.cancel}' : 'Esc: ${l10n.cancel}')
+                : l10n.cancel),
           ),
           ElevatedButton.icon(
             onPressed: widget.onShowMsgHistory,

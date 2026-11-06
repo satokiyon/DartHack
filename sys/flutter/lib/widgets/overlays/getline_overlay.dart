@@ -23,6 +23,7 @@ class GetLineOverlay extends StatefulWidget {
   final double bottomInset;
   final bool Function(String prompt) isCallOrNamePrompt;
   final List<String> recentMessages;
+  final bool usePhysicalKeyboardNotation;
 
   const GetLineOverlay({
     super.key,
@@ -34,6 +35,7 @@ class GetLineOverlay extends StatefulWidget {
     required this.bottomInset,
     required this.isCallOrNamePrompt,
     this.recentMessages = const [],
+    this.usePhysicalKeyboardNotation = false,
   });
 
   @override
@@ -634,7 +636,11 @@ class GetLineOverlayState extends State<GetLineOverlay> {
                                       ? const BorderSide(color: Colors.amberAccent, width: 2.5)
                                       : null,
                                 ),
-                                child: Text(l10n.cancel),
+                                child: Text(widget.usePhysicalKeyboardNotation
+                                  ? (Localizations.localeOf(context).languageCode == 'ja'
+                                      ? 'Esc:${l10n.cancel}'
+                                      : 'Esc: ${l10n.cancel}')
+                                  : l10n.cancel),
                               ),
                               const SizedBox(width: 8),
                               ValueListenableBuilder<TextEditingValue>(

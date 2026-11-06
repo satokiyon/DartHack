@@ -35,6 +35,7 @@ class MenuOverlay extends StatefulWidget {
   final ui.Image? tileImage;
   final int tileWidth;
   final int tileHeight;
+  final bool usePhysicalKeyboardNotation;
 
   const MenuOverlay({
     super.key,
@@ -53,6 +54,7 @@ class MenuOverlay extends StatefulWidget {
     required this.tileImage,
     required this.tileWidth,
     required this.tileHeight,
+    this.usePhysicalKeyboardNotation = false,
   });
 
   @override
@@ -1415,7 +1417,11 @@ class MenuOverlayState extends State<MenuOverlay> {
                                   ? const BorderSide(color: Colors.amberAccent, width: 2.5)
                                   : null,
                             ),
-                            child: Text(AppLocalizations.of(context)!.selectAll),
+                            child: Text(widget.usePhysicalKeyboardNotation
+                                ? AppLocalizations.of(context)!.selectAll
+                                : AppLocalizations.of(context)!
+                                    .selectAll
+                                    .replaceFirst(RegExp(r'^[.\-@]:'), '')),
                           ),
                           ElevatedButton(
                             onPressed: _handleDeselectAll,
@@ -1424,7 +1430,11 @@ class MenuOverlayState extends State<MenuOverlay> {
                                   ? const BorderSide(color: Colors.amberAccent, width: 2.5)
                                   : null,
                             ),
-                            child: Text(AppLocalizations.of(context)!.deselectAll),
+                            child: Text(widget.usePhysicalKeyboardNotation
+                                ? AppLocalizations.of(context)!.deselectAll
+                                : AppLocalizations.of(context)!
+                                    .deselectAll
+                                    .replaceFirst(RegExp(r'^[.\-@]:'), '')),
                           ),
                           ElevatedButton(
                             onPressed: _handleInvertAll,
@@ -1433,7 +1443,11 @@ class MenuOverlayState extends State<MenuOverlay> {
                                   ? const BorderSide(color: Colors.amberAccent, width: 2.5)
                                   : null,
                             ),
-                            child: Text(AppLocalizations.of(context)!.invertAll),
+                            child: Text(widget.usePhysicalKeyboardNotation
+                                ? AppLocalizations.of(context)!.invertAll
+                                : AppLocalizations.of(context)!
+                                    .invertAll
+                                    .replaceFirst(RegExp(r'^[.\-@]:'), '')),
                           ),
                           ElevatedButton(
                             onPressed: submit,
@@ -1453,7 +1467,11 @@ class MenuOverlayState extends State<MenuOverlay> {
                                 ? const BorderSide(color: Colors.amberAccent, width: 2.5)
                                 : null,
                           ),
-                          child: Text(AppLocalizations.of(context)!.cancel),
+                          child: Text(widget.usePhysicalKeyboardNotation
+                              ? (Localizations.localeOf(context).languageCode == 'ja'
+                                  ? 'Esc:${AppLocalizations.of(context)!.cancel}'
+                                  : 'Esc: ${AppLocalizations.of(context)!.cancel}')
+                              : AppLocalizations.of(context)!.cancel),
                         ),
                       ],
                     ),

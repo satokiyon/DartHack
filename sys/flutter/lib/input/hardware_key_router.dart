@@ -206,6 +206,21 @@ class MenuHorizontalJumpEdge extends KeyAction {
   int get hashCode => toLeft.hashCode;
 }
 
+/// F1 キーによる操作ヘルプの表示
+class ShowKeyboardHelp extends KeyAction {
+  const ShowKeyboardHelp();
+
+  @override
+  String toString() => 'ShowKeyboardHelp()';
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) || other is ShowKeyboardHelp;
+
+  @override
+  int get hashCode => runtimeType.hashCode;
+}
+
 /// メニューのページ送り（1: 次、-1: 前）
 class MenuPage extends KeyAction {
   final int direction;
@@ -845,6 +860,13 @@ class HardwareKeyRouter {
     // 0. タイトル画面
     if (context == KeyInputContext.titleScreen) {
       return _routeTitleScreen(event, isShiftPressed: isShiftPressed);
+    }
+
+    // F1 キー: 操作ヘルプの表示（テキスト入力欄フォーカス時は除外）
+    if (event.logicalKey == LogicalKeyboardKey.f1 && !isTextFieldFocused) {
+      return (event is KeyDownEvent)
+          ? const ShowKeyboardHelp()
+          : const SwallowKey();
     }
 
     // 1a. 1文字コマンド説明検索（AnyKeyOverlay: `?` コマンド説明）

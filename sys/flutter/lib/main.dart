@@ -41,6 +41,7 @@ import 'widgets/shortcut_edit_dialog.dart';
 import 'widgets/game_drawer.dart';
 import 'widgets/guidebook_dialog.dart';
 import 'widgets/spoiler_dialog.dart';
+import 'widgets/keyboard_help_dialog.dart';
 import 'widgets/overlays/menu_overlay.dart';
 import 'widgets/overlays/yn_overlay.dart';
 import 'widgets/overlays/any_key_overlay.dart';
@@ -187,6 +188,7 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
   // タイルセット用変数
   ui.Image? _tileImage;
   bool _useTiles = true; // デフォルトでタイル表示を有効化
+  bool _usePhysicalKeyboardNotation = false; // 物理キーボード用の表記を使用
   int _tileWidth = 32;
   int _tileHeight = 32;
   String _selectedTileset = 'pixelhack_32x32';
@@ -361,6 +363,7 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
     final tilesetChanged = newTileset != _selectedTileset;
     setState(() {
       _useTiles = prefs.getBool('use_tiles') ?? true;
+      _usePhysicalKeyboardNotation = prefs.getBool('use_physical_keyboard_notation') ?? false;
       _selectedTileset = newTileset;
       _isKeyboardVisible = prefs.getBool('keyboard_visible') ?? true;
       final controllerModeStr = prefs.getString('controller_mode') ?? 'pad';
@@ -1579,12 +1582,36 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
         }
         return KeyEventResult.handled;
 
+      case ShowKeyboardHelp():
+        if (_usePhysicalKeyboardNotation) {
+          _showKeyboardHelp();
+        }
+        return KeyEventResult.handled;
+
       case IgnoreKey():
         return KeyEventResult.ignored;
 
       case SwallowKey():
         return KeyEventResult.handled;
     }
+  }
+
+  void _showKeyboardHelp() {
+    KeyboardHelpContext helpContext;
+    if (_screen.isMenuWindowVisible) {
+      helpContext = KeyboardHelpContext.menu;
+    } else if (_isYnVisible) {
+      helpContext = KeyboardHelpContext.yn;
+    } else {
+      helpContext = KeyboardHelpContext.game;
+    }
+
+    KeyboardHelpDialog.show(
+      context,
+      helpContext: helpContext,
+      menuHow: _screen.menuHow,
+      isJapanese: _selectedLanguage == 'ja',
+    );
   }
 
   bool get _shouldShowController {
@@ -3705,6 +3732,7 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
       tileImage: _tileImage,
       tileWidth: _tileWidth,
       tileHeight: _tileHeight,
+      usePhysicalKeyboardNotation: _usePhysicalKeyboardNotation,
     );
   }
 
@@ -3733,6 +3761,7 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
       onShowMsgHistory: _showMsgHistoryPanel,
       bottomInset: _dialogBottomInset(context),
       recentMessages: recentMsgs,
+      usePhysicalKeyboardNotation: _usePhysicalKeyboardNotation,
     );
   }
 
@@ -3801,6 +3830,7 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
       bottomInset: _dialogBottomInset(context),
       isCallOrNamePrompt: isCallOrNamePrompt,
       recentMessages: recentMsgs,
+      usePhysicalKeyboardNotation: _usePhysicalKeyboardNotation,
     );
   }
 
@@ -3816,6 +3846,7 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
         _sendAskNameResult(name);
       },
       bottomInset: _dialogBottomInset(context),
+      usePhysicalKeyboardNotation: _usePhysicalKeyboardNotation,
     );
   }
 

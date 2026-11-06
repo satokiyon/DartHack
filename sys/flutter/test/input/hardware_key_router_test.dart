@@ -1150,5 +1150,49 @@ void main() {
         equals(const TextJumpEdge(false)),
       );
     });
+
+    test('F1 key routes to ShowKeyboardHelp across contexts when text field is not focused', () {
+      final f1Event = const KeyDownEvent(
+        physicalKey: PhysicalKeyboardKey.f1,
+        logicalKey: LogicalKeyboardKey.f1,
+        timeStamp: Duration.zero,
+      );
+
+      // game
+      expect(
+        HardwareKeyRouter.route(event: f1Event, context: KeyInputContext.game),
+        equals(const ShowKeyboardHelp()),
+      );
+
+      // menu
+      expect(
+        HardwareKeyRouter.route(event: f1Event, context: KeyInputContext.menu),
+        equals(const ShowKeyboardHelp()),
+      );
+
+      // yn
+      expect(
+        HardwareKeyRouter.route(event: f1Event, context: KeyInputContext.yn),
+        equals(const ShowKeyboardHelp()),
+      );
+
+      // textWindow
+      expect(
+        HardwareKeyRouter.route(event: f1Event, context: KeyInputContext.textWindow),
+        equals(const ShowKeyboardHelp()),
+      );
+
+      // textInputOverlay without text field focused
+      expect(
+        HardwareKeyRouter.route(event: f1Event, context: KeyInputContext.textInputOverlay, isTextFieldFocused: false),
+        equals(const ShowKeyboardHelp()),
+      );
+
+      // textInputOverlay with text field focused -> IgnoreKey
+      expect(
+        HardwareKeyRouter.route(event: f1Event, context: KeyInputContext.textInputOverlay, isTextFieldFocused: true),
+        equals(const IgnoreKey()),
+      );
+    });
   });
 }

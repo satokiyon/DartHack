@@ -596,5 +596,7 @@
   "optAdFeatureNewLevelRestSub": "Prompt to rest by watching an ad upon reaching a new floor",
   "optAdFeatureExitHighlightTitle": "Show highlights on game end",
   "optAdFeatureExitHighlightSub": "Display run highlights with banner ad when the game ends",
-  "gameEndDialogTitle": "Game Over"
+  "gameEndDialogTitle": "Game Over",
+  "usePhysicalKeyboardNotation": "Use Physical Keyboard Notation",
+  "usePhysicalKeyboardNotationSub": "Show shortcut keys (y:, n:, Esc:, etc.) on buttons. When ON, press F1 to display controls help"
 }

@@ -1578,4 +1578,11 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get gameEndDialogTitle => 'ゲーム終了';
+
+  @override
+  String get usePhysicalKeyboardNotation => '物理キーボード用の表記を使用';
+
+  @override
+  String get usePhysicalKeyboardNotationSub =>
+      'ボタンに割り当てキー（y:、n:、Esc:等）を表示します。ON時はF1キーで操作ヘルプを表示できます';
 }

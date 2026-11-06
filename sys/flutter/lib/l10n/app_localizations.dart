@@ -3073,6 +3073,18 @@ abstract class AppLocalizations {
   /// In ja, this message translates to:
   /// **'ゲーム終了'**
   String get gameEndDialogTitle;
+
+  /// No description provided for @usePhysicalKeyboardNotation.
+  ///
+  /// In ja, this message translates to:
+  /// **'物理キーボード用の表記を使用'**
+  String get usePhysicalKeyboardNotation;
+
+  /// No description provided for @usePhysicalKeyboardNotationSub.
+  ///
+  /// In ja, this message translates to:
+  /// **'ボタンに割り当てキー（y:、n:、Esc:等）を表示します。ON時はF1キーで操作ヘルプを表示できます'**
+  String get usePhysicalKeyboardNotationSub;
 }
 
 class _AppLocalizationsDelegate

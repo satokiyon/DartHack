@@ -755,25 +755,25 @@ void main() {
       await tester.pump();
       expect(state.selectedCounts.isEmpty, isTrue);
 
-      // 4. ボタンのテキスト検証（「.:全選択」「-:選択解除」「@:選択反転」）
-      expect(find.text('.:全選択'), findsOneWidget);
-      expect(find.text('-:選択解除'), findsOneWidget);
-      expect(find.text('@:選択反転'), findsOneWidget);
+      // 4. ボタンのテキスト検証（デフォルトOFF: 「全選択」「選択解除」「選択反転」）
+      expect(find.text('全選択'), findsOneWidget);
+      expect(find.text('選択解除'), findsOneWidget);
+      expect(find.text('選択反転'), findsOneWidget);
 
       // 5. ボタンタップでの動作検証
-      await tester.tap(find.text('.:全選択'));
+      await tester.tap(find.text('全選択'));
       await tester.pump();
       expect(state.selectedCounts.length, equals(20));
 
-      await tester.tap(find.text('@:選択反転'));
+      await tester.tap(find.text('選択反転'));
       await tester.pump();
       expect(state.selectedCounts.isEmpty, isTrue);
 
-      await tester.tap(find.text('.:全選択'));
+      await tester.tap(find.text('全選択'));
       await tester.pump();
       expect(state.selectedCounts.length, equals(20));
 
-      await tester.tap(find.text('-:選択解除'));
+      await tester.tap(find.text('選択解除'));
       await tester.pump();
       expect(state.selectedCounts.isEmpty, isTrue);
 
@@ -788,6 +788,59 @@ void main() {
       state.jumpToEdge(true); // 先頭へジャンプ
       await tester.pumpAndSettle();
       expect(scrollController.offset, equals(0.0));
+    });
+
+    testWidgets('MenuOverlay multiple selection displays accelerator prefixes when usePhysicalKeyboardNotation is true', (tester) async {
+      final items = List.generate(
+        5,
+        (i) => MenuItemData(
+          ident: i + 1,
+          accelerator: 97 + i, // 'a' + i
+          groupacc: 0,
+          attr: 0,
+          text: 'Item $i',
+          preselected: 0,
+          color: 0,
+          tile: -1,
+        ),
+      );
+
+      await tester.pumpWidget(
+        MaterialApp(
+          locale: const Locale('ja'),
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
+          home: Scaffold(
+            body: Stack(
+              children: [
+                MenuOverlay(
+                  menuPrompt: 'Select:',
+                  menuItems: items,
+                  menuHow: 2, // PICK_ANY
+                  usePhysicalKeyboardNotation: true,
+                  initialSelectedCounts: const {},
+                  initialSearchQuery: '',
+                  bottomInset: 0,
+                  useTiles: false,
+                  tileImage: null,
+                  tileWidth: 32,
+                  tileHeight: 32,
+                  onSingleSelect: (_) {},
+                  onMultiSelect: (_) {},
+                  onItemLongPress: (_) {},
+                ),
+              ],
+            ),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      // 「.:全選択」「-:選択解除」「@:選択反転」「Esc:キャンセル」が表示されること
+      expect(find.text('.:全選択'), findsOneWidget);
+      expect(find.text('-:選択解除'), findsOneWidget);
+      expect(find.text('@:選択反転'), findsOneWidget);
+      expect(find.text('Esc:キャンセル'), findsOneWidget);
     });
   });
 }

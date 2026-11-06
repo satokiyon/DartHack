@@ -8,6 +8,7 @@ import '../utils/app_prefs.dart';
 
 import '../l10n/app_localizations.dart';
 import 'spoiler_dialog.dart';
+import 'keyboard_help_dialog.dart';
 
 /// NetHack 5.0 ガイドブック（日本語 Guidebook_JP.md / 英語 Guidebook.md）閲覧ダイアログ
 class GuidebookDialog extends StatefulWidget {
@@ -126,6 +127,7 @@ class _GuidebookDialogState extends State<GuidebookDialog> {
   // 一時透過（覗き見）制御用状態
   bool _isHoldPeeking = false;
   bool _isTapPeeking = false;
+  bool _usePhysicalKeyboardNotation = false;
   _GuidebookButtonFocus _buttonFocus = _GuidebookButtonFocus.none;
 
   bool get _isPeeking => _isHoldPeeking || _isTapPeeking;
@@ -136,6 +138,16 @@ class _GuidebookDialogState extends State<GuidebookDialog> {
     _searchFocusNode.onKeyEvent = _handleSearchKeyEvent;
     _itemPositionsListener.itemPositions.addListener(_onItemPositionsChanged);
     _loadGuidebook();
+    AppPrefs.getInstance().then((prefs) {
+      if (mounted) {
+        setState(() {
+          _usePhysicalKeyboardNotation =
+              prefs.getBool('use_physical_keyboard_notation') ?? false;
+        });
+      }
+    }).catchError((_) {
+      // テスト環境などで AppPrefs がモックされていない場合の安全なフォールバック
+    });
   }
 
   final Map<int, ScrollController> _horizontalScrollControllers = {};
@@ -808,6 +820,18 @@ class _GuidebookDialogState extends State<GuidebookDialog> {
         return KeyEventResult.handled;
       }
       return KeyEventResult.ignored;
+    }
+
+    // F1: 操作ヘルプ
+    if (key == LogicalKeyboardKey.f1) {
+      if (isDown && _usePhysicalKeyboardNotation) {
+        KeyboardHelpDialog.show(
+          context,
+          helpContext: KeyboardHelpContext.guidebook,
+          isJapanese: _isJp,
+        );
+      }
+      return KeyEventResult.handled;
     }
 
     // Tab / Shift+Tab によるボタンフォーカス循環 (none ↔ search ↔ peek ↔ toc ↔ close)

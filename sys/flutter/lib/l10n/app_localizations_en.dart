@@ -1615,4 +1615,11 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get gameEndDialogTitle => 'Game Over';
+
+  @override
+  String get usePhysicalKeyboardNotation => 'Use Physical Keyboard Notation';
+
+  @override
+  String get usePhysicalKeyboardNotationSub =>
+      'Show shortcut keys (y:, n:, Esc:, etc.) on buttons. When ON, press F1 to display controls help';
 }

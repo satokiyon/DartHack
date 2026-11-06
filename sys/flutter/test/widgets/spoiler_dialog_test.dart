@@ -1,9 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:darthack/l10n/app_localizations.dart';
+import 'package:darthack/utils/app_prefs.dart';
 import 'package:darthack/widgets/spoiler_dialog.dart';
 
 void main() {
+  setUp(() async {
+    await AppPrefs.setMockInitialValues({'selected_language': 'ja'});
+    SpoilerDialog.resetSavedScrollPosition();
+  });
   const sampleMarkdown = '''
 # NetHack Spoilers {#intro}
 

@@ -50,6 +50,7 @@ class _SettingsPageState extends State<SettingsPage> {
   bool _adFeaturesEnabled = true;
   bool _adFeatureNewLevelRest = true;
   bool _adFeatureExitHighlight = true;
+  bool _usePhysicalKeyboardNotation = false;
   int _screenMode = 0; // 0: 通常, 1: イマーシブ
   double _padOpacity = 0.8;
   double _dpadScale = 1.0;
@@ -286,6 +287,7 @@ class _SettingsPageState extends State<SettingsPage> {
       _adFeaturesEnabled = prefs.getBool('ad_features_enabled') ?? true;
       _adFeatureNewLevelRest = prefs.getBool('ad_feature_new_level_rest') ?? true;
       _adFeatureExitHighlight = prefs.getBool('ad_feature_exit_highlight') ?? true;
+      _usePhysicalKeyboardNotation = prefs.getBool('use_physical_keyboard_notation') ?? false;
       final screenModeRaw = prefs.getInt('screen_mode');
       _screenMode = (screenModeRaw == 1) ? 1 : 0;
       _cameraFollowMode = prefs.getString('camera_follow_mode') ?? 'center';
@@ -886,7 +888,16 @@ class _SettingsPageState extends State<SettingsPage> {
                     _saveSetting('map_fixed_msg_avoid_flip', val);
                   }
                 : null,
-          ), 
+          ),
+          SwitchListTile(
+            title: Text(l10n.usePhysicalKeyboardNotation),
+            subtitle: Text(l10n.usePhysicalKeyboardNotationSub),
+            value: _usePhysicalKeyboardNotation,
+            onChanged: (val) {
+              setState(() => _usePhysicalKeyboardNotation = val);
+              _saveSetting('use_physical_keyboard_notation', val);
+            },
+          ),
         ]),
       ),
     );
