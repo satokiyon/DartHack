@@ -418,6 +418,8 @@ class NetHackWorker {
           final y = message['y'] as int;
           final mod = message['mod'] as int? ?? 1;
           ffi.sendPosCmdToC(x, y, mod);
+        } else if (type == 'menu_cancel') {
+          ffi.sendMenuCancel();
         } else if (type == 'menu_select') {
           final ident = message['ident'] as int;
           final count = message['count'] as int? ?? -1;

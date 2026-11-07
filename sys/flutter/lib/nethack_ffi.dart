@@ -135,7 +135,10 @@ typedef RegisterCallbacksDart = void Function(
 typedef SendKeyFunc = Void Function(Int32 key);
 typedef SendKeyDart = void Function(int key);
 
-// メニュー選択結果送信
+// メニュー選択結果・キャンセル送信
+typedef SendMenuCancelFunc = Void Function();
+typedef SendMenuCancelDart = void Function();
+
 typedef SendMenuSelectionFunc = Void Function(IntPtr ident, Long count);
 typedef SendMenuSelectionDart = void Function(int ident, int count);
 
@@ -210,6 +213,7 @@ class NetHackFfi {
   late final SendKeyDart sendKeyToC;
   late final SendKeysDart sendKeysToC;
   late final SendShortcutDart sendShortcutToC;
+  late final SendMenuCancelDart sendMenuCancel;
   late final SendMenuSelectionDart sendMenuSelection;
   late final SendMenuSelectionsDart sendMenuSelections;
   late final GetInputRequestIdDart getInputRequestId;
@@ -298,6 +302,10 @@ class NetHackFfi {
 
     sendShortcutToC = _lib
         .lookup<NativeFunction<SendShortcutFunc>>('SendShortcutToFlutter')
+        .asFunction();
+
+    sendMenuCancel = _lib
+        .lookup<NativeFunction<SendMenuCancelFunc>>('SendMenuCancel')
         .asFunction();
 
     sendMenuSelection = _lib

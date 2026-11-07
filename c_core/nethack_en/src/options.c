@@ -6336,78 +6336,234 @@ handler_symset(int optidx)
     return reslt;
 }
 
+struct ape_preset {
+    const char *label;
+    const char *pattern_jp;
+    const char *pattern_en;
+};
+
+static const struct ape_preset ape_presets[] = {
+    { "Always pick up holy water",
+      "\"<*聖水*\"", "\"<*holy water*\"" },
+    { "Do not pick up corpses",
+      "\">*(死体|の死骸)*\"", "\">*(corpse|corpses)*\"" },
+    { "Do not pick up scare monster scrolls",
+      "\">*(怪物を怯えさせる巻物|恐れさせる巻物)*\"", "\">*(scroll of scare monster|scare monster)*\"" },
+    { "Do not pick up heavy iron balls",
+      "\">*(重い鉄球|鉄球)*\"", "\">*(heavy iron ball|iron ball)*\"" },
+    { "Do not pick up potions of poison",
+      "\">*(毒薬|毒の薬)*\"", "\">*(potion of poison|potions of poison)*\"" },
+    { "Always pick up luckstones",
+      "\"<*幸運の石*\"", "\"<*luckstone*\"" },
+    { "Always pick up amulets of life saving",
+      "\"<*命の魔除け*\"", "\"<*amulet of life saving*\"" },
+    { "Always pick up wands of death",
+      "\"<*死の杖*\"", "\"<*wand of death*\"" },
+};
+#define NUM_APE_PRESETS ((int) SIZE(ape_presets))
+
+staticfn boolean
+ape_matches_preset_pattern(struct autopickup_exception *ape, const char *mapping)
+{
+    char text[256], end;
+    int n;
+    boolean grab = FALSE;
+
+    end = '\0';
+    if ((n = sscanf(mapping, "\"<%253[^\"]\" %c", text, &end)) == 1
+        || (n == 2 && end == '#')) {
+        grab = TRUE;
+    } else if ((n = sscanf(mapping, "\">%253[^\"]\" %c", text, &end)) == 1
+               || (n == 2 && end == '#')) {
+        grab = FALSE;
+    } else {
+        return FALSE;
+    }
+
+    if (ape->grab == grab && !strcmp(ape->pattern, text))
+        return TRUE;
+    return FALSE;
+}
+
+staticfn boolean
+is_ape_preset_active(int preset_idx)
+{
+    struct autopickup_exception *ape;
+    const struct ape_preset *p = &ape_presets[preset_idx];
+
+    for (ape = ga.apelist; ape; ape = ape->next) {
+        if (ape_matches_preset_pattern(ape, p->pattern_jp)
+            || ape_matches_preset_pattern(ape, p->pattern_en))
+            return TRUE;
+    }
+    return FALSE;
+}
+
+staticfn void
+remove_ape_preset(int preset_idx)
+{
+    struct autopickup_exception *ape, *next;
+    const struct ape_preset *p = &ape_presets[preset_idx];
+
+    for (ape = ga.apelist; ape; ape = next) {
+        next = ape->next;
+        if (ape_matches_preset_pattern(ape, p->pattern_jp)
+            || ape_matches_preset_pattern(ape, p->pattern_en)) {
+            remove_autopickup_exception(ape);
+        }
+    }
+}
+
+staticfn void
+add_ape_preset(int preset_idx)
+{
+    const struct ape_preset *p = &ape_presets[preset_idx];
+
+    add_autopickup_exception(p->pattern_jp);
+    add_autopickup_exception(p->pattern_en);
+}
+
+staticfn boolean
+is_ape_any_preset(struct autopickup_exception *ape)
+{
+    int i;
+
+    for (i = 0; i < NUM_APE_PRESETS; i++) {
+        if (ape_matches_preset_pattern(ape, ape_presets[i].pattern_jp)
+            || ape_matches_preset_pattern(ape, ape_presets[i].pattern_en))
+            return TRUE;
+    }
+    return FALSE;
+}
+
 staticfn int
 handler_autopickup_exception(void)
 {
     winid tmpwin;
     anything any;
-    int i;
-    int opt_idx, numapes = 0;
-    char apebuf[2 + BUFSZ]; /* so &apebuf[1] is BUFSZ long for getlin() */
+    int i, pick_cnt, k;
+    menu_item *pick_list = (menu_item *) 0;
+    char buf[BUFSZ], apebuf[2 + BUFSZ];
     struct autopickup_exception *ape;
     int clr = NO_COLOR;
+    int numapes;
 
  ape_again:
     numapes = count_apes();
-    opt_idx = handle_add_list_remove("autopickup exception", numapes);
-    if (opt_idx == 3) { /* done */
-        return TRUE;
-    } else if (opt_idx == 0) { /* add new */
-        /* EDIT_GETLIN:  assume user doesn't user want previous
-           exception used as default input string for this one... */
-        apebuf[0] = apebuf[1] = '\0';
-        getlin("What new autopickup exception pattern?", &apebuf[1]);
-        mungspaces(&apebuf[1]); /* regularize whitespace */
-        if (apebuf[1] == '\033')
-            return TRUE;
-        if (apebuf[1]) {
-            apebuf[0] = '\"';
-            /* guarantee room for \" prefix and \"\0 suffix;
-               -2 is good enough for apebuf[] but -3 makes
-               sure the whole thing fits within normal BUFSZ */
-            apebuf[sizeof apebuf - 2] = '\0';
-            Strcat(apebuf, "\"");
-            add_autopickup_exception(apebuf);
-        }
-        goto ape_again;
-    } else { /* list (1) or remove (2) */
-        int pick_idx, pick_cnt;
-        menu_item *pick_list = (menu_item *) 0;
+    tmpwin = create_nhwindow(NHW_MENU);
+    start_menu(tmpwin, MENU_BEHAVE_STANDARD);
 
-        tmpwin = create_nhwindow(NHW_MENU);
-        start_menu(tmpwin, MENU_BEHAVE_STANDARD);
-        if (numapes) {
-            ape = ga.apelist;
-            any = cg.zeroany;
-            add_menu_heading(tmpwin,
-                             "Always pickup '<'; never pickup '>'");
-            for (i = 0; i < numapes && ape; i++) {
-                any.a_void = (opt_idx == 1) ? 0 : ape;
-                /* length of pattern plus quotes (plus '<'/'>') is
-                   less than BUFSZ */
-                Sprintf(apebuf, "\"%c%s\"", ape->grab ? '<' : '>',
-                        ape->pattern);
-                add_menu(tmpwin, &nul_glyphinfo, &any, 0, 0,
-                         ATR_NONE, clr, apebuf, MENU_ITEMFLAGS_NONE);
-                ape = ape->next;
+    /* 1. Manual pattern input */
+    any = cg.zeroany;
+    any.a_int = 1;
+    add_menu(tmpwin, &nul_glyphinfo, &any, '+', 0, ATR_NONE, clr,
+             "+ [Manual Input] Enter new custom pattern...",
+             MENU_ITEMFLAGS_NONE);
+
+    add_menu_str(tmpwin, "");
+    add_menu_heading(tmpwin, "Common Presets (tap to toggle)");
+
+    /* 2. Presets list */
+    for (i = 0; i < NUM_APE_PRESETS; i++) {
+        boolean active = is_ape_preset_active(i);
+        char accel = (i < 26) ? (char) ('a' + i) : 0;
+
+        any = cg.zeroany;
+        any.a_int = 100 + i;
+        Sprintf(buf, "[%s] %s", active ? "X" : " ", ape_presets[i].label);
+        add_menu(tmpwin, &nul_glyphinfo, &any, accel, 0, ATR_NONE, clr, buf,
+                 MENU_ITEMFLAGS_NONE);
+    }
+
+    /* 3. Active custom exceptions */
+    {
+        boolean has_custom = FALSE;
+
+        for (ape = ga.apelist; ape; ape = ape->next) {
+            if (!is_ape_any_preset(ape)) {
+                has_custom = TRUE;
+                break;
             }
         }
-        Sprintf(apebuf, "%s autopickup exceptions",
-                (opt_idx == 1) ? "List of" : "Remove which");
-        end_menu(tmpwin, apebuf);
-        pick_cnt = select_menu(tmpwin,
-                               (opt_idx == 1) ? PICK_NONE : PICK_ANY,
-                               &pick_list);
-        if (pick_cnt > 0) {
-            for (pick_idx = 0; pick_idx < pick_cnt; ++pick_idx)
-                remove_autopickup_exception(
-                                     (struct autopickup_exception *)
-                                         pick_list[pick_idx].item.a_void);
-            free((genericptr_t) pick_list), pick_list = (menu_item *) 0;
+        if (has_custom) {
+            int custom_idx = 0;
+
+            add_menu_str(tmpwin, "");
+            add_menu_heading(tmpwin, "Active Custom Exceptions (tap to delete)");
+            for (ape = ga.apelist; ape; ape = ape->next) {
+                if (!is_ape_any_preset(ape)) {
+                    any = cg.zeroany;
+                    any.a_int = 1000 + custom_idx;
+                    Sprintf(buf, "\"%c%s\" (delete)",
+                            ape->grab ? '<' : '>',
+                            ape->pattern);
+                    add_menu(tmpwin, &nul_glyphinfo, &any, 0, 0, ATR_NONE, clr, buf,
+                             MENU_ITEMFLAGS_NONE);
+                    custom_idx++;
+                }
+            }
         }
+    }
+
+    /* 4. Exit menu */
+    any = cg.zeroany;
+    any.a_int = 3;
+    add_menu(tmpwin, &nul_glyphinfo, &any, 'x', 0, ATR_NONE, clr,
+             "Exit this menu", MENU_ITEMFLAGS_SELECTED);
+
+    Sprintf(buf, "Autopickup Exceptions (%d active)", numapes);
+    end_menu(tmpwin, buf);
+
+    pick_cnt = select_menu(tmpwin, PICK_ONE, &pick_list);
+    if (pick_cnt > 0) {
+        k = pick_list[0].item.a_int;
+        free((genericptr_t) pick_list);
         destroy_nhwindow(tmpwin);
-        if (pick_cnt >= 0)
+
+        if (k == 3) {
+            /* Exit */
+            return optn_ok;
+        } else if (k == 1) {
+            /* Manual input */
+            apebuf[0] = apebuf[1] = '\0';
+            getlin("What new autopickup exception pattern? (e.g. <*holy water* or >*boulder*)",
+                   &apebuf[1]);
+            mungspaces(&apebuf[1]);
+            if (apebuf[1] != '\033' && apebuf[1] != '\0') {
+                apebuf[0] = '\"';
+                apebuf[sizeof apebuf - 2] = '\0';
+                Strcat(apebuf, "\"");
+                add_autopickup_exception(apebuf);
+            }
             goto ape_again;
+        } else if (k >= 100 && k < 100 + NUM_APE_PRESETS) {
+            /* Toggle preset */
+            int p_idx = k - 100;
+
+            if (is_ape_preset_active(p_idx)) {
+                remove_ape_preset(p_idx);
+            } else {
+                add_ape_preset(p_idx);
+            }
+            goto ape_again;
+        } else if (k >= 1000) {
+            /* Delete custom exception */
+            int target_idx = k - 1000;
+            int cur_idx = 0;
+
+            for (ape = ga.apelist; ape; ape = ape->next) {
+                if (!is_ape_any_preset(ape)) {
+                    if (cur_idx == target_idx) {
+                        remove_autopickup_exception(ape);
+                        break;
+                    }
+                    cur_idx++;
+                }
+            }
+            goto ape_again;
+        }
+    } else {
+        destroy_nhwindow(tmpwin);
     }
     return optn_ok;
 }

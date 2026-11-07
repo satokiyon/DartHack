@@ -28,6 +28,7 @@ class MenuOverlay extends StatefulWidget {
   final Function(int ident) onSingleSelect;
   final Function(Map<int, int> selectedCounts) onMultiSelect;
   final Function(Map<int, int> selectedCounts)? onSelectionChanged;
+  final VoidCallback? onCancel;
   final Function(MenuItemData item) onItemLongPress;
   final double bottomInset;
   final int? pendingCount;
@@ -47,6 +48,7 @@ class MenuOverlay extends StatefulWidget {
     required this.onSingleSelect,
     required this.onMultiSelect,
     this.onSelectionChanged,
+    this.onCancel,
     required this.onItemLongPress,
     required this.bottomInset,
     this.pendingCount,
@@ -311,10 +313,18 @@ class MenuOverlayState extends State<MenuOverlay> {
     });
   }
 
+  void _handleCancel() {
+    if (widget.onCancel != null) {
+      widget.onCancel!();
+    } else {
+      widget.onSingleSelect(-1);
+    }
+  }
+
   /// 複数選択メニューの確定送信処理
   void submit() {
     if (_currentFocusTarget == MenuFocusTarget.cancel) {
-      widget.onSingleSelect(-1);
+      _handleCancel();
       return;
     }
     if (_currentFocusTarget == MenuFocusTarget.selectAll) {
@@ -1099,8 +1109,18 @@ class MenuOverlayState extends State<MenuOverlay> {
 
                             if (isPlain) {
                               final hasTab = commandText.contains('\t');
+                              // 先行スペースを持つ非選択テキスト行（説明文）は白70%・通常ウェイトで表示して見やすく階層化
+                              final isIndentedDescription = commandText.startsWith('  ') || commandText.startsWith('\t');
+                              final plainTextColor = isIndentedDescription
+                                  ? (itemColor == Colors.white ? Colors.white70 : itemColor.withValues(alpha: 0.85))
+                                  : itemColor;
+                              final plainFontWeight = isIndentedDescription ? FontWeight.w400 : FontWeight.w700;
+
                               return Padding(
-                                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                                padding: EdgeInsets.symmetric(
+                                  horizontal: 10,
+                                  vertical: isIndentedDescription ? 2 : 4,
+                                ),
                                 child: Row(
                                   children: [
                                     _buildMenuItemTile(item.tile),
@@ -1110,22 +1130,22 @@ class MenuOverlayState extends State<MenuOverlay> {
                                           ? _buildTabSeparatedRow(
                                               commandText,
                                               TextStyle(
-                                                color: itemColor,
+                                                color: plainTextColor,
                                                 fontFamily: FontManager.instance.getSelectedFont(FontTarget.menu).fontFamily,
                 fontFamilyFallback: FontManager.defaultJapaneseFallbacks,
                                                 fontSize: 14,
-                                                fontWeight: FontWeight.w700,
+                                                fontWeight: plainFontWeight,
                                               ),
                                               accLabel: accLabel,
                                             )
                                           : Text(
                                               "$accLabel$commandText",
                                               style: TextStyle(
-                                                color: itemColor,
+                                                color: plainTextColor,
                                                 fontFamily: FontManager.instance.getSelectedFont(FontTarget.menu).fontFamily,
                 fontFamilyFallback: FontManager.defaultJapaneseFallbacks,
                                                 fontSize: 14,
-                                                fontWeight: FontWeight.w700,
+                                                fontWeight: plainFontWeight,
                                               ),
                                             ),
                                     ),
@@ -1461,7 +1481,7 @@ class MenuOverlayState extends State<MenuOverlay> {
                           ),
                         ],
                         ElevatedButton(
-                          onPressed: () => widget.onSingleSelect(-1),
+                          onPressed: _handleCancel,
                           style: ElevatedButton.styleFrom(
                             side: _currentFocusTarget == MenuFocusTarget.cancel
                                 ? const BorderSide(color: Colors.amberAccent, width: 2.5)

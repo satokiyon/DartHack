@@ -1032,16 +1032,19 @@ NH_EXPORT void SendPosCmdToFlutter(int x, int y, int mod) {
     debuglog("C core received PosCmd: x=%d, y=%d, mod=%d (queued=%d)", x, y, mod, g_poscmd_count);
 }
 
+// Dart 側からメニューキャンセル通知を受け取る関数
+NH_EXPORT void SendMenuCancel(void) {
+    g_selected_menu_item = -1;
+    g_selected_menu_count = -1;
+    debuglog("C core received menu cancel");
+}
+
 // Dart 側からメニュー選択結果を受け取る関数
 NH_EXPORT void SendMenuSelection(intptr_t ident, long count) {
     g_selected_menu_item = ident;
-    if (ident == -1) {
-        g_selected_menu_count = -1;
-    } else {
-        g_selected_menu_items[0] = ident;
-        g_selected_menu_counts[0] = count;
-        g_selected_menu_count = 1;
-    }
+    g_selected_menu_items[0] = ident;
+    g_selected_menu_counts[0] = count;
+    g_selected_menu_count = 1;
     debuglog("C core received menu selection: %zd (count=%ld)", (ssize_t)ident, count);
 }
 

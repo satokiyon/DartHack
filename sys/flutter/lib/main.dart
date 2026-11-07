@@ -1234,7 +1234,7 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
           return KeyEventResult.handled;
         }
         if (_screen.isMenuWindowVisible && code == 27) {
-          _sendMenuSelection(-1);
+          _sendMenuCancel();
           return KeyEventResult.handled;
         }
         if (_waitingForInput) {
@@ -1514,14 +1514,14 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
             return KeyEventResult.handled;
           }
           if (_screen.menuHow == 0 /* PICK_NONE */) {
-            _sendMenuSelection(-1);
+            _sendMenuCancel();
           } else if (_screen.menuHow == 1 /* PICK_ONE */) {
             if (_menuOverlayKey.currentState?.currentFocusTarget == MenuFocusTarget.cancel) {
-              _sendMenuSelection(-1);
+              _sendMenuCancel();
               return KeyEventResult.handled;
             }
             // autopickup_exception 等の特定メニューでのみ事前選択（「x - このメニューを終了」等）を実行し、
-            // 死亡時所持品一覧や通常の閲覧系メニューでは Enter で安全に画面を閉じる (-1 送信)
+            // 死亡時所持品一覧や通常の閲覧系メニューでは Enter で安全に画面を閉じる
             final isAutopickupMenu = _screen.menuPrompt.contains('autopickup') ||
                 _screen.menuPrompt.contains('自動拾い');
             final preselected = _menuSelectedCounts.entries
@@ -1530,7 +1530,7 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
             if (isAutopickupMenu && preselected != null) {
               _sendMenuSelection(preselected.key, preselected.value);
             } else {
-              _sendMenuSelection(-1);
+              _sendMenuCancel();
             }
           } else {
             if (_menuOverlayKey.currentState != null) {
@@ -1556,7 +1556,7 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
             _sendFfiKey(27, "ESC");
             return KeyEventResult.handled;
           }
-          _sendMenuSelection(-1);
+          _sendMenuCancel();
           return KeyEventResult.handled;
         }
         return KeyEventResult.handled;
@@ -3346,14 +3346,14 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
       // 拡張コマンドメニューの場合はアクセラレータ即決を行わない（検索フィルターに委ねる）
       if (isExtCmdMenuPrompt(_screen.menuPrompt)) {
         if (code == 27) {
-          _sendMenuSelection(-1);
+          _sendMenuCancel();
         }
         return;
       }
 
       if (_screen.menuHow == 0 /* PICK_NONE */) {
         if (code == 32 || code == 10 || code == 13 || code == 27) {
-          _sendMenuSelection(-1);
+          _sendMenuCancel();
         }
         return;
       }
@@ -3361,7 +3361,7 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
       final isMultiSelectMenu = _screen.menuHow > 1;
       if (isMultiSelectMenu) {
         if (code == 27) {
-          _sendMenuSelection(-1);
+          _sendMenuCancel();
           return;
         }
         if (code == 10 || code == 13) {
@@ -3383,7 +3383,7 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
 
       // PICK_ONE
       if (code == 27) {
-        _sendMenuSelection(-1);
+        _sendMenuCancel();
         return;
       }
       for (final item in _screen.menuItems) {
@@ -3611,12 +3611,39 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
     });
   }
 
+  void _sendMenuCancel() {
+    if (!_waitingForInput || !_screen.isMenuWindowVisible) return;
+    if (_screen.menuItems.isEmpty && _screen.textLines.isNotEmpty) {
+      _sendFfiKey(32, "Space");
+      return;
+    }
+    setState(() {
+      _waitingForInput = false;
+      _extCmdMenuFilter = "";
+      _extCmdMenuFilterController.clear();
+    });
+    _addLog("> Menu Cancel");
+    _workerSendPort?.send({
+      'type': 'menu_cancel',
+    });
+    _screen.clearMenu();
+    _menuSelectedCounts = <int, int>{};
+    _menuPendingCount = null;
+    WidgetsBinding.instance.addPostFrameCallback((_) => _ensureGameFocus());
+  }
+
   void _sendMenuSelection(int ident, [int count = -1]) {
     if (!_waitingForInput || !_screen.isMenuWindowVisible) return;
     // ブロッキング表示（flutter_nhgetch() 待機中）のテキストメニューウィンドウの場合は、
     // menu_select ではなく key イベント (32: Space) を送って待機を解除する
     if (_screen.menuItems.isEmpty && _screen.textLines.isNotEmpty) {
       _sendFfiKey(32, "Space");
+      return;
+    }
+    // フェイルセーフ: ident == -1 のアイテムが現在のメニュー項目に実在しない場合、
+    // キャンセル要求とみなして安全にキャンセルを送信する
+    if (ident == -1 && !_screen.menuItems.any((item) => item.ident == -1)) {
+      _sendMenuCancel();
       return;
     }
     setState(() {
@@ -3691,6 +3718,7 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
       onSelectionChanged: (counts) => setState(() => _menuSelectedCounts = counts),
       onSingleSelect: (ident) => _sendMenuSelection(ident),
       onMultiSelect: (counts) => _sendMenuSelections(counts),
+      onCancel: _sendMenuCancel,
       onItemLongPress: (item) => _onMenuItemLongPress(item),
       bottomInset: _dialogBottomInset(context),
       pendingCount: _menuPendingCount,
