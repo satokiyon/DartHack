@@ -14,6 +14,7 @@ enum KeyboardHelpContext {
   askName,    // キャラ作成・お名前入力画面
   textWindow, // 長文テキスト (概要、怪物・所持品一覧、墓石、スコア等)
   anyKey,     // 1文字コマンド説明 (「&」コマンド / AnyKeyOverlay)
+  fullMap,    // 階層の全体地図 (FullMapDialog)
 }
 
 /// キーボード操作ヘルプダイアログ
@@ -485,6 +486,19 @@ class _KeyboardHelpDialogState extends State<KeyboardHelpDialog> {
           _HelpItem('Tab / Shift+Tab', isJp ? 'none ↔「閉じる」↔「履歴」ボタンのフォーカス循環' : 'Cycle none, Close, History buttons'),
           _HelpItem('Enter / Space', isJp ? 'フォーカス中のボタンを実行（閉じる / 履歴）' : 'Execute focused button (Close / History)'),
           _HelpItem('Esc', isJp ? '画面を閉じる' : 'Close overlay'),
+          _HelpItem('F1 / Alt-h', isJp ? '操作ヘルプの表示' : 'Show controls help'),
+        ];
+
+      case KeyboardHelpContext.fullMap:
+        return [
+          _HelpItem('z', isJp ? '6倍拡大 ⇔ 全体表示（等倍）アニメーショントグル' : 'Toggle 6x zoom and fit-all view'),
+          _HelpItem('+ / =', isJp ? '画面中央を基準にズームイン' : 'Zoom in'),
+          _HelpItem('-', isJp ? '画面中央を基準にズームアウト' : 'Zoom out'),
+          _HelpItem('0 / Home', isJp ? '全体表示（等倍）にリセット' : 'Reset to fit-all view'),
+          _HelpItem('矢印 / hjkl yubn', isJp ? 'マップのパン（平行移動）' : 'Pan map'),
+          _HelpItem('Shift + 移動キー', isJp ? '2倍のスピードで高速パン移動' : 'Fast pan (2x speed)'),
+          _HelpItem('Tab / Shift+Tab', isJp ? '閉じるボタンのフォーカス選択' : 'Focus Close button'),
+          _HelpItem('Enter / Space / Esc / q / F9 / Alt-z', isJp ? '全体マップを閉じる' : 'Close full map'),
           _HelpItem('F1 / Alt-h', isJp ? '操作ヘルプの表示' : 'Show controls help'),
         ];
     }

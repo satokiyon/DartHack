@@ -181,6 +181,8 @@ NetHack 伝統のコマンドがすべてそのまま利用可能です。
 - **Tab 循環 ＆ 閉じる**:
   - `Tab`: 右上の「閉じる（`×`）」ボタンにアンバー枠ハイライト。
   - `Escape`、`q`、`Space`、`Enter`、または起動キーである **`F9`**、**`Alt + z` (`M-z`)** のいずれでも瞬時にマップを閉じてゲームに戻れます。
+- **操作ヘルプの表示 (`F1` / `Alt + h`)**:
+  - 設定の「物理キーボード用の表記を使用」が ON の時、**`F1` または `Alt + h`** を押すと、全体マップ専用のキーボード操作ヘルプが表示されます（Viキーのパン移動 `h` と誤爆しません）。
 
 #### 情報表示・ダンジョン概要・死亡時一覧 (TextOverlay / #overview / 怪物・所持品一覧)
 `#overview` によるダンジョン階層構造表示、ゲーム中のメッセージ確認、および死亡時の「倒した怪物の一覧」「持ち物一覧」「能力一覧」などの長文テキスト表示画面です。
@@ -414,6 +416,7 @@ Cコアからの一行文字列入力要求ダイアログです。
 | **`Shift` + 移動キー** | **2 倍のスピードで高速パン移動** |
 | `Tab` / `Shift + Tab` | `none` ↔ 右上の閉じるボタン間でフォーカス循環 |
 | `Escape` / `q` / `Space` / `Enter` / `F9` / `Alt + z` | 全体マップを閉じる |
+| **`F1` / `Alt + h`** | **操作ヘルプ表示（物理キーボード表記ON時）** |
 
 ### ガイドブック・スポイラー閲覧画面
 
@@ -693,8 +696,9 @@ flowchart TD
    - 矢印キー・`j`/`k` スクロール、PageDown/PageUp、Space によるページ送りおよび最下部閉鎖。
    - `q` / `Escape` / `Enter` 閉鎖の検証。
 8. [`test/widgets/full_map_dialog_test.dart`](../test/widgets/full_map_dialog_test.dart):
-   - `+` / `-` 段階的ズーム、`0` / `Home` リセット、`z` キーの 6 倍アニメーショントグル。
+   - `+` / `-` 段階的ズーム、`0` / `Home` リセット、`z` キーの 6倍アニメーショントグル。
    - 矢印キーおよび 8 方向 Vi キー（`hjkl yubn`）によるパン移動、Tab フォーカス循環、`q`/`Escape`/`Space` 閉鎖の検証。
+   - `usePhysicalKeyboardNotation: true` の時、`F1` または `Alt + h` で全体地図専用ヘルプが開くこと、`Alt + h` 時にマップ左パン（hキー）が誤爆しないこと、および OFF 時にヘルプが開かないことの検証。
 9. [`test/widgets/guidebook_keyboard_test.dart`](../test/widgets/guidebook_keyboard_test.dart):
    - ガイドブックおよびスポイラーの Tab 循環（目次ボタン・閉じるボタン）、`t` キーによる目次モーダル起動。
    - 目次内での上下選択・文字入力インクリメンタル絞り込み・Enter ジャンプ、`q`/`Escape` 閉鎖の検証。
@@ -721,6 +725,6 @@ flowchart TD
     - 一行テキスト入力ダイアログにおける Tab 巡回時の `_inputFocusNode.unfocus()` 維持とフォーカスレス入力互換検証。
     - `ExcludeFocus` によるダイアログ外への Flutter 標準フォーカス漏延遮断の検証。
 15. [`test/widgets/keyboard_help_dialog_test.dart`](../test/widgets/keyboard_help_dialog_test.dart):
-    - 画面コンテキスト（`game`, `menu`, `yn`, `guidebook`, `titleScreen`, `settings`）に応じた最適化操作ガイド項目の表示検証（`game` コンテキストでは DartHack 固有 UI 操作および `?` による NetHack 標準ヘルプ導線のみを表示し、NetHack 本来の移動操作等は非表示分離）。
+    - 画面コンテキスト（`game`, `menu`, `yn`, `guidebook`, `titleScreen`, `settings`, `fullMap`）に応じた最適化操作ガイド項目の表示検証（`game` コンテキストでは DartHack 固有 UI 操作および `?` による NetHack 標準ヘルプ導線のみを表示し、NetHack 本来の移動操作等は非表示分離。`fullMap` では全体地図専用のズーム・パン・高速パン等の操作ガイドを表示）。
     - 数量指定可能なメニュー（`menuHow >= 1`）のみにおける `0〜9` 数量指定案内の動的表示、および閲覧専用メニュー（`menuHow == 0`）での非表示分離の検証。
     - `F1`、`Alt + h`、`Escape`、閉じるアイコンボタンによるダイアログの安全閉鎖の検証。

@@ -169,6 +169,20 @@ void main() {
       expect(find.textContaining('冒険を始める'), findsWidgets);
     });
 
+    testWidgets('fullMap コンテキストで全体地図向け操作ヘルプが表示されること', (tester) async {
+      await tester.pumpWidget(buildTestWidget(
+        helpContext: KeyboardHelpContext.fullMap,
+      ));
+
+      await tester.tap(find.text('Open Help'));
+      await tester.pumpAndSettle();
+
+      expect(find.byType(KeyboardHelpDialog), findsOneWidget);
+      expect(find.textContaining('6倍拡大 ⇔ 全体表示'), findsOneWidget);
+      expect(find.textContaining('マップのパン（平行移動）'), findsOneWidget);
+      expect(find.textContaining('全体マップを閉じる'), findsOneWidget);
+    });
+
     testWidgets('settings コンテキストで設定画面向け操作ヘルプが表示されること', (tester) async {
       await tester.pumpWidget(buildTestWidget(
         helpContext: KeyboardHelpContext.settings,

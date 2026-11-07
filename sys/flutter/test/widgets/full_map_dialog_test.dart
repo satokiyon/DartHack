@@ -4,6 +4,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:darthack/l10n/app_localizations.dart';
 import 'package:darthack/nethack_screen.dart';
 import 'package:darthack/widgets/full_map_dialog.dart';
+import 'package:darthack/widgets/keyboard_help_dialog.dart';
 
 void main() {
   testWidgets('縦長画面（Portrait）で全体マップダイアログの高さが画面の65%になること', (tester) async {
@@ -374,6 +375,121 @@ void main() {
       await tester.sendKeyEvent(LogicalKeyboardKey.keyJ);
       await tester.pumpAndSettle();
       expect(controller.value.storage[13], closeTo(initialTy, 0.1));
+    });
+
+    testWidgets('Alt+h does not pan the map, and opens KeyboardHelpDialog when usePhysicalKeyboardNotation is true', (tester) async {
+      final screen = NetHackScreen();
+
+      await tester.pumpWidget(
+        MaterialApp(
+          locale: const Locale('ja'),
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
+          home: Scaffold(
+            body: Builder(
+              builder: (context) {
+                return ElevatedButton(
+                  onPressed: () {
+                    showFullMapDialog(
+                      context: context,
+                      screen: screen,
+                      useTiles: false,
+                      tileImage: null,
+                      tileWidth: 16,
+                      tileHeight: 16,
+                      usePhysicalKeyboardNotation: true,
+                    );
+                  },
+                  child: const Text('Open'),
+                );
+              },
+            ),
+          ),
+        ),
+      );
+
+      await tester.tap(find.text('Open'));
+      await tester.pumpAndSettle();
+
+      final viewer = tester.widget<InteractiveViewer>(find.byType(InteractiveViewer));
+      final controller = viewer.transformationController!;
+
+      final initialTx = controller.value.storage[12];
+
+      // Alt+h を送信
+      await tester.sendKeyDownEvent(LogicalKeyboardKey.altLeft);
+      await tester.sendKeyEvent(LogicalKeyboardKey.keyH);
+      await tester.sendKeyUpEvent(LogicalKeyboardKey.altLeft);
+      await tester.pumpAndSettle();
+
+      // パン移動していないこと（hキーが誤爆していないこと）
+      expect(controller.value.storage[12], equals(initialTx));
+
+      // KeyboardHelpDialog が開いていること
+      expect(find.byType(KeyboardHelpDialog), findsOneWidget);
+      expect(find.textContaining('6倍拡大 ⇔ 全体表示'), findsOneWidget);
+      expect(find.textContaining('マップのパン（平行移動）'), findsOneWidget);
+
+      // Escape でヘルプを閉じる
+      await tester.sendKeyEvent(LogicalKeyboardKey.escape);
+      await tester.pumpAndSettle();
+      expect(find.byType(KeyboardHelpDialog), findsNothing);
+
+      // F1 キーでもヘルプが開くこと
+      await tester.sendKeyEvent(LogicalKeyboardKey.f1);
+      await tester.pumpAndSettle();
+      expect(find.byType(KeyboardHelpDialog), findsOneWidget);
+    });
+
+    testWidgets('Alt+h or F1 does not open KeyboardHelpDialog when usePhysicalKeyboardNotation is false', (tester) async {
+      final screen = NetHackScreen();
+
+      await tester.pumpWidget(
+        MaterialApp(
+          locale: const Locale('ja'),
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
+          home: Scaffold(
+            body: Builder(
+              builder: (context) {
+                return ElevatedButton(
+                  onPressed: () {
+                    showFullMapDialog(
+                      context: context,
+                      screen: screen,
+                      useTiles: false,
+                      tileImage: null,
+                      tileWidth: 16,
+                      tileHeight: 16,
+                      usePhysicalKeyboardNotation: false,
+                    );
+                  },
+                  child: const Text('Open'),
+                );
+              },
+            ),
+          ),
+        ),
+      );
+
+      await tester.tap(find.text('Open'));
+      await tester.pumpAndSettle();
+
+      // Alt+h を送信
+      await tester.sendKeyDownEvent(LogicalKeyboardKey.altLeft);
+      await tester.sendKeyEvent(LogicalKeyboardKey.keyH);
+      await tester.sendKeyUpEvent(LogicalKeyboardKey.altLeft);
+      await tester.pumpAndSettle();
+
+      // ヘルプが開かないこと
+      expect(find.byType(KeyboardHelpDialog), findsNothing);
+
+      // F1 を送信
+      await tester.sendKeyEvent(LogicalKeyboardKey.f1);
+      await tester.pumpAndSettle();
+
+      // ヘルプが開かないこと
+      expect(find.byType(KeyboardHelpDialog), findsNothing);
     });
   });
 }

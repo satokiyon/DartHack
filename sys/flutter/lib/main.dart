@@ -983,6 +983,7 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
       tileWidth: _tileWidth,
       tileHeight: _tileHeight,
       isTransparentTileset: TilesetManager.instance.getTilesetById(_selectedTileset).isTransparent,
+      usePhysicalKeyboardNotation: _usePhysicalKeyboardNotation,
     ).then((_) {
       _ensureGameFocus();
     });

@@ -5,6 +5,7 @@ import '../l10n/app_localizations.dart';
 import '../nethack_screen.dart';
 import '../nethack_map_painter.dart';
 import '../services/font_manager.dart';
+import 'keyboard_help_dialog.dart';
 
 Future<void> showFullMapDialog({
   required BuildContext context,
@@ -14,6 +15,7 @@ Future<void> showFullMapDialog({
   required int tileWidth,
   required int tileHeight,
   bool isTransparentTileset = false,
+  bool usePhysicalKeyboardNotation = false,
 }) {
   final l10n = AppLocalizations.of(context)!;
   return showDialog(
@@ -36,6 +38,7 @@ Future<void> showFullMapDialog({
           tileHeight: tileHeight,
           isTransparentTileset: isTransparentTileset,
           l10n: l10n,
+          usePhysicalKeyboardNotation: usePhysicalKeyboardNotation,
         ),
       );
     },
@@ -50,6 +53,7 @@ class _FullMapDialogContent extends StatefulWidget {
   final int tileHeight;
   final bool isTransparentTileset;
   final AppLocalizations l10n;
+  final bool usePhysicalKeyboardNotation;
 
   const _FullMapDialogContent({
     required this.screen,
@@ -59,6 +63,7 @@ class _FullMapDialogContent extends StatefulWidget {
     required this.tileHeight,
     this.isTransparentTileset = false,
     required this.l10n,
+    this.usePhysicalKeyboardNotation = false,
   });
 
   @override
@@ -253,40 +258,54 @@ class _FullMapDialogContentState extends State<_FullMapDialogContent>
       return KeyEventResult.handled;
     }
 
+    // F1 / Alt-h: 操作ヘルプの表示
+    final isHelpKey = key == LogicalKeyboardKey.f1 ||
+        (isAlt && key == LogicalKeyboardKey.keyH);
+    if (isHelpKey) {
+      if (isDown && widget.usePhysicalKeyboardNotation) {
+        KeyboardHelpDialog.show(
+          context,
+          helpContext: KeyboardHelpContext.fullMap,
+          isJapanese: widget.l10n.localeName.startsWith('ja'),
+        );
+      }
+      return KeyEventResult.handled;
+    }
+
     // パン移動量 (Shiftで2倍高速)
     final panStep = isShift ? 80.0 : 40.0;
 
     // パン（平行移動）: 矢印キーおよび Viキー (h, j, k, l, y, u, b, n)
-    if (key == LogicalKeyboardKey.arrowLeft || (key == LogicalKeyboardKey.keyH && !isCtrl)) {
+    if (key == LogicalKeyboardKey.arrowLeft || (key == LogicalKeyboardKey.keyH && !isCtrl && !isAlt)) {
       _panBy(panStep, 0.0);
       return KeyEventResult.handled;
     }
-    if (key == LogicalKeyboardKey.arrowRight || (key == LogicalKeyboardKey.keyL && !isCtrl)) {
+    if (key == LogicalKeyboardKey.arrowRight || (key == LogicalKeyboardKey.keyL && !isCtrl && !isAlt)) {
       _panBy(-panStep, 0.0);
       return KeyEventResult.handled;
     }
-    if (key == LogicalKeyboardKey.arrowUp || (key == LogicalKeyboardKey.keyK && !isCtrl)) {
+    if (key == LogicalKeyboardKey.arrowUp || (key == LogicalKeyboardKey.keyK && !isCtrl && !isAlt)) {
       _panBy(0.0, panStep);
       return KeyEventResult.handled;
     }
-    if (key == LogicalKeyboardKey.arrowDown || (key == LogicalKeyboardKey.keyJ && !isCtrl)) {
+    if (key == LogicalKeyboardKey.arrowDown || (key == LogicalKeyboardKey.keyJ && !isCtrl && !isAlt)) {
       _panBy(0.0, -panStep);
       return KeyEventResult.handled;
     }
     // 斜め Vi キー
-    if (key == LogicalKeyboardKey.keyY && !isCtrl) {
+    if (key == LogicalKeyboardKey.keyY && !isCtrl && !isAlt) {
       _panBy(panStep, panStep);
       return KeyEventResult.handled;
     }
-    if (key == LogicalKeyboardKey.keyU && !isCtrl) {
+    if (key == LogicalKeyboardKey.keyU && !isCtrl && !isAlt) {
       _panBy(-panStep, panStep);
       return KeyEventResult.handled;
     }
-    if (key == LogicalKeyboardKey.keyB && !isCtrl) {
+    if (key == LogicalKeyboardKey.keyB && !isCtrl && !isAlt) {
       _panBy(panStep, -panStep);
       return KeyEventResult.handled;
     }
-    if (key == LogicalKeyboardKey.keyN && !isCtrl) {
+    if (key == LogicalKeyboardKey.keyN && !isCtrl && !isAlt) {
       _panBy(-panStep, -panStep);
       return KeyEventResult.handled;
     }
