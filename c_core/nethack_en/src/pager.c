@@ -3060,9 +3060,9 @@ clicklook_at(coordxy cx, coordxy cy)
 
     found = do_screen_description(cc, TRUE, 0, out_str, &firstmatch,
                                   &supplemental_pm);
-    if (found) {
-        /* print as normal message so it stays in message history */
-        putmixed(WIN_MESSAGE, ATR_NONE, out_str);
+    if (found && firstmatch && *firstmatch) {
+        /* print only the actual object/terrain/monster name (firstmatch) */
+        pline("%s", firstmatch);
     }
 }
 
