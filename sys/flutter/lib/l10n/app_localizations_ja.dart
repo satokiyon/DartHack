@@ -605,13 +605,19 @@ class AppLocalizationsJa extends AppLocalizations {
   String get dpadModeFCmd => 'F: 強制攻撃';
 
   @override
-  String get mapTapTravelTitle => 'マップタップでの自動移動';
+  String get mapTapTravelTitle => '離れたマスのタップ時動作（自動移動）';
 
   @override
-  String get mapTapAlways => '常に有効';
+  String get mapTapMenu => 'メニュー表示（移動・記号確認）';
 
   @override
-  String get mapTapAfterScroll => 'スクロール・ズーム直後のみ有効';
+  String get mapTapAlways => '即時移動（常に有効）';
+
+  @override
+  String get mapTapAfterScroll => '即時移動（スクロール・ズーム直後のみ）';
+
+  @override
+  String get mapTapDisabled => '無効';
 
   @override
   String get shortcutPadScaleTitle => 'ショートカットボタンサイズ倍率';

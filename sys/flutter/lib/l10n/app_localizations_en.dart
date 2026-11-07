@@ -614,13 +614,19 @@ class AppLocalizationsEn extends AppLocalizations {
   String get dpadModeFCmd => 'F: Force fight';
 
   @override
-  String get mapTapTravelTitle => 'Map Tap Travel Mode';
+  String get mapTapTravelTitle => 'Action on Far Tap (Auto-Travel)';
 
   @override
-  String get mapTapAlways => 'Always Enabled';
+  String get mapTapMenu => 'Show Menu (Travel / Look)';
 
   @override
-  String get mapTapAfterScroll => 'Enabled Only After Scroll/Zoom';
+  String get mapTapAlways => 'Immediate Travel (Always)';
+
+  @override
+  String get mapTapAfterScroll => 'Immediate Travel (After Scroll/Zoom)';
+
+  @override
+  String get mapTapDisabled => 'Disabled';
 
   @override
   String get shortcutPadScaleTitle => 'Shortcut Pad Scale Multiplier';

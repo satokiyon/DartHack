@@ -67,6 +67,7 @@ void debuglog(const char *fmt, ...) {
 static int flutter_nhgetch(void);
 static void flutter_nhbell(void);
 extern char *decode_mixed(char *, const char *); // src/windows.c の関数 (\GXXXXNNNN → showsym 1 文字)
+extern boolean bind_mousebtn(int, const char *); // src/cmd.c のマウスバインディング関数
 
 #ifdef NETHACK_JP
 extern const char *jp_role_name_for_display(int role_idx, int gender);
@@ -1024,6 +1025,12 @@ NH_EXPORT void SendPosCmdToFlutter(int x, int y, int mod) {
         debuglog("SendPosCmdToFlutter: queue full, dropping pos_cmd x=%d y=%d mod=%d", x, y, mod);
         return;
     }
+    // mod == 2 (即時移動用 CLICK_2) の場合、mouse2 に確実に mouseaction がバインドされていることを担保
+    static int s_mousebtn2_ensured = 0;
+    if (mod == 2 && !s_mousebtn2_ensured) {
+        bind_mousebtn(2, "mouseaction");
+        s_mousebtn2_ensured = 1;
+    }
     g_poscmd_queue[g_poscmd_tail].x = x;
     g_poscmd_queue[g_poscmd_tail].y = y;
     g_poscmd_queue[g_poscmd_tail].mod = mod;
@@ -1122,6 +1129,7 @@ static void flutter_init_nhwindows(int* argc, char** argv) {
     iflags.voices = TRUE;
     gc.chosen_soundlib = soundlib_androidsound;
     sysopt.check_save_uid = 0;
+    bind_mousebtn(2, "mouseaction");
 }
 
 static void flutter_player_selection(void) {

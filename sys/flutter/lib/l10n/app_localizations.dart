@@ -1271,20 +1271,32 @@ abstract class AppLocalizations {
   /// No description provided for @mapTapTravelTitle.
   ///
   /// In ja, this message translates to:
-  /// **'マップタップでの自動移動'**
+  /// **'離れたマスのタップ時動作（自動移動）'**
   String get mapTapTravelTitle;
+
+  /// No description provided for @mapTapMenu.
+  ///
+  /// In ja, this message translates to:
+  /// **'メニュー表示（移動・記号確認）'**
+  String get mapTapMenu;
 
   /// No description provided for @mapTapAlways.
   ///
   /// In ja, this message translates to:
-  /// **'常に有効'**
+  /// **'即時移動（常に有効）'**
   String get mapTapAlways;
 
   /// No description provided for @mapTapAfterScroll.
   ///
   /// In ja, this message translates to:
-  /// **'スクロール・ズーム直後のみ有効'**
+  /// **'即時移動（スクロール・ズーム直後のみ）'**
   String get mapTapAfterScroll;
+
+  /// No description provided for @mapTapDisabled.
+  ///
+  /// In ja, this message translates to:
+  /// **'無効'**
+  String get mapTapDisabled;
 
   /// No description provided for @shortcutPadScaleTitle.
   ///

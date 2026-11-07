@@ -201,6 +201,7 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
   late TransformationController _transformationController;
   double _currentScale = 1.0; // ピンチズームで設定された現在のズーム率を保持する状態変数
   TapDownDetails? _lastMapTapDownDetails; // マップタップ時の座標一時保持用
+  TapDownDetails? _lastMapSecondaryTapDownDetails; // マップ右クリック時の座標一時保持用
   String _cameraFollowMode = 'center'; // 'center': 常時センタリング, 'fixed': マップ固定・端スクロール
   int _scrollMargin = 3;
   int _scrollAmount = 3;
@@ -305,7 +306,7 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
     DPadMoveMode.fCmd,
   ];
   bool _isDirectionPromptActive = false;
-  String _mapTapTravelMode = 'always';
+  String _mapTapTravelMode = 'menu';
   bool _isMapScrolledOrZoomed = false;
 
   @override
@@ -402,7 +403,10 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
       }
       final savedLongPressMoveModeName = prefs.getString('dpad_long_press_move_mode') ?? 'G_UPPER';
       _dPadLongPressMoveMode = _parseMoveMode(savedLongPressMoveModeName);
-      _mapTapTravelMode = prefs.getString('map_tap_travel_mode') ?? 'always';
+      _mapTapTravelMode = prefs.getString('map_tap_travel_mode') ?? 'menu';
+      if (!const ['menu', 'always', 'after_scroll', 'disabled'].contains(_mapTapTravelMode)) {
+        _mapTapTravelMode = 'menu';
+      }
       _cameraFollowMode = prefs.getString('camera_follow_mode') ?? 'center';
       _scrollMargin = prefs.getInt('scroll_margin') ?? 3;
       _scrollAmount = prefs.getInt('scroll_amount') ?? 3;
@@ -3562,12 +3566,13 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
     return (tileX: tileX, tileY: tileY, inMap: true);
   }
 
-  // マップタップ処理。主人公タイルをタップしたとき Java 版と同じ流れで
-  // PosCmd(x, y, mod) を C コアに送信し、C コア側の click_to_cmd 経由で
-  // #herecmdmenu (主人公) / #therecmdmenu (隣接) を起動する。
-  // (拡張コマンド "#herecmdmenu" の文字列送信は Flutter 版の get_ext_cmd
-  //  実装 (メニュー起動型) と整合せず、メニュー表示前の残文字が暴走する
-  //  ため廃止。Java 版の PosCmd 送信方式を踏襲する。)
+  // マップタップ処理。主人公タイルまたは隣接マスをタップしたときは
+  // PosCmd(x, y, 1 /* CLICK_1: therecmdmenu */) を C コアに送信して
+  // #herecmdmenu (主人公) / #therecmdmenu (隣接) のアクションメニューを起動する。
+  // 離れたマス（2マス以上）の場合は、設定（_mapTapTravelMode）に応じて:
+  // - 'menu': CLICK_1 (therecmdmenu: 移動/記号を見る等の確認メニュー)
+  // - 'always' / 'after_scroll': CLICK_2 (mouseaction: 即時自動移動 dotravel_target)
+  // - 'disabled': 無視
   void _handleMapTap(TapDownDetails details) {
     if (!_isMainGameStarted) return;
     final px = _screen.playerX;
@@ -3582,21 +3587,76 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
     final bool isGetposOrTargetingMode = _screen.topline != null ||
         (_screen.messages.isNotEmpty && _screen.messages.last.trim().endsWith("?"));
 
+    if (isGetposOrTargetingMode) {
+      sendPosCmd(tile.tileX, tile.tileY, 1 /* CLICK_1 */);
+      return;
+    }
+
     // 主人公タイルまたは隣接8マスの判定
     final dx = (tile.tileX - px).abs();
     final dy = (tile.tileY - py).abs();
     final bool isAdjacentOrSelf = (dx <= 1 && dy <= 1);
 
-    // 自動トラベル（2マス以上離れた場所への移動）の制限判定
-    if (!isGetposOrTargetingMode && !isAdjacentOrSelf && _mapTapTravelMode == 'after_scroll') {
-      if (!_isMapScrolledOrZoomed) {
-        _addLog("Map tap travel ignored: scroll or zoom required");
-        return;
-      }
-      _isMapScrolledOrZoomed = false;
+    if (isAdjacentOrSelf) {
+      // 主人公・隣接マスは常にアクションメニューを起動
+      sendPosCmd(tile.tileX, tile.tileY, 1 /* CLICK_1: therecmdmenu */);
+      return;
     }
 
-    sendPosCmd(tile.tileX, tile.tileY, 1 /* CLICK_1 */);
+    // 離れたマス（2マス以上離れた場所への移動）の動作分岐
+    switch (_mapTapTravelMode) {
+      case 'disabled':
+        _addLog("Map tap travel ignored: travel disabled");
+        return;
+
+      case 'after_scroll':
+        if (!_isMapScrolledOrZoomed) {
+          _addLog("Map tap travel ignored: scroll or zoom required");
+          return;
+        }
+        _isMapScrolledOrZoomed = false;
+        // 即時移動: CLICK_2 (mouseaction -> dotravel_target)
+        sendPosCmd(tile.tileX, tile.tileY, 2 /* CLICK_2: mouseaction */);
+        break;
+
+      case 'always':
+        // 即時移動: CLICK_2 (mouseaction -> dotravel_target)
+        sendPosCmd(tile.tileX, tile.tileY, 2 /* CLICK_2: mouseaction */);
+        break;
+
+      case 'menu':
+      default:
+        // メニュー表示: CLICK_1 (therecmdmenu -> there_cmd_menu_far)
+        sendPosCmd(tile.tileX, tile.tileY, 1 /* CLICK_1: therecmdmenu */);
+        break;
+    }
+  }
+
+  // マップ右クリック処理 (Windows / PC向け)
+  // 右クリック (CLICK_2: mouseaction) を C コアに送信する。
+  // - 離れたマス: その地点までダイレクトに即時自動移動 (dotravel_target)
+  // - 主人公マス: 直接拾う/階段昇降/休息などの直接アクション (メニュー非表示)
+  // - 隣接マス: ドア開閉/直接攻撃/1歩移動
+  // - ターゲット選択中/farlook中: ターゲット座標指定として CLICK_1 を送信
+  void _handleMapSecondaryTap(TapDownDetails details) {
+    if (!_isMainGameStarted) return;
+    final px = _screen.playerX;
+    final py = _screen.playerY;
+    if (px < 0 || py < 0) return;
+
+    final tile = _mapLocalToTile(details.localPosition);
+    if (tile == null) return;
+
+    final bool isGetposOrTargetingMode = _screen.topline != null ||
+        (_screen.messages.isNotEmpty && _screen.messages.last.trim().endsWith("?"));
+
+    if (isGetposOrTargetingMode) {
+      sendPosCmd(tile.tileX, tile.tileY, 1 /* CLICK_1 */);
+      return;
+    }
+
+    // 右クリックは設定値に関わらず常に CLICK_2 (mouseaction) を送信して即時移動/直接アクションを実行
+    sendPosCmd(tile.tileX, tile.tileY, 2 /* CLICK_2: mouseaction */);
   }
 
   // マップ座標クリック (PosCmd) を C コアに送信する。
@@ -3935,6 +3995,15 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
                         _ensureGameFocus();
                         if (_lastMapTapDownDetails != null) {
                           _handleMapTap(_lastMapTapDownDetails!);
+                        }
+                      },
+                      onSecondaryTapDown: (details) {
+                        _lastMapSecondaryTapDownDetails = details;
+                      },
+                      onSecondaryTap: () {
+                        _ensureGameFocus();
+                        if (_lastMapSecondaryTapDownDetails != null) {
+                          _handleMapSecondaryTap(_lastMapSecondaryTapDownDetails!);
                         }
                       },
                       child: CustomPaint(
