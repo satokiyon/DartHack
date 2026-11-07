@@ -1,5 +1,5 @@
--- Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-04.
--- $NHDT-Header: NetHack 5.0 Tou-fila.lua 1970/01/01_00:00:00 NetHack-5.0:1.6 $
+-- Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-08.
+-- $NHDT-Header: NetHack 5.0 Tou-fila.lua 2026/06/20_22:34:34 NetHack-5.0:1.6 $
 --	Copyright (c) 1989 by Jean-Christophe Collet
 --	Copyright (c) 1991,92 by M. Stephenson, P. Winner
 -- NetHack may be freely redistributed.  See license for details.

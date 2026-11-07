@@ -1,5 +1,5 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-04. */
-/* $NHDT-Header: NetHack 5.0 wingem1.c 1970/01/01_00:00:00 NetHack-5.0:1.65 $ */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-08. */
+/* $NHDT-Header: NetHack 5.0 wingem1.c 2015/06/08_23:36:53 NetHack-5.0:1.65 $ */
 /* Copyright (c) Christian Bressler 1999 	  */
 /* NetHack may be freely redistributed.  See license for details. */
 

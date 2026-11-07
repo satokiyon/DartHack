@@ -1,5 +1,5 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-04. */
-/* $NHDT-Header: NetHack 5.0 amistack.c 1970/01/01_00:00:00 NetHack-5.0:1.17 $ */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-08. */
+/* $NHDT-Header: NetHack 5.0 amistack.c 2015/05/25_00:13:15 NetHack-5.0:1.17 $ */
 /* Copyright (c) Janne Salmijärvi, Tampere, Finland, 2000		*/
 /* NetHack may be freely redistributed.  See license for details.	*/
 

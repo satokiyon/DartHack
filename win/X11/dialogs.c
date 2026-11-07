@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-04. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-08. */
 /*
  * Copyright 1991 University of Wisconsin-Madison
  *
@@ -55,7 +55,7 @@
  *    + Make 'okay' button same width as 'cancel', and both wider than
  *      default by a small arbitrary amount.
  *
- * $NHDT-Header: NetHack 5.0 dialogs.c 1970/01/01_00:00:00 NetHack-5.0:1.17 $
+ * $NHDT-Header: NetHack 5.0 dialogs.c 2016/02/11_02:24:30 NetHack-5.0:1.17 $
  */
 
 #ifndef SYSV
