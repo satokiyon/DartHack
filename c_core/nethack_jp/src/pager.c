@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-04. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-08. */
 /* $NHDT-Header: NetHack 5.0 pager.c 2026/06/20_22:26:43 NetHack-5.0:1.304 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2018. */
@@ -3559,11 +3559,10 @@ clicklook_at(coordxy cx, coordxy cy)
 
     found = do_screen_description(cc, TRUE, 0, out_str, &firstmatch,
                                   &supplemental_pm);
-    if (found) {
-        jp_translate_screen_desc(out_str);
-        /* 一時メッセージ (ATR_NOHISTORY) ではなく通常メッセージとして出力し、
-         * メッセージ履歴に残るようにする */
-        putmixed(WIN_MESSAGE, ATR_NONE, out_str);
+    if (found && firstmatch && *firstmatch) {
+        /* 記号辞書の候補一覧 (out_str) ではなく、
+         * そのマスにある実際の実物名 (firstmatch) のみを出力する */
+        pline("%s", firstmatch);
     }
 }
 
