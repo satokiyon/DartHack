@@ -1,5 +1,8 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-04. */
-/* $NHDT-Header: NetHack 5.0 load_img.c 2026/09/30_14:47:34 NetHack-5.0:1.10 $ */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-08. */
+/* $NHDT-Header: NetHack 5.0 load_img.c 2026/11/07_02:51:19 NetHack-5.0:1.11 $ */
+/* Copyright (c) Ingo Paschke 2026. */
+/* NetHack may be freely redistributed.  See license for details. */
+
 #define __TCC_COMPAT__
 #include <stdio.h>
 #include <string.h>
