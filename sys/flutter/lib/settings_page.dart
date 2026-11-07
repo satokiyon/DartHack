@@ -680,6 +680,7 @@ class _SettingsPageState extends State<SettingsPage> {
     return Focus(
       focusNode: focusNode,
       onKeyEvent: (node, event) {
+        if (!node.hasPrimaryFocus) return KeyEventResult.ignored;
         if (event is! KeyDownEvent) return KeyEventResult.ignored;
         if (event.logicalKey == LogicalKeyboardKey.enter ||
             event.logicalKey == LogicalKeyboardKey.numpadEnter ||
@@ -739,8 +740,6 @@ class _SettingsPageState extends State<SettingsPage> {
   }
 
   /// プルダウン設定項目の共通ビルダー
-  /// スマホ縦画面（幅 < 600px）では上下配置（タイトル・説明文の下に全幅角丸プルダウン）、
-  /// ワイド画面（幅 >= 600px）では左右配置に切り替えるレスポンシブ設計
   Widget _buildDropdownSettingTile<T>({
     required String title,
     String? description,
@@ -750,76 +749,15 @@ class _SettingsPageState extends State<SettingsPage> {
     required ValueChanged<T?> onChanged,
     String? hintText,
   }) {
-    final screenWidth = MediaQuery.of(context).size.width;
-    final isNarrow = screenWidth < 600;
-
-    final dropdownWidget = Container(
-      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 3),
-      decoration: BoxDecoration(
-        color: const Color(0xFF262638),
-        borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: Colors.white24, width: 1.0),
-      ),
-      child: DropdownButtonHideUnderline(
-        child: DropdownButton<T>(
-          value: value,
-          isExpanded: true,
-          hint: hintText != null
-              ? Text(hintText, style: const TextStyle(fontSize: 13, color: Colors.white70))
-              : null,
-          dropdownColor: const Color(0xFF1E1E2C),
-          style: const TextStyle(fontSize: 13, color: Colors.white),
-          icon: const Icon(Icons.arrow_drop_down, color: Colors.white70),
-          items: items,
-          onChanged: onChanged,
-        ),
-      ),
+    return _SettingsDropdownTile<T>(
+      title: title,
+      description: description,
+      leading: leading,
+      value: value,
+      items: items,
+      onChanged: onChanged,
+      hintText: hintText,
     );
-
-    if (isNarrow) {
-      // スマホ縦画面: 上下配置
-      return Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              children: [
-                if (leading != null) ...[leading, const SizedBox(width: 12)],
-                Expanded(
-                  child: Text(
-                    title,
-                    style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w600, color: Colors.white),
-                  ),
-                ),
-              ],
-            ),
-            if (description != null) ...[
-              const SizedBox(height: 4),
-              Text(
-                description,
-                style: const TextStyle(fontSize: 12, color: Colors.white60, height: 1.4),
-              ),
-            ],
-            const SizedBox(height: 8),
-            dropdownWidget,
-          ],
-        ),
-      );
-    } else {
-      // ワイド画面: 左右配置
-      return ListTile(
-        leading: leading,
-        title: Text(title, style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w600)),
-        subtitle: description != null
-            ? Text(description, style: const TextStyle(fontSize: 12, color: Colors.white60, height: 1.3))
-            : null,
-        trailing: ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: 320),
-          child: dropdownWidget,
-        ),
-      );
-    }
   }
 
   Widget _buildScreenDisplaySection() {
@@ -846,7 +784,7 @@ class _SettingsPageState extends State<SettingsPage> {
               }
             },
           ),
-          SwitchListTile(
+          _SettingsSwitchTile(
             title: Text(l10n.usePhysicalKeyboardNotation),
             subtitle: Text(l10n.usePhysicalKeyboardNotationSub),
             value: _usePhysicalKeyboardNotation,
@@ -869,78 +807,82 @@ class _SettingsPageState extends State<SettingsPage> {
               }
             },
           ),
-          ListTile(
-            title: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(l10n.scrollMargin),
-                Text('$_scrollMargin', style: const TextStyle(fontSize: 14, color: Colors.white70)),
-              ],
-            ),
-            subtitle: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                _SettingsSlider(
-                  child: Slider(
-                    value: _scrollMargin.toDouble(),
-                    min: 1.0,
-                    max: 10.0,
-                    divisions: 9,
-                    label: '$_scrollMargin',
-                    onChanged: _cameraFollowMode == 'fixed'
-                        ? (val) {
-                            final intVal = val.round();
-                            setState(() => _scrollMargin = intVal);
-                            _saveSetting('scroll_margin', intVal);
-                          }
-                        : null,
+          _SettingsSliderTile(
+            child: ListTile(
+              title: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(l10n.scrollMargin),
+                  Text('$_scrollMargin', style: const TextStyle(fontSize: 14, color: Colors.white70)),
+                ],
+              ),
+              subtitle: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  _SettingsSlider(
+                    child: Slider(
+                      value: _scrollMargin.toDouble(),
+                      min: 1.0,
+                      max: 10.0,
+                      divisions: 9,
+                      label: '$_scrollMargin',
+                      onChanged: _cameraFollowMode == 'fixed'
+                          ? (val) {
+                              final intVal = val.round();
+                              setState(() => _scrollMargin = intVal);
+                              _saveSetting('scroll_margin', intVal);
+                            }
+                          : null,
+                    ),
                   ),
-                ),
-                Text(
-                  _cameraFollowMode == 'fixed' ? l10n.scrollMarginDesc : l10n.cameraScrollOnlyFixed,
-                  style: TextStyle(
-                    fontSize: 12,
-                    color: _cameraFollowMode == 'fixed' ? Colors.white60 : Colors.white38,
+                  Text(
+                    _cameraFollowMode == 'fixed' ? l10n.scrollMarginDesc : l10n.cameraScrollOnlyFixed,
+                    style: TextStyle(
+                      fontSize: 12,
+                      color: _cameraFollowMode == 'fixed' ? Colors.white60 : Colors.white38,
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
-          ListTile(
-            title: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(l10n.scrollAmount),
-                Text('$_scrollAmount', style: const TextStyle(fontSize: 14, color: Colors.white70)),
-              ],
-            ),
-            subtitle: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                _SettingsSlider(
-                  child: Slider(
-                    value: _scrollAmount.toDouble(),
-                    min: 1.0,
-                    max: 10.0,
-                    divisions: 9,
-                    label: '$_scrollAmount',
-                    onChanged: _cameraFollowMode == 'fixed'
-                        ? (val) {
-                            final intVal = val.round();
-                            setState(() => _scrollAmount = intVal);
-                            _saveSetting('scroll_amount', intVal);
-                          }
-                        : null,
+          _SettingsSliderTile(
+            child: ListTile(
+              title: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(l10n.scrollAmount),
+                  Text('$_scrollAmount', style: const TextStyle(fontSize: 14, color: Colors.white70)),
+                ],
+              ),
+              subtitle: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  _SettingsSlider(
+                    child: Slider(
+                      value: _scrollAmount.toDouble(),
+                      min: 1.0,
+                      max: 10.0,
+                      divisions: 9,
+                      label: '$_scrollAmount',
+                      onChanged: _cameraFollowMode == 'fixed'
+                          ? (val) {
+                              final intVal = val.round();
+                              setState(() => _scrollAmount = intVal);
+                              _saveSetting('scroll_amount', intVal);
+                            }
+                          : null,
+                    ),
                   ),
-                ),
-                Text(
-                  _cameraFollowMode == 'fixed' ? l10n.scrollAmountDesc : l10n.cameraScrollOnlyFixed,
-                  style: TextStyle(
-                    fontSize: 12,
-                    color: _cameraFollowMode == 'fixed' ? Colors.white60 : Colors.white38,
+                  Text(
+                    _cameraFollowMode == 'fixed' ? l10n.scrollAmountDesc : l10n.cameraScrollOnlyFixed,
+                    style: TextStyle(
+                      fontSize: 12,
+                      color: _cameraFollowMode == 'fixed' ? Colors.white60 : Colors.white38,
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
           _buildDropdownSettingTile<String>(
@@ -959,7 +901,7 @@ class _SettingsPageState extends State<SettingsPage> {
               }
             },
           ),
-          SwitchListTile(
+          _SettingsSwitchTile(
             title: Text(l10n.msgAvoidFlip),
             subtitle: Text(
               _cameraFollowMode == 'fixed' ? l10n.msgAvoidFlipDesc : l10n.cameraScrollOnlyFixed,
@@ -1092,29 +1034,31 @@ class _SettingsPageState extends State<SettingsPage> {
             title: l10n.fontUiLabel,
           ),
           // アスキーマップ倍率スライダー
-          ListTile(
-            title: Text(l10n.fontAsciiScale),
-            subtitle: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  '${fontMgr.mapAsciiScale.toStringAsFixed(1)}x',
-                  style: const TextStyle(color: Colors.cyanAccent, fontWeight: FontWeight.bold),
-                ),
-                _SettingsSlider(
-                  child: Slider(
-                    value: fontMgr.mapAsciiScale,
-                    min: 1.0,
-                    max: 2.5,
-                    divisions: 15,
-                    label: '${fontMgr.mapAsciiScale.toStringAsFixed(1)}x',
-                    onChanged: (val) {
-                      setState(() {});
-                      fontMgr.setMapAsciiScale(val);
-                    },
+          _SettingsSliderTile(
+            child: ListTile(
+              title: Text(l10n.fontAsciiScale),
+              subtitle: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    '${fontMgr.mapAsciiScale.toStringAsFixed(1)}x',
+                    style: const TextStyle(color: Colors.cyanAccent, fontWeight: FontWeight.bold),
                   ),
-                ),
-              ],
+                  _SettingsSlider(
+                    child: Slider(
+                      value: fontMgr.mapAsciiScale,
+                      min: 1.0,
+                      max: 2.5,
+                      divisions: 15,
+                      label: '${fontMgr.mapAsciiScale.toStringAsFixed(1)}x',
+                      onChanged: (val) {
+                        setState(() {});
+                        fontMgr.setMapAsciiScale(val);
+                      },
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
           // 外部フォント追加ボタン
@@ -1449,7 +1393,7 @@ class _SettingsPageState extends State<SettingsPage> {
         leading: const Icon(Icons.palette, color: Colors.deepPurpleAccent),
         title: Text(l10n.secTilesetTitle),
         children: _withDividers([
-          SwitchListTile(
+          _SettingsSwitchTile(
             title: Text(l10n.useTiles),
             subtitle: Text(l10n.useTilesSub),
             value: _useTiles,
@@ -1614,7 +1558,7 @@ class _SettingsPageState extends State<SettingsPage> {
             ),
           ),
           // 移動パッドとショートカットの左右入れ替えスイッチ
-          SwitchListTile(
+          _SettingsSwitchTile(
             title: Text(l10n.swapPadSideTitle),
             subtitle: Text(l10n.swapPadSideDesc),
             value: _swapPadSide,
@@ -1679,7 +1623,7 @@ class _SettingsPageState extends State<SettingsPage> {
               ],
             ),
           ),
-          SwitchListTile(
+          _SettingsSwitchTile(
             title: Text(l10n.hideMsgWithControlsTitle),
             subtitle: Text(l10n.hideMsgWithControlsDesc),
             value: _hideMsgWithControls,
@@ -1688,7 +1632,7 @@ class _SettingsPageState extends State<SettingsPage> {
               _saveSetting('hide_msg_with_controls', val);
             },
           ),
-          SwitchListTile(
+          _SettingsSwitchTile(
             title: Text(l10n.hideMapBtnWithControlsTitle),
             subtitle: Text(l10n.hideMapBtnWithControlsDesc),
             value: _hideMapBtnWithControls,
@@ -1697,7 +1641,7 @@ class _SettingsPageState extends State<SettingsPage> {
               _saveSetting('hide_map_btn_with_controls', val);
             },
           ),
-          SwitchListTile(
+          _SettingsSwitchTile(
             title: Text(l10n.hideMenuBtnWithControlsTitle),
             subtitle: Text(l10n.hideMenuBtnWithControlsDesc),
             value: _hideMenuBtnWithControls,
@@ -1789,46 +1733,50 @@ class _SettingsPageState extends State<SettingsPage> {
               }
             },
           ),
-          ListTile(
-            title: Text(l10n.padOpacityTitle),
-            subtitle: _SettingsSlider(
-              child: Slider(
-                value: _padOpacity,
-                min: 0.1,
-                max: 1.0,
-                divisions: 9,
-                label: _padOpacity.toStringAsFixed(1),
-                onChanged: (val) {
-                  setState(() => _padOpacity = val);
-                  _saveSetting('pad_opacity', val);
-                },
+          _SettingsSliderTile(
+            child: ListTile(
+              title: Text(l10n.padOpacityTitle),
+              subtitle: _SettingsSlider(
+                child: Slider(
+                  value: _padOpacity,
+                  min: 0.1,
+                  max: 1.0,
+                  divisions: 9,
+                  label: _padOpacity.toStringAsFixed(1),
+                  onChanged: (val) {
+                    setState(() => _padOpacity = val);
+                    _saveSetting('pad_opacity', val);
+                  },
+                ),
               ),
             ),
           ),
-          ListTile(
-            title: Text(l10n.dpadScaleTitle),
-            subtitle: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                _SettingsSlider(
-                  child: Slider(
-                    value: _dpadScale,
-                    min: 0.6,
-                    max: 1.5,
-                    divisions: 9,
-                    label: _dpadScale.toStringAsFixed(1),
-                    onChanged: (val) {
-                      setState(() => _dpadScale = val);
-                      _saveSetting('dpad_scale', val);
-                    },
+          _SettingsSliderTile(
+            child: ListTile(
+              title: Text(l10n.dpadScaleTitle),
+              subtitle: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  _SettingsSlider(
+                    child: Slider(
+                      value: _dpadScale,
+                      min: 0.6,
+                      max: 1.5,
+                      divisions: 9,
+                      label: _dpadScale.toStringAsFixed(1),
+                      onChanged: (val) {
+                        setState(() => _dpadScale = val);
+                        _saveSetting('dpad_scale', val);
+                      },
+                    ),
                   ),
-                ),
-                _buildAppliedScaleLabel(
-                  setting: _dpadScale,
-                  effective: _previewDpadEffectiveScale,
-                  label: l10n.dpadScaleLabel,
-                ),
-              ],
+                  _buildAppliedScaleLabel(
+                    setting: _dpadScale,
+                    effective: _previewDpadEffectiveScale,
+                    label: l10n.dpadScaleLabel,
+                  ),
+                ],
+              ),
             ),
           ),
           _buildDropdownSettingTile<String>(
@@ -1864,56 +1812,60 @@ class _SettingsPageState extends State<SettingsPage> {
               }
             },
           ),
-          ListTile(
-            title: Text(l10n.shortcutPadScaleTitle),
-            subtitle: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                _SettingsSlider(
-                  child: Slider(
-                    value: _shortcutPadScale,
-                    min: 0.6,
-                    max: 1.5,
-                    divisions: 9,
-                    label: _shortcutPadScale.toStringAsFixed(1),
-                    onChanged: (val) {
-                      setState(() => _shortcutPadScale = val);
-                      _saveSetting('shortcut_pad_scale', val);
-                    },
+          _SettingsSliderTile(
+            child: ListTile(
+              title: Text(l10n.shortcutPadScaleTitle),
+              subtitle: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  _SettingsSlider(
+                    child: Slider(
+                      value: _shortcutPadScale,
+                      min: 0.6,
+                      max: 1.5,
+                      divisions: 9,
+                      label: _shortcutPadScale.toStringAsFixed(1),
+                      onChanged: (val) {
+                        setState(() => _shortcutPadScale = val);
+                        _saveSetting('shortcut_pad_scale', val);
+                      },
+                    ),
                   ),
-                ),
-                _buildAppliedScaleLabel(
-                  setting: _shortcutPadScale,
-                  effective: _previewShortcutPadEffectiveScale,
-                  label: l10n.shortcutPadScaleLabel,
-                ),
-              ],
+                  _buildAppliedScaleLabel(
+                    setting: _shortcutPadScale,
+                    effective: _previewShortcutPadEffectiveScale,
+                    label: l10n.shortcutPadScaleLabel,
+                  ),
+                ],
+              ),
             ),
           ),
-          ListTile(
-            title: Text(l10n.cmdPanelScaleTitle),
-            subtitle: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                _SettingsSlider(
-                  child: Slider(
-                    value: _cmdPanelScale,
-                    min: 0.6,
-                    max: 1.5,
-                    divisions: 9,
-                    label: _cmdPanelScale.toStringAsFixed(1),
-                    onChanged: (val) {
-                      setState(() => _cmdPanelScale = val);
-                      _saveSetting('cmd_panel_scale', val);
-                    },
+          _SettingsSliderTile(
+            child: ListTile(
+              title: Text(l10n.cmdPanelScaleTitle),
+              subtitle: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  _SettingsSlider(
+                    child: Slider(
+                      value: _cmdPanelScale,
+                      min: 0.6,
+                      max: 1.5,
+                      divisions: 9,
+                      label: _cmdPanelScale.toStringAsFixed(1),
+                      onChanged: (val) {
+                        setState(() => _cmdPanelScale = val);
+                        _saveSetting('cmd_panel_scale', val);
+                      },
+                    ),
                   ),
-                ),
-                _buildAppliedScaleLabel(
-                  setting: _cmdPanelScale,
-                  effective: _cmdPanelScale,
-                  label: l10n.cmdPanelScaleLabel,
-                ),
-              ],
+                  _buildAppliedScaleLabel(
+                    setting: _cmdPanelScale,
+                    effective: _cmdPanelScale,
+                    label: l10n.cmdPanelScaleLabel,
+                  ),
+                ],
+              ),
             ),
           ),
           _buildDropdownSettingTile<String>(
@@ -2006,82 +1958,88 @@ class _SettingsPageState extends State<SettingsPage> {
         subtitle: Text(l10n.secMsgSub),
         children: _withDividers([         
           // 行数スライダー（1〜15）
-          ListTile(
-            title: Text(l10n.msgLineCount),
-            subtitle: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                _SettingsSlider(
-                  child: Slider(
-                    value: _msgLineCount.toDouble(),
-                    min: 1,
-                    max: 15,
-                    divisions: 14,
-                    label: '$_msgLineCount',
-                    onChanged: (val) {
-                      final intVal = val.round();
-                      setState(() => _msgLineCount = intVal);
-                      _saveSetting('msg_line_count', intVal);
-                    },
+          _SettingsSliderTile(
+            child: ListTile(
+              title: Text(l10n.msgLineCount),
+              subtitle: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  _SettingsSlider(
+                    child: Slider(
+                      value: _msgLineCount.toDouble(),
+                      min: 1,
+                      max: 15,
+                      divisions: 14,
+                      label: '$_msgLineCount',
+                      onChanged: (val) {
+                        final intVal = val.round();
+                        setState(() => _msgLineCount = intVal);
+                        _saveSetting('msg_line_count', intVal);
+                      },
+                    ),
                   ),
-                ),
-                Text(
-                  l10n.msgLineCountLabel(_msgLineCount.toString()),
-                  style: const TextStyle(fontSize: 12, color: Colors.white54),
-                ),
-              ],
+                  Text(
+                    l10n.msgLineCountLabel(_msgLineCount.toString()),
+                    style: const TextStyle(fontSize: 12, color: Colors.white54),
+                  ),
+                ],
+              ),
             ),
           ),
           // 透過度スライダー（0〜100、実際は 0.0〜1.0 で保存）
-          ListTile(
-            title: Text(l10n.msgOpacity),
-            subtitle: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                _SettingsSlider(
-                  child: Slider(
-                    value: _msgOpacity,
-                    min: 0.0,
-                    max: 1.0,
-                    divisions: 20,
-                    label: '${(_msgOpacity * 100).round()}%',
-                    onChanged: (val) {
-                      setState(() => _msgOpacity = val);
-                      _saveSetting('msg_opacity', val);
-                    },
+          _SettingsSliderTile(
+            child: ListTile(
+              title: Text(l10n.msgOpacity),
+              subtitle: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  _SettingsSlider(
+                    child: Slider(
+                      value: _msgOpacity,
+                      min: 0.0,
+                      max: 1.0,
+                      divisions: 20,
+                      label: '${(_msgOpacity * 100).round()}%',
+                      onChanged: (val) {
+                        setState(() => _msgOpacity = val);
+                        _saveSetting('msg_opacity', val);
+                      },
+                    ),
                   ),
-                ),
-                Text(
-                  l10n.msgOpacityLabel((_msgOpacity * 100).round().toString()),
-                  style: const TextStyle(fontSize: 12, color: Colors.white54),
-                ),
-              ],
+                  Text(
+                    l10n.msgOpacityLabel((_msgOpacity * 100).round().toString()),
+                    style: const TextStyle(fontSize: 12, color: Colors.white54),
+                  ),
+                ],
+              ),
             ),
           ),
           // フォントサイズスライダー（8〜24）
-          ListTile(
-            title: Text(l10n.msgFontSize),
-            subtitle: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                _SettingsSlider(
-                  child: Slider(
-                    value: _msgFontSize,
-                    min: 8.0,
-                    max: 24.0,
-                    divisions: 16,
-                    label: '${_msgFontSize.round()} pt',
-                    onChanged: (val) {
-                      setState(() => _msgFontSize = val);
-                      _saveSetting('msg_font_size', val);
-                    },
+          _SettingsSliderTile(
+            child: ListTile(
+              title: Text(l10n.msgFontSize),
+              subtitle: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  _SettingsSlider(
+                    child: Slider(
+                      value: _msgFontSize,
+                      min: 8.0,
+                      max: 24.0,
+                      divisions: 16,
+                      label: '${_msgFontSize.round()} pt',
+                      onChanged: (val) {
+                        setState(() => _msgFontSize = val);
+                        _saveSetting('msg_font_size', val);
+                      },
+                    ),
                   ),
-                ),
-                Text(
-                  l10n.msgFontSizeLabel(_msgFontSize.round().toString()),
-                  style: const TextStyle(fontSize: 12, color: Colors.white54),
-                ),
-              ],
+                  Text(
+                    l10n.msgFontSizeLabel(_msgFontSize.round().toString()),
+                    style: const TextStyle(fontSize: 12, color: Colors.white54),
+                  ),
+                ],
+              ),
             ),
           ),
           // プレビュー
@@ -2171,7 +2129,7 @@ class _SettingsPageState extends State<SettingsPage> {
         subtitle: Text(l10n.secSoundSub),
         children: _withDividers([
           // マスター（全体）ON/OFF スイッチ
-          SwitchListTile(
+          _SettingsSwitchTile(
             secondary: Icon(
               _soundMasterEnabled ? Icons.volume_up : Icons.volume_off,
               color: _soundMasterEnabled ? Colors.amberAccent : Colors.grey,
@@ -2185,7 +2143,7 @@ class _SettingsPageState extends State<SettingsPage> {
             },
           ),
           // BGM 個別ON/OFF スイッチ
-          SwitchListTile(
+          _SettingsSwitchTile(
             secondary: const Icon(Icons.music_note, color: Colors.tealAccent),
             title: Text(l10n.soundBgm),
             value: _soundBgmEnabled,
@@ -2210,7 +2168,7 @@ class _SettingsPageState extends State<SettingsPage> {
             },
           ),
           // 効果音(SE) 個別ON/OFF スイッチ
-          SwitchListTile(
+          _SettingsSwitchTile(
             secondary: const Icon(Icons.touch_app, color: Colors.orangeAccent),
             title: Text(l10n.soundSe),
             value: _soundSeEnabled,
@@ -2236,7 +2194,7 @@ class _SettingsPageState extends State<SettingsPage> {
             },
           ),
           // 環境音 個別ON/OFF スイッチ
-          SwitchListTile(
+          _SettingsSwitchTile(
             secondary: const Icon(Icons.waves, color: Colors.lightBlueAccent),
             title: Text(l10n.soundAmbience),
             value: _soundAmbienceEnabled,
@@ -2273,31 +2231,33 @@ class _SettingsPageState extends State<SettingsPage> {
     ValueChanged<double>? onChangeEnd,
   }) {
     final int percent = (volume * 100).round();
-    return ListTile(
-      enabled: enabled,
-      title: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Text(title, style: TextStyle(color: enabled ? Colors.white : Colors.white38)),
-          Text(
-            '$percent%',
-            style: TextStyle(
-              fontSize: 13,
-              color: enabled ? Colors.amberAccent : Colors.white38,
-              fontWeight: FontWeight.bold,
+    return _SettingsSliderTile(
+      child: ListTile(
+        enabled: enabled,
+        title: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(title, style: TextStyle(color: enabled ? Colors.white : Colors.white38)),
+            Text(
+              '$percent%',
+              style: TextStyle(
+                fontSize: 13,
+                color: enabled ? Colors.amberAccent : Colors.white38,
+                fontWeight: FontWeight.bold,
+              ),
             ),
+          ],
+        ),
+        subtitle: _SettingsSlider(
+          child: Slider(
+            value: enabled ? volume : 0.0,
+            min: 0.0,
+            max: 1.0,
+            divisions: 20,
+            label: '$percent%',
+            onChanged: enabled ? onChanged : null,
+            onChangeEnd: enabled ? onChangeEnd : null,
           ),
-        ],
-      ),
-      subtitle: _SettingsSlider(
-        child: Slider(
-          value: enabled ? volume : 0.0,
-          min: 0.0,
-          max: 1.0,
-          divisions: 20,
-          label: '$percent%',
-          onChanged: enabled ? onChanged : null,
-          onChangeEnd: enabled ? onChangeEnd : null,
         ),
       ),
     );
@@ -2497,7 +2457,7 @@ class _SettingsPageState extends State<SettingsPage> {
               }
             },
           ),
-          SwitchListTile(
+          _SettingsSwitchTile(
             secondary: const Icon(Icons.campaign_outlined, color: Colors.amberAccent),
             title: Text(l10n.optAdFeaturesTitle),
             subtitle: Text(l10n.optAdFeaturesSub),
@@ -2509,7 +2469,7 @@ class _SettingsPageState extends State<SettingsPage> {
           ),
           Padding(
             padding: const EdgeInsets.only(left: 24.0),
-            child: SwitchListTile(
+            child: _SettingsSwitchTile(
               title: Text(
                 l10n.optAdFeatureNewLevelRestTitle,
                 style: TextStyle(
@@ -2534,7 +2494,7 @@ class _SettingsPageState extends State<SettingsPage> {
           ),
           Padding(
             padding: const EdgeInsets.only(left: 24.0),
-            child: SwitchListTile(
+            child: _SettingsSwitchTile(
               title: Text(
                 l10n.optAdFeatureExitHighlightTitle,
                 style: TextStyle(
@@ -3043,7 +3003,7 @@ class _SettingsPageState extends State<SettingsPage> {
               }
             },
           ),
-          SwitchListTile(
+          _SettingsSwitchTile(
             title: Text(l10n.optAutopickup),
             subtitle: Text(l10n.autopickupSub),
             value: _optAutopickup,
@@ -3075,7 +3035,7 @@ class _SettingsPageState extends State<SettingsPage> {
             ),
             onTap: _optAutopickup ? _editPickupTypes : null,
           ),
-          SwitchListTile(
+          _SettingsSwitchTile(
             title: Text(l10n.optTime),
             subtitle: Text(l10n.timeSub),
             value: _optTime,
@@ -3084,7 +3044,7 @@ class _SettingsPageState extends State<SettingsPage> {
               _saveGameOption('nh_opt_time', val);
             },
           ),
-          SwitchListTile(
+          _SettingsSwitchTile(
             title: Text(l10n.optShowexp),
             subtitle: Text(l10n.showexpSub),
             value: _optShowexp,
@@ -3093,7 +3053,7 @@ class _SettingsPageState extends State<SettingsPage> {
               _saveGameOption('nh_opt_showexp', val);
             },
           ),
-          SwitchListTile(
+          _SettingsSwitchTile(
             title: Text(l10n.optPriceQuotes),
             subtitle: Text(l10n.priceQuotesSub),
             value: _optPriceQuotes,
@@ -3102,7 +3062,7 @@ class _SettingsPageState extends State<SettingsPage> {
               _saveGameOption('nh_opt_price_quotes', val);
             },
           ),
-          SwitchListTile(
+          _SettingsSwitchTile(
             title: Text(l10n.optHitpointbar),
             subtitle: Text(l10n.hitpointbarSub),
             value: _optHitpointbar,
@@ -3111,7 +3071,7 @@ class _SettingsPageState extends State<SettingsPage> {
               _saveGameOption('nh_opt_hitpointbar', val);
             },
           ),
-          SwitchListTile(
+          _SettingsSwitchTile(
             title: Text(l10n.optHiliteStatus),
             subtitle: Text(l10n.hiliteStatusSub),
             value: _optHiliteStatus,
@@ -3120,7 +3080,7 @@ class _SettingsPageState extends State<SettingsPage> {
               _saveGameOption('nh_opt_hilite_status', val);
             },
           ),
-          SwitchListTile(
+          _SettingsSwitchTile(
             title: Text(l10n.optMenucolor),
             subtitle: Text(l10n.menucolorSub),
             value: _optMenucolor,
@@ -3169,7 +3129,7 @@ class _SettingsPageState extends State<SettingsPage> {
         title: Text(l10n.secHardModeTitle),
         subtitle: Text(l10n.secHardModeSub),
         children: _withDividers([
-          SwitchListTile(
+          _SettingsSwitchTile(
             title: Text(l10n.optBlindTitle),
             subtitle: Text(l10n.optBlindSub),
             value: _optBlind,
@@ -3178,7 +3138,7 @@ class _SettingsPageState extends State<SettingsPage> {
               _saveGameOption('nh_opt_blind', val);
             },
           ),
-          SwitchListTile(
+          _SettingsSwitchTile(
             title: Text(l10n.optNudistTitle),
             subtitle: Text(l10n.optNudistSub),
             value: _optNudist,
@@ -3194,7 +3154,7 @@ class _SettingsPageState extends State<SettingsPage> {
               _saveGameOption('nh_opt_nudist', val);
             },
           ),
-          SwitchListTile(
+          _SettingsSwitchTile(
             title: Text(l10n.optDeafTitle),
             subtitle: Text(l10n.optDeafSub),
             value: _optDeaf,
@@ -3203,7 +3163,7 @@ class _SettingsPageState extends State<SettingsPage> {
               _saveGameOption('nh_opt_deaf', val);
             },
           ),
-          SwitchListTile(
+          _SettingsSwitchTile(
             title: Text(l10n.optPauperTitle),
             subtitle: Text(l10n.optPauperSub),
             value: _optPauper,
@@ -3219,7 +3179,7 @@ class _SettingsPageState extends State<SettingsPage> {
               _saveGameOption('nh_opt_pauper', val);
             },
           ),
-          SwitchListTile(
+          _SettingsSwitchTile(
             title: Text(l10n.optNoBonesTitle),
             subtitle: Text(l10n.optNoBonesSub),
             value: !_optBones, // bonesがfalseのときに骨塚禁止ON
@@ -3531,7 +3491,7 @@ class _SettingsPageState extends State<SettingsPage> {
         initiallyExpanded: false,
         title: Text(isJa ? '自動セーブ' : 'Autosave'),
         children: _withDividers([
-          SwitchListTile(
+          _SettingsSwitchTile(
             title: Text(isJa ? '自動セーブを有効化' : 'Enable Autosave'),
             subtitle: Text(isJa
                 ? '階層移動時、および一定ターン毎に入力待ち状態で自動セーブします'
@@ -3543,26 +3503,21 @@ class _SettingsPageState extends State<SettingsPage> {
             },
           ),
           if (_autosaveEnabled)
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-              child: DropdownButtonFormField<int>(
-                decoration: InputDecoration(
-                  labelText: isJa ? '自動セーブのターン間隔' : 'Autosave Turn Interval',
-                ),
-                initialValue: _autosaveInterval,
-                items: [
-                  DropdownMenuItem(value: 20, child: Text(isJa ? '20 ターン毎' : 'Every 20 turns')),
-                  DropdownMenuItem(value: 50, child: Text(isJa ? '50 ターン毎 (推奨)' : 'Every 50 turns (Recommended)')),
-                  DropdownMenuItem(value: 100, child: Text(isJa ? '100 ターン毎' : 'Every 100 turns')),
-                  DropdownMenuItem(value: 0, child: Text(isJa ? 'ターン毎のセーブ無効（階層移動時のみ）' : 'Disabled (Level transition only)')),
-                ],
-                onChanged: (val) {
-                  if (val != null) {
-                    setState(() => _autosaveInterval = val);
-                    _saveSetting('autosave_interval', val);
-                  }
-                },
-              ),
+            _buildDropdownSettingTile<int>(
+              title: isJa ? '自動セーブのターン間隔' : 'Autosave Turn Interval',
+              value: _autosaveInterval,
+              items: [
+                DropdownMenuItem(value: 20, child: Text(isJa ? '20 ターン毎' : 'Every 20 turns')),
+                DropdownMenuItem(value: 50, child: Text(isJa ? '50 ターン毎 (推奨)' : 'Every 50 turns (Recommended)')),
+                DropdownMenuItem(value: 100, child: Text(isJa ? '100 ターン毎' : 'Every 100 turns')),
+                DropdownMenuItem(value: 0, child: Text(isJa ? 'ターン毎のセーブ無効（階層移動時のみ）' : 'Disabled (Level transition only)')),
+              ],
+              onChanged: (val) {
+                if (val != null) {
+                  setState(() => _autosaveInterval = val);
+                  _saveSetting('autosave_interval', val);
+                }
+              },
             ),
         ]),
       ),
@@ -3681,6 +3636,24 @@ class _SettingsPageState extends State<SettingsPage> {
           _scrollToTop();
           return KeyEventResult.handled;
         } else {
+          // カード見出しにフォーカスがあり、かつ折りたたまれている場合は
+          // 子ツリー（ヘッダー）に入らず直接次のセクション（またはAppBar戻るボタン）へジャンプ
+          final currentSectionIndex = _sectionKeys.indexWhere((k) => _getSectionFocusNode(k).hasPrimaryFocus);
+          if (currentSectionIndex != -1) {
+            final controller = _getSectionController(_sectionKeys[currentSectionIndex]);
+            if (!controller.isExpanded) {
+              if (currentSectionIndex < _sectionKeys.length - 1) {
+                _getSectionFocusNode(_sectionKeys[currentSectionIndex + 1]).requestFocus();
+                _ensureFocusedVisible();
+                return KeyEventResult.handled;
+              } else {
+                _backButtonFocusNode.requestFocus();
+                _scrollToTop();
+                return KeyEventResult.handled;
+              }
+            }
+          }
+
           // 通常の順送り
           final moved = primaryFocus.nextFocus();
           if (!moved) {
@@ -3710,6 +3683,24 @@ class _SettingsPageState extends State<SettingsPage> {
           _scrollToBottom();
           return KeyEventResult.handled;
         } else {
+          // カード見出しにフォーカスがあり、かつ折りたたまれている場合は
+          // 直接前のセクション（またはAppBar戻るボタン）へジャンプ
+          final currentSectionIndex = _sectionKeys.indexWhere((k) => _getSectionFocusNode(k).hasPrimaryFocus);
+          if (currentSectionIndex != -1) {
+            final controller = _getSectionController(_sectionKeys[currentSectionIndex]);
+            if (!controller.isExpanded) {
+              if (currentSectionIndex > 0) {
+                _getSectionFocusNode(_sectionKeys[currentSectionIndex - 1]).requestFocus();
+                _ensureFocusedVisible();
+                return KeyEventResult.handled;
+              } else {
+                _backButtonFocusNode.requestFocus();
+                _scrollToTop();
+                return KeyEventResult.handled;
+              }
+            }
+          }
+
           // 通常の逆送り
           final moved = primaryFocus.previousFocus();
           if (!moved) {
@@ -4008,7 +3999,7 @@ class _SettingsPageState extends State<SettingsPage> {
         title: Text(l10n.secCmdPanelTitle),
         subtitle: Text(l10n.secCmdPanelSub),
         children: _withDividers([
-          SwitchListTile(
+          _SettingsSwitchTile(
             title: Text(l10n.showPanelNamesTitle),
             subtitle: Text(l10n.showPanelNamesSub),
             value: _showPanelNames,
@@ -4123,6 +4114,365 @@ class _SettingsSlider extends StatelessWidget {
           return KeyEventResult.ignored;
         },
         child: child,
+      ),
+    );
+  }
+}
+
+/// 物理キーボードでフォーカス時に行全体をハイライトし、
+/// Enter / Space でトグル、上下キーで前後の設定項目へフォーカス移動するスイッチ項目用ラッパー
+class _SettingsSwitchTile extends StatefulWidget {
+  final Widget title;
+  final Widget? subtitle;
+  final Widget? secondary;
+  final bool value;
+  final ValueChanged<bool>? onChanged;
+
+  const _SettingsSwitchTile({
+    required this.title,
+    this.subtitle,
+    this.secondary,
+    required this.value,
+    this.onChanged,
+  });
+
+  @override
+  State<_SettingsSwitchTile> createState() => _SettingsSwitchTileState();
+}
+
+class _SettingsSwitchTileState extends State<_SettingsSwitchTile> {
+  final FocusNode _focusNode = FocusNode();
+  final FocusNode _innerFocusNode = FocusNode(canRequestFocus: false, skipTraversal: true);
+  bool _hasFocus = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _focusNode.addListener(_onFocusChange);
+  }
+
+  @override
+  void dispose() {
+    _focusNode.removeListener(_onFocusChange);
+    _focusNode.dispose();
+    _innerFocusNode.dispose();
+    super.dispose();
+  }
+
+  void _onFocusChange() {
+    if (_hasFocus != _focusNode.hasFocus) {
+      setState(() => _hasFocus = _focusNode.hasFocus);
+    }
+  }
+
+  void _toggle() {
+    if (widget.onChanged != null) {
+      widget.onChanged!(!widget.value);
+    }
+  }
+
+  KeyEventResult _handleKeyEvent(FocusNode node, KeyEvent event) {
+    if (event is! KeyDownEvent) return KeyEventResult.ignored;
+
+    // Enter / Space: トグル切り替え
+    if (event.logicalKey == LogicalKeyboardKey.enter ||
+        event.logicalKey == LogicalKeyboardKey.numpadEnter ||
+        event.logicalKey == LogicalKeyboardKey.space) {
+      _toggle();
+      return KeyEventResult.handled;
+    }
+
+    // 上下キー: 前後の設定項目へフォーカス移動
+    if (event.logicalKey == LogicalKeyboardKey.arrowDown) {
+      FocusManager.instance.primaryFocus?.nextFocus();
+      return KeyEventResult.handled;
+    }
+    if (event.logicalKey == LogicalKeyboardKey.arrowUp) {
+      FocusManager.instance.primaryFocus?.previousFocus();
+      return KeyEventResult.handled;
+    }
+
+    return KeyEventResult.ignored;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Focus(
+      focusNode: _focusNode,
+      onKeyEvent: _handleKeyEvent,
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 100),
+        color: _hasFocus ? Colors.amberAccent.withValues(alpha: 0.25) : Colors.transparent,
+        child: Material(
+          color: Colors.transparent,
+          child: SwitchListTile(
+            focusNode: _innerFocusNode,
+            secondary: widget.secondary,
+            title: widget.title,
+            subtitle: widget.subtitle,
+            value: widget.value,
+            onChanged: widget.onChanged,
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+/// 物理キーボードでフォーカス時に行全体の背景をハイライトする Slider 項目用ラッパー
+class _SettingsSliderTile extends StatefulWidget {
+  final Widget child;
+  const _SettingsSliderTile({required this.child});
+
+  @override
+  State<_SettingsSliderTile> createState() => _SettingsSliderTileState();
+}
+
+class _SettingsSliderTileState extends State<_SettingsSliderTile> {
+  bool _hasFocus = false;
+
+  @override
+  Widget build(BuildContext context) {
+    return Focus(
+      canRequestFocus: false,
+      skipTraversal: true,
+      onFocusChange: (has) {
+        if (_hasFocus != has) {
+          setState(() => _hasFocus = has);
+        }
+      },
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 100),
+        color: _hasFocus ? Colors.amberAccent.withValues(alpha: 0.25) : Colors.transparent,
+        child: widget.child,
+      ),
+    );
+  }
+}
+
+/// 物理キーボードで左右キーで値変更、Enter/Spaceでダイアログ選択、
+/// 上下キーでフォーカス移動、およびフォーカス時に背景ハイライトを行うプルダウン項目ラッパー
+class _SettingsDropdownTile<T> extends StatefulWidget {
+  final String title;
+  final String? description;
+  final Widget? leading;
+  final T? value;
+  final List<DropdownMenuItem<T>> items;
+  final ValueChanged<T?> onChanged;
+  final String? hintText;
+
+  const _SettingsDropdownTile({
+    required this.title,
+    this.description,
+    this.leading,
+    required this.value,
+    required this.items,
+    required this.onChanged,
+    this.hintText,
+  });
+
+  @override
+  State<_SettingsDropdownTile<T>> createState() => _SettingsDropdownTileState<T>();
+}
+
+class _SettingsDropdownTileState<T> extends State<_SettingsDropdownTile<T>> {
+  final FocusNode _focusNode = FocusNode();
+  bool _hasFocus = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _focusNode.addListener(_onFocusChange);
+  }
+
+  @override
+  void dispose() {
+    _focusNode.removeListener(_onFocusChange);
+    _focusNode.dispose();
+    super.dispose();
+  }
+
+  void _onFocusChange() {
+    if (_hasFocus != _focusNode.hasFocus) {
+      setState(() => _hasFocus = _focusNode.hasFocus);
+    }
+  }
+
+  void _stepValue(int step) {
+    if (widget.items.isEmpty) return;
+    final currentIndex = widget.items.indexWhere((item) => item.value == widget.value);
+    int newIndex;
+    if (currentIndex == -1) {
+      newIndex = 0;
+    } else {
+      newIndex = (currentIndex + step).clamp(0, widget.items.length - 1);
+    }
+    if (newIndex != currentIndex) {
+      widget.onChanged(widget.items[newIndex].value);
+    }
+  }
+
+  Future<void> _openSelectionDialog() async {
+    final selected = await showDialog<T>(
+      context: context,
+      builder: (context) {
+        return FocusTraversalGroup(
+          policy: ReadingOrderTraversalPolicy(),
+          child: SimpleDialog(
+            title: Text(widget.title),
+            backgroundColor: const Color(0xFF1E1F24),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+              side: const BorderSide(color: Colors.amberAccent, width: 1.5),
+            ),
+            children: widget.items.map((item) {
+              final isSelected = item.value == widget.value;
+              return Material(
+                color: isSelected ? Colors.amberAccent.withValues(alpha: 0.2) : Colors.transparent,
+                child: ListTile(
+                  autofocus: isSelected,
+                  leading: isSelected
+                      ? const Icon(Icons.check_circle, color: Colors.amberAccent)
+                      : const Icon(Icons.radio_button_unchecked, color: Colors.white54),
+                  title: DefaultTextStyle(
+                    style: const TextStyle(fontSize: 14, color: Colors.white),
+                    child: item.child,
+                  ),
+                  onTap: () => Navigator.of(context).pop(item.value),
+                ),
+              );
+            }).toList(),
+          ),
+        );
+      },
+    );
+    if (selected != null && selected != widget.value) {
+      widget.onChanged(selected);
+    }
+    if (mounted) {
+      _focusNode.requestFocus();
+    }
+  }
+
+  KeyEventResult _handleKeyEvent(FocusNode node, KeyEvent event) {
+    if (event is! KeyDownEvent) return KeyEventResult.ignored;
+
+    // 左右キーで直接選択肢を前後に切り替え
+    if (event.logicalKey == LogicalKeyboardKey.arrowLeft) {
+      _stepValue(-1);
+      return KeyEventResult.handled;
+    }
+    if (event.logicalKey == LogicalKeyboardKey.arrowRight) {
+      _stepValue(1);
+      return KeyEventResult.handled;
+    }
+
+    // 上下キーはスライダーと同様に前後の設定項目へフォーカス移動
+    if (event.logicalKey == LogicalKeyboardKey.arrowDown) {
+      FocusManager.instance.primaryFocus?.nextFocus();
+      return KeyEventResult.handled;
+    }
+    if (event.logicalKey == LogicalKeyboardKey.arrowUp) {
+      FocusManager.instance.primaryFocus?.previousFocus();
+      return KeyEventResult.handled;
+    }
+
+    // Enter / Space: 選択肢一覧を展開して選択可能に
+    if (event.logicalKey == LogicalKeyboardKey.enter ||
+        event.logicalKey == LogicalKeyboardKey.numpadEnter ||
+        event.logicalKey == LogicalKeyboardKey.space) {
+      _openSelectionDialog();
+      return KeyEventResult.handled;
+    }
+
+    return KeyEventResult.ignored;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    final isNarrow = screenWidth < 600;
+
+    final dropdownWidget = Container(
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 3),
+      decoration: BoxDecoration(
+        color: const Color(0xFF262638),
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(
+          color: _hasFocus ? Colors.amberAccent : Colors.white24,
+          width: _hasFocus ? 1.5 : 1.0,
+        ),
+      ),
+      child: DropdownButtonHideUnderline(
+        child: DropdownButton<T>(
+          value: widget.value,
+          isExpanded: true,
+          hint: widget.hintText != null
+              ? Text(widget.hintText!, style: const TextStyle(fontSize: 13, color: Colors.white70))
+              : null,
+          dropdownColor: const Color(0xFF1E1E2C),
+          style: const TextStyle(fontSize: 13, color: Colors.white),
+          icon: Icon(
+            Icons.arrow_drop_down,
+            color: _hasFocus ? Colors.amberAccent : Colors.white70,
+          ),
+          items: widget.items,
+          onChanged: widget.onChanged,
+        ),
+      ),
+    );
+
+    Widget content;
+    if (isNarrow) {
+      content = Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                if (widget.leading != null) ...[widget.leading!, const SizedBox(width: 12)],
+                Expanded(
+                  child: Text(
+                    widget.title,
+                    style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w600, color: Colors.white),
+                  ),
+                ),
+              ],
+            ),
+            if (widget.description != null) ...[
+              const SizedBox(height: 4),
+              Text(
+                widget.description!,
+                style: const TextStyle(fontSize: 12, color: Colors.white60, height: 1.4),
+              ),
+            ],
+            const SizedBox(height: 8),
+            dropdownWidget,
+          ],
+        ),
+      );
+    } else {
+      content = ListTile(
+        leading: widget.leading,
+        title: Text(widget.title, style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w600)),
+        subtitle: widget.description != null
+            ? Text(widget.description!, style: const TextStyle(fontSize: 12, color: Colors.white60, height: 1.3))
+            : null,
+        trailing: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 320),
+          child: dropdownWidget,
+        ),
+      );
+    }
+
+    return Focus(
+      focusNode: _focusNode,
+      onKeyEvent: _handleKeyEvent,
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 100),
+        color: _hasFocus ? Colors.amberAccent.withValues(alpha: 0.25) : Colors.transparent,
+        child: content,
       ),
     );
   }

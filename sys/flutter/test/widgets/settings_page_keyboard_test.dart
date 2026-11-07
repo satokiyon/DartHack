@@ -279,13 +279,17 @@ void main() {
       await tester.tap(find.text('画面表示設定'));
       await tester.pumpAndSettle();
 
-      final switchFinder = find.widgetWithText(SwitchListTile, '物理キーボード用ヘルプを有効化');
-      await tester.ensureVisible(switchFinder);
+      final textFinder = find.text('物理キーボード用ヘルプを有効化');
+      await tester.ensureVisible(textFinder);
       await tester.pumpAndSettle();
 
-      final switchWidget = tester.widget<SwitchListTile>(switchFinder);
+      final switchFinder = find.descendant(
+        of: find.ancestor(of: textFinder, matching: find.byType(ListTile)),
+        matching: find.byType(Switch),
+      );
+      final switchWidget = tester.widget<Switch>(switchFinder);
       if (!switchWidget.value) {
-        await tester.tap(switchFinder);
+        await tester.tap(textFinder);
         await tester.pumpAndSettle();
       }
 
@@ -473,6 +477,277 @@ void main() {
       await tester.sendKeyEvent(LogicalKeyboardKey.arrowRight);
       await tester.pumpAndSettle();
       expect(FontManager.instance.mapAsciiScale, greaterThan(initialVal));
+    });
+
+    testWidgets('カードが折りたたまれている時、下キーまたはTabキー1回で次のカードへ遷移し二重フォーカスにならないこと', (tester) async {
+      await tester.pumpWidget(buildTestableSettingsApp());
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.text('Open Settings'));
+      await tester.pumpAndSettle();
+      expect(find.byType(SettingsPage), findsOneWidget);
+
+      // 初期状態で下キーを押す -> 一番上のセクション（タイル／シンボル設定）が選択される
+      await tester.sendKeyEvent(LogicalKeyboardKey.arrowDown);
+      await tester.pumpAndSettle();
+
+      // カード外枠（Card）の境界線がアンバー色になっていること
+      final firstCardFinder = find.ancestor(
+        of: find.text('タイル／シンボル設定'),
+        matching: find.byType(Card),
+      ).first;
+      final cardWidget = tester.widget<Card>(firstCardFinder);
+      final shape = cardWidget.shape as RoundedRectangleBorder;
+      expect((shape.side.color), equals(Colors.amberAccent));
+
+      // もう一度下キーを押す -> 同じカードに留まらず、直接2番目のセクション（フォント設定）へ遷移すること
+      await tester.sendKeyEvent(LogicalKeyboardKey.arrowDown);
+      await tester.pumpAndSettle();
+
+      final secondCardFinder = find.ancestor(
+        of: find.text('フォント設定'),
+        matching: find.byType(Card),
+      ).first;
+      final secondCardWidget = tester.widget<Card>(secondCardFinder);
+      final secondShape = secondCardWidget.shape as RoundedRectangleBorder;
+      expect((secondShape.side.color), equals(Colors.amberAccent));
+    });
+
+    testWidgets('スライダーにフォーカスがある時、行全体の背景がハイライトされること', (tester) async {
+      await tester.pumpWidget(buildTestableSettingsApp());
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.text('Open Settings'));
+      await tester.pumpAndSettle();
+
+      // 「フォント設定」を展開
+      await tester.tap(find.text('フォント設定'));
+      await tester.pumpAndSettle();
+
+      final sliderFinder = find.byType(Slider).first;
+      await tester.ensureVisible(sliderFinder);
+      await tester.pumpAndSettle();
+
+      // Slider の FocusNode を取得してフォーカスを当てる
+      final FocusNode sliderFocus = (tester.state(sliderFinder) as dynamic).focusNode as FocusNode;
+      sliderFocus.requestFocus();
+      await tester.pumpAndSettle();
+      expect(sliderFocus.hasPrimaryFocus, isTrue);
+
+      // 祖先の AnimatedContainer の色がアンバー透過色になっていること
+      final animatedContainerFinder = find.ancestor(
+        of: sliderFinder,
+        matching: find.byType(AnimatedContainer),
+      ).first;
+      final containerWidget = tester.widget<AnimatedContainer>(animatedContainerFinder);
+      final decoration = containerWidget.decoration as BoxDecoration?;
+      expect(
+        decoration?.color,
+        equals(Colors.amberAccent.withValues(alpha: 0.25)),
+      );
+    });
+
+    testWidgets('プルダウン項目にフォーカスがある時、背景がハイライトされ、左右キーで値が切り替わり、Enterでダイアログが開くこと', (tester) async {
+      await tester.pumpWidget(buildTestableSettingsApp());
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.text('Open Settings'));
+      await tester.pumpAndSettle();
+
+      // 「画面表示設定」を展開
+      await tester.tap(find.text('画面表示設定'));
+      await tester.pumpAndSettle();
+
+      // カメラ追従モードのプルダウンを探す
+      final dropdownTileFinder = find.ancestor(
+        of: find.text('カメラ追従モード'),
+        matching: find.byWidgetPredicate((w) => w.runtimeType.toString().startsWith('_SettingsDropdownTile')),
+      ).first;
+      await tester.ensureVisible(dropdownTileFinder);
+      await tester.pumpAndSettle();
+
+      // Focus ウィジェットを探してフォーカスを当てる
+      final focusFinder = find.descendant(
+        of: dropdownTileFinder,
+        matching: find.byType(Focus),
+      ).first;
+      final focusWidget = tester.widget<Focus>(focusFinder);
+      focusWidget.focusNode!.requestFocus();
+      await tester.pumpAndSettle();
+      expect(focusWidget.focusNode!.hasFocus, isTrue);
+
+      // 行全体の背景色がアンバー透過色になっていること
+      final animatedContainerFinder = find.descendant(
+        of: dropdownTileFinder,
+        matching: find.byType(AnimatedContainer),
+      ).first;
+      final containerWidget = tester.widget<AnimatedContainer>(animatedContainerFinder);
+      final decoration = containerWidget.decoration as BoxDecoration?;
+      expect(
+        decoration?.color,
+        equals(Colors.amberAccent.withValues(alpha: 0.25)),
+      );
+
+      // 左右キーで値が変更できること（右キーを押す）
+      expect(find.textContaining('常時センタリング'), findsOneWidget);
+      await tester.sendKeyEvent(LogicalKeyboardKey.arrowRight);
+      await tester.pumpAndSettle();
+      // 'fixed'（マップ固定）に切り替わっていること
+      expect(find.textContaining('マップ固定'), findsOneWidget);
+
+      // 左キーを押すと元の 'center'（常時センタリング）に戻ること
+      await tester.sendKeyEvent(LogicalKeyboardKey.arrowLeft);
+      await tester.pumpAndSettle();
+      expect(find.textContaining('常時センタリング'), findsOneWidget);
+
+      // Enter キーを押すと選択ダイアログが表示されること
+      await tester.sendKeyEvent(LogicalKeyboardKey.enter);
+      await tester.pumpAndSettle();
+      expect(find.byType(SimpleDialog), findsOneWidget);
+
+      // ダイアログ内の選択肢をタップまたはEscapeで閉じる
+      await tester.sendKeyEvent(LogicalKeyboardKey.escape);
+      await tester.pumpAndSettle();
+      expect(find.byType(SimpleDialog), findsNothing);
+    });
+
+    testWidgets('スイッチ項目にフォーカスがある時、行全体がハイライトされ、SpaceまたはEnterでトグル反転し親カードが閉じないこと', (tester) async {
+      await tester.pumpWidget(buildTestableSettingsApp());
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.text('Open Settings'));
+      await tester.pumpAndSettle();
+      expect(find.byType(SettingsPage), findsOneWidget);
+
+      // 「画面表示設定」カードを展開
+      final sectionTitleFinder = find.text('画面表示設定');
+      await tester.ensureVisible(sectionTitleFinder);
+      await tester.tap(sectionTitleFinder);
+      await tester.pumpAndSettle();
+
+      // 「物理キーボード用ヘルプを有効化」の _SettingsSwitchTile を探す
+      final switchTileFinder = find.ancestor(
+        of: find.text('物理キーボード用ヘルプを有効化'),
+        matching: find.byWidgetPredicate((w) => w.runtimeType.toString().startsWith('_SettingsSwitchTile')),
+      ).first;
+      await tester.ensureVisible(switchTileFinder);
+      await tester.pumpAndSettle();
+
+      final switchFinder = find.descendant(
+        of: switchTileFinder,
+        matching: find.byType(Switch),
+      );
+      expect(switchFinder, findsOneWidget);
+
+      // Focus ウィジェットを探してフォーカスを当てる
+      final focusFinder = find.descendant(
+        of: switchTileFinder,
+        matching: find.byType(Focus),
+      ).first;
+      final focusWidget = tester.widget<Focus>(focusFinder);
+      focusWidget.focusNode!.requestFocus();
+      await tester.pumpAndSettle();
+      expect(focusWidget.focusNode!.hasFocus, isTrue);
+
+      // 行全体（AnimatedContainer）の背景色がアンバー透過色になっていること
+      final animatedContainerFinder = find.descendant(
+        of: switchTileFinder,
+        matching: find.byType(AnimatedContainer),
+      ).first;
+      final containerWidget = tester.widget<AnimatedContainer>(animatedContainerFinder);
+      final decoration = containerWidget.decoration as BoxDecoration?;
+      expect(
+        decoration?.color,
+        equals(Colors.amberAccent.withValues(alpha: 0.25)),
+      );
+
+      // 初期値を確認
+      final initialVal = tester.widget<Switch>(switchFinder).value;
+
+      // Space キーを押下 -> 値が反転し、かつカードが閉じていないこと
+      await tester.sendKeyEvent(LogicalKeyboardKey.space);
+      await tester.pumpAndSettle();
+      expect(tester.widget<Switch>(switchFinder).value, equals(!initialVal));
+      expect(find.text('物理キーボード用ヘルプを有効化'), findsOneWidget); // カードが開いたまま
+
+      // Enter キーを押下 -> 値が再度反転し、かつカードが閉じていないこと
+      await tester.sendKeyEvent(LogicalKeyboardKey.enter);
+      await tester.pumpAndSettle();
+      expect(tester.widget<Switch>(switchFinder).value, equals(initialVal));
+      expect(find.text('物理キーボード用ヘルプを有効化'), findsOneWidget); // カードが開いたまま
+    });
+
+    testWidgets('自動セーブのターン間隔項目が共通プルダウンとして描画され左右キーやEnterキーで操作できること', (tester) async {
+      await tester.pumpWidget(buildTestableSettingsApp());
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.text('Open Settings'));
+      await tester.pumpAndSettle();
+
+      // 「自動セーブ」カードまでスクロールして展開
+      final sectionFinder = find.text('自動セーブ');
+      await tester.scrollUntilVisible(
+        sectionFinder,
+        300.0,
+        scrollable: find.byType(Scrollable).first,
+      );
+      await tester.tap(sectionFinder);
+      await tester.pumpAndSettle();
+
+      // 「自動セーブを有効化」がONになっているか確認（OFFならタップしてONにする）
+      final enableSwitchTile = find.ancestor(
+        of: find.text('自動セーブを有効化'),
+        matching: find.byWidgetPredicate((w) => w.runtimeType.toString().startsWith('_SettingsSwitchTile')),
+      ).first;
+      await tester.ensureVisible(enableSwitchTile);
+      final switchFinder = find.descendant(
+        of: enableSwitchTile,
+        matching: find.byType(Switch),
+      );
+      if (!tester.widget<Switch>(switchFinder).value) {
+        await tester.tap(enableSwitchTile);
+        await tester.pumpAndSettle();
+      }
+
+      // 「自動セーブのターン間隔」プルダウンを探す
+      final dropdownTileFinder = find.ancestor(
+        of: find.text('自動セーブのターン間隔'),
+        matching: find.byWidgetPredicate((w) => w.runtimeType.toString().startsWith('_SettingsDropdownTile')),
+      ).first;
+      await tester.ensureVisible(dropdownTileFinder);
+      await tester.pumpAndSettle();
+
+      // プルダウンの Focus ウィジェットにフォーカスを当てる
+      final focusFinder = find.descendant(
+        of: dropdownTileFinder,
+        matching: find.byType(Focus),
+      ).first;
+      final focusWidget = tester.widget<Focus>(focusFinder);
+      focusWidget.focusNode!.requestFocus();
+      await tester.pumpAndSettle();
+      expect(focusWidget.focusNode!.hasFocus, isTrue);
+
+      // 背景色がアンバー透過色になっていること
+      final animatedContainerFinder = find.descendant(
+        of: dropdownTileFinder,
+        matching: find.byType(AnimatedContainer),
+      ).first;
+      final containerWidget = tester.widget<AnimatedContainer>(animatedContainerFinder);
+      final decoration = containerWidget.decoration as BoxDecoration?;
+      expect(
+        decoration?.color,
+        equals(Colors.amberAccent.withValues(alpha: 0.25)),
+      );
+
+      // Enter キーを押すとダイアログが開くこと
+      await tester.sendKeyEvent(LogicalKeyboardKey.enter);
+      await tester.pumpAndSettle();
+      expect(find.byType(SimpleDialog), findsOneWidget);
+
+      // Escape でダイアログを閉じる
+      await tester.sendKeyEvent(LogicalKeyboardKey.escape);
+      await tester.pumpAndSettle();
+      expect(find.byType(SimpleDialog), findsNothing);
     });
   });
 }
