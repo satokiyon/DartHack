@@ -3,6 +3,7 @@ import 'dart:ffi';
 import 'dart:io';
 import 'package:ffi/ffi.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/services.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'utils/app_prefs.dart';
@@ -24,6 +25,22 @@ import 'services/tileset_manager.dart';
 import 'widgets/keyboard_help_dialog.dart';
 
 
+/// 設定画面内の操作モード（物理キーボード操作中か、画面タップ操作中か）を子孫へ伝播する InheritedNotifier
+class _SettingsInteractionMode extends InheritedNotifier<ValueNotifier<bool>> {
+  const _SettingsInteractionMode({
+    required ValueNotifier<bool> super.notifier,
+    required super.child,
+  });
+
+  static bool isKeyboard(BuildContext context) {
+    return context
+            .dependOnInheritedWidgetOfExactType<_SettingsInteractionMode>()
+            ?.notifier
+            ?.value ??
+        false;
+  }
+}
+
 class SettingsPage extends StatefulWidget {
   final String defaultsFilePath;
   final String dataDirString;
@@ -42,6 +59,39 @@ class _SettingsPageState extends State<SettingsPage> {
   final ScrollController _scrollController = ScrollController();
   final FocusNode _rootFocusNode = FocusNode();
   final FocusNode _backButtonFocusNode = FocusNode();
+  final ValueNotifier<bool> _isKeyboardMode = ValueNotifier<bool>(false);
+
+  void _enableKeyboardMode() {
+    if (!_isKeyboardMode.value) {
+      _isKeyboardMode.value = true;
+    }
+    if (FocusManager.instance.highlightStrategy != FocusHighlightStrategy.alwaysTraditional) {
+      FocusManager.instance.highlightStrategy = FocusHighlightStrategy.alwaysTraditional;
+    }
+  }
+
+  void _disableKeyboardMode() {
+    if (_isKeyboardMode.value) {
+      _isKeyboardMode.value = false;
+    }
+    if (FocusManager.instance.highlightStrategy != FocusHighlightStrategy.automatic) {
+      FocusManager.instance.highlightStrategy = FocusHighlightStrategy.automatic;
+    }
+  }
+
+  KeyEventResult _handleEarlyKeyEvent(KeyEvent event) {
+    if (event is KeyDownEvent || event is KeyRepeatEvent) {
+      _enableKeyboardMode();
+    }
+    return KeyEventResult.ignored;
+  }
+
+  void _handleGlobalPointerEvent(PointerEvent event) {
+    if (event is PointerDownEvent) {
+      _disableKeyboardMode();
+    }
+  }
+
   static const List<String> _sectionKeys = [
     'tileset',
     'font',
@@ -288,6 +338,8 @@ class _SettingsPageState extends State<SettingsPage> {
   @override
   void initState() {
     super.initState();
+    FocusManager.instance.addEarlyKeyEventHandler(_handleEarlyKeyEvent);
+    GestureBinding.instance.pointerRouter.addGlobalRoute(_handleGlobalPointerEvent);
     _loadAllSettings();
     _loadExtCmds();
     _loadAppVersion();
@@ -295,6 +347,10 @@ class _SettingsPageState extends State<SettingsPage> {
 
   @override
   void dispose() {
+    FocusManager.instance.removeEarlyKeyEventHandler(_handleEarlyKeyEvent);
+    GestureBinding.instance.pointerRouter.removeGlobalRoute(_handleGlobalPointerEvent);
+    FocusManager.instance.highlightStrategy = FocusHighlightStrategy.automatic;
+    _isKeyboardMode.dispose();
     _rootFocusNode.dispose();
     _backButtonFocusNode.dispose();
     for (final node in _sectionFocusNodes.values) {
@@ -671,6 +727,15 @@ class _SettingsPageState extends State<SettingsPage> {
     );
   }
 
+  bool _isSectionHeaderFocused(FocusNode sectionNode) {
+    if (!sectionNode.hasFocus) return false;
+    if (sectionNode.hasPrimaryFocus) return true;
+    final firstFocusable = sectionNode.descendants
+        .where((n) => n.canRequestFocus && !n.skipTraversal)
+        .firstOrNull;
+    return firstFocusable != null && firstFocusable.hasPrimaryFocus;
+  }
+
   Widget _buildSectionCard({
     required String sectionKey,
     required Widget child,
@@ -680,7 +745,7 @@ class _SettingsPageState extends State<SettingsPage> {
     return Focus(
       focusNode: focusNode,
       onKeyEvent: (node, event) {
-        if (!node.hasPrimaryFocus) return KeyEventResult.ignored;
+        if (!_isSectionHeaderFocused(node)) return KeyEventResult.ignored;
         if (event is! KeyDownEvent) return KeyEventResult.ignored;
         if (event.logicalKey == LogicalKeyboardKey.enter ||
             event.logicalKey == LogicalKeyboardKey.numpadEnter ||
@@ -695,24 +760,43 @@ class _SettingsPageState extends State<SettingsPage> {
         return KeyEventResult.ignored;
       },
       child: AnimatedBuilder(
-        animation: focusNode,
+        animation: Listenable.merge([focusNode, _isKeyboardMode]),
         builder: (context, _) {
-          final isFocused = focusNode.hasFocus;
+          final isKeyboard = _isKeyboardMode.value;
+          final isCardFocused = isKeyboard && focusNode.hasFocus;
+          final isHeaderFocused = isKeyboard && _isSectionHeaderFocused(focusNode);
+
+          final Color headerHighlightBg = Color.alphaBlend(
+            Colors.amberAccent.withValues(alpha: 0.25),
+            const Color(0xFF25262E),
+          );
+
+          final BorderSide borderSide;
+          if (isHeaderFocused) {
+            borderSide = const BorderSide(color: Colors.amberAccent, width: 2.5);
+          } else if (isCardFocused) {
+            borderSide = BorderSide(color: Colors.amberAccent.withValues(alpha: 0.65), width: 1.5);
+          } else {
+            borderSide = const BorderSide(color: Colors.white12, width: 1.0);
+          }
+
           return Card(
             color: const Color(0xFF25262E),
             margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-            elevation: isFocused ? 6 : 3,
+            elevation: isHeaderFocused ? 6 : (isCardFocused ? 4 : 3),
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(12),
-              side: isFocused
-                  ? const BorderSide(color: Colors.amberAccent, width: 2.5)
-                  : const BorderSide(color: Colors.white12, width: 1.0),
+              side: borderSide,
             ),
             clipBehavior: Clip.antiAlias,
             child: ExpansionTileTheme(
-              data: const ExpansionTileThemeData(
-                backgroundColor: Color(0xFF1E1F24),
-                collapsedBackgroundColor: Color(0xFF25262E),
+              data: ExpansionTileThemeData(
+                backgroundColor: isHeaderFocused ? headerHighlightBg : const Color(0xFF1E1F24),
+                collapsedBackgroundColor: isHeaderFocused ? headerHighlightBg : const Color(0xFF25262E),
+                textColor: isHeaderFocused ? Colors.amberAccent : null,
+                iconColor: isHeaderFocused ? Colors.amberAccent : null,
+                collapsedTextColor: isHeaderFocused ? Colors.amberAccent : null,
+                collapsedIconColor: isHeaderFocused ? Colors.amberAccent : null,
               ),
               child: child,
             ),
@@ -724,11 +808,11 @@ class _SettingsPageState extends State<SettingsPage> {
 
   List<Widget> _withDividers(List<Widget> children) {
     if (children.isEmpty) return children;
-    final List<Widget> result = [];
+    final List<Widget> items = [];
     for (int i = 0; i < children.length; i++) {
-      result.add(children[i]);
+      items.add(children[i]);
       if (i < children.length - 1) {
-        result.add(const Divider(
+        items.add(const Divider(
           height: 1,
           indent: 16,
           endIndent: 16,
@@ -736,7 +820,16 @@ class _SettingsPageState extends State<SettingsPage> {
         ));
       }
     }
-    return result;
+    return [
+      Material(
+        color: const Color(0xFF1E1F24),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: items,
+        ),
+      ),
+    ];
   }
 
   /// プルダウン設定項目の共通ビルダー
@@ -3318,7 +3411,7 @@ class _SettingsPageState extends State<SettingsPage> {
         controller: _getSectionController('credits'),
         leading: const Icon(Icons.info_outline, color: Colors.pinkAccent),
         title: Text(l10n.secCreditsTitle),
-        children: [
+        children: _withDividers([
           Padding(
             padding: const EdgeInsets.all(16.0),
             child: Column(
@@ -3446,7 +3539,7 @@ class _SettingsPageState extends State<SettingsPage> {
               ],
             ),
           ),
-        ],
+        ]),
       ),
     );
   }
@@ -3611,8 +3704,8 @@ class _SettingsPageState extends State<SettingsPage> {
       final firstNode = _getSectionFocusNode(_sectionKeys.first);
       final lastNode = _getSectionFocusNode(_sectionKeys.last);
       final isBackFocused = _backButtonFocusNode.hasPrimaryFocus;
-      final isFirstFocused = firstNode.hasPrimaryFocus;
-      final isLastFocused = lastNode.hasPrimaryFocus;
+      final isFirstFocused = _isSectionHeaderFocused(firstNode);
+      final isLastFocused = _isSectionHeaderFocused(lastNode);
 
       // 未選択状態: ルートFocusNodeにいるか、まだ具体的なコントロールにフォーカスがない
       final isUnfocused = primaryFocus == null ||
@@ -3625,8 +3718,8 @@ class _SettingsPageState extends State<SettingsPage> {
           firstNode.requestFocus();
           _scrollToTop();
           return KeyEventResult.handled;
-        } else if (isLastFocused) {
-          // 一番下の項目から順方向へ -> AppBar戻るボタンへループ
+        } else if (isLastFocused && !_getSectionController(_sectionKeys.last).isExpanded) {
+          // 一番下の項目（折りたたみ時）から順方向へ -> AppBar戻るボタンへループ
           _backButtonFocusNode.requestFocus();
           _scrollToTop();
           return KeyEventResult.handled;
@@ -3636,12 +3729,13 @@ class _SettingsPageState extends State<SettingsPage> {
           _scrollToTop();
           return KeyEventResult.handled;
         } else {
-          // カード見出しにフォーカスがあり、かつ折りたたまれている場合は
-          // 子ツリー（ヘッダー）に入らず直接次のセクション（またはAppBar戻るボタン）へジャンプ
-          final currentSectionIndex = _sectionKeys.indexWhere((k) => _getSectionFocusNode(k).hasPrimaryFocus);
+          // カード見出しにフォーカスがある場合
+          final currentSectionIndex =
+              _sectionKeys.indexWhere((k) => _isSectionHeaderFocused(_getSectionFocusNode(k)));
           if (currentSectionIndex != -1) {
             final controller = _getSectionController(_sectionKeys[currentSectionIndex]);
             if (!controller.isExpanded) {
+              // 折りたたまれている場合は子ツリーに入らず直接次のセクション（またはAppBar戻るボタン）へジャンプ
               if (currentSectionIndex < _sectionKeys.length - 1) {
                 _getSectionFocusNode(_sectionKeys[currentSectionIndex + 1]).requestFocus();
                 _ensureFocusedVisible();
@@ -3661,6 +3755,14 @@ class _SettingsPageState extends State<SettingsPage> {
             _backButtonFocusNode.requestFocus();
             _scrollToTop();
           } else {
+            // 展開中のカードの見出しから進んだ際、内部ヘッダーノードに止まった場合はもう1歩進めて最初の設定項目へ
+            if (currentSectionIndex != -1) {
+              final newFocus = FocusManager.instance.primaryFocus;
+              final secNode = _getSectionFocusNode(_sectionKeys[currentSectionIndex]);
+              if (newFocus != null && _isSectionHeaderFocused(secNode)) {
+                newFocus.nextFocus();
+              }
+            }
             _ensureFocusedVisible();
           }
           return KeyEventResult.handled;
@@ -3683,19 +3785,22 @@ class _SettingsPageState extends State<SettingsPage> {
           _scrollToBottom();
           return KeyEventResult.handled;
         } else {
-          // カード見出しにフォーカスがあり、かつ折りたたまれている場合は
-          // 直接前のセクション（またはAppBar戻るボタン）へジャンプ
-          final currentSectionIndex = _sectionKeys.indexWhere((k) => _getSectionFocusNode(k).hasPrimaryFocus);
+          final currentSectionIndex =
+              _sectionKeys.indexWhere((k) => _isSectionHeaderFocused(_getSectionFocusNode(k)));
           if (currentSectionIndex != -1) {
-            final controller = _getSectionController(_sectionKeys[currentSectionIndex]);
-            if (!controller.isExpanded) {
-              if (currentSectionIndex > 0) {
-                _getSectionFocusNode(_sectionKeys[currentSectionIndex - 1]).requestFocus();
+            // 見出しにフォーカスがある場合
+            if (currentSectionIndex == 0) {
+              // 一番上のセクションの見出しからは開閉状態に関わらず AppBar 戻るボタンへ
+              _backButtonFocusNode.requestFocus();
+              _scrollToTop();
+              return KeyEventResult.handled;
+            } else {
+              final prevSectionKey = _sectionKeys[currentSectionIndex - 1];
+              final prevController = _getSectionController(prevSectionKey);
+              if (!prevController.isExpanded) {
+                // 1つ前のカードが折りたたまれている場合は直接そのカードの見出しへジャンプ
+                _getSectionFocusNode(prevSectionKey).requestFocus();
                 _ensureFocusedVisible();
-                return KeyEventResult.handled;
-              } else {
-                _backButtonFocusNode.requestFocus();
-                _scrollToTop();
                 return KeyEventResult.handled;
               }
             }
@@ -3708,6 +3813,18 @@ class _SettingsPageState extends State<SettingsPage> {
             _backButtonFocusNode.requestFocus();
             _scrollToTop();
           } else {
+            // 逆送り後にいずれかのセクションの内部ヘッダーに着地した場合は、正規の sectionFocusNode に補正
+            final newFocus = FocusManager.instance.primaryFocus;
+            if (newFocus != null) {
+              final landedIndex =
+                  _sectionKeys.indexWhere((k) => _isSectionHeaderFocused(_getSectionFocusNode(k)));
+              if (landedIndex != -1) {
+                final targetNode = _getSectionFocusNode(_sectionKeys[landedIndex]);
+                if (!targetNode.hasPrimaryFocus) {
+                  targetNode.requestFocus();
+                }
+              }
+            }
             _ensureFocusedVisible();
           }
           return KeyEventResult.handled;
@@ -3751,62 +3868,64 @@ class _SettingsPageState extends State<SettingsPage> {
     final l10n = AppLocalizations.of(context)!;
     final theme = Theme.of(context);
 
-    return Theme(
-      data: theme.copyWith(
-        focusColor: Colors.amberAccent.withValues(alpha: 0.25),
-      ),
-      child: Focus(
-        focusNode: _rootFocusNode,
-        autofocus: true,
-        onKeyEvent: _onSettingsKeyEvent,
-        child: FocusTraversalGroup(
-          policy: ReadingOrderTraversalPolicy(),
-          child: Scaffold(
-            backgroundColor: const Color(0xFF121214),
-            appBar: AppBar(
-              title: Text(l10n.detailedSettings),
-              backgroundColor: const Color(0xFF1A1A1E),
-              leading: Focus(
-                focusNode: _backButtonFocusNode,
-                onKeyEvent: (node, event) {
-                  if (event is KeyDownEvent &&
-                      (event.logicalKey == LogicalKeyboardKey.enter ||
-                       event.logicalKey == LogicalKeyboardKey.numpadEnter ||
-                       event.logicalKey == LogicalKeyboardKey.space)) {
-                    Navigator.maybePop(context);
-                    return KeyEventResult.handled;
-                  }
-                  return KeyEventResult.ignored;
-                },
-                child: AnimatedBuilder(
-                  animation: _backButtonFocusNode,
-                  builder: (context, child) {
-                    final isFocused = _backButtonFocusNode.hasFocus;
-                    return Container(
-                      margin: const EdgeInsets.all(8),
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        border: isFocused ? Border.all(color: Colors.amberAccent, width: 2.5) : null,
-                        boxShadow: isFocused
-                            ? [
-                                BoxShadow(
-                                  color: Colors.amberAccent.withValues(alpha: 0.8),
-                                  blurRadius: 8,
-                                  spreadRadius: 1,
-                                )
-                              ]
-                            : null,
-                      ),
-                      child: IconButton(
-                        icon: const Icon(Icons.arrow_back),
-                        onPressed: () => Navigator.maybePop(context),
-                        tooltip: MaterialLocalizations.of(context).backButtonTooltip,
-                      ),
-                    );
+    return _SettingsInteractionMode(
+      notifier: _isKeyboardMode,
+      child: Theme(
+        data: theme.copyWith(
+          focusColor: Colors.amberAccent.withValues(alpha: 0.25),
+        ),
+        child: Focus(
+          focusNode: _rootFocusNode,
+          autofocus: true,
+          onKeyEvent: _onSettingsKeyEvent,
+          child: FocusTraversalGroup(
+            policy: ReadingOrderTraversalPolicy(),
+            child: Scaffold(
+              backgroundColor: const Color(0xFF121214),
+              appBar: AppBar(
+                title: Text(l10n.detailedSettings),
+                backgroundColor: const Color(0xFF1A1A1E),
+                leading: Focus(
+                  focusNode: _backButtonFocusNode,
+                  onKeyEvent: (node, event) {
+                    if (event is KeyDownEvent &&
+                        (event.logicalKey == LogicalKeyboardKey.enter ||
+                         event.logicalKey == LogicalKeyboardKey.numpadEnter ||
+                         event.logicalKey == LogicalKeyboardKey.space)) {
+                      Navigator.maybePop(context);
+                      return KeyEventResult.handled;
+                    }
+                    return KeyEventResult.ignored;
                   },
+                  child: AnimatedBuilder(
+                    animation: Listenable.merge([_backButtonFocusNode, _isKeyboardMode]),
+                    builder: (context, child) {
+                      final isFocused = _backButtonFocusNode.hasFocus && _isKeyboardMode.value;
+                      return Container(
+                        margin: const EdgeInsets.all(8),
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          border: isFocused ? Border.all(color: Colors.amberAccent, width: 2.5) : null,
+                          boxShadow: isFocused
+                              ? [
+                                  BoxShadow(
+                                    color: Colors.amberAccent.withValues(alpha: 0.8),
+                                    blurRadius: 8,
+                                    spreadRadius: 1,
+                                  )
+                                ]
+                              : null,
+                        ),
+                        child: IconButton(
+                          icon: const Icon(Icons.arrow_back),
+                          onPressed: () => Navigator.maybePop(context),
+                          tooltip: MaterialLocalizations.of(context).backButtonTooltip,
+                        ),
+                      );
+                    },
+                  ),
                 ),
               ),
-            ),
             body: ListView(
               controller: _scrollController,
               children: [
@@ -3836,8 +3955,9 @@ class _SettingsPageState extends State<SettingsPage> {
           ),
         ),
       ),
-    );
-  }
+    ),
+  );
+}
   Future<void> _savePanels() async {
     final prefs = await AppPrefs.getInstance();
     await prefs.setInt('panel_count', _panels.length);
@@ -4197,12 +4317,14 @@ class _SettingsSwitchTileState extends State<_SettingsSwitchTile> {
 
   @override
   Widget build(BuildContext context) {
+    final bool showHighlight = _hasFocus && _SettingsInteractionMode.isKeyboard(context);
+
     return Focus(
       focusNode: _focusNode,
       onKeyEvent: _handleKeyEvent,
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 100),
-        color: _hasFocus ? Colors.amberAccent.withValues(alpha: 0.25) : Colors.transparent,
+        color: showHighlight ? Colors.amberAccent.withValues(alpha: 0.25) : Colors.transparent,
         child: Material(
           color: Colors.transparent,
           child: SwitchListTile(
@@ -4233,6 +4355,8 @@ class _SettingsSliderTileState extends State<_SettingsSliderTile> {
 
   @override
   Widget build(BuildContext context) {
+    final bool showHighlight = _hasFocus && _SettingsInteractionMode.isKeyboard(context);
+
     return Focus(
       canRequestFocus: false,
       skipTraversal: true,
@@ -4243,7 +4367,7 @@ class _SettingsSliderTileState extends State<_SettingsSliderTile> {
       },
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 100),
-        color: _hasFocus ? Colors.amberAccent.withValues(alpha: 0.25) : Colors.transparent,
+        color: showHighlight ? Colors.amberAccent.withValues(alpha: 0.25) : Colors.transparent,
         child: widget.child,
       ),
     );
@@ -4366,7 +4490,11 @@ class _SettingsDropdownTileState<T> extends State<_SettingsDropdownTile<T>> {
       widget.onChanged(selected);
     }
     if (mounted) {
-      _focusNode.requestFocus();
+      if (_SettingsInteractionMode.isKeyboard(context)) {
+        _focusNode.requestFocus();
+      } else {
+        _focusNode.unfocus();
+      }
     }
   }
 
@@ -4408,6 +4536,7 @@ class _SettingsDropdownTileState<T> extends State<_SettingsDropdownTile<T>> {
   Widget build(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
     final isNarrow = screenWidth < 600;
+    final bool showHighlight = _hasFocus && _SettingsInteractionMode.isKeyboard(context);
 
     final dropdownWidget = Container(
       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 3),
@@ -4415,8 +4544,8 @@ class _SettingsDropdownTileState<T> extends State<_SettingsDropdownTile<T>> {
         color: const Color(0xFF262638),
         borderRadius: BorderRadius.circular(8),
         border: Border.all(
-          color: _hasFocus ? Colors.amberAccent : Colors.white24,
-          width: _hasFocus ? 1.5 : 1.0,
+          color: showHighlight ? Colors.amberAccent : Colors.white24,
+          width: showHighlight ? 1.5 : 1.0,
         ),
       ),
       child: DropdownButtonHideUnderline(
@@ -4430,10 +4559,15 @@ class _SettingsDropdownTileState<T> extends State<_SettingsDropdownTile<T>> {
           style: const TextStyle(fontSize: 13, color: Colors.white),
           icon: Icon(
             Icons.arrow_drop_down,
-            color: _hasFocus ? Colors.amberAccent : Colors.white70,
+            color: showHighlight ? Colors.amberAccent : Colors.white70,
           ),
           items: widget.items,
-          onChanged: widget.onChanged,
+          onChanged: (val) {
+            widget.onChanged(val);
+            if (!_SettingsInteractionMode.isKeyboard(context)) {
+              FocusManager.instance.primaryFocus?.unfocus();
+            }
+          },
         ),
       ),
     );
@@ -4487,7 +4621,7 @@ class _SettingsDropdownTileState<T> extends State<_SettingsDropdownTile<T>> {
       onKeyEvent: _handleKeyEvent,
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 100),
-        color: _hasFocus ? Colors.amberAccent.withValues(alpha: 0.25) : Colors.transparent,
+        color: showHighlight ? Colors.amberAccent.withValues(alpha: 0.25) : Colors.transparent,
         child: content,
       ),
     );

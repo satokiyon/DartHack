@@ -1,4 +1,4 @@
-<!-- Modified by NetHackJP contributor @satokiyon; latest change date: 2026-07-13. -->
+<!-- Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-07. -->
 # NetHackJP Android 開発・ビルドに関する追加ルール
 
 NetHackJPをAndroid向けにWSLおよびGradleでビルドする際は、以下の制約とトラブルシューティング知識を遵守してください。
@@ -338,3 +338,80 @@ NetHackJPをAndroid向けにWSLおよびGradleでビルドする際は、以下�
    - `query_category` やメニュー関連の単体テスト（WidgetTest 等）を作成する際は、テストモックデータの `MenuItemData.ident` に適当な文字コード（例: 武器に `'A'` = 65 など）を割り当ててはなりません。
    - 必ず C コアの実装（`include/objclass.h` の `WEAPON_CLASS` 等）に準拠し、純粋カテゴリにはアイテムクラス番号（1, 2, ...）、メタ項目には C コアが使用する ASCII コード（`'A'` = 65, `'B'` = 66, `'u'` = 117 等）を正確に割り当ててモックを構築してください。
    - 不正確なモック値を使用すると、メタ項目の誤選択や自動ピックアップ誤爆などの重大なデグレがテストをすり抜ける原因となります。
+
+## 55. Flutter 物理キーボード操作における画面外ウィジェットのフォーカス横取り防止とモーダル排他・復帰原則
+
+1. **画面外常時マウントウィジェット（ドロワー等）の `autofocus: true` 禁止とフォーカス横取り防止**:
+   - 画面外に隠れたドロワーやサイドバーなどのウィジェットが `autofocus: true` を持っていると、常時マウントされている場合に Tab キー等のキー入力を画面外で横取り（`KeyEventResult.handled`）して消費し、前面のダイアログに Tab キーが届かなくなるとともに、Enter で画面外の項目（全体地図やメニュー項目など）が誤爆実行される。
+   - 画面外ウィジェットは `autofocus: false` を原則とし、展開時のみ外部から `FocusNode.requestFocus()` でフォーカスを渡し、閉鎖時に `unfocus()` してルートへ確定復帰させる。また、非展開時は `ExcludeFocus(excluding: ...)` でフォーカスツリーから完全に隔離する。
+
+2. **モーダルダイアログ・オーバーレイ表示時における背景要素の一括 `ExcludeFocus` と `Positioned` 親データ保護原則**:
+   - ダイアログやメニュー、プロンプト等のモーダル・オーバーレイ表示中（`_hasAnyActiveOverlay`）は、ゲーム画面（`Column`）、操作盤（コントローラー）、メッセージ領域、ドロワー（上下・左右）、画面上のフローティングボタン（メニュー/全体マップ）を `ExcludeFocus(excluding: _hasAnyActiveOverlay)` で一括保護し、Tab キーによる背景要素へのフォーカス迷い込みを 100% 遮断する。
+   - **`Positioned` 親データの保護**: `Stack` 内で `Positioned` ウィジェットを扱う際、`Positioned` 自体を `ExcludeFocus` 等で包むと `StackParentData` が無効化されて実行時例外（RenderObject エラー）が発生する。必ず `Positioned` の内部（`child` 直下）で `ExcludeFocus` を適用する。
+
+3. **フラットな仮想フォーカス方式と不要な `FocusScope` の排除**:
+   - ダイアログやオーバーレイのルートに未活性の `FocusScope` を配置してはならない。`FocusScope` は内部で独立したフォーカススコープ境界を形成し、フォーカスツリーの断片化を引き起こして、親のキーハンドラからのフォーカス循環制御（`cycleFocus`）を阻害する。
+   - ダイアログ自身はルートのキーハンドラから `cycleFocus` を直接ディスパッチされる「自前仮想フォーカス方式（アンバー枠表示）」を採用し、不要な `FocusScope` を撤廃してフラットな階層構造を維持する。
+
+4. **Tab 巡回時の入力欄（TextField）本物フォーカス連動と IME 保護原則**:
+   - Tab 巡回で名前や文字列の入力欄（`input`）にフォーカスが当たった際は、日本語 IME（ローマ字かな変換等）の入力やキャレット表示を可能にするため、本物のフォーカス（`_nameFocusNode.requestFocus()`）を付与する。
+   - 入力欄から Tab キーで次の項目へ遷移する際は、`FocusNode.onKeyEvent` で Tab を捕捉して `cycleFocus` を進めると同時に、`unfocus()` を呼んでフォーカスを解除し、Flutter 標準のフォーカストラバーサル（`NextFocusIntent`）が外側へ漏延するのを遮断する。
+
+5. **モーダルダイアログ閉鎖後のルートフォーカス確定復帰とゲーム開始前ガード解除原則**:
+   - `showFullMapDialog` や `showScoreboardDialog`、ガイドブック等の `showDialog` によるモーダルダイアログを閉じた後、ゲーム画面へ確実にキーボード操作を復帰させるため、ダイアログ閉鎖直後（`.then((_) => _ensureGameFocus())`）にルートの `_focusNode.requestFocus()` を呼んでフォーカスを確定復帰させる。
+   - ルートフォーカス確保処理（`_ensureGameFocus`）において、`if (!_isGameRunning) return;` などのゲーム実行中限定ガードを設けてはならず、タイトル画面やキャラクター作成画面などのゲーム開始前フェーズであっても常に安全にルートフォーカスが確保されるようにする。
+
+## 56. Flutter 物理キーボードルーティングにおけるグローバルキー最優先配置と KeyEvent 修飾キーおよび Widget テスト検証原則
+
+1. **`HardwareKeyRouter` におけるグローバル共通キー（F1 / Alt-h / Escape等）の最優先判定原則**:
+   - `KeyInputContext.titleScreen` などの画面コンテキスト個別分岐を、全画面共通キー（操作ヘルプ `F1` / `Alt-h` や緊急キャンセル等）の判定より前に配置してはならない。
+   - 個別コンテキストハンドラの末尾（`SwallowKey()` やデフォルト処理）でキーが早期消費・握りつぶされ、タイトル画面や設定画面でヘルプが表示されなくなる重大な潜在バグの原因となる。
+   - テキスト入力欄フォーカス時（`isTextFieldFocused`）を除き、全画面で共通して発火すべきキーは、各コンテキスト分岐の**前（最優先共通ブロック）**に配置してルーティングしなければならない。
+
+2. **Flutter `KeyEvent` API における修飾キー判定規約（`event.isAltPressed` 廃止と `HardwareKeyboard` 参照義務）**:
+   - Flutter 新 `KeyEvent`（`KeyDownEvent`, `KeyRepeatEvent`, `KeyUpEvent`）には、旧 `RawKeyEvent` に存在した `event.isAltPressed` ゲッターは存在しない。
+   - キーハンドラ内で Alt / Control / Shift などの修飾キー状態を判定する際は、必ず `HardwareKeyboard.instance.isAltPressed` などのシングルトンプロパティ（または `logicalKeysPressed`）を参照すること。
+
+3. **Flutter Widget テストにおけるアコーディオン（ExpansionTile）内コントロールの `ensureVisible` 原則**:
+   - `ExpansionTile`（アコーディオン）内部の子要素（`SwitchListTile` 等）は、親タイルを展開してもビューポート（通常 800x600）の外側に配置される場合がある。
+   - そのまま `tester.tap(finder)` を呼ぶと、RenderBox がビューポート外にはみ出しているため `Offset that would not hit test on the specified widget` 警告やタップミスが発生してテストが失敗する。
+   - アコーディオンやスクロールビュー内の要素をタップ操作する際は、必ず事前に `await tester.ensureVisible(finder); await tester.pumpAndSettle();` を呼び出して画面内に確実にスクロールさせてから操作を行うこと。
+
+4. **数量指定可能メニューにおける操作ヘルプ案内分離原則**:
+   - メニュー画面の操作ヘルプ（`KeyboardHelpDialog`）において、数量指定（`0〜9`）の説明は、実際に数量指定が機能する選択・ドロップメニュー（`menuHow >= 1`）のみに限定して動的に表示し、閲覧専用メニュー（`menuHow == 0`）では表示から除外してプレイヤーの混乱を防止する。
+
+## 57. Flutter キーボード操作ヘルプおよび Table レイアウトにおけるキー表記簡潔化と列幅防護原則
+
+1. **ヘルプ項目のキー表記簡潔化原則（主要キーへの厳選）**:
+   - キーボード操作ヘルプ（`KeyboardHelpDialog`）やショートカット案内において、閉じる操作や決定操作などの代替キーが多数存在する場合（Enter, Space, Esc, q, ファンクションキー等）、それらを全て列挙して長大なキー文字列（例: `Enter / Space / Esc / q / F9 / Alt-z`）にしてはならない。
+   - 案内には最も代表的かつ直感的な主要キー（例: `Enter / Esc` など）のみを厳選して簡潔に記載し、キーバッジの横幅肥大化を防止して説明文エリアの横幅と可読性を最優先に確保すること。
+
+2. **Table レイアウトにおけるキー列幅の最大防護策（`MinColumnWidth`）の義務化**:
+   - キー列（バッジ）と説明文列を並べる `Table` レイアウトにおいて、列0（キー列）を単なる `IntrinsicColumnWidth()` のみで定義してはならない。単一の長いキー文字列によってテーブル全行のキー列が画面幅の大半を占有し、説明文が画面右端の極狭領域に押し出されるリスクを防ぐためである。
+   - 必ず `LayoutBuilder` を併用し、列0には `MinColumnWidth(const IntrinsicColumnWidth(), FixedColumnWidth(constraints.maxWidth * 0.45))` などの最大幅制約（ダイアログ幅の45%以下）を適用すること。
+   - これにより、キー列は短いときは固有幅にフィットしつつ、最大でも画面幅の45%でクランプされ、説明文列（`FlexColumnWidth`）に常に55%以上の十分な表示領域が保証される。
+
+## 58. Flutter モバイル／実機環境における物理キーボード操作と画面タップ操作の両立およびフォーカス・ハイライト分離原則
+
+1. **Android 実機での IME 経由による `FocusManager.instance.highlightMode` 不全の回避**:
+   - Flutter SDK の `_HighlightModeManager.handleKeyMessage` は、Android 実機において日本語 IME（Gboard 等）や仮想キーボードを経由したキーイベント（`KeyEvent.FLAG_SOFT_KEYBOARD` や `VIRTUAL_KEYBOARD`）を「ソフトキーボード入力」と判定し、物理キーボードを押下しても `FocusHighlightMode.touch` のまま `traditional` に切り替わらない制約がある。
+   - そのため、UI のハイライト判定を Flutter 標準の `FocusManager.instance.highlightMode == traditional` に安易に依存してはならず、`FocusManager.instance.addEarlyKeyEventHandler` を用いてどのフォーカスノードよりも最優先で物理キー押下を検知し、自前の操作モード状態（`_isKeyboardMode` 等）へ即座に反映させる設計を徹底すること。
+
+2. **Overlay（ポップアップ・ダイアログ）を含む全画面タップの漏れなき検知とハイライト即時消去**:
+   - `DropdownButton` のポップアップメニューや `showDialog` は、画面のウィジェットツリーではなく `Navigator` の `Overlay` 直下に描画されるため、ローカルな `Listener(onPointerDown)` ではタップが検知漏れを起こす。
+   - `GestureBinding.instance.pointerRouter.addGlobalRoute` を用いてグローバルなポインタイベントを監視し、画面上のどこかがタップ（`PointerDownEvent`）された瞬間に `_isKeyboardMode` を即座に `false` に復帰させ、カード枠線や項目背景の不要なハイライト点灯を完全に防ぐこと。
+   - また、他画面への副作用を防ぐため、`FocusHighlightStrategy.alwaysTouch` などにグローバル固定せず、`FocusHighlightStrategy.automatic` を維持・復元すること。
+
+3. **アコーディオン（ExpansionTile）における多段ハイライト設計と展開中二重フォーカス解消**:
+   - **3段階ハイライト表現の統一**:
+     - ① 未選択・画面タップ操作時: 通常細枠（幅 1.0px、`Colors.white12`）、項目背景は透明。
+     - ② 見出し選択時: カード外枠が鮮やかな太枠（幅 2.5px、アンバー）、開閉状態に関わらず見出し行の背景がアンバーハイライト（`alpha: 0.25`）。展開ボディ部は `Material(color: 背景色)` で包んで見出し行のみハイライトを維持する。
+     - ③ 子項目選択時: カード外枠は操作中カードを示す中太枠（幅 1.5px、アンバー半透明）を維持し、選択中の項目行のみがアンバー背景でハイライトされる。
+   - **二重フォーカスの解消**:
+     - `ExpansionTile` は内部に独自の無名ヘッダー `FocusNode` を持つ。展開中のカード見出しから下キー（Tab）を押した際は、内部ヘッダーで停止せず、1回のキー押下で直接最初の子項目へ移動するよう `nextFocus()` の補正を行うこと。
+     - 逆方向（上キー / Shift+Tab）で子項目から見出しに戻る際も、内部ヘッダーに着地した場合は正規のセクション `FocusNode` へフォーカスを正規化し、操作の迷走を防止すること。
+
+4. **Widget テストにおけるキーボード／タッチモードの明示的シミュレーション**:
+   - 物理キーボード操作を検証するテストでは、`await tester.tap(...)` でセクションを展開した直後にプログラマティックな `focusNode.requestFocus()` を呼ぶだけでは、テスト環境の `highlightMode` が直前の `tap` による `touch` のまま残る。
+   - テスト内でキーボード操作中であることを明示するため、フォーカス移動前または検証前に `await tester.sendKeyEvent(LogicalKeyboardKey.select);` 等のキーイベントを送信するか、キーボード操作でフォーカスを遷移させて検証すること。
+

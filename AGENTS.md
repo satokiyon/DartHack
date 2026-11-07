@@ -1504,3 +1504,28 @@ PC（Google Play Games 等）や物理キーボード操作環境におけるキ
    - 必ず `LayoutBuilder` を併用し、列0には `MinColumnWidth(const IntrinsicColumnWidth(), FixedColumnWidth(constraints.maxWidth * 0.45))` などの最大幅制約（ダイアログ幅の45%以下）を適用すること。
    - これにより、キー列は短いときは固有幅にフィットしつつ、最大でも画面幅の45%でクランプされ、説明文列（`FlexColumnWidth`）に常に55%以上の十分な表示領域が保証される。
 
+## 58. Flutter モバイル／実機環境における物理キーボード操作と画面タップ操作の両立およびフォーカス・ハイライト分離原則
+
+1. **Android 実機での IME 経由による `FocusManager.instance.highlightMode` 不全の回避**:
+   - Flutter SDK の `_HighlightModeManager.handleKeyMessage` は、Android 実機において日本語 IME（Gboard 等）や仮想キーボードを経由したキーイベント（`KeyEvent.FLAG_SOFT_KEYBOARD` や `VIRTUAL_KEYBOARD`）を「ソフトキーボード入力」と判定し、物理キーボードを押下しても `FocusHighlightMode.touch` のまま `traditional` に切り替わらない制約がある。
+   - そのため、UI のハイライト判定を Flutter 標準の `FocusManager.instance.highlightMode == traditional` に安易に依存してはならず、`FocusManager.instance.addEarlyKeyEventHandler` を用いてどのフォーカスノードよりも最優先で物理キー押下を検知し、自前の操作モード状態（`_isKeyboardMode` 等）へ即座に反映させる設計を徹底すること。
+
+2. **Overlay（ポップアップ・ダイアログ）を含む全画面タップの漏れなき検知とハイライト即時消去**:
+   - `DropdownButton` のポップアップメニューや `showDialog` は、画面のウィジェットツリーではなく `Navigator` の `Overlay` 直下に描画されるため、ローカルな `Listener(onPointerDown)` ではタップが検知漏れを起こす。
+   - `GestureBinding.instance.pointerRouter.addGlobalRoute` を用いてグローバルなポインタイベントを監視し、画面上のどこかがタップ（`PointerDownEvent`）された瞬間に `_isKeyboardMode` を即座に `false` に復帰させ、カード枠線や項目背景の不要なハイライト点灯を完全に防ぐこと。
+   - また、他画面への副作用を防ぐため、`FocusHighlightStrategy.alwaysTouch` などにグローバル固定せず、`FocusHighlightStrategy.automatic` を維持・復元すること。
+
+3. **アコーディオン（ExpansionTile）における多段ハイライト設計と展開中二重フォーカス解消**:
+   - **3段階ハイライト表現の統一**:
+     - ① 未選択・画面タップ操作時: 通常細枠（幅 1.0px、`Colors.white12`）、項目背景は透明。
+     - ② 見出し選択時: カード外枠が鮮やかな太枠（幅 2.5px、アンバー）、開閉状態に関わらず見出し行の背景がアンバーハイライト（`alpha: 0.25`）。展開ボディ部は `Material(color: 背景色)` で包んで見出し行のみハイライトを維持する。
+     - ③ 子項目選択時: カード外枠は操作中カードを示す中太枠（幅 1.5px、アンバー半透明）を維持し、選択中の項目行のみがアンバー背景でハイライトされる。
+   - **二重フォーカスの解消**:
+     - `ExpansionTile` は内部に独自の無名ヘッダー `FocusNode` を持つ。展開中のカード見出しから下キー（Tab）を押した際は、内部ヘッダーで停止せず、1回のキー押下で直接最初の子項目へ移動するよう `nextFocus()` の補正を行うこと。
+     - 逆方向（上キー / Shift+Tab）で子項目から見出しに戻る際も、内部ヘッダーに着地した場合は正規のセクション `FocusNode` へフォーカスを正規化し、操作の迷走を防止すること。
+
+4. **Widget テストにおけるキーボード／タッチモードの明示的シミュレーション**:
+   - 物理キーボード操作を検証するテストでは、`await tester.tap(...)` でセクションを展開した直後にプログラマティックな `focusNode.requestFocus()` を呼ぶだけでは、テスト環境の `highlightMode` が直前の `tap` による `touch` のまま残る。
+   - テスト内でキーボード操作中であることを明示するため、フォーカス移動前または検証前に `await tester.sendKeyEvent(LogicalKeyboardKey.select);` 等のキーイベントを送信するか、キーボード操作でフォーカスを遷移させて検証すること。
+
+

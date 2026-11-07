@@ -433,7 +433,8 @@ void main() {
       final sliderWidget = tester.widget<Slider>(sliderFinder);
       final initialVal = sliderWidget.value;
 
-      // Slider の FocusNode を取得してフォーカスを当てる
+      // キーボード操作モードにして、Slider の FocusNode を取得してフォーカスを当てる
+      await tester.sendKeyEvent(LogicalKeyboardKey.select);
       final FocusNode sliderFocus = (tester.state(sliderFinder) as dynamic).focusNode as FocusNode;
       sliderFocus.requestFocus();
       await tester.pumpAndSettle();
@@ -467,7 +468,8 @@ void main() {
       final initialVal = sliderWidget.value;
 
       // Slider 内部の FocusNode にフォーカスを当てる
-      // Slider の FocusNode を取得してフォーカスを当てる
+      // キーボード操作モードにして、Slider の FocusNode を取得してフォーカスを当てる
+      await tester.sendKeyEvent(LogicalKeyboardKey.select);
       final FocusNode sliderFocus = (tester.state(sliderFinder) as dynamic).focusNode as FocusNode;
       sliderFocus.requestFocus();
       await tester.pumpAndSettle();
@@ -528,7 +530,8 @@ void main() {
       await tester.ensureVisible(sliderFinder);
       await tester.pumpAndSettle();
 
-      // Slider の FocusNode を取得してフォーカスを当てる
+      // キーボード操作モードにして、Slider の FocusNode を取得してフォーカスを当てる
+      await tester.sendKeyEvent(LogicalKeyboardKey.select);
       final FocusNode sliderFocus = (tester.state(sliderFinder) as dynamic).focusNode as FocusNode;
       sliderFocus.requestFocus();
       await tester.pumpAndSettle();
@@ -566,7 +569,8 @@ void main() {
       await tester.ensureVisible(dropdownTileFinder);
       await tester.pumpAndSettle();
 
-      // Focus ウィジェットを探してフォーカスを当てる
+      // キーボード操作モードにして、Focus ウィジェットを探してフォーカスを当てる
+      await tester.sendKeyEvent(LogicalKeyboardKey.select);
       final focusFinder = find.descendant(
         of: dropdownTileFinder,
         matching: find.byType(Focus),
@@ -639,7 +643,8 @@ void main() {
       );
       expect(switchFinder, findsOneWidget);
 
-      // Focus ウィジェットを探してフォーカスを当てる
+      // キーボード操作モードにして、Focus ウィジェットを探してフォーカスを当てる
+      await tester.sendKeyEvent(LogicalKeyboardKey.select);
       final focusFinder = find.descendant(
         of: switchTileFinder,
         matching: find.byType(Focus),
@@ -717,7 +722,8 @@ void main() {
       await tester.ensureVisible(dropdownTileFinder);
       await tester.pumpAndSettle();
 
-      // プルダウンの Focus ウィジェットにフォーカスを当てる
+      // キーボード操作モードにして、プルダウンの Focus ウィジェットにフォーカスを当てる
+      await tester.sendKeyEvent(LogicalKeyboardKey.select);
       final focusFinder = find.descendant(
         of: dropdownTileFinder,
         matching: find.byType(Focus),
@@ -882,6 +888,150 @@ void main() {
       await tester.sendKeyEvent(LogicalKeyboardKey.escape);
       await tester.pumpAndSettle();
       expect(find.byType(SimpleDialog), findsNothing);
+    });
+
+    testWidgets('Touch interaction on dropdown does not highlight tile background or parent card border', (tester) async {
+      await tester.pumpWidget(buildTestableSettingsApp());
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.text('Open Settings'));
+      await tester.pumpAndSettle();
+
+      // 「画面表示設定」カードを展開
+      final sectionTitleFinder = find.text('画面表示設定');
+      await tester.ensureVisible(sectionTitleFinder);
+      await tester.tap(sectionTitleFinder);
+      await tester.pumpAndSettle();
+
+      // タッチ操作モードであることを確認
+      expect(FocusManager.instance.highlightMode, equals(FocusHighlightMode.touch));
+
+      // カメラ追従モードのプルダウンを探す
+      final dropdownTileFinder = find.ancestor(
+        of: find.text('カメラ追従モード'),
+        matching: find.byWidgetPredicate((w) => w.runtimeType.toString().startsWith('_SettingsDropdownTile')),
+      ).first;
+      await tester.ensureVisible(dropdownTileFinder);
+      await tester.pumpAndSettle();
+
+      // プルダウンの DropdownButton をタップ
+      final dropdownButtonFinder = find.descendant(
+        of: dropdownTileFinder,
+        matching: find.byType(DropdownButton<String>),
+      );
+      await tester.tap(dropdownButtonFinder);
+      await tester.pumpAndSettle();
+
+      // ポップアップメニューから 'fixed' (マップ固定) をタップ選択
+      final menuItemFinder = find.text('マップ固定 (PC版スタイル・端スクロール)').last;
+      await tester.tap(menuItemFinder);
+      await tester.pumpAndSettle();
+
+      // タップ選択後: プルダウンタイルの AnimatedContainer の背景色が透明であること（アンバーハイライトされていないこと）
+      final tileAnimatedContainer = find.descendant(
+        of: dropdownTileFinder,
+        matching: find.byType(AnimatedContainer),
+      ).last;
+      final tileDecor = tester.widget<AnimatedContainer>(tileAnimatedContainer).decoration as BoxDecoration?;
+      expect(tileDecor?.color, equals(Colors.transparent));
+
+      // 親カード（画面表示設定）の枠線が通常色（Colors.white12, width: 1.0）であり、アンバーの太線（width: 2.5）でないこと
+      final cardFinder = find.ancestor(
+        of: sectionTitleFinder,
+        matching: find.byType(Card),
+      ).first;
+      final cardShape = tester.widget<Card>(cardFinder).shape as RoundedRectangleBorder;
+      expect(cardShape.side.color, equals(Colors.white12));
+      expect(cardShape.side.width, equals(1.0));
+    });
+
+    testWidgets('キーボードでカード見出しを選択中、カード外枠が太枠(width: 2.5)かつ見出し行がアンバー色でハイライトされ、展開時も維持されること', (tester) async {
+      await tester.pumpWidget(buildTestableSettingsApp());
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.text('Open Settings'));
+      await tester.pumpAndSettle();
+
+      // 初期状態で下キー -> 最初のカード「タイル／シンボル設定」を選択
+      await tester.sendKeyEvent(LogicalKeyboardKey.arrowDown);
+      await tester.pumpAndSettle();
+
+      final cardFinder = find.ancestor(
+        of: find.text('タイル／シンボル設定'),
+        matching: find.byType(Card),
+      ).first;
+      final cardWidget = tester.widget<Card>(cardFinder);
+      final shape = cardWidget.shape as RoundedRectangleBorder;
+
+      // カード外枠が太いアンバー枠線（width: 2.5）であること
+      expect(shape.side.color, equals(Colors.amberAccent));
+      expect(shape.side.width, equals(2.5));
+
+      // 見出しテーマの背景色がアンバー色（alphaBlend: 0.25）であること
+      final themeFinder = find.descendant(
+        of: cardFinder,
+        matching: find.byType(ExpansionTileTheme),
+      ).first;
+      final tileTheme = tester.widget<ExpansionTileTheme>(themeFinder);
+      final headerHighlightBg = Color.alphaBlend(
+        Colors.amberAccent.withValues(alpha: 0.25),
+        const Color(0xFF25262E),
+      );
+      expect(tileTheme.data.collapsedBackgroundColor, equals(headerHighlightBg));
+      expect(tileTheme.data.backgroundColor, equals(headerHighlightBg));
+
+      // Enter キーでカードを展開
+      await tester.sendKeyEvent(LogicalKeyboardKey.enter);
+      await tester.pumpAndSettle();
+
+      // 展開後も見出し選択中はカード外枠が太枠（width: 2.5）であり、backgroundColor がアンバー色を維持していること
+      final expandedCardWidget = tester.widget<Card>(cardFinder);
+      final expandedShape = expandedCardWidget.shape as RoundedRectangleBorder;
+      expect(expandedShape.side.color, equals(Colors.amberAccent));
+      expect(expandedShape.side.width, equals(2.5));
+
+      final expandedTileTheme = tester.widget<ExpansionTileTheme>(themeFinder);
+      expect(expandedTileTheme.data.backgroundColor, equals(headerHighlightBg));
+    });
+
+    testWidgets('展開されたカード内で下キーを押すと1回のキー押下で子項目へ進み、カード外枠がwidth: 1.5を維持しつつ項目行がハイライトされること', (tester) async {
+      await tester.pumpWidget(buildTestableSettingsApp());
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.text('Open Settings'));
+      await tester.pumpAndSettle();
+
+      // 下キーで「タイル／シンボル設定」を選択し、Enter で展開
+      await tester.sendKeyEvent(LogicalKeyboardKey.arrowDown);
+      await tester.pumpAndSettle();
+      await tester.sendKeyEvent(LogicalKeyboardKey.enter);
+      await tester.pumpAndSettle();
+
+      // 下キーを1回押下 -> 内部ヘッダーをスキップして直接最初の設定項目（タイル表示を使用）へ進むこと
+      await tester.sendKeyEvent(LogicalKeyboardKey.arrowDown);
+      await tester.pumpAndSettle();
+
+      // 選択中の設定項目「タイル表示を使用」の行背景がアンバー色（alpha: 0.25）でハイライトされていること
+      final switchTileFinder = find.ancestor(
+        of: find.text('タイル表示を使用'),
+        matching: find.byWidgetPredicate((w) => w.runtimeType.toString().startsWith('_SettingsSwitchTile')),
+      ).first;
+      final tileAnimatedContainer = find.descendant(
+        of: switchTileFinder,
+        matching: find.byType(AnimatedContainer),
+      ).first;
+      final tileDecor = tester.widget<AnimatedContainer>(tileAnimatedContainer).decoration as BoxDecoration?;
+      expect(tileDecor?.color, equals(Colors.amberAccent.withValues(alpha: 0.25)));
+
+      // 親カードの枠線が幅 1.5（子項目操作中の中太枠線）でアンバー枠線を維持していること
+      final cardFinder = find.ancestor(
+        of: find.text('タイル／シンボル設定'),
+        matching: find.byType(Card),
+      ).first;
+      final cardWidget = tester.widget<Card>(cardFinder);
+      final shape = cardWidget.shape as RoundedRectangleBorder;
+      expect(shape.side.width, equals(1.5));
+      expect(shape.side.color, equals(Colors.amberAccent.withValues(alpha: 0.65)));
     });
   });
 }
