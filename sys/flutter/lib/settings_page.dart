@@ -4313,9 +4313,17 @@ class _SettingsDropdownTileState<T> extends State<_SettingsDropdownTile<T>> {
   }
 
   Future<void> _openSelectionDialog() async {
+    if (widget.items.isEmpty) return;
+
     final selected = await showDialog<T>(
       context: context,
-      builder: (context) {
+      builder: (dialogContext) {
+        // 保存値と一致する最初のアイテムを検索。なければ先頭（0番目）を初期フォーカスに確定
+        final selectedIndex = widget.items.indexWhere((item) => item.value == widget.value);
+        final initialFocusIndex = (selectedIndex != -1) ? selectedIndex : 0;
+
+        final screenHeight = MediaQuery.of(dialogContext).size.height;
+
         return FocusTraversalGroup(
           policy: ReadingOrderTraversalPolicy(),
           child: SimpleDialog(
@@ -4325,23 +4333,31 @@ class _SettingsDropdownTileState<T> extends State<_SettingsDropdownTile<T>> {
               borderRadius: BorderRadius.circular(12),
               side: const BorderSide(color: Colors.amberAccent, width: 1.5),
             ),
-            children: widget.items.map((item) {
-              final isSelected = item.value == widget.value;
-              return Material(
-                color: isSelected ? Colors.amberAccent.withValues(alpha: 0.2) : Colors.transparent,
-                child: ListTile(
-                  autofocus: isSelected,
-                  leading: isSelected
-                      ? const Icon(Icons.check_circle, color: Colors.amberAccent)
-                      : const Icon(Icons.radio_button_unchecked, color: Colors.white54),
-                  title: DefaultTextStyle(
-                    style: const TextStyle(fontSize: 14, color: Colors.white),
-                    child: item.child,
-                  ),
-                  onTap: () => Navigator.of(context).pop(item.value),
+            children: [
+              ConstrainedBox(
+                constraints: BoxConstraints(
+                  maxHeight: screenHeight * 0.7,
                 ),
-              );
-            }).toList(),
+                child: SingleChildScrollView(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: widget.items.asMap().entries.map((entry) {
+                      final index = entry.key;
+                      final item = entry.value;
+                      final isSelected = item.value == widget.value;
+                      final shouldAutofocus = (index == initialFocusIndex);
+
+                      return _DropdownDialogItem<T>(
+                        item: item,
+                        isSelected: isSelected,
+                        autofocus: shouldAutofocus,
+                        onSelect: () => Navigator.of(dialogContext).pop(item.value),
+                      );
+                    }).toList(),
+                  ),
+                ),
+              ),
+            ],
           ),
         );
       },
@@ -4473,6 +4489,108 @@ class _SettingsDropdownTileState<T> extends State<_SettingsDropdownTile<T>> {
         duration: const Duration(milliseconds: 100),
         color: _hasFocus ? Colors.amberAccent.withValues(alpha: 0.25) : Colors.transparent,
         child: content,
+      ),
+    );
+  }
+}
+
+/// プルダウン一覧ダイアログ内の選択肢行コンポーネント
+/// キーボードフォーカス時に鮮やかなアンバー色で行全体をハイライトし、自動スクロール追従する
+class _DropdownDialogItem<T> extends StatefulWidget {
+  final DropdownMenuItem<T> item;
+  final bool isSelected;
+  final bool autofocus;
+  final VoidCallback onSelect;
+
+  const _DropdownDialogItem({
+    required this.item,
+    required this.isSelected,
+    required this.autofocus,
+    required this.onSelect,
+  });
+
+  @override
+  State<_DropdownDialogItem<T>> createState() => _DropdownDialogItemState<T>();
+}
+
+class _DropdownDialogItemState<T> extends State<_DropdownDialogItem<T>> {
+  final FocusNode _focusNode = FocusNode();
+  bool _hasFocus = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _focusNode.addListener(_onFocusChange);
+  }
+
+  @override
+  void dispose() {
+    _focusNode.removeListener(_onFocusChange);
+    _focusNode.dispose();
+    super.dispose();
+  }
+
+  void _onFocusChange() {
+    if (_hasFocus != _focusNode.hasFocus) {
+      setState(() => _hasFocus = _focusNode.hasFocus);
+      if (_focusNode.hasFocus && mounted) {
+        Scrollable.ensureVisible(
+          context,
+          alignment: 0.5,
+          duration: const Duration(milliseconds: 100),
+        );
+      }
+    }
+  }
+
+  KeyEventResult _handleKeyEvent(FocusNode node, KeyEvent event) {
+    if (event is! KeyDownEvent) return KeyEventResult.ignored;
+
+    // Enter / Space で決定
+    if (event.logicalKey == LogicalKeyboardKey.enter ||
+        event.logicalKey == LogicalKeyboardKey.numpadEnter ||
+        event.logicalKey == LogicalKeyboardKey.space) {
+      widget.onSelect();
+      return KeyEventResult.handled;
+    }
+
+    return KeyEventResult.ignored;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    // 背景ハイライトは「現在カーソルが合っている行（1行）」だけに限定
+    final Color bgColor = _hasFocus
+        ? Colors.amberAccent.withValues(alpha: 0.35)
+        : Colors.transparent;
+
+    return Focus(
+      focusNode: _focusNode,
+      autofocus: widget.autofocus,
+      onKeyEvent: _handleKeyEvent,
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 100),
+        color: bgColor,
+        child: Material(
+          color: Colors.transparent,
+          child: InkWell(
+            canRequestFocus: false,
+            onTap: widget.onSelect,
+            child: ListTile(
+              leading: widget.isSelected
+                  ? const Icon(Icons.check_circle, color: Colors.amberAccent)
+                  : const Icon(Icons.radio_button_unchecked, color: Colors.white54),
+              title: DefaultTextStyle(
+                style: TextStyle(
+                  fontSize: 14,
+                  color: Colors.white,
+                  fontWeight: widget.isSelected ? FontWeight.bold : FontWeight.normal,
+                ),
+                child: widget.item.child,
+              ),
+            ),
+          ),
+        ),
       ),
     );
   }

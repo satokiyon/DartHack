@@ -749,6 +749,140 @@ void main() {
       await tester.pumpAndSettle();
       expect(find.byType(SimpleDialog), findsNothing);
     });
+
+    testWidgets('プルダウン一覧ダイアログ内で上下キーを押すとフォーカスが移動し、背景ハイライトが移動先に追従すること、およびEnterで決定されること', (tester) async {
+      await tester.pumpWidget(buildTestableSettingsApp());
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.text('Open Settings'));
+      await tester.pumpAndSettle();
+
+      // 「画面表示設定」カードを展開
+      final sectionTitleFinder = find.text('画面表示設定');
+      await tester.ensureVisible(sectionTitleFinder);
+      await tester.tap(sectionTitleFinder);
+      await tester.pumpAndSettle();
+
+      // カメラ追従モードのプルダウンを探す
+      final dropdownTileFinder = find.ancestor(
+        of: find.text('カメラ追従モード'),
+        matching: find.byWidgetPredicate((w) => w.runtimeType.toString().startsWith('_SettingsDropdownTile')),
+      ).first;
+      await tester.ensureVisible(dropdownTileFinder);
+      await tester.pumpAndSettle();
+
+      // プルダウンにフォーカスを当てて Enter を押す -> ダイアログ展開
+      final focusFinder = find.descendant(
+        of: dropdownTileFinder,
+        matching: find.byType(Focus),
+      ).first;
+      tester.widget<Focus>(focusFinder).focusNode!.requestFocus();
+      await tester.pumpAndSettle();
+
+      await tester.sendKeyEvent(LogicalKeyboardKey.enter);
+      await tester.pumpAndSettle();
+      expect(find.byType(SimpleDialog), findsOneWidget);
+
+      // ダイアログ内の選択肢アイテムを探す
+      final dialogItemFinders = find.byWidgetPredicate(
+        (w) => w.runtimeType.toString().startsWith('_DropdownDialogItem'),
+      );
+      expect(dialogItemFinders, findsNWidgets(2)); // 'center' と 'fixed'
+
+      // 初期フォーカス（'center'）の背景色がアンバー色（alpha: 0.35）であること
+      final firstItemContainer = find.descendant(
+        of: dialogItemFinders.first,
+        matching: find.byType(AnimatedContainer),
+      ).first;
+      final firstDecor = tester.widget<AnimatedContainer>(firstItemContainer).decoration as BoxDecoration?;
+      expect(firstDecor?.color, equals(Colors.amberAccent.withValues(alpha: 0.35)));
+
+      // 2番目のアイテム（'fixed'）の背景色は透明であること
+      final secondItemContainer = find.descendant(
+        of: dialogItemFinders.last,
+        matching: find.byType(AnimatedContainer),
+      ).first;
+      final secondDecor = tester.widget<AnimatedContainer>(secondItemContainer).decoration as BoxDecoration?;
+      expect(secondDecor?.color, equals(Colors.transparent));
+
+      // 下キー（ArrowDown）を押下 -> 2番目のアイテムへフォーカス移動
+      await tester.sendKeyEvent(LogicalKeyboardKey.arrowDown);
+      await tester.pumpAndSettle();
+
+      // 移動先（'fixed'）の背景色がアンバー色になり、移動元（'center'）は透明に戻ること！
+      final firstDecorAfter = tester.widget<AnimatedContainer>(firstItemContainer).decoration as BoxDecoration?;
+      final secondDecorAfter = tester.widget<AnimatedContainer>(secondItemContainer).decoration as BoxDecoration?;
+      expect(firstDecorAfter?.color, equals(Colors.transparent));
+      expect(secondDecorAfter?.color, equals(Colors.amberAccent.withValues(alpha: 0.35)));
+
+      // Enter キーを押下 -> 選択中の 'fixed' が決定されてダイアログが閉じる
+      await tester.sendKeyEvent(LogicalKeyboardKey.enter);
+      await tester.pumpAndSettle();
+      expect(find.byType(SimpleDialog), findsNothing);
+
+      // 設定値が「マップ固定」に変更されていること
+      expect(find.textContaining('マップ固定'), findsOneWidget);
+    });
+
+    testWidgets('valueがnullのプルダウン（一括フォント変更）でもダイアログの先頭アイテムが初期フォーカスされ上下キーで追従すること', (tester) async {
+      await tester.pumpWidget(buildTestableSettingsApp());
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.text('Open Settings'));
+      await tester.pumpAndSettle();
+
+      // 「フォント設定」カードを展開
+      final sectionTitleFinder = find.text('フォント設定');
+      await tester.ensureVisible(sectionTitleFinder);
+      await tester.tap(sectionTitleFinder);
+      await tester.pumpAndSettle();
+
+      // 「一括フォント変更」プルダウン（value: null）を探す
+      final dropdownTileFinder = find.ancestor(
+        of: find.text('一括フォント変更'),
+        matching: find.byWidgetPredicate((w) => w.runtimeType.toString().startsWith('_SettingsDropdownTile')),
+      ).first;
+      await tester.ensureVisible(dropdownTileFinder);
+      await tester.pumpAndSettle();
+
+      // フォーカスを当てて Enter を押す -> ダイアログ展開
+      final focusFinder = find.descendant(
+        of: dropdownTileFinder,
+        matching: find.byType(Focus),
+      ).first;
+      tester.widget<Focus>(focusFinder).focusNode!.requestFocus();
+      await tester.pumpAndSettle();
+
+      await tester.sendKeyEvent(LogicalKeyboardKey.enter);
+      await tester.pumpAndSettle();
+      expect(find.byType(SimpleDialog), findsOneWidget);
+
+      // ダイアログ内の選択肢アイテムを探す
+      final dialogItemFinders = find.byWidgetPredicate(
+        (w) => w.runtimeType.toString().startsWith('_DropdownDialogItem'),
+      );
+      expect(dialogItemFinders, findsWidgets);
+
+      // 先頭アイテムが初期フォーカスされ、背景色がアンバー色（alpha: 0.35）であること！
+      final firstItemContainer = find.descendant(
+        of: dialogItemFinders.first,
+        matching: find.byType(AnimatedContainer),
+      ).first;
+      final firstDecor = tester.widget<AnimatedContainer>(firstItemContainer).decoration as BoxDecoration?;
+      expect(firstDecor?.color, equals(Colors.amberAccent.withValues(alpha: 0.35)));
+
+      // 下キーを押すと2番目のアイテムへアンバー色が移動すること
+      await tester.sendKeyEvent(LogicalKeyboardKey.arrowDown);
+      await tester.pumpAndSettle();
+
+      final firstDecorAfter = tester.widget<AnimatedContainer>(firstItemContainer).decoration as BoxDecoration?;
+      expect(firstDecorAfter?.color, equals(Colors.transparent));
+
+      // Escape でダイアログを閉じる
+      await tester.sendKeyEvent(LogicalKeyboardKey.escape);
+      await tester.pumpAndSettle();
+      expect(find.byType(SimpleDialog), findsNothing);
+    });
   });
 }
 
