@@ -1580,7 +1580,7 @@ class AppLocalizationsJa extends AppLocalizations {
   String get gameEndDialogTitle => 'ゲーム終了';
 
   @override
-  String get usePhysicalKeyboardNotation => '物理キーボード用の表記を使用';
+  String get usePhysicalKeyboardNotation => '物理キーボード用ヘルプを有効化';
 
   @override
   String get usePhysicalKeyboardNotationSub =>

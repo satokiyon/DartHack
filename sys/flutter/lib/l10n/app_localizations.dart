@@ -3077,7 +3077,7 @@ abstract class AppLocalizations {
   /// No description provided for @usePhysicalKeyboardNotation.
   ///
   /// In ja, this message translates to:
-  /// **'物理キーボード用の表記を使用'**
+  /// **'物理キーボード用ヘルプを有効化'**
   String get usePhysicalKeyboardNotation;
 
   /// No description provided for @usePhysicalKeyboardNotationSub.

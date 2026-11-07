@@ -275,11 +275,11 @@ void main() {
       await tester.pumpAndSettle();
       expect(find.byType(SettingsPage), findsOneWidget);
 
-      // 「画面表示設定」を展開して「物理キーボード用の表記を使用」を確実に ON にする
+      // 「画面表示設定」を展開して「物理キーボード用ヘルプを有効化」を確実に ON にする
       await tester.tap(find.text('画面表示設定'));
       await tester.pumpAndSettle();
 
-      final switchFinder = find.widgetWithText(SwitchListTile, '物理キーボード用の表記を使用');
+      final switchFinder = find.widgetWithText(SwitchListTile, '物理キーボード用ヘルプを有効化');
       await tester.ensureVisible(switchFinder);
       await tester.pumpAndSettle();
 

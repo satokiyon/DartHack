@@ -597,6 +597,6 @@
   "optAdFeatureExitHighlightTitle": "Show highlights on game end",
   "optAdFeatureExitHighlightSub": "Display run highlights with banner ad when the game ends",
   "gameEndDialogTitle": "Game Over",
-  "usePhysicalKeyboardNotation": "Use Physical Keyboard Notation",
+  "usePhysicalKeyboardNotation": "Enable Physical Keyboard Help",
   "usePhysicalKeyboardNotationSub": "Show shortcut keys (y:, n:, Esc:, etc.) on buttons. When ON, press F1 or M-h (Alt-h) to display controls help"
 }

@@ -598,6 +598,6 @@
   "optAdFeatureExitHighlightTitle": "ゲーム終了時のハイライト表示",
   "optAdFeatureExitHighlightSub": "ゲーム終了時に今回の冒険のハイライトを表示します",
   "gameEndDialogTitle": "ゲーム終了",
-  "usePhysicalKeyboardNotation": "物理キーボード用の表記を使用",
+  "usePhysicalKeyboardNotation": "物理キーボード用ヘルプを有効化",
   "usePhysicalKeyboardNotationSub": "ボタンに割り当てキー（y:、n:、Esc:等）を表示します。ON時はF1またはM-h (Alt-h)キーで操作ヘルプを表示できます"
 }

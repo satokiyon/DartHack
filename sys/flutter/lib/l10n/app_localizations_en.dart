@@ -1617,7 +1617,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get gameEndDialogTitle => 'Game Over';
 
   @override
-  String get usePhysicalKeyboardNotation => 'Use Physical Keyboard Notation';
+  String get usePhysicalKeyboardNotation => 'Enable Physical Keyboard Help';
 
   @override
   String get usePhysicalKeyboardNotationSub =>
