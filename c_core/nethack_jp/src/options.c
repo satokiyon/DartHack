@@ -6468,21 +6468,21 @@ struct ape_preset {
 
 static const struct ape_preset ape_presets[] = {
     { "聖水を常に拾う",
-      "\"<*聖水*\"", "\"<*holy water*\"" },
+      "\"<聖水\"", "\"<holy water\"" },
     { "死体を拾わない",
-      "\">*(死体|の死骸)*\"", "\">*(corpse|corpses)*\"" },
+      "\">死体\"", "\">corpse\"" },
     { "怪物を怯えさせる巻物を拾わない",
-      "\">*(怪物を怯えさせる巻物|恐れさせる巻物)*\"", "\">*(scroll of scare monster|scare monster)*\"" },
+      "\">怪物を怯えさせる巻物\"", "\">scare monster\"" },
     { "重い鉄球を拾わない",
-      "\">*(重い鉄球|鉄球)*\"", "\">*(heavy iron ball|iron ball)*\"" },
+      "\">重い鉄球\"", "\">heavy iron ball\"" },
     { "毒薬を拾わない",
-      "\">*(毒薬|毒の薬)*\"", "\">*(potion of poison|potions of poison)*\"" },
+      "\">毒薬\"", "\">potion of poison\"" },
     { "幸運の石を常に拾う",
-      "\"<*幸運の石*\"", "\"<*luckstone*\"" },
+      "\"<幸運の石\"", "\"<luckstone\"" },
     { "命の魔除けを常に拾う",
-      "\"<*命の魔除け*\"", "\"<*amulet of life saving*\"" },
+      "\"<命の魔除け\"", "\"<amulet of life saving\"" },
     { "死の杖を常に拾う",
-      "\"<*死の杖*\"", "\"<*wand of death*\"" },
+      "\"<死の杖\"", "\"<wand of death\"" },
 };
 #define NUM_APE_PRESETS ((int) SIZE(ape_presets))
 
@@ -6649,15 +6649,33 @@ handler_autopickup_exception(void)
             return optn_ok;
         } else if (k == 1) {
             /* 自由入力 */
-            apebuf[0] = apebuf[1] = '\0';
-            getlin("新しい自動拾いの例外パターンは? (例: <*聖水* または >*大岩*)",
-                   &apebuf[1]);
-            mungspaces(&apebuf[1]);
-            if (apebuf[1] != '\033' && apebuf[1] != '\0') {
-                apebuf[0] = '\"';
-                apebuf[sizeof apebuf - 2] = '\0';
-                Strcat(apebuf, "\"");
-                add_autopickup_exception(apebuf);
+            char rawbuf[BUFSZ];
+
+            rawbuf[0] = '\0';
+            getlin("新しい自動拾いの例外パターンは? (例: <聖水 または >大岩)",
+                   rawbuf);
+            mungspaces(rawbuf);
+            if (rawbuf[0] != '\033' && rawbuf[0] != '\0') {
+                char *p_in = rawbuf;
+                char prefix = '\0';
+                int in_len;
+
+                if (*p_in == '<' || *p_in == '>') {
+                    prefix = *p_in++;
+                }
+                while (*p_in == '*')
+                    p_in++;
+                in_len = (int) strlen(p_in);
+                while (in_len > 0 && p_in[in_len - 1] == '*') {
+                    p_in[--in_len] = '\0';
+                }
+                if (in_len > 0) {
+                    if (prefix)
+                        Sprintf(apebuf, "\"%c%s\"", prefix, p_in);
+                    else
+                        Sprintf(apebuf, "\">%s\"", p_in);
+                    add_autopickup_exception(apebuf);
+                }
             }
             goto ape_again;
         } else if (k >= 100 && k < 100 + NUM_APE_PRESETS) {
