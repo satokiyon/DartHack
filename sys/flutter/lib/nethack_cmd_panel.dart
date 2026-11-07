@@ -135,12 +135,12 @@ class NetHackCmdPanel extends StatefulWidget {
     {
       'nameJp': '標準',
       'nameEn': 'Default',
-      'cmds': r'[Kbd] # 20s . : ; d q t f x a E ^p ^t D p M-p M-o M-w',
+      'cmds': r'[Kbd] # 20s . : ; d q t f x a E ^p ^t D p M-p M-o M-w _>. _<.',
     },
     {
       'nameJp': '戦闘',
       'nameEn': 'Combat',
-      'cmds': r't f Q r z Z + ^d x X w a W P R T A M-e M-t \e M-m M-i',
+      'cmds': r't f Q r z Z + ^d x X w a W P R T A M-e M-t M-m M-i',
     },
     {
       'nameJp': '道具',
@@ -187,6 +187,8 @@ class NetHackCmdPanel extends StatefulWidget {
     '.': {'ja': '待機', 'en': 'Wait'},
     '20s': {'ja': '20探索', 'en': '20Srch'},
     '_': {'ja': '移動', 'en': 'Travel'},
+    '_>.': {'ja': '下階段へ', 'en': 'DownStair'},
+    '_<.': {'ja': '上階段へ', 'en': 'UpStair'},
     '?': {'ja': 'ヘルプ', 'en': 'Help'},
     '/': {'ja': '調べる', 'en': 'WhatIs'},
     ';': {'ja': '遠見', 'en': 'Glance'},
@@ -209,7 +211,7 @@ class NetHackCmdPanel extends StatefulWidget {
     '^o': {'ja': '迷宮概要', 'en': 'Overvw'},
     '#overview': {'ja': '迷宮概要', 'en': 'Overvw'},
     'M-e': {'ja': 'スキル', 'en': 'Enhan'},
-    'M-t': {'ja': '退散', 'en': 'Turn'},
+    'M-t': {'ja': '死霊退散', 'en': 'Turn'},
     'M-m': {'ja': '怪物能力', 'en': 'Monst'},
     'M-i': {'ja': '発動', 'en': 'Invoke'},
     'M-l': {'ja': 'あさる', 'en': 'Loot'},

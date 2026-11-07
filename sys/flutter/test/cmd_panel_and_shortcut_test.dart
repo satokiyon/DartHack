@@ -30,6 +30,9 @@ void main() {
 
       // 20s が含まれていること
       expect(items.contains('20s'), isTrue);
+      // 下階段へ・上階段へコマンドが含まれていること
+      expect(items.contains('_>.'), isTrue);
+      expect(items.contains('_<.'), isTrue);
       // ユーザー指示で追加されたコマンド
       expect(items.contains('t'), isTrue);
       expect(items.contains('f'), isTrue);
@@ -43,6 +46,18 @@ void main() {
       expect(items.contains('^x'), isFalse);
       expect(items.contains('^o'), isFalse);
       expect(items.contains('?'), isFalse);
+    });
+
+    test('戦闘パネルの内容に Esc (\\e) が含まれず、死霊退散 (M-t) 等が含まれること', () {
+      final combatCmds = NetHackCmdPanel.defaultPanels[1]['cmds']!;
+      final items = CmdItem.parseCmds(combatCmds).map((e) => e.command).toList();
+
+      expect(items.contains(r'\e'), isFalse);
+      expect(items.contains('M-t'), isTrue);
+      expect(items.contains('t'), isTrue);
+      expect(items.contains('f'), isTrue);
+      expect(items.contains('z'), isTrue);
+      expect(items.contains('Z'), isTrue);
     });
 
     test('デフォルトショートカットが新 9 枠（3x3）正しく定義されていること', () {
@@ -99,6 +114,18 @@ void main() {
       final itemDropType = const CmdItem(command: '#droptype');
       expect(itemDropType.getEffectiveLabel(showLabel: true, langCode: 'ja'), '複数置');
 
+      // M-t -> '死霊退散'
+      final itemTurn = const CmdItem(command: 'M-t');
+      expect(itemTurn.getEffectiveLabel(showLabel: true, langCode: 'ja'), '死霊退散');
+
+      // _>. -> '下階段へ'
+      final itemDownStair = const CmdItem(command: '_>.');
+      expect(itemDownStair.getEffectiveLabel(showLabel: true, langCode: 'ja'), '下階段へ');
+
+      // _<. -> '上階段へ'
+      final itemUpStair = const CmdItem(command: '_<.');
+      expect(itemUpStair.getEffectiveLabel(showLabel: true, langCode: 'ja'), '上階段へ');
+
       // 個別ラベルが設定されている場合は辞書引きより優先されること
       final customItem = const CmdItem(command: '20s', label: 'マイ探索');
       expect(customItem.getEffectiveLabel(showLabel: true, langCode: 'ja'), 'マイ探索');
@@ -125,6 +152,15 @@ void main() {
 
       final itemHere = const CmdItem(command: '#herecmdmenu');
       expect(itemHere.getEffectiveLabel(showLabel: true, langCode: 'en'), 'Here');
+
+      final itemTurn = const CmdItem(command: 'M-t');
+      expect(itemTurn.getEffectiveLabel(showLabel: true, langCode: 'en'), 'Turn');
+
+      final itemDownStair = const CmdItem(command: '_>.');
+      expect(itemDownStair.getEffectiveLabel(showLabel: true, langCode: 'en'), 'DownStair');
+
+      final itemUpStair = const CmdItem(command: '_<.');
+      expect(itemUpStair.getEffectiveLabel(showLabel: true, langCode: 'en'), 'UpStair');
     });
 
     test('CmdItem.parseCmds における特殊キー \\e, \\n, \\s のパースおよびエスケープ保持検証', () {
