@@ -1,6 +1,7 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-04. */
-/* $NHDT-Header: NetHack 5.0 warnings.h 2026/06/20_22:26:43 NetHack-5.0:1.13 $ */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-08. */
+/* $NHDT-Header: NetHack 5.0 warnings.h 2026/10/31_22:59:35 NetHack-5.0:1.14 $ */
 /* Copyright (c) Michael Allison, 2021. */
+/* NetHack may be freely redistributed.  See license for details. */
 
 #ifndef WARNINGS_H
 #define WARNINGS_H

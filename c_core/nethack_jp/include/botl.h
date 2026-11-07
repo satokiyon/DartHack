@@ -1,5 +1,5 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-04. */
-/* $NHDT-Header: NetHack 5.0 botl.h 1970/01/01_00:00:00 NetHack-5.0:1.48 $ */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-08. */
+/* $NHDT-Header: NetHack 5.0 botl.h 2026/06/20_16:31:17 NetHack-5.0:1.48 $ */
 /* Copyright (c) Michael Allison, 2003                            */
 /* NetHack may be freely redistributed.  See license for details. */
 

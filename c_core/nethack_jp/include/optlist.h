@@ -1,5 +1,6 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-09-03. */
-/* NetHack 5.0	optlist.h */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-08. */
+/* $NHDT-Header: NetHack 5.0 optlist.h 2026/08/19_11:16:57 NetHack-5.0:1.122 $ */
+/* Copyright (c) Michael Allison 2024. */
 /* NetHack may be freely redistributed.  See license for details. */
 
 #ifndef OPTLIST_H

@@ -1,5 +1,5 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-04. */
-/* $NHDT-Header: NetHack 5.0 mhsplash.h 1970/01/01_00:00:00 NetHack-5.0:1.8 $ */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-08. */
+/* $NHDT-Header: NetHack 5.0 mhsplash.h 2015/05/25_00:13:31 NetHack-5.0:1.8 $ */
 /* Copyright (C) 2002 by Alex Kompel */
 /* NetHack may be freely redistributed.  See license for details. */
 

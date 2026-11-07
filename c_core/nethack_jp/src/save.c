@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-04. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-08. */
 /* $NHDT-Header: NetHack 5.0 save.c 2026/10/27_11:20:36 NetHack-5.0:1.274 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2009. */
@@ -428,9 +428,9 @@ savegamestate(NHFILE *nhfp)
      */
     u.ustuck_mid = 0;
     u.usteed_mid = 0;
-    Sfo_char(nhfp, yyyymmddhhmmss(ubirthday), "gamestate-ubirthday", 14);
+    Sfo_char(nhfp, yyyymmddhhmmss(ubirthday), "gamestate-ubirthday", NHDATELEN);
     Sfo_long(nhfp, &urealtime.realtime, "gamestate-realtime");
-    Sfo_char(nhfp, yyyymmddhhmmss(urealtime.start_timing), "gamestate-start_timing", 14);
+    Sfo_char(nhfp, yyyymmddhhmmss(urealtime.start_timing), "gamestate-start_timing", NHDATELEN);
     /* this is the value to use for the next update of urealtime.realtime */
     urealtime.start_timing = urealtime.finish_time;
     save_killers(nhfp);

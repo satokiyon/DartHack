@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-04. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-08. */
 /* $NHDT-Header: NetHack 5.0 windmain.c 2026/07/31_12:59:20 NetHack-5.0:1.236 $ */
 /* Copyright (c) Derek S. Ray, 2015. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -371,13 +371,21 @@ _CrtSetReportFile(_CRT_ASSERT, _CRTDBG_FILE_STDERR);*/
         toggle_mouse_support();
 #endif
 
-    if (gs.symset[PRIMARYSET].handling
-        && !symset_is_compatible(gs.symset[PRIMARYSET].handling,
-                                 windowprocs.wincap2)) {
+    if (gs.symset[PRIMARYSET].handling == H_UNK
+        || (gs.symset[PRIMARYSET].handling
+            && !symset_is_compatible(gs.symset[PRIMARYSET].handling,
+                                     windowprocs.wincap2))) {
         /* current symset handling and windowtype are
            not compatible, feature-wise. Use IBM defaults */
-            load_symset("IBMGraphics_2", PRIMARYSET);
-            load_symset("RogueEpyx", ROGUESET);
+        load_symset("IBMGraphics_2", PRIMARYSET);
+    }
+    if (gs.symset[ROGUESET].handling == H_UNK
+        || (gs.symset[ROGUESET].handling
+            && !symset_is_compatible(gs.symset[ROGUESET].handling,
+                                     windowprocs.wincap2))) {
+        /* current symset handling and windowtype are
+           not compatible, feature-wise. Use IBM defaults */
+        load_symset("RogueEpyx", ROGUESET);
     }
     /* Has the callback for the symset been invoked? Config file processing to
        load a symset runs too early to accomplish that because

@@ -1,5 +1,5 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-04. */
-/* $NHDT-Header: NetHack 5.0 amimenu.c 1970/01/01_00:00:00 NetHack-5.0:1.11 $ */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-08. */
+/* $NHDT-Header: NetHack 5.0 amimenu.c 2015/05/25_00:13:16 NetHack-5.0:1.11 $ */
 /*    Copyright (c) Olaf 'Rhialto' Seibert, 1989		   */
 /*    Copyright (c) Kenneth Lorber, Bethesda, Maryland, 1992, 1993, 1996 */
 /*    Copyright (c) Janne Salmij�rvi, 2000 */
