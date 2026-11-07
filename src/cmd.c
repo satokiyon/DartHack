@@ -4358,11 +4358,11 @@ dotherecmdmenu(void)
     coordxy y = gc.clicklook_cc.y;
 
     if (isok(x, y)) {
+        gc.clicklook_cc.x = gc.clicklook_cc.y = -1;
         if (x == u.ux && y == u.uy)
             ch = here_cmd_menu();
         else
             ch = there_cmd_menu(x, y, iflags.getdir_click);
-        gc.clicklook_cc.x = gc.clicklook_cc.y = -1;
         iflags.getdir_click = 0;
         return (ch && ch != '\033') ? ECMD_TIME : ECMD_OK;
     }
@@ -5426,7 +5426,8 @@ doclicklook(void)
         return ECMD_OK;
 
     svc.context.move = FALSE;
-    auto_describe(gc.clicklook_cc.x, gc.clicklook_cc.y);
+    clicklook_at(gc.clicklook_cc.x, gc.clicklook_cc.y);
+    gc.clicklook_cc.x = gc.clicklook_cc.y = -1;
 
     return ECMD_OK;
 }
