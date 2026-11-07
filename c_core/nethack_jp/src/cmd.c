@@ -5448,7 +5448,7 @@ doclicklook(void)
         return ECMD_OK;
 
     svc.context.move = FALSE;
-    auto_describe(gc.clicklook_cc.x, gc.clicklook_cc.y);
+    clicklook_at(gc.clicklook_cc.x, gc.clicklook_cc.y);
 
     return ECMD_OK;
 }

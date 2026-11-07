@@ -3543,5 +3543,29 @@ dohistory(void)
     return ECMD_OK;
 }
 
+/* 指定座標のマップ記号を説明し、通常メッセージとして出力する (clicklook コマンド用) */
+void
+clicklook_at(coordxy cx, coordxy cy)
+{
+    coord cc;
+    char out_str[BUFSZ];
+    const char *firstmatch = (const char *) 0;
+    struct permonst *supplemental_pm = (struct permonst *) 0;
+    int found;
+
+    cc.x = cx;
+    cc.y = cy;
+    out_str[0] = '\0';
+
+    found = do_screen_description(cc, TRUE, 0, out_str, &firstmatch,
+                                  &supplemental_pm);
+    if (found) {
+        jp_translate_screen_desc(out_str);
+        /* 一時メッセージ (ATR_NOHISTORY) ではなく通常メッセージとして出力し、
+         * メッセージ履歴に残るようにする */
+        putmixed(WIN_MESSAGE, ATR_NONE, out_str);
+    }
+}
+
 /*pager.c*/
 

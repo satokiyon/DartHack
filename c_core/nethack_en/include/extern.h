@@ -2387,6 +2387,7 @@ extern boolean ia_checkfile(struct obj *) NONNULLARG1;
 extern int do_screen_description(coord, boolean, int, char *, const char **,
                                  struct permonst **) NONNULLARG45;
 extern int do_look(int, coord *);
+extern void clicklook_at(coordxy, coordxy);
 extern int dowhatis(void);
 extern int doquickwhatis(void);
 extern int doidtrap(void);

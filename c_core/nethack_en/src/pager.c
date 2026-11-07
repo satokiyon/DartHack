@@ -3044,4 +3044,26 @@ dohistory(void)
     return ECMD_OK;
 }
 
+/* describe map screen symbol and print as persistent normal message */
+void
+clicklook_at(coordxy cx, coordxy cy)
+{
+    coord cc;
+    char out_str[BUFSZ];
+    const char *firstmatch = (const char *) 0;
+    struct permonst *supplemental_pm = (struct permonst *) 0;
+    int found;
+
+    cc.x = cx;
+    cc.y = cy;
+    out_str[0] = '\0';
+
+    found = do_screen_description(cc, TRUE, 0, out_str, &firstmatch,
+                                  &supplemental_pm);
+    if (found) {
+        /* print as normal message so it stays in message history */
+        putmixed(WIN_MESSAGE, ATR_NONE, out_str);
+    }
+}
+
 /*pager.c*/
