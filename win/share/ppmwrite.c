@@ -1,5 +1,8 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-04. */
-/* $NHDT-Header: NetHack 5.0 ppmwrite.c 2026/06/20_22:26:43 NetHack-5.0:1.12 $ */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-08. */
+/* $NHDT-Header: NetHack 5.0 ppmwrite.c 2026/06/20_22:26:43 NetHack-5.0:1.13 $ */
+/* Copyright (c) Sean Hunt 2015. */
+/* NetHack may be freely redistributed.  See license for details.  */
+
 /* this produces a raw ppm file, with a 15-character header of
  * "P6 3-digit-width 3-digit-height 255\n"
  */

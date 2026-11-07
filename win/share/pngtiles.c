@@ -1,4 +1,10 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-09-14. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-08. */
+/*
+ * $NHDT-Header: NetHack 5.0 pngtiles.c 2026/08/24_16:02:35 NetHack-5.0:1.0 $
+ * Copyright (c) Ray Chason 2026.
+ * NetHack may be freely redistributed.  See license for details.
+ */
+
 #include "config.h"
 #include "tileset.h"
 
