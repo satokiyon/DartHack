@@ -181,6 +181,34 @@ void main() {
       expect(find.textContaining('6倍拡大 ⇔ 全体表示'), findsOneWidget);
       expect(find.textContaining('マップのパン（平行移動）'), findsOneWidget);
       expect(find.textContaining('全体マップを閉じる'), findsOneWidget);
+      // 閉じるキー表記が Enter / Esc に簡潔化され、冗長な全キー列挙が表示されないこと
+      expect(find.text('Enter / Esc'), findsOneWidget);
+      expect(find.textContaining('Enter / Space / Esc / q / F9 / Alt-z'), findsNothing);
+    });
+
+    testWidgets('狭幅画面 (360x640) でも Table のキー列幅制限 (45%) により説明文が押し出されず正常にレンダリングされること', (tester) async {
+      tester.view.physicalSize = const Size(360, 640);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(() {
+        tester.view.resetPhysicalSize();
+        tester.view.resetDevicePixelRatio();
+      });
+
+      await tester.pumpWidget(buildTestWidget(
+        helpContext: KeyboardHelpContext.fullMap,
+      ));
+
+      await tester.tap(find.text('Open Help'));
+      await tester.pumpAndSettle();
+
+      expect(find.byType(KeyboardHelpDialog), findsOneWidget);
+      expect(find.text('Enter / Esc'), findsOneWidget);
+      expect(find.text('全体マップを閉じる'), findsOneWidget);
+
+      // 説明文の RenderBox 幅が極狭（50px未満）に押し出されず、十分な表示幅を確保できていること
+      final descFinder = find.text('全体マップを閉じる');
+      final descRenderBox = tester.renderObject<RenderBox>(descFinder);
+      expect(descRenderBox.size.width, greaterThan(100.0));
     });
 
     testWidgets('settings コンテキストで設定画面向け操作ヘルプが表示されること', (tester) async {

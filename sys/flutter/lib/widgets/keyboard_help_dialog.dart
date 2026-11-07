@@ -245,49 +245,56 @@ class _KeyboardHelpDialogState extends State<KeyboardHelpDialog> {
                     child: SingleChildScrollView(
                       controller: _scrollController,
                       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                      child: Table(
-                        columnWidths: const {
-                          0: IntrinsicColumnWidth(),
-                          1: FlexColumnWidth(),
-                        },
-                        defaultVerticalAlignment: TableCellVerticalAlignment.middle,
-                        children: items.map((item) {
-                          return TableRow(
-                            children: [
-                              Padding(
-                                padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 4),
-                                child: Container(
-                                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                                  decoration: BoxDecoration(
-                                    color: const Color(0xFF242C3D),
-                                    borderRadius: BorderRadius.circular(4),
-                                    border: Border.all(color: Colors.white24, width: 0.8),
-                                  ),
-                                  child: Text(
-                                    item.key,
-                                    style: const TextStyle(
-                                      color: Colors.amberAccent,
-                                      fontWeight: FontWeight.bold,
-                                      fontFamily: 'monospace',
-                                      fontSize: 12.5,
+                      child: LayoutBuilder(
+                        builder: (context, constraints) {
+                          return Table(
+                            columnWidths: {
+                              0: MinColumnWidth(
+                                const IntrinsicColumnWidth(),
+                                FixedColumnWidth(constraints.maxWidth * 0.45),
+                              ),
+                              1: const FlexColumnWidth(),
+                            },
+                            defaultVerticalAlignment: TableCellVerticalAlignment.middle,
+                            children: items.map((item) {
+                              return TableRow(
+                                children: [
+                                  Padding(
+                                    padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 4),
+                                    child: Container(
+                                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                                      decoration: BoxDecoration(
+                                        color: const Color(0xFF242C3D),
+                                        borderRadius: BorderRadius.circular(4),
+                                        border: Border.all(color: Colors.white24, width: 0.8),
+                                      ),
+                                      child: Text(
+                                        item.key,
+                                        style: const TextStyle(
+                                          color: Colors.amberAccent,
+                                          fontWeight: FontWeight.bold,
+                                          fontFamily: 'monospace',
+                                          fontSize: 12.5,
+                                        ),
+                                      ),
                                     ),
                                   ),
-                                ),
-                              ),
-                              Padding(
-                                padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 8),
-                                child: Text(
-                                  item.desc,
-                                  style: const TextStyle(
-                                    color: Color(0xFFE2E8F0),
-                                    fontSize: 13,
-                                    height: 1.35,
+                                  Padding(
+                                    padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 8),
+                                    child: Text(
+                                      item.desc,
+                                      style: const TextStyle(
+                                        color: Color(0xFFE2E8F0),
+                                        fontSize: 13,
+                                        height: 1.35,
+                                      ),
+                                    ),
                                   ),
-                                ),
-                              ),
-                            ],
+                                ],
+                              );
+                            }).toList(),
                           );
-                        }).toList(),
+                        },
                       ),
                     ),
                   ),
@@ -498,7 +505,7 @@ class _KeyboardHelpDialogState extends State<KeyboardHelpDialog> {
           _HelpItem('矢印 / hjkl yubn', isJp ? 'マップのパン（平行移動）' : 'Pan map'),
           _HelpItem('Shift + 移動キー', isJp ? '2倍のスピードで高速パン移動' : 'Fast pan (2x speed)'),
           _HelpItem('Tab / Shift+Tab', isJp ? '閉じるボタンのフォーカス選択' : 'Focus Close button'),
-          _HelpItem('Enter / Space / Esc / q / F9 / Alt-z', isJp ? '全体マップを閉じる' : 'Close full map'),
+          _HelpItem('Enter / Esc', isJp ? '全体マップを閉じる' : 'Close full map'),
           _HelpItem('F1 / Alt-h', isJp ? '操作ヘルプの表示' : 'Show controls help'),
         ];
     }
