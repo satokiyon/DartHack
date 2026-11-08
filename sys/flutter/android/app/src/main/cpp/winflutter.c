@@ -1018,6 +1018,10 @@ void SetExtMenuFlutter(int enable) {
     debuglog("SetExtMenuFlutter: iflags.extmenu = %d", enable);
 }
 
+#define FLUTTER_POSCMD_MENU           1
+#define FLUTTER_POSCMD_ACTION         2
+#define FLUTTER_POSCMD_SMART_ADJACENT 3
+
 // Dart 側から PosCmd (座標クリック) を受け取る関数。
 // マップタップ時の herecmdmenu/therecmdmenu 連動のために使用。
 NH_EXPORT void SendPosCmdToFlutter(int x, int y, int mod) {
@@ -1025,9 +1029,9 @@ NH_EXPORT void SendPosCmdToFlutter(int x, int y, int mod) {
         debuglog("SendPosCmdToFlutter: queue full, dropping pos_cmd x=%d y=%d mod=%d", x, y, mod);
         return;
     }
-    // mod == 2 (即時移動用 CLICK_2) の場合、mouse2 に確実に mouseaction がバインドされていることを担保
+    // mod == 2 または 3 (即時移動用) の場合、mouse2 に確実に mouseaction がバインドされていることを担保
     static int s_mousebtn2_ensured = 0;
-    if (mod == 2 && !s_mousebtn2_ensured) {
+    if ((mod == FLUTTER_POSCMD_ACTION || mod == FLUTTER_POSCMD_SMART_ADJACENT) && !s_mousebtn2_ensured) {
         bind_mousebtn(2, "mouseaction");
         s_mousebtn2_ensured = 1;
     }
@@ -1499,11 +1503,10 @@ static void flutter_curs(winid window, int x, int y) {
 // マップ上の主人公タップ検出 (#herecmdmenu 連動) のために必要。
 static void flutter_cliparound(int x, int y) {
     if (g_cliparound_cb) {
-        // (x, y) はフォーカス座標、続いてプレイヤー位置を渡す。
-        // u.ux は 1-based (1..COLNO-1)、u.uy は 0-based (0..ROWNO-1)
-        // (src/cmd.c の isok() 参照)。
-        // マップグリッド座標系 (0-based for both) に合わせるため x は -1。
-        g_cliparound_cb(x, y, (int) u.ux - 1, (int) u.uy);
+        // (x, y) はフォーカス座標、続いてプレイヤー位置 (u.ux, u.uy) を渡す。
+        // Dart 側の _mapGrid およびタップ座標 (_mapLocalToTile) は flutter_print_glyph と同じく
+        // C コアのダンジョン座標系 (x: 1..COLNO-1, y: 0..ROWNO-1) をそのまま使用する。
+        g_cliparound_cb(x, y, (int) u.ux, (int) u.uy);
     }
 }
 
@@ -1907,6 +1910,69 @@ static int flutter_nhgetch(void) {
     return g_last_received_key;
 }
 
+// 即時移動設定時の隣接マス判定 (mod == 3: FLUTTER_POSCMD_SMART_ADJACENT)
+// 移動可能な床や敵、ペットなら CLICK_2 (即時アクション)、
+// 友好的モンスター、扉、発見済みの罠、大岩、危険地形、壁なら CLICK_1 (メニュー表示) に変換する。
+static int resolve_smart_adjacent_mod(coordxy x, coordxy y) {
+    if (!isok(x, y) || (x == u.ux && y == u.uy)) {
+        return FLUTTER_POSCMD_MENU;
+    }
+    // 2マス以上離れている場合（安全ガード）
+    if (dist2(x, y, u.ux, u.uy) > 2) {
+        return FLUTTER_POSCMD_ACTION;
+    }
+
+    // 1. 未探索の暗闇: CLICK_2 (歩いてみる)
+    if (levl[x][y].seenv == 0 || glyph_at(x, y) == GLYPH_UNEXPLORED) {
+        return FLUTTER_POSCMD_ACTION;
+    }
+
+    // 2. モンスター / 見えない何か
+    struct monst *mtmp = m_at(x, y);
+    if (mtmp && canspotmon(mtmp)) {
+        if (mtmp->mtame) {
+            return FLUTTER_POSCMD_ACTION; // ペット: そのまま位置を入れ替える
+        }
+        if (mtmp->mpeaceful) {
+            return FLUTTER_POSCMD_MENU;   // 友好的モンスター: 誤攻撃防止のためメニュー表示
+        }
+        return FLUTTER_POSCMD_ACTION;     // 敵対モンスター: そのまま攻撃
+    }
+    if (glyph_is_invisible(glyph_at(x, y))) {
+        return FLUTTER_POSCMD_ACTION;     // 見えない何か (I): そのまま攻撃
+    }
+
+    // 3. 発見済みの罠: メニュー表示
+    struct trap *ttmp = t_at(x, y);
+    if (ttmp && ttmp->tseen) {
+        return FLUTTER_POSCMD_MENU;
+    }
+
+    // 4. 巨大な岩: メニュー表示
+    if (levl[x][y].glyph == objnum_to_glyph(BOULDER)) {
+        return FLUTTER_POSCMD_MENU;
+    }
+
+    // 5. 扉（開閉・施錠問わず扉すべて）: メニュー表示
+    if (IS_DOOR(levl[x][y].typ)) {
+        return FLUTTER_POSCMD_MENU;
+    }
+
+    // 6. 注意が必要な地形（水・溶岩・氷・穴・跳ね橋・空中・雲）: メニュー表示
+    if (is_pool(x, y) || is_lava(x, y) || is_ice(x, y) || IS_DRAWBRIDGE(levl[x][y].typ)
+        || levl[x][y].typ == AIR || levl[x][y].typ == CLOUD) {
+        return FLUTTER_POSCMD_MENU;
+    }
+
+    // 7. 壁・岩など通れない場所: メニュー表示（「隠し扉を探す」等）
+    if (!test_move(u.ux, u.uy, x - u.ux, y - u.uy, TEST_MOVE)) {
+        return FLUTTER_POSCMD_MENU;
+    }
+
+    // 8. それ以外（通常の床・通路、および階段・はしご・泉・祭壇・シンク・玉座などの乗っても安全な設備）: CLICK_2 (1歩移動)
+    return FLUTTER_POSCMD_ACTION;
+}
+
 static int flutter_nh_poskey(coordxy* x, coordxy* y, int* event) {
     // まず PosCmd キューにエントリがあれば、それを優先的に消費する。
     if (g_poscmd_count > 0) {
@@ -1915,9 +1981,13 @@ static int flutter_nh_poskey(coordxy* x, coordxy* y, int* event) {
         g_poscmd_count--;
         *x = (coordxy) cmd.x;
         *y = (coordxy) cmd.y;
-        *event = cmd.mod;
-        debuglog("flutter_nh_poskey: dispatched PosCmd x=%d y=%d mod=%d (remaining=%d)",
-                 cmd.x, cmd.y, cmd.mod, g_poscmd_count);
+        if (cmd.mod == FLUTTER_POSCMD_SMART_ADJACENT) {
+            *event = resolve_smart_adjacent_mod(*x, *y);
+        } else {
+            *event = cmd.mod;
+        }
+        debuglog("flutter_nh_poskey: dispatched PosCmd x=%d y=%d mod=%d (resolved=%d, remaining=%d)",
+                 cmd.x, cmd.y, cmd.mod, *event, g_poscmd_count);
         return 0; // 0 = クリックイベント (readchar_core で click_to_cmd 経由)
     }
     // 既に nhgetch が PosCmd を消費して pending に積んでいるケース。
@@ -1927,9 +1997,13 @@ static int flutter_nh_poskey(coordxy* x, coordxy* y, int* event) {
         g_pending_poscmd = 0;
         *x = (coordxy) g_pending_poscmd_x;
         *y = (coordxy) g_pending_poscmd_y;
-        *event = g_pending_poscmd_mod;
-        debuglog("flutter_nh_poskey: restored pending PosCmd x=%d y=%d mod=%d",
-                 g_pending_poscmd_x, g_pending_poscmd_y, g_pending_poscmd_mod);
+        if (g_pending_poscmd_mod == FLUTTER_POSCMD_SMART_ADJACENT) {
+            *event = resolve_smart_adjacent_mod(*x, *y);
+        } else {
+            *event = g_pending_poscmd_mod;
+        }
+        debuglog("flutter_nh_poskey: restored pending PosCmd x=%d y=%d mod=%d (resolved=%d)",
+                 g_pending_poscmd_x, g_pending_poscmd_y, g_pending_poscmd_mod, *event);
         return 0; // クリックイベント
     }
     int ret = flutter_nhgetch();
@@ -1937,9 +2011,13 @@ static int flutter_nh_poskey(coordxy* x, coordxy* y, int* event) {
         g_pending_poscmd = 0;
         *x = (coordxy) g_pending_poscmd_x;
         *y = (coordxy) g_pending_poscmd_y;
-        *event = g_pending_poscmd_mod;
-        debuglog("flutter_nh_poskey: consumed PosCmd from nhgetch x=%d y=%d mod=%d",
-                 g_pending_poscmd_x, g_pending_poscmd_y, g_pending_poscmd_mod);
+        if (g_pending_poscmd_mod == FLUTTER_POSCMD_SMART_ADJACENT) {
+            *event = resolve_smart_adjacent_mod(*x, *y);
+        } else {
+            *event = g_pending_poscmd_mod;
+        }
+        debuglog("flutter_nh_poskey: consumed PosCmd from nhgetch x=%d y=%d mod=%d (resolved=%d)",
+                 g_pending_poscmd_x, g_pending_poscmd_y, g_pending_poscmd_mod, *event);
     }
     return ret;
 }

@@ -32,6 +32,7 @@ import 'widgets/standard_exit_dialog.dart';
 import 'widgets/new_level_rest_dialog.dart';
 import 'utils/rewarded_ad_manager.dart';
 import 'utils/yn_choice_parser.dart';
+import 'utils/map_tap_resolver.dart';
 
 import 'models/game_enums.dart';
 import 'models/ext_cmd_entry.dart';
@@ -2765,10 +2766,10 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
           final playerX = (message['playerX'] as int?) ?? 0;
           final playerY = (message['playerY'] as int?) ?? 0;
           _screen.setPlayerPos(playerX, playerY);
-          final focusXRaw = (message['x'] as int?) ?? (playerX + 1);
-          final focusYRaw = (message['y'] as int?) ?? playerY;
-          _cameraFocusX = (focusXRaw > 0) ? (focusXRaw - 1) : playerX;
-          _cameraFocusY = focusYRaw;
+          final focusX = (message['x'] as int?) ?? playerX;
+          final focusY = (message['y'] as int?) ?? playerY;
+          _cameraFocusX = focusX;
+          _cameraFocusY = focusY;
           _triggerCameraUpdate();
         } else if (type == 'request_input') {
           setState(() {
@@ -3566,13 +3567,10 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
     return (tileX: tileX, tileY: tileY, inMap: true);
   }
 
-  // マップタップ処理。主人公タイルまたは隣接マスをタップしたときは
-  // PosCmd(x, y, 1 /* CLICK_1: therecmdmenu */) を C コアに送信して
-  // #herecmdmenu (主人公) / #therecmdmenu (隣接) のアクションメニューを起動する。
-  // 離れたマス（2マス以上）の場合は、設定（_mapTapTravelMode）に応じて:
-  // - 'menu': CLICK_1 (therecmdmenu: 移動/記号を見る等の確認メニュー)
-  // - 'always' / 'after_scroll': CLICK_2 (mouseaction: 即時自動移動 dotravel_target)
-  // - 'disabled': 無視
+  // マップタップ処理。
+  // 主人公・隣接・離れたマスの相対位置および設定値 (_mapTapTravelMode) に応じて
+  // MapTapResolver で適切な mod (1: メニュー, 2: アクション, 3: スマート隣接) を算出し、
+  // PosCmd(x, y, mod) を C コアへ送信する。
   void _handleMapTap(TapDownDetails details) {
     if (!_isMainGameStarted) return;
     final px = _screen.playerX;
@@ -3592,44 +3590,30 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
       return;
     }
 
-    // 主人公タイルまたは隣接8マスの判定
-    final dx = (tile.tileX - px).abs();
-    final dy = (tile.tileY - py).abs();
-    final bool isAdjacentOrSelf = (dx <= 1 && dy <= 1);
+    final resolution = MapTapResolver.resolve(
+      tileX: tile.tileX,
+      tileY: tile.tileY,
+      playerX: px,
+      playerY: py,
+      travelMode: _mapTapTravelMode,
+      isMapScrolledOrZoomed: _isMapScrolledOrZoomed,
+      isTargetingMode: isGetposOrTargetingMode,
+    );
 
-    if (isAdjacentOrSelf) {
-      // 主人公・隣接マスは常にアクションメニューを起動
-      sendPosCmd(tile.tileX, tile.tileY, 1 /* CLICK_1: therecmdmenu */);
+    if (resolution.mod == null) {
+      if (_mapTapTravelMode == 'disabled') {
+        _addLog("Map tap travel ignored: travel disabled");
+      } else if (_mapTapTravelMode == 'after_scroll') {
+        _addLog("Map tap travel ignored: scroll or zoom required");
+      }
       return;
     }
 
-    // 離れたマス（2マス以上離れた場所への移動）の動作分岐
-    switch (_mapTapTravelMode) {
-      case 'disabled':
-        _addLog("Map tap travel ignored: travel disabled");
-        return;
-
-      case 'after_scroll':
-        if (!_isMapScrolledOrZoomed) {
-          _addLog("Map tap travel ignored: scroll or zoom required");
-          return;
-        }
-        _isMapScrolledOrZoomed = false;
-        // 即時移動: CLICK_2 (mouseaction -> dotravel_target)
-        sendPosCmd(tile.tileX, tile.tileY, 2 /* CLICK_2: mouseaction */);
-        break;
-
-      case 'always':
-        // 即時移動: CLICK_2 (mouseaction -> dotravel_target)
-        sendPosCmd(tile.tileX, tile.tileY, 2 /* CLICK_2: mouseaction */);
-        break;
-
-      case 'menu':
-      default:
-        // メニュー表示: CLICK_1 (therecmdmenu -> there_cmd_menu_far)
-        sendPosCmd(tile.tileX, tile.tileY, 1 /* CLICK_1: therecmdmenu */);
-        break;
+    if (resolution.consumeScrollZoom) {
+      _isMapScrolledOrZoomed = false;
     }
+
+    sendPosCmd(tile.tileX, tile.tileY, resolution.mod!);
   }
 
   // マップ右クリック処理 (Windows / PC向け)
