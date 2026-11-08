@@ -32,7 +32,7 @@
   "showHelp": "Show Help (?)",
   "dbSearch": "Database Search ( /? )",
   "gameOptions": "Game Options ( O )",
-  "showFullMap": "Show Full Level Map (F9 / M-z)",
+  "showFullMap": "Show Full Map (M-z)",
   "hideKeyboard": "Hide Controls",
   "showKeyboard": "Show Controls",
   "openSettings": "Open Game Settings",

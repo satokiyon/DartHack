@@ -99,7 +99,7 @@ class AppLocalizationsJa extends AppLocalizations {
   String get gameOptions => 'オプション設定 ( O )';
 
   @override
-  String get showFullMap => '階層の全体地図を表示 (F9 / M-z)';
+  String get showFullMap => '全体地図を表示 (M-z)';
 
   @override
   String get hideKeyboard => '操作ボタンを非表示';

@@ -100,7 +100,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get gameOptions => 'Game Options ( O )';
 
   @override
-  String get showFullMap => 'Show Full Level Map (F9 / M-z)';
+  String get showFullMap => 'Show Full Map (M-z)';
 
   @override
   String get hideKeyboard => 'Hide Controls';

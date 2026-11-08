@@ -281,7 +281,7 @@ abstract class AppLocalizations {
   /// No description provided for @showFullMap.
   ///
   /// In ja, this message translates to:
-  /// **'階層の全体地図を表示 (F9 / M-z)'**
+  /// **'全体地図を表示 (M-z)'**
   String get showFullMap;
 
   /// No description provided for @hideKeyboard.
