@@ -307,7 +307,7 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
     DPadMoveMode.fCmd,
   ];
   bool _isDirectionPromptActive = false;
-  String _mapTapTravelMode = 'menu';
+  String _mapTapTravelMode = 'always';
   bool _isMapScrolledOrZoomed = false;
 
   @override
@@ -404,9 +404,9 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
       }
       final savedLongPressMoveModeName = prefs.getString('dpad_long_press_move_mode') ?? 'G_UPPER';
       _dPadLongPressMoveMode = _parseMoveMode(savedLongPressMoveModeName);
-      _mapTapTravelMode = prefs.getString('map_tap_travel_mode') ?? 'menu';
+      _mapTapTravelMode = prefs.getString('map_tap_travel_mode') ?? 'always';
       if (!const ['menu', 'always', 'after_scroll', 'disabled'].contains(_mapTapTravelMode)) {
-        _mapTapTravelMode = 'menu';
+        _mapTapTravelMode = 'always';
       }
       _cameraFollowMode = prefs.getString('camera_follow_mode') ?? 'center';
       _scrollMargin = prefs.getInt('scroll_margin') ?? 3;

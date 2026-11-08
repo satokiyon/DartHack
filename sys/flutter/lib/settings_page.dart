@@ -159,7 +159,7 @@ class _SettingsPageState extends State<SettingsPage> {
   int _layoutPattern = 1; // UIレイアウトパターン (1 or 2)
   bool _swapPadSide = false; // 移動パッドとショートカットパッドの左右反転
   String _dpadLongPressMoveMode = 'G_UPPER';
-  String _mapTapTravelMode = 'menu';
+  String _mapTapTravelMode = 'always';
   String _cameraFollowMode = 'center';
   int _scrollMargin = 3;
   int _scrollAmount = 3;
@@ -428,9 +428,9 @@ class _SettingsPageState extends State<SettingsPage> {
         _cmdPanelPosition   = patternDef['cmd_panel_position'] ?? _cmdPanelPosition;
       }
       _dpadLongPressMoveMode = prefs.getString('dpad_long_press_move_mode') ?? 'G_UPPER';
-      _mapTapTravelMode = prefs.getString('map_tap_travel_mode') ?? 'menu';
+      _mapTapTravelMode = prefs.getString('map_tap_travel_mode') ?? 'always';
       if (!const ['menu', 'always', 'after_scroll', 'disabled'].contains(_mapTapTravelMode)) {
-        _mapTapTravelMode = 'menu';
+        _mapTapTravelMode = 'always';
       }
       _autosaveEnabled = prefs.getBool('autosave_enabled') ?? true;
       _autosaveInterval = prefs.getInt('autosave_interval') ?? 50;
