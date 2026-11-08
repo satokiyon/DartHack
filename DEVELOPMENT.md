@@ -1,4 +1,4 @@
-<!-- Modified by NetHackJP contributor @satokiyon; latest change date: 2026-10-23. -->
+<!-- Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-08. -->
 <!--
   IMPORTANT POLICY FOR NetHackJP-ONLY MODIFICATIONS
   =================================================
@@ -830,6 +830,26 @@ Xaw AsciiText の `XtNinternational=True` は WSLg/XWayland + fcitx5 構成で I
 * **対応ファイル**: `util/makedefs.c`, `util/sftags.c`
 * **アップストリーム追従手順**:
   本修正はアップストリーム（本家 NetHack）に存在する潜在バグの先行修正です。アップストリームで `fgetline()` のバッファ拡張処理が修正された場合は、本マーカータグのブロックを確認し、関数のインターフェース互換性を維持したままアップストリーム版の実装に追従してください。
+
+### 25. マップ記号を見る (clicklook) の実物名表示・メッセージ履歴化と dotherecmdmenu における座標クリア順序の修復
+
+マウス操作やコマンドメニューから指定マスのマップ記号・エンティティを説明する `clicklook` 機能において、記号候補一覧のノイズを除去して実際の実物名（`firstmatch`）のみを通常メッセージとして表示し、メニュー経由時の引数座標誤クリアを防止するための独自修復です。
+
+* **マーカータグ**: `/* NetHackJP: clicklook firstmatch description and history fix */`
+* **対象ファイル**:
+  1. **`include/extern.h`**: `clicklook_at(coordxy, coordxy)` のプロトタイプ宣言を追加。
+  2. **`src/pager.c`**:
+     - `clicklook_at()` を新設。`do_screen_description()` で得られる記号候補一覧全体（`out_str`）ではなく、そのマスに実在するエンティティ名（`firstmatch`）のみを取り出し、`pline("%s", firstmatch)` で通常メッセージとして出力。一時メッセージ（`ATR_NOHISTORY`）を廃し、`^P`（メッセージ履歴）に残るように改善。
+  3. **`src/cmd.c`**:
+     - `doclicklook()`: `auto_describe()` の代わりに `clicklook_at()` を呼び出すよう変更し、処理終端で `gc.clicklook_cc.x = gc.clicklook_cc.y = -1;` を実行して座標を消費。
+     - `dotherecmdmenu()`: `there_cmd_menu()` 呼び出し後に `gc.clicklook_cc` をクリアしていた処理を、メニュー呼び出し前の座標退避直後に移動。これにより、メニュー内で `MCMD_LOOK_AT` がキュー登録した座標が直後にクリアされて `doclicklook` が不発になる不具合を修正。
+* **背景**:
+  - アップストリームの `auto_describe()` は英語説明を一時メッセージ（`ATR_NOHISTORY`）で出力するため、未翻訳なだけでなく直前の説明をメッセージ履歴で再確認できなかった。
+  - さらに記号辞書の全候補一覧（`out_str`）を出力すると「〜あるいは〜」といった無関係な候補が大量に表示されるため、実在する対象名（`firstmatch`）のみに絞り込む必要があった。
+  - また `dotherecmdmenu()` の事後クリア処理は、メニュー選択（`MCMD_LOOK_AT`）で設定された `gc.clicklook_cc` を上書き破壊するアップストリームの設計バグであった。
+* **アップストリーム追従手順**:
+  1. アップストリームで `clicklook` の実物説明化やメッセージ履歴保持、および `there_cmd_menu` の `clicklook_cc` ライフサイクルバグ修正が入った場合は、差分を確認して追従する。
+  2. 日本語メッセージ出力（`pline("%s", firstmatch)`）については、NetHackJP の標準出力仕様として維持する。
 ---
 
 ## 5. ライセンスと NetHack License 2(a) への対応方針

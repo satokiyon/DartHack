@@ -4550,6 +4550,7 @@ there_cmd_menu_next2u(
     int *act)
 {
     int K = 0;
+    boolean added_move = FALSE;
     char buf[BUFSZ];
     schar typ = levl[x][y].typ;
     struct trap *ttmp;
@@ -4593,10 +4594,13 @@ there_cmd_menu_next2u(
             mcmd_addmenu(win, MCMD_UNTRAP_TRAP,
                                  "罠を解除しようとする"), ++K;
         mcmd_addmenu(win, MCMD_MOVE_DIR, "罠の上を移動する"), ++K;
+        added_move = TRUE;
     }
 
-    if (levl[x][y].glyph == objnum_to_glyph(BOULDER))
+    if (levl[x][y].glyph == objnum_to_glyph(BOULDER)) {
         mcmd_addmenu(win, MCMD_MOVE_DIR, "巨大な岩を押す"), ++K;
+        added_move = TRUE;
+    }
 
     mtmp = m_at(x, y);
     if (mtmp && !canspotmon(mtmp))
@@ -4623,6 +4627,7 @@ there_cmd_menu_next2u(
 
         Sprintf(buf, "%sと位置を入れ替える", l_monnam(mtmp));
         mcmd_addmenu(win, MCMD_MOVE_DIR, buf), ++K;
+        added_move = TRUE;
 
         if (!has_mgivenname(mtmp))
             Sprintf(buf, "その%sに名前を付ける", l_monnam(mtmp));
@@ -4638,7 +4643,12 @@ there_cmd_menu_next2u(
         /* attacking overrides any other automatic action */
         *act = MCMD_ATTACK_NEXT2U;
     } else {
-        /* "Move %s", direction - handled below */
+        /* DartHack/NetHackJP: Add explicit move option for passable adjacent squares.
+         * NOTE: When upstream NetHack implements the "Move <dir>" option here,
+         * prioritize and adopt the upstream implementation upon subtree merge. */
+        if (!added_move && test_move(u.ux, u.uy, x - u.ux, y - u.uy, TEST_MOVE)) {
+            mcmd_addmenu(win, MCMD_MOVE_DIR, "ここに移動する"), ++K;
+        }
     }
     return K;
 }

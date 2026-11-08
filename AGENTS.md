@@ -1,4 +1,4 @@
-<!-- Modified by NetHackJP contributor @satokiyon; latest change date: 2026-10-26. -->
+<!-- Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-08. -->
 <!-- agent-ninja-START -->
 ## Agent Skills
 
@@ -133,6 +133,14 @@
 16. **動的メッセージにおけるモンスター名・名詞の日本語化徹底（缶詰、投擲、警告等）**:
     - 缶詰を開けたときの匂いや味（`src/eat.c`）、死体投げ・死体殴打（`src/uhitm.c`, `src/mthrowu.c`）、警告メッセージ（`src/timeout.c`）、気配察知（`src/insight.c`）、遠見・墓石（`src/engrave.c`, `src/pager.c`）など、名詞が動的に埋め込まれるメッセージでは、アップストリームの `m_monnam`, `pmname`, `mons` から直接英語名や複数形化された文字列を取得してはなりません。
     - 必ず `jp_pmname` / `jp_pmname_from_idx` などの日本語化関数を経由させて取得し、特殊な味・匂い表現（例: 「チキン」等）についても適切な日本語表現にマッピングしてください。
+
+17. **マップ座標・実物調査（look / clicklook）における実物名（`firstmatch`）の採用と通常メッセージ化**:
+    - マップ上の特定座標や対象物を調査・説明する処理（`clicklook` 等）において、アップストリームの `auto_describe()` をそのまま呼び出してはなりません。`auto_describe()` は未翻訳の英文を出力する上、一時メッセージ属性（`ATR_NOHISTORY`）で出力されるため、`^P` によるメッセージ履歴に残りません。
+    - また、`do_screen_description()` の `out_str` に返されるグリフ記号の候補一覧全体（「〜あるいは〜」等の辞書候補）をそのまま出力するとノイズになるため、対象マスに実際に存在するエンティティ名（`firstmatch`）のみを抽出し、`pline("%s", firstmatch)` で通常メッセージとして出力してください（`clicklook_at` の利用）。
+
+18. **メニュー操作およびコマンドキュー（`cmdq`）におけるグローバル引数・状態変数のライフサイクル管理**:
+    - `here_cmd_menu` や `there_cmd_menu` などのメニュー表示処理、および `cmdq_add_ec()` でコマンドキューに遅延実行関数を登録する処理において、引数や対象座標を保持するグローバル変数（`gc.clicklook_cc` 等）をメニュー呼び出し直後に一律クリアしてはなりません。
+    - メニュー実行中にユーザーが選択したサブコマンド（例: `MCMD_LOOK_AT`）がキュー実行用に設定した状態を呼び出し元が上書き破壊してしまうため、呼び出し前にローカル退避と初期化を行うか、ディスパッチされたコマンド実行関数側（例: `doclicklook()`）の処理完了時にクリアするライフサイクルを徹底してください。
 
 ## アイテムの日本語助数詞（単位）表示方針
 
