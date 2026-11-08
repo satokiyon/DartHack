@@ -94,10 +94,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get showHelp => 'Show Help (?)';
 
   @override
-  String get dbSearch => 'Database Search ( /? )';
+  String get dbSearch => 'Database Search (/?)';
 
   @override
-  String get gameOptions => 'Game Options ( O )';
+  String get gameOptions => 'Game Options (O)';
 
   @override
   String get showFullMap => 'Show Full Map (M-z)';

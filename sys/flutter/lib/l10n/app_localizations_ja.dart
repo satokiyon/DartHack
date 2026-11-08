@@ -93,10 +93,10 @@ class AppLocalizationsJa extends AppLocalizations {
   String get showHelp => 'ヘルプを表示 (?)';
 
   @override
-  String get dbSearch => 'データベース検索 ( /? )';
+  String get dbSearch => 'データベース検索(/?)';
 
   @override
-  String get gameOptions => 'オプション設定 ( O )';
+  String get gameOptions => 'オプション設定(O)';
 
   @override
   String get showFullMap => '全体地図を表示 (M-z)';

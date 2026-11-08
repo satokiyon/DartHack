@@ -269,13 +269,13 @@ abstract class AppLocalizations {
   /// No description provided for @dbSearch.
   ///
   /// In ja, this message translates to:
-  /// **'データベース検索 ( /? )'**
+  /// **'データベース検索(/?)'**
   String get dbSearch;
 
   /// No description provided for @gameOptions.
   ///
   /// In ja, this message translates to:
-  /// **'オプション設定 ( O )'**
+  /// **'オプション設定(O)'**
   String get gameOptions;
 
   /// No description provided for @showFullMap.
