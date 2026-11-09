@@ -1,10 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
 <data-extraction-rules>
     <cloud-backup>
-        <!-- nethackdir 内全体（セーブデータ、スコアファイル record, logfile、骨ファイル bon* 等）を自動バックアップ対象にする -->
+        <!-- nethackdir 内（スコアファイル record, logfile、骨ファイル bon* 等）をバックアップ対象にする -->
         <include domain="file" path="nethackdir" />
+        <!-- 死亡して削除されたセーブデータのゾンビ復活を防止するためクラウドバックアップから除外 -->
+        <exclude domain="file" path="nethackdir/save" />
+
+        <!-- アプリ設定（音量、キーバインド、パッド配置等） -->
+        <include domain="sharedpref" path="." />
+
+        <!-- ユーザーインポート済みのカスタムタイル・フォント -->
+        <include domain="root" path="app_flutter/custom_tiles" />
+        <include domain="root" path="app_flutter/custom_fonts" />
     </cloud-backup>
+
     <device-transfer>
+        <!-- 機種変更時の直接移行では進行中のセーブデータも含めて丸ごと引き継ぐ -->
         <include domain="file" path="nethackdir" />
+        <include domain="sharedpref" path="." />
+        <include domain="root" path="app_flutter/custom_tiles" />
+        <include domain="root" path="app_flutter/custom_fonts" />
     </device-transfer>
 </data-extraction-rules>

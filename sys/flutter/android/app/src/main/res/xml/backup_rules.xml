@@ -1,5 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <full-backup-content>
-    <!-- nethackdir 内全体（セーブデータ、スコアファイル record, logfile、骨ファイル bon* 等）を自動バックアップ＆リストア対象にする -->
+    <!-- nethackdir 内（スコアファイル record, logfile、骨ファイル bon* 等）をバックアップ対象にする -->
     <include domain="file" path="nethackdir" />
+    <!-- 死亡して削除されたセーブデータのゾンビ復活を防止するため除外 -->
+    <exclude domain="file" path="nethackdir/save" />
+
+    <!-- アプリ設定（音量、操作設定等） -->
+    <include domain="sharedpref" path="." />
+
+    <!-- ユーザーインポート済みのカスタムタイル・フォント -->
+    <include domain="root" path="app_flutter/custom_tiles" />
+    <include domain="root" path="app_flutter/custom_fonts" />
 </full-backup-content>

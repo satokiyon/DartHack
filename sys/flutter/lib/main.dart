@@ -4109,7 +4109,7 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
     final isJp = _selectedLanguage == 'ja';
 
     try {
-      final recordPath = findRecordFilePath();
+      final recordPath = findRecordFilePath(_assetsPath);
       if (recordPath != null) {
         entries = parseRecordFile(recordPath, isJp: isJp);
       }

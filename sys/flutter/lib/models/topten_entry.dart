@@ -230,8 +230,13 @@ class _RecordRawEntry {
   });
 }
 
-String? findRecordFilePath() {
-  final candidatePaths = [
+String? findRecordFilePath([String? basePath]) {
+  final candidatePaths = <String>[];
+  if (basePath != null && basePath.isNotEmpty) {
+    candidatePaths.add('$basePath/record');
+    candidatePaths.add('$basePath/record_jp');
+  }
+  candidatePaths.addAll([
     'record',
     './record',
     '../record',
@@ -239,7 +244,7 @@ String? findRecordFilePath() {
     'record_jp',
     './record_jp',
     '../record_jp',
-  ];
+  ]);
 
   for (final path in candidatePaths) {
     if (File(path).existsSync()) {
