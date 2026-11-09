@@ -1,4 +1,4 @@
-<!-- Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-07. -->
+<!-- Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-09. -->
 <!-- agent-ninja-START -->
 ## Agent Skills
 
@@ -134,6 +134,27 @@ Flutter ポートにおけるハイスコア・スコアボード表示には、
 2. **動的メッセージにおけるモンスター名・名詞の日本語化徹底**:
    - 缶詰を開けたときの匂いや味（`src/eat.c`）、死体投げ・死体殴打（`src/uhitm.c`, `src/mthrowu.c`）、警告メッセージ（`src/timeout.c`）、気配察知（`src/insight.c`）、遠見・墓石（`src/engrave.c`, `src/pager.c`）など、名詞が動的に埋め込まれるメッセージでは、アップストリームの `m_monnam`, `pmname`, `mons` から直接英語名や複数形化された文字列を取得してはなりません。
    - 必ず `jp_pmname` / `jp_pmname_from_idx` などの日本語化関数を経由させて取得し、特殊な味・匂い表現（例: 「チキン」等）についても適切な日本語表現にマッピングしてください。
+
+## 対話プロンプトにおける全角英数字・記号入力の正規化および自然な日本語キーワード受理原則
+
+1. **全角入力の自動正規化 (`normalize_fullwidth_to_ascii`)**:
+   - 日本語 IME が有効な状態のまま入力された全角数字（`０`〜`９`）、全角アルファベット（`ａ`〜`ｚ`, `Ａ`〜`Ｚ`）、および全角記号（`？`, `！`, `：`, `＃`, `，`, `．`, `／` 等）は、C コア側の正規化関数 `normalize_fullwidth_to_ascii()` により自動的に ASCII 半角へ変換されます。
+   - 対象箇所: `paranoid_query`（Yes/No）、`bribe`（寄付・賄賂額入力）、`do_play_instrument`（演奏）、`makewish`（願い）、`query_classes`（拾うアイテム種別選択）、`ggetobj`（インベントリ操作）、`status_hilite_menu_add`（ステータスハイライト）、`wiz_force_cham_form`（カメレオン変身）、`create_particular`（特定モンスター生成）など。
+2. **自然な日本語キーワードの認識・受理**:
+   - プロンプト入力において、英語コマンドや単一キー（`y/n` 等）だけでなく、「はい」「いいえ」「ヘルプ」「ランダム」などの自然な日本語表現をそのまま解釈・受理します。
+   - Flutter UI（Dart）側で独自の文字コード変換処理を二重に挟まず、C コアの正規化層に透過的に入力文字列を渡す設計を維持してください。
+
+## 移動可能な隣接マスに対する「ここに移動する」メニュー項目 (MCMD_MOVE) 原則
+
+1. **移動可能隣接マスへの移動コマンド提供**:
+   - 対象マス指定メニュー（`there_cmd_menu` / `there_cmd_menu_next2u`）において、主人公に隣接するマス（8方向）が移動可能な地形である場合、直接そのマスへ移動する「ここに移動する (`MCMD_MOVE`)」メニュー項目を表示・選択可能とします。
+   - プレイヤーが隣接マスをタップした際に、調査（look）や扉開閉だけでなく、直接移動アクションも直感的に選べる UX を保証します。
+
+## Windows コンソール構造体の console.active.* 再配置追従原則
+
+1. **NetHack 5.0 コンソール設計刷新への追従**:
+   - 上流 NetHack-5.0 において、Windows コンソール構造体（`console_t`）のメンバー（`attr`, `current_nhcolor`, `current_nhbkcolor` 等）が `console.active.*` サブ構造体配下に再配置されました。
+   - コンソール制御や画面描画に関わる C コードを改修する際は、古いフラットな構造体メンバーを直接参照せず、必ず `console.active.*` または `console.orig.*` を正しく参照してください。また、MSVC UNICODE ビルド環境における Win32 ANSI API（`GetConsoleTitleA` 等）の明示的な型整合を維持してください。
 
 ## Flutter UI TopTen (TextOverlay / TopTenEntry) のバイリンガル判定とパース原則
 

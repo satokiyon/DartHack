@@ -1,4 +1,4 @@
-<!-- Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-07. -->
+<!-- Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-09. -->
 # NetHackJP Android 開発・ビルドに関する追加ルール
 
 NetHackJPをAndroid向けにWSLおよびGradleでビルドする際は、以下の制約とトラブルシューティング知識を遵守してください。
@@ -414,4 +414,18 @@ NetHackJPをAndroid向けにWSLおよびGradleでビルドする際は、以下�
 4. **Widget テストにおけるキーボード／タッチモードの明示的シミュレーション**:
    - 物理キーボード操作を検証するテストでは、`await tester.tap(...)` でセクションを展開した直後にプログラマティックな `focusNode.requestFocus()` を呼ぶだけでは、テスト環境の `highlightMode` が直前の `tap` による `touch` のまま残る。
    - テスト内でキーボード操作中であることを明示するため、フォーカス移動前または検証前に `await tester.sendKeyEvent(LogicalKeyboardKey.select);` 等のキーイベントを送信するか、キーボード操作でフォーカスを遷移させて検証すること。
+
+## 59. 対話プロンプト全角正規化・自然な日本語入力受理および隣接マス移動メニュー (MCMD_MOVE) 原則
+
+1. **対話プロンプト全角英数字・記号自動正規化 (`normalize_fullwidth_to_ascii`)**:
+   - ゲーム内の対話プロンプト（Yes/No、寄付額入力、演奏楽器、願い、拾うアイテム種別、インベントリ操作、ステータスハイライト追加、カメレオン変身、魔物生成など）において、IME が有効な状態で入力された全角数字・英字・記号を C コア側で自動的に ASCII 半角へ正規化し、かつ「はい」「いいえ」「ヘルプ」「ランダム」などの自然な日本語キーワードを受理する。
+   - Flutter UI（Dart）側から全角文字が C コアに渡った場合でも C コア側で透過的に正規化されるため、Dart 側で無理に全角変換ロジックを個別実装せず、C コアの正規化層に透過的に入力文字列を渡す設計を維持すること。
+
+2. **移動可能な隣接マスに対する「ここに移動する」メニュー項目 (`MCMD_MOVE`)**:
+   - マウスやタップ操作による対象マス指定メニュー（`there_cmd_menu` / `there_cmd_menu_next2u`）において、主人公に隣接するマス（8方向）が移動可能な地形である場合、直接そのマスへ移動する「ここに移動する (`MCMD_MOVE`)」メニュー項目を表示・選択可能とする。
+   - プレイヤーが隣接マスをタップした際に、調査（look）や扉開閉だけでなく、直接移動アクションも直感的に選べる UX を保証すること。
+
+3. **Windows コンソール構造体の `console.active.*` 再配置追従**:
+   - NetHack 5.0 本家追従（`consoletty.c` 等）において、コンソール属性やカラー情報が `console.active.*` 配下に配置されたため、関連コードを変更する際は旧メンバー（`console.attr` 等）ではなく新構造体メンバーを参照すること。
+
 

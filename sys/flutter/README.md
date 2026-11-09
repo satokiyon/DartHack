@@ -1,4 +1,4 @@
-<!-- Modified by NetHackJP contributor @satokiyon; latest change date: 2026-10-22. -->
+<!-- Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-09. -->
 # DartHack : 開発者向けドキュメント
 
 NetHack 5.0 (日本語版 / 英語版) に **Flutter / Dart** でUIを実装するためのプロジェクトです。
@@ -53,6 +53,11 @@ NetHack 5.0 (日本語版 / 英語版) に **Flutter / Dart** でUIを実装す�
     - 設定画面からマップ、メッセージ、ステータス、メニュー、テキスト、UI の各系統ごとにフォントを自由に変更可能。
     - アスキーマップ描画（タイルOFF時）における日本語フォールバック完全排除による高速描画、表示倍率スライダー連動、および `OPTIONS=symset` / `roguesymset` の設定画面連動と C コア即時反映に対応。
     - 外部フォントファイル（TTF/OTF/WOFF/TTC）の安全なインポート（マジックナンバー・テーブル境界・サイズ上限の厳格な検証）を搭載。詳細は [`doc/font_and_symset_architecture.md`](doc/font_and_symset_architecture.md) を参照してください。
+
+12. **自然な日本語入力 & 対話プロンプト全角正規化・隣接移動メニュー**:
+    - **全角入力自動正規化**: モバイル IME（全角入力）が有効な状態でも、全角数字・英字・記号が C コアの `normalize_fullwidth_to_ascii` により自動的に ASCII 半角へ正規化され、入力モード切り替えの手間なく快適に対話可能。
+    - **日本語キーワード受理**: Yes/No プロンプトや各種問い合わせにおいて、「はい」「いいえ」「ヘルプ」「ランダム」などの自然な日本語表現をそのまま解釈・受理。
+    - **隣接マス直接移動**: マップタップ時の対象マス指定メニューにおいて、移動可能な隣接マスであれば直接移動できる「ここに移動する (`MCMD_MOVE`)」メニュー項目をサポート。
 
 ---
 

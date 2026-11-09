@@ -50,3 +50,14 @@
 
 * **日付コメントの陳腐化**:
   - 1行目の日付コメントが `latest change date: 2026-11-08.` のまま。
+
+---
+
+## 修正完了状況 (2026-11-09)
+
+本レポートで指摘された全項目は、コミット `8cc5e29dc`（NetHackJP）および DartHack への Git Subtree マージ（コミット `f9f47a99d`）においてすべて修正・解消されました。
+- `DEVELOPMENT.md`: §4.1〜§4.32 の連番整理、新規機能3件の追記、日付更新、DartHack 側 Subtree 連携注記を追加。
+- `README.md`: `nethackX11` への表記修正、日付更新。
+- `AGENTS.md` / `.agents/AGENTS.md`: 相互欠落項目の統合・同期、日付更新。
+- `Contributing.md`: 日付更新。
+
