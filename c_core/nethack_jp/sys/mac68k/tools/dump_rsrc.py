@@ -1,5 +1,8 @@
-# Modified by NetHackJP contributor @satokiyon; latest change date: 2026-10-01.
+# Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-09.
 #!/usr/bin/env python3
+# $NHDT-Header: NetHack 5.0 dump_rsrc.py 2026/09/30_14:47:34 NetHack-5.0:1.2 $
+# Copyright (c) Ingo Paschke 2026.
+# NetHack may be freely redistributed.  See license for details.
 """Dump resource types and IDs from a Mac resource fork."""
 import struct
 import sys

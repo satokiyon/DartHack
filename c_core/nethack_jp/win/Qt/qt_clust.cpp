@@ -1,4 +1,5 @@
-/*	SCCS Id: @(#)qt_clust.cpp	3.4	1999/11/19	*/
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-09. */
+/* $NHDT-Header: NetHack 5.0 qt_clust.cpp 2020/12/28_01:01:33 NetHack-5.0:1.11 $ */
 /* Copyright (c) Warwick Allison, 1999. */
 /* NetHack may be freely redistributed.  See license for details. */
 #include "qt_clust.h"

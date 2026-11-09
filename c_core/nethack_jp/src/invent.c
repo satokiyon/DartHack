@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-08. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-09. */
 /* $NHDT-Header: NetHack 5.0 invent.c 2026/06/20 16:30:52 NetHack-5.0:1.569 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Derek S. Ray, 2015. */
@@ -2421,6 +2421,7 @@ ggetobj(const char *word, int (*fn)(OBJ_P), int mx,
         Sprintf(qbuf, "%s [%s]",
                 prompt ? prompt : "どれを選択しますか?", ilets);
         getlin(qbuf, buf);
+        jp_normalize_zenkaku(buf);
         if (buf[0] == '\033')
             return 0;
         if (strchr(buf, 'i')) {

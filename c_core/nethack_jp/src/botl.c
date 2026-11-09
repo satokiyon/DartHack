@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-08. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-09. */
 /* $NHDT-Header: NetHack 5.0 botl.c 2026/06/20_16:30:42 NetHack-5.0:1.289 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2006. */
@@ -4488,6 +4488,7 @@ status_hilite_menu_add(int origfld)
             status_field_label_for_display(fld),
             percent ? "(%)" : "");
         getlin(buf, inbuf);
+        jp_normalize_zenkaku(inbuf);
         if (inbuf[0] == '\0' || inbuf[0] == '\033')
             goto choose_behavior;
 

@@ -1,4 +1,7 @@
-<!-- Modified by NetHackJP contributor @satokiyon; latest change date: 2026-10-02. -->
+<!-- Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-09. -->
+# $NHDT-Header: NetHack 5.0 BUILD.md 2026/10/01_11:32:39 NetHack-5.0:1.7 $
+# Copyright (c) Ingo Paschke 2026.
+# NetHack may be freely redistributed.  See license for details.
 # Building NetHack for Classic Mac OS (68k / PowerPC)
 
 Cross-compiled with the [Retro68](https://github.com/autc04/Retro68) GCC

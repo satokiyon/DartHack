@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-04. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-09. */
 /* $NHDT-Header: NetHack 5.0 mon.c 2026/11/02_21:05:17 NetHack-5.0:1.643 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Derek S. Ray, 2015. */
@@ -5133,11 +5133,12 @@ wiz_force_cham_form(struct monst *mon)
         monclass = 0;
         getlin(pprompt, buf);
         mungspaces(buf);
+        jp_normalize_zenkaku(buf);
         /* for ESC, take form selected above (might be NON_PM) */
         if (*buf == '\033')
             break;
         /* for "*", use NON_PM to pick an arbitrary shape below */
-        if (!strcmp(buf, "*") || !strcmpi(buf, "random")) {
+        if (!strcmp(buf, "*") || !strcmpi(buf, "random") || !strcmp(buf, "ランダム")) {
             mndx = NON_PM;
             break;
         }

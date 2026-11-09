@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-08. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-09. */
 /* $NHDT-Header: NetHack 5.0 cmd.c 2026/09/30_14:47:34 NetHack-5.0:1.788 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2013. */
@@ -5699,19 +5699,25 @@ paranoid_ynq(
                      responsetype);
             *ans = '\0';
             getlin(qbuf, ans);
+            jp_normalize_zenkaku(ans);
             (void) mungspaces(ans);
-            if (!strcmpi(ans, "yes")) {
+            if (!strcmpi(ans, "yes") || !strcmp(ans, "はい")) {
                 c = 'y';
                 break;
             }
-            if (!strcmpi(ans, "quit") || *ans == '\033') {
+            if (!strcmpi(ans, "quit") || !strcmp(ans, "やめる")
+                || !strcmp(ans, "中止") || *ans == '\033') {
                 c = 'q';
                 break;
             }
+            if (!strcmpi(ans, "no") || !strcmp(ans, "いいえ") || !*ans) {
+                c = 'n';
+                break;
+            }
             /* we don't bother adding "or \"Quit\"" for the accept_q case */
-            promptprefix = "\"Yes\" or \"No\": ";
+            promptprefix = "「はい」または「いいえ」（\"Yes\" or \"No\"）を入力: ";
             /* for empty input, return value c will already be 'n' */
-        } while (ParanoidConfirm && strcmpi(ans, "no") && --trylimit);
+        } while (ParanoidConfirm && --trylimit);
     } else if (accept_q) {
         /* 'y', 'n', or 'q' */
         c = yn_function(prompt, ynqchars, 'n', FALSE);

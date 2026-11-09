@@ -1,3 +1,7 @@
+-- Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-09.
+-- $NHDT-Header: NetHack 5.0 test_lev.lua 2021/07/24_07:49:06 NetHack-5.0:1.2 $
+-- Copyright (c) Pasi Kallinen 2021.
+-- NetHack may be freely redistributed.  See license for details.
 
 -- Test all of the special levels
 

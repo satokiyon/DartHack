@@ -1,4 +1,4 @@
--- Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-08.
+-- Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-09.
 -- $NHDT-Header: NetHack 5.0 Mon-loca.lua 2026/06/20_22:34:29 NetHack-5.0:1.7 $
 --	Copyright (c) 1989 by Jean-Christophe Collet
 --	Copyright (c) 1991-2 by M. Stephenson
@@ -17,8 +17,11 @@ des.region(selection.area(00,00,78,20), "lit")
 des.non_diggable(selection.area(00,00,75,20))
 
 
+
+local formations = {
+
 -- wu wei
-local formation = [[
+[[
 ......................xxxx
 ..L............L...L....xx
 ..LLLLLLLLL.....L..L.....x
@@ -32,11 +35,33 @@ local formation = [[
 ..L.L..L..L.....L.L.L...L.
 .L...L..L..L...L..L....LL.
 ..........................
-]];
+]],
+
+[[
+..........................
+.LLLLL.L...........LLLLL..
+...L...LLLLL.......L......
+...L...L..L....LLLLLLLLLL.
+..L..L.L..L....L...L....L.
+.LLLL.L.L.L....L.LLLLLL...
+...L....L.L....L...L...L..
+...L.....L.....L...LLLL...
+.LLLLL...L.....L.L.L.L.L..
+...L....L.L....L.LLL.LLL..
+...LLL..L.L...L....L.L....
+.LLL...L...L..L.LLLLLLLLL.
+..........................
+]],
+
+};
 
 des.map({ halign = "center", valign = "center",
-          map = formation, lit = 1,
+          map = formations[math.random(#formations)], lit = 1,
           contents = function() end });
+
+if (percent(75)) then
+   des.replace_terrain({ selection = selection.negate(), fromterrain ="L", toterrain = "P" });
+end
 
 des.wallify();
 

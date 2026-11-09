@@ -1,5 +1,6 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-10-01. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-09. */
 /* NetHack 5.0	mactile.h	*/
+/* $NHDT-Header: NetHack 5.0 mactile.h 2026/09/30_14:47:34 NetHack-5.0:1.5 $ */
 /* Copyright (c) Ingo Paschke, 2026. */
 /* NetHack may be freely redistributed.  See license for details. */
 /* mactile.h: tile sheet asset + per-tile blit. See macmap.h for the

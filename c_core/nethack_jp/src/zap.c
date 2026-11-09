@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-08. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-09. */
 /* $NHDT-Header: NetHack 5.0 zap.c 2026/06/20_16:31:15 NetHack-5.0:1.601 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2013. */
@@ -6368,6 +6368,7 @@ makewish(void)
         wish_history_menu(buf);
     else
         getlin(promptbuf, buf);
+    jp_normalize_zenkaku(buf);
 
     if (iflags.term_gone) {
         if (!iflags.debug_fuzzer)
@@ -6378,7 +6379,7 @@ makewish(void)
     (void) mungspaces(buf);
     if (buf[0] == '\033') {
         buf[0] = '\0';
-    } else if (!strcmpi(buf, "help")) {
+    } else if (!strcmpi(buf, "help") || !strcmp(buf, "ヘルプ") || !strcmp(buf, "たすけて")) {
         wishcmdassist(MAXWISHTRY - tries);
         buf[0] = '\0'; /* for EDIT_GETLIN */
         goto retry;
