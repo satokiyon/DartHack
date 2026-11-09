@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-04. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-09. */
 /* $NHDT-Header: NetHack 5.0 pickup.c 2026/06/27_15:18:44 NetHack-5.0:1.405 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
@@ -226,6 +226,7 @@ query_classes(
         getlin(qbuf, inbuf);
         if (*inbuf == '\033')
             return FALSE;
+        jp_normalize_zenkaku(inbuf);
 
         for (p = inbuf; (sym = *p++) != 0; ) {
             if (sym == ' ')

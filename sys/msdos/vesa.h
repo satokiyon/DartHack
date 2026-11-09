@@ -1,5 +1,7 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-04. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-09. */
 /* $NHDT-Header: NetHack 5.0 vesa.h 2026/04/26_14:47:48 NetHack-5.0:1.4 $ */
+/* Copyright (c) Michael Allison 2017. */
+/* NetHack may be freely redistributed.  See license for details. */
 
 /* VESA structures from the VESA BIOS Specification, retrieved 15 Jan 2016
  * from http://flint.cs.yale.edu/cs422/readings/hardware/vbe3.pdf

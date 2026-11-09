@@ -1,4 +1,4 @@
-<!-- Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-08. -->
+<!-- Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-09. -->
 <!--
   IMPORTANT POLICY FOR NetHackJP-ONLY MODIFICATIONS
   =================================================
@@ -220,11 +220,11 @@ X11 版では getlin / askname ダイアログ（`#名前`、`#願い`、`#虐�
    ```
    - stderr に `XIM: connected to input method` と出力されれば fcitx5 との接続成功。
    - `XIM: XOpenIM failed` と出た場合は `pgrep -a fcitx5` と `echo $XMODIFIERS` を確認し、`fcitx5-diagnose` で問題箇所を切り分けてください。また、**新しいターミナルで nethack を起動してください**（既存ターミナルには環境変数の変更が反映されません）。fcitx5 未起動時でも ASCII 入力は動作します。
-5. 入力の切替: ダイアログ内で **Ctrl+Space** で日本語入力モードをトグルします。確定は Enter / Space で、確定文字列が入力欄に挿入されダイアログは閉じないため、もう一度 Enter で OK します（詳細は §4.12）。
+5. 入力の切替: ダイアログ内で **Ctrl+Space** で日本語入力モードをトグルします。確定は Enter / Space で、確定文字列が入力欄に挿入されダイアログは閉じないため、もう一度 Enter で OK します（詳細は §4.16）。
 6. IM を無効化したい場合は `~/.nethackrc` に `OPTIONS=use_xim:off` を指定します（デフォルトは on）。
 
 > [!NOTE]
-> `hints/linux-jp` 内で `WANT_WIN_X11 = 1` および `HAVE_NCURSESW = 1` が定義されているため、生成されるバイナリは `tty`, `curses`, `X11` の 3 ポートマルチウィンドウに対応します。`X11` 使用時には Xft による日本語 TrueType/OpenType フォント描画が有効です（日本語 CJK フォントが未導入の場合は文字が白四角＝豆腐で表示されます）。マップ画面等の通常操作は 1 バイト＝1 コマンドのため IM を経由せず、日本語入力が有効なのは getlin / askname ダイアログのみです（§4.11 / §4.12）。
+> `hints/linux-jp` 内で `WANT_WIN_X11 = 1` および `HAVE_NCURSESW = 1` が定義されているため、生成されるバイナリは `tty`, `curses`, `X11` の 3 ポートマルチウィンドウに対応します。`X11` 使用時には Xft による日本語 TrueType/OpenType フォント描画が有効です（日本語 CJK フォントが未導入の場合は文字が白四角＝豆腐で表示されます）。マップ画面等の通常操作は 1 バイト＝1 コマンドのため IM を経由せず、日本語入力が有効なのは getlin / askname ダイアログのみです（§4.15 / §4.16）。
 
 #### 2.2.3. まとめ（WSL での初回セットアップ全体フロー）
 
@@ -307,9 +307,9 @@ XAPPLRESDIR=./playground ./playground/nethack -wX11  # X11 GUI インターフ�
 ### 開発で得た汎用のノウハウと落とし穴（積立型）
 ポート移植・GUI 対応・WSL 開発を通じて得た、特定の §4 エントリに留まらない汎用の知見。
 
-* **コア側に既存実装がないか先に探す**: 各ウィンドウポートで同種の表示問題（墓石の UTF-8 折り返し等）に直面したとき、ポート側でロジックを複製する前にコア (`src/`) に同等実装が無いか確認する。`static` 関数であっても他ポートから共有すべきものは `extern` 化して `include/extern.h` に宣言を追加する方が、実装重複による将来の不整合を防げる（例: §4.20 の `rip_utf8_*` ヘルパー）。
-* **コア API の戻り値 `0` をエラーと決めつけない**: `describe_level()` はメイン地層では常に `0` を返す仕様（`botl.c` のコメントどおり "ports with more room may expand this"）。戻り値 `0` を「失敗 ⇒ フォールバック」と誤解すると、ポート独自の英文フォールバックが常時使われて日本語化が効かなくなる（§4.19 の落とし穴）。コア関数を利用する際は呼び出し元とコメントを読み、`0` が正常系か異常系かを確認してから分岐を設計する。
-* **GNU Make の `ifdef` は実行時評価**: ビルド時に与えた変数フラグ（例: `WANT_WIN_QT=1`）は、`make install` 等の後続の make 呼び出しにも同じ値を渡す必要がある。条件分岐は make 起動時に評価されるため、フラグ無しの `make install` では変数依存のデータ配置（`VARDATND0` → `DATNODLB` 等）が再現されない（§4.17 参照）。
+* **コア側に既存実装がないか先に探す**: 各ウィンドウポートで同種の表示問題（墓石の UTF-8 折り返し等）に直面したとき、ポート側でロジックを複製する前にコア (`src/`) に同等実装が無いか確認する。`static` 関数であっても他ポートから共有すべきものは `extern` 化して `include/extern.h` に宣言を追加する方が、実装重複による将来の不整合を防げる（例: §4.24 の `rip_utf8_*` ヘルパー）。
+* **コア API の戻り値 `0` をエラーと決めつけない**: `describe_level()` はメイン地層では常に `0` を返す仕様（`botl.c` のコメントどおり "ports with more room may expand this"）。戻り値 `0` を「失敗 ⇒ フォールバック」と誤解すると、ポート独自の英文フォールバックが常時使われて日本語化が効かなくなる（§4.23 の落とし穴）。コア関数を利用する際は呼び出し元とコメントを読み、`0` が正常系か異常系かを確認してから分岐を設計する。
+* **GNU Make の `ifdef` は実行時評価**: ビルド時に与えた変数フラグ（例: `WANT_WIN_QT=1`）は、`make install` 等の後続の make 呼び出しにも同じ値を渡す必要がある。条件分岐は make 起動時に評価されるため、フラグ無しの `make install` では変数依存のデータ配置（`VARDATND0` → `DATNODLB` 等）が再現されない（§4.21 参照）。
 * **WSL ディストロは `-d` で明示指定**: `wsl.exe` 実行時、既定ディストロが `podman-machine` (Fedora) 等に変わっている場合があるため、`wsl.exe -d Ubuntu-26.04` のようにディストロを明示指定するのが確実。
 * **PowerShell 経由の `wsl.exe` 呼び出しでは複雑なコマンドをスクリプト化**: PowerShell は `$?`（PS 変数）や `$(...)` を自身で展開するため、`wsl.exe` に複雑なワンライナーを直接渡すと意図しない展開が起きる。複雑なコマンドは `.sh` ファイルに書き出してから `wsl.exe -d <distro> -- bash ./script.sh` のように実行するのが信頼できる。
 * **ライブラリの文字コード仕様の仮定は小さなテストで実証**: エンコーディングの扱い（例: Qt6 の `QString(const char *)` 暗黙変換や `QString::asprintf` の `%s` が UTF-8 として処理されること）は、ドキュメントや推測に頼らず最小のテストプログラムで日本語文字列の出力を実証してから全面置換に進むと手戻りを防げる。
@@ -449,7 +449,7 @@ ncursesw (Linux/WSL ワイド文字 curses) や PDCursesMod (Windows) 環境に�
   - アップストリーム 5.0.1 (コミット `d649a0a68`) にて `CURSES_WIDE_PAIRS` マクロおよび `mvwin_wch` / `getcchar` によるワイド文字カラーペア取得が本家に導入された。
   - これに伴い、NetHackJP では `include/wincurs.h` にて `CURSES_WIDE_PAIRS` の有効化条件を `NCURSES_WIDECHAR` だけでなく `PDC_WIDE` および `CURSES_UNICODE`（PDCursesMod や Linux/WSL UTF-8 環境）にも拡張し、`win/curses/cursmesg.c` はアップストリーム実装に統合・追従した。
 
-### 5. 日本語メッセージ内の複数形 "s" (plur) の排除と日本語化
+### 7. 日本語メッセージ内の複数形 "s" (plur) の排除と日本語化
 日本語メッセージが表示される箇所において、英語の複数形接尾辞 `"s"`（`plur()` マクロ）がそのまま表示されてしまう翻訳バグや、英語の単語がそのまま出力されてしまっていた箇所を修正しました。
 * **マーカータグ**: 
   - `/* NetHackJP: Pass currency(amt) instead of plur(amt) to display proper currency unit */` (通貨表示の修正)
@@ -473,7 +473,7 @@ ncursesw (Linux/WSL ワイド文字 curses) や PDCursesMod (Windows) 環境に�
 * **アップストリーム追従手順**:
   1. 本件は日本語メッセージのフォーマットに合わせた修正（日本語化特有の対応）であるため、アップストリームマージ時に競合した場合は、日本語側の文脈に合わせて `plur` や英語表記を排除する変更を維持するように競合解決を行ってください。
 
-### 6. CodeQL指摘によるバグ・誤検知の安全な修正
+### 8. CodeQL指摘によるバグ・誤検知の安全な修正
 GitHub CodeQL によるコードスキャン警告（Critical）を修正するための NetHackJP 独自の変更です。
 
 1. **makedefs.c のバッファオーバーフロー修正**
@@ -483,14 +483,14 @@ GitHub CodeQL によるコードスキャン警告（Critical）を修正する�
    - **アップストリーム追従手順**:
      1. アップストリーム（本家）で同等のバッファサイズ変更やキャスト修正が入った場合は、本修正を削除して追従します。
 
-### 7. ステータスハイライトメニューにおけるキャンセル時の無限ループ修正
+### 9. ステータスハイライトメニューにおけるキャンセル時の無限ループ修正
 ステータスハイライトルール追加時 (`status_hilite_menu_add()`) に、文字列型フィールドや値入力のない動作で色選択をキャンセル（`-1`）した際、`goto choose_value` からそのまま `choose_color` に直線落下して即座に色選択が再表示される無限ループバグの修正です。
 
 * **マーカータグ**: `/* NetHackJP: Fix infinite loop on cancel in status_hilite_menu_add */`
 * **対象ファイル**:
   - **`src/botl.c`**: `status_hilite_menu_add()` 内の色選択キャンセル判定を修正し、数値入力を行わない動作または文字列型フィールドの場合は `goto choose_behavior` へジャンプして動作選択メニューへ復帰するよう変更。
 * **アップストリーム追従手順**:
-### 8. C23 規格 / GCC 14+ / Clang 18+ 基準でのビルド警告・型厳格化対応
+### 10. C23 規格 / GCC 14+ / Clang 18+ 基準でのビルド警告・型厳格化対応
 現代の C コンパイラ（GCC 14+ / Clang 18+）および C23 規格でのビルド厳格化に伴うコンパイルエラー・警告の解体と、マルチプラットフォーム（Linux / WSL, Android NDK, Windows MSVC）互換性を維持するための修正です。アップストリーム（本家 NetHack）のマージ時にコンフリクトが発生した場合は、以下の指針に従って競合解決を行ってください。
 
 * **主な修正内容**:
@@ -511,7 +511,7 @@ GitHub CodeQL によるコードスキャン警告（Critical）を修正する�
   4. **型修復・シャドウイング対策**: アップストリームで同等の型修正や変数名変更が入っている場合はアップストリームの表記に追従し、入っていない場合は型安全性維持のため本修正を保持してください。
   5. **`makedefs.c` の関数プロトタイプ**: `MD_USE_TMPFILE_S` ブロック内の重複する早期プロトタイプを再導入しないでください。必要な宣言は各関数の既存宣言箇所に置き、`staticfn` と `static` のリンケージを一致させてください。
 
-### 7. TTY 環境における `DEF_PAGER` の `_jp` ヘルプファイル優先検索と DLB フォールバック
+### 11. TTY 環境における `DEF_PAGER` の `_jp` ヘルプファイル優先検索と DLB フォールバック
 Linux/UNIX 環境の TTY モード（`wintty.c`）において、`DEF_PAGER`（外部ページャー `more`/`less` 等）使用時に日本語ファイル（`help_jp` 等）が優先オープンされるようにし、実ファイルがない場合は `dlb_fopen`（内部画面表示）に自動フォールバックする機能を追加しました。
 * **マーカータグ**: `/* NetHackJP: try _jp file first for DEF_PAGER, and fallback to dlb_fopen if open fails */`
 * **対象ファイル**: `win/tty/wintty.c`
@@ -521,11 +521,11 @@ Linux/UNIX 環境の TTY モード（`wintty.c`）において、`DEF_PAGER`（�
 * **アップストリーム追従手順**:
   - アップストリームで外部ページャーの `open()` 処理や `display_file` の仕様が変更された場合、本マーカータグのブロックを確認し、`_jp` 付きファイル検索と `dlb_fopen` フォールバックのロジックを保持した状態で競合解決を行ってください。
 
-### 8. Linux/WSL X11 GUI ポートにおける UTF-8 日本語描画対応
+### 12. Linux/WSL X11 GUI ポートにおける UTF-8 日本語描画対応
 Linux/UNIX 環境の X11 ウィンドウポート（`win/X11`）において、Xft (FreeType/Fontconfig) 描画を UTF-8 化し、日本語 TrueType/OpenType フォントを正しくレンダリングできるようにしました。
 
 > [!IMPORTANT]
-> §4.8 は **描画のみ** を扱います。**XIM（インプットメソッド）による日本語入力は §4.10 で扱います**。`XtSetLanguageProc(NULL, NULL, NULL)` は `LC_CTYPE` / `LC_MESSAGES` のロケールを初期化するのみで、fcitx5 / ibus 等の IM サーバとの通信経路は提供しません。XIM による実際の日本語入力は §4.10 を参照してください。
+> §4.12 は **描画のみ** を扱います。**XIM（インプットメソッド）による日本語入力は §4.15 で扱います**。`XtSetLanguageProc(NULL, NULL, NULL)` は `LC_CTYPE` / `LC_MESSAGES` のロケールを初期化するのみで、fcitx5 / ibus 等の IM サーバとの通信経路は提供しません。XIM による実際の日本語入力は §4.15 を参照してください。
 
 * **マーカータグ**: `/* NetHackJP: X11 UTF-8 text rendering and input support */`
 * **対象ファイル**:
@@ -537,12 +537,12 @@ Linux/UNIX 環境の X11 ウィンドウポート（`win/X11`）において、X
   6. **`win/X11/winstat.c`**: ステータス表示の `XftTextExtents8` / `XftDrawString8` を `XftTextExtentsUtf8` / `XftDrawStringUtf8` に更新。
   7. **`win/X11/NetHack.ad`**: Xft デフォルトフォント注釈に CJK 日本語フォント（`Noto Sans CJK JP` 等）のフォールバックガイドを追加。
 * **`XtSetLanguageProc(NULL, NULL, NULL)`** は `X11_init_nhwindows` の先頭で呼んでロケールを初期化（`LC_CTYPE=ja_JP.UTF-8` 等）。**これは XIM 接続ではない**。
-* **ダイアログ入力の XIM 化は当初 `AsciiText` Widget の `XtNinternational=True` で試行したが、WSLg/XWayland 環境で fcitx5 が engage しなかった**。`win/X11/dialogs.c` 側の `XtNinternational` 指定は無効で、§4.10 の `wingetlin.c` 自前ダイアログに置き換えた。
+* **ダイアログ入力の XIM 化は当初 `AsciiText` Widget の `XtNinternational=True` で試行したが、WSLg/XWayland 環境で fcitx5 が engage しなかった**。`win/X11/dialogs.c` 側の `XtNinternational` 指定は無効で、§4.16 の `wingetlin.c` 自前ダイアログに置き換えた。
 * **アップストリーム追従手順**:
   - アップストリームで X11 ポートの Xft UTF-8 化や Pango/Cairo への置き換えが入った場合は、本変更箇所を取り消してアップストリームに追従してください。
 
 
-### 9. X11 ポートにおける未初期化 XFontStruct ポインタ参照保護
+### 13. X11 ポートにおける未初期化 XFontStruct ポインタ参照保護
 WSL環境などの X11 ポート (`-wX11`) において、`XtNinternational = True` 指定により `XtGetValues` で `XtNfont` が返されなかった場合に未初期化の `XFontStruct *` ポインタをデリファレンスして Signal 11 (Segmentation Fault) によりクラッシュする問題を修正するための安全ガードです。
 * **マーカータグ**: 
   - `/* NetHackJP: uninitialized XFontStruct pointer guard under XtNinternational */`
@@ -551,7 +551,7 @@ WSL環境などの X11 ポート (`-wX11`) において、`XtNinternational = Tr
   1. **`win/X11/dialogs.c`**: `SetDialogResponse()` 内の `XFontStruct *font` を NULL 初期化し、フォールバック幅計算を追加。
   2. **`win/X11/winstat.c`**: `create_status_window_fancy()` および `display_status_line()` 内の `fs` / `font` を NULL 初期化し、ガードを追加。
   3. **`win/X11/winX.c`**: `set_bold_font()`、`nhFontHeight()` 内の `fs` を NULL 初期化し、`yn_font` の `XTextWidth` 呼び出しに NULL ガードを追加。
-### 10. UNIX/Linux 環境における起動時キャラクター名入力のデフォルト化 (`GENERICUSERS=*`) と二重入力防止
+### 14. UNIX/Linux 環境における起動時キャラクター名入力のデフォルト化 (`GENERICUSERS=*`) と二重入力防止
 WSL や Linux 環境において、NetHack 起動時に Linux のログインユーザー名（`$USER`）が自動でキャラクター名として確定されてしまうのを防ぎ、ゲーム開始時に常にキャラクター名入力プロンプト（「お名前は？」）を表示できるようにするための設定、およびそれに伴う二重入力防止ガードです。
 * **マーカータグ**: 
   - `# NetHackJP: prompt for character name on startup instead of using Linux username`
@@ -571,7 +571,7 @@ WSL や Linux 環境において、NetHack 起動時に Linux のログインユ
 * **アップストリーム追従手順**:
   - アップストリームで `plnamesuffix()` や `sysconf` のマージ競合が生じた場合は、本設定および `iflags.plname_from_os` によるガードを維持してください。
 
-### 11. Linux/WSL X11 GUI ポートにおける XIM インプットメソッド対応
+### 15. Linux/WSL X11 GUI ポートにおける XIM インプットメソッド対応
 本リポジトリの X11 ポートは上流 NetHack 5.0 には XIM（X Input Method）対応が含まれていません。fcitx5 / ibus / IIIMF 等の IM サーバと通信して日本語入力を行うための独自拡張です。詳細はルートの `XIM-IMPLEMENTATION-PLAN.md` を参照。
 
 * **マーカータグ**: `/* NetHackJP: XIM integration */` および各ファイル内の補助タグ
@@ -582,13 +582,13 @@ WSL や Linux 環境において、NetHack 起動時に Linux のログインユ
   3. **`sys/unix/Makefile.src`**: `win/X11/winxim.c` と `win/X11/wingetlin.c` を `WINX11SRC` / `WINX11OBJ` に追加し、対応する `$(TARGETPFX)winxim.o` / `$(TARGETPFX)wingetlin.o` ビルドルールを追加。
   4. **`sys/unix/hints/linux-jp`**: `HAVE_XIM=1` 設定と `CFLAGS += -DHAVE_XIM` を追加。`winxim.o` を `WINX11OBJ` に追加。
   5. **`win/X11/winX.c`**: `X11_init_nhwindows` で `xim_init(XtDisplay(toplevel))`、`X11_exit_nhwindows` で `xim_cleanup()` を呼ぶ。`nh_XtPopdown` で `xim_focus_out(NULL)` を呼んで popup 終了時に IM focus を解放。`key_event_to_utf8` を新設（Phase 4）。
-  6. **`win/X11/winmap.c`**: かつては `map_input` で XIM 経路（map IC の lazy 生成と `xim_focus_in`）を使用したが、メインウィンドウで IM が勝手に engage する問題のため撤去済み（§4.12）。現在は `XLookupString` のみを使用し、メインウィンドウは IC を一切 focus しない。
-  7. **`win/X11/wingetlin.c` (新規)**: `XtNinternational=True` を使った Xaw AsciiText は WSLg/XWayland + fcitx5 で engage しなかったため、`asciiTextWidgetClass` を自前の `labelWidgetClass` ベースに置換。`CreateXimDialog` / `XimDialogSetPrompt` / `XimDialogSetResponse` / `XimDialogGetResponse` / `XimDialogFocusInput` の API を提供。レイアウト・キー分類・フォーカス保存/復元を含む最終仕様は §4.12 を参照。
+  6. **`win/X11/winmap.c`**: かつては `map_input` で XIM 経路（map IC の lazy 生成と `xim_focus_in`）を使用したが、メインウィンドウで IM が勝手に engage する問題のため撤去済み（§4.16）。現在は `XLookupString` のみを使用し、メインウィンドウは IC を一切 focus しない。
+  7. **`win/X11/wingetlin.c` (新規)**: `XtNinternational=True` を使った Xaw AsciiText は WSLg/XWayland + fcitx5 で engage しなかったため、`asciiTextWidgetClass` を自前の `labelWidgetClass` ベースに置換。`CreateXimDialog` / `XimDialogSetPrompt` / `XimDialogSetResponse` / `XimDialogGetResponse` / `XimDialogFocusInput` の API を提供。レイアウト・キー分類・フォーカス保存/復元を含む最終仕様は §4.16 を参照。
   8. **`win/X11/winmisc.c`**: `ec_key`（`#versuswizard` 等の extended command）をマルチバイト UTF-8 対応に。`key_event_to_utf8` で全バイトを `ec_chars[]` に append して `strncmp` で `command_list[]` と比較。
   9. **`include/winX.h`**: Phase 4 で `key_event_to_utf8` の extern 宣言追加。
 * **既知の制限**:
   - yn prompts / role / race / gender / alignment 選択は単一文字入力のため、ASCII のみ対応（`や` を打鍵しても先頭バイト 0xE3 が `y`/`n` にマッチしないため無視）。これは仕様。将来の拡張で YN プロンプトも XIM 経由にできるが、yn の本質的意味（y/n/?/q の即応）からは離れる。
-  - メインウィンドウ（`map_input`）は XIM 経路を持たない（§4.12）。IM は getlin / askname ダイアログでのみ engage し、プレイ中に日本語入力 UI が起動することはない。
+  - メインウィンドウ（`map_input`）は XIM 経路を持たない（§4.16）。IM は getlin / askname ダイアログでのみ engage し、プレイ中に日本語入力 UI が起動することはない。
   - XtNinternational (Athena Widgets 内部 XIM) は WSLg/XWayland + fcitx5 構成で機能しなかったため、`wingetlin.c` の自前実装に全面置換した。
 * **実行時トグル (Phase 7)**:
   - `OPTIONS=use_xim:on`（デフォルト）／ `OPTIONS=use_xim:off` で XIM の有効・無効を切り替え可能。
@@ -603,9 +603,9 @@ WSL や Linux 環境において、NetHack 起動時に Linux のログインユ
   - アップストリーム NetHack 5.0 に XIM 対応がマージされた場合は、本セクションの全独自拡張を取り消してアップストリーム版に追従する。
   - 追従時は `winxim.c` / `wingetlin.c` を削除し、`Makefile.src` から関連エントリを削除し、`linux-jp` から `HAVE_XIM=1` を削除し、`flag.h` / `optlist.h` / `options.c` / `winprocs.h` の XIM 関連エントリを取り消す。
 
-### 12. X11 getlin / askname ダイアログ（`wingetlin.c`）の最終仕様
+### 16. X11 getlin / askname ダイアログ（`wingetlin.c`）の最終仕様
 
-Xaw AsciiText の `XtNinternational=True` は WSLg/XWayland + fcitx5 構成で IM が engage しなかったため（§4.11 Phase 3）、`labelWidgetClass` ベースの自前ダイアログ `win/X11/wingetlin.c` を新設し、XIM を直接駆動している。実装過程で判明した一連の問題（フォーム縮潤・ボタン枠線不可視・ESC 経路のクラッシュ・確定文字取りこぼし・stale IC・入力欄最低幅・メインウィンドウでの IM 誤起動）はすべて解決済みで、現在は次の最終仕様で動作する。
+Xaw AsciiText の `XtNinternational=True` は WSLg/XWayland + fcitx5 構成で IM が engage しなかったため（§4.15 Phase 3）、`labelWidgetClass` ベースの自前ダイアログ `win/X11/wingetlin.c` を新設し、XIM を直接駆動している。実装過程で判明した一連の問題（フォーム縮潤・ボタン枠線不可視・ESC 経路のクラッシュ・確定文字取りこぼし・stale IC・入力欄最低幅・メインウィンドウでの IM 誤起動）はすべて解決済みで、現在は次の最終仕様で動作する。
 
 #### 最終動作仕様
 - **表示**: 入力欄は空欄時でも半角10文字分以上の幅を保ち、11文字以上でテキスト幅に追従し、全削除で最低幅へ戻る。OK / Cancel ボタンは角丸枠線（`NetHack.ad` の `shapeStyle: roundedRectangle`）が表示される。
@@ -634,7 +634,7 @@ Xaw AsciiText の `XtNinternational=True` は WSLg/XWayland + fcitx5 構成で I
 * **削除手順**: `wingetlin.c` / `winxim.c` 自体が独自実装であるため、アップストリームへ戻す場合はファイルごと削除し、`Makefile.src` / `linux-jp` のエントリ、`nh_XtPopdown` の `XimDialogReleaseInputFocus()` 呼び出し、winmap.c の注釈コメント、winX.h の追加宣言を取り消す。`X11_label_string_width` のみ winlabel.c 内の独立追加のため単独で取り消し可能。
 * **アップストリーム追従手順**: 上流 NetHack-5.0 に XIM 対応（XFilterEvent を含む IM 統合、または `XtNinternational` ベースの実装）が導入された場合、`wingetlin.c` / `winxim.c` を削除して上流設計に全面的に追従する。`X11_label_string_width` は上流に同等の測定 API が追加された場合はそちらへ移行する。
 
-### 13. Windows コンソール（WIN32CON）における絵文字（4バイトUTF-8）のサロゲートペア対応
+### 17. Windows コンソール（WIN32CON）における絵文字（4バイトUTF-8）のサロゲートペア対応
 
 * **背景**:
   Windows コンソール（WIN32CON）の `utf8_char_chartype()` / `utf8_char_display_width()`（`win/tty/wintty.c`）および `getlin_utf8_char_chartype()` / `getlin_utf8_char_display_width()`（`win/tty/getline.c`）において、`MultiByteToWideChar()` に渡す出力バッファ長が `1` に固定されていたため、サロゲートペア（UTF-16 で 2 つの `wchar_t` を要する 4 バイト絵文字や SMP 補助漢字）の変換時にバッファ不足エラー（戻り値 0）となり、文字種別判定が失敗して表示幅が 1（半角）と誤認される問題があった。これにより、画面上の絵文字のバックスペース消去幅計算（`delcols`）が狂い、消去残骸が発生していた。
@@ -650,7 +650,7 @@ Xaw AsciiText の `XtNinternational=True` は WSLg/XWayland + fcitx5 構成で I
 * **アップストリーム追従手順**:
   上流 NetHack-5.0 で Windows コンソールの UTF-8/サロゲートペア入力および文字幅判定が改善された場合、本独自修正と競合箇所の差分を確認し、上流の実装へ追従する。
 
-### 14. フルーツ名バッファ（`PL_FSIZ`）の 64 バイト拡張と重複時プレフィックスの日本語化
+### 18. フルーツ名バッファ（`PL_FSIZ`）の 64 バイト拡張と重複時プレフィックスの日本語化
 
 * **背景**:
   プレイヤーが設定したフルーツ名（`svp.pl_fruit`）が他の既存食料名や特定接頭辞と重複した際、NetHack は区別のために `"candied "`（8 バイト）を自動付加する。しかし日本語環境において以下の問題があった。
@@ -671,7 +671,7 @@ Xaw AsciiText の `XtNinternational=True` は WSLg/XWayland + fcitx5 構成で I
 * **アップストリーム追従手順**:
   上流 NetHack-5.0 で `PL_FSIZ` の拡張やフルーツ名重複判定の変更が入った場合、本独自拡張の差分（64 拡張と日本語プレフィックス処理）を維持しつつ追従する。
 
-### 15. 主人公・ペット・フルーツ等の名前設定におけるバイト数上限と文字数制限の仕様
+### 19. 主人公・ペット・フルーツ等の名前設定におけるバイト数上限と文字数制限の仕様
 
 本リポジトリ（NetHackJP）における主人公名・ペット名・フルーツ名の各バッファ上限、文字種別の最大文字数、および設定経路別の仕様は以下の通りである。
 
@@ -698,7 +698,7 @@ Xaw AsciiText の `XtNinternational=True` は WSLg/XWayland + fcitx5 構成で I
    - `OPTIONS=dogname:xxx` / `catname:xxx` / `horsename:xxx` は最大 62 バイト。
    - `OPTIONS=fruit:xxx` は最大 63 バイト（重複時はプレフィックスが付加され文字境界でトリミング）。
 
-### 16. 埃・混乱時の刻印ブレ処理（`doengrave`）における UTF-8 マルチバイト文字境界保護
+### 20. 埃・混乱時の刻印ブレ処理（`doengrave`）における UTF-8 マルチバイト文字境界保護
 * **マーカータグ**: `/* NetHackJP: UTF-8 safe engraving mix-up */`
 * **対象ファイル**: `src/engrave.c`（約 1350〜1420 行目）
 * **概要**:
@@ -709,7 +709,7 @@ Xaw AsciiText の `XtNinternational=True` は WSLg/XWayland + fcitx5 構成で I
   アップストリームのマルチバイト対応方針（Unicode コードポイント単位処理など）に沿って追従する。
 
 
-### 17. WSL ビルドスクリプト（`build_wsl.sh`）への Qt6 ウィンドウポート有効化オプションの追加
+### 21. WSL ビルドスクリプト（`build_wsl.sh`）への Qt6 ウィンドウポート有効化オプションの追加
 * **背景**:
   WSL (Ubuntu) 環境の `build_wsl.sh` は tty / curses / X11 の3ポートをビルドしていたが、Qt6 ポート (`win/Qt/`) を UTF-8 日本語対応させるため、まず Qt6 でビルドを通す経路が必要となった。Qt ポート向けのヒント分岐 (`WANT_WIN_QT` / `WANT_WIN_QT6`) は `sys/unix/hints/linux-jp` に既存しており、スクリプト側で明示的に有効化するだけで Qt6 ポートをビルド可能。
 * **修正内容**:
@@ -726,7 +726,7 @@ Xaw AsciiText の `XtNinternational=True` は WSLg/XWayland + fcitx5 構成で I
   上流 NetHack-5.0 に Qt ビルドを CLI から有効化する仕組みが入った場合、本オプションを取り消して追従する。linux-jp ヒント側の `WANT_WIN_QT` 分岐が上流 `linux.500` 由来であるため、ヒントファイル側の追従競合も併せて確認する。
 
 
-### 18. Qt ポートの文字コード変換の UTF-8 化（`fromLatin1`/`toLatin1` の排除）
+### 22. Qt ポートの文字コード変換の UTF-8 化（`fromLatin1`/`toLatin1` の排除）
 * **背景**:
   Qt ポート (`win/Qt/`) はコアとの `char *` テキスト受け渡しを Latin-1 前提（`QString::fromLatin1` / `QString::toLatin1`）で実装していたため、日本語化されたコアが渡す UTF-8 文字列が文字化けしていた。逆に入力ダイアログ (`QLineEdit`) からコアへ戻す際も `toLatin1()` で日本語が破壊され、getlin / askname / plsel / メニューSearch への日本語入力が不可能だった。
 * **修正内容**:
@@ -741,7 +741,7 @@ Xaw AsciiText の `XtNinternational=True` は WSLg/XWayland + fcitx5 構成で I
 * **アップストリーム追従手順**:
   上流 NetHack-5.0 の Qt ポート変更で `fromLatin1`/`toLatin1` 箇所に差分が入った場合、Latin-1 から UTF-8 への変換選択（fromUtf8 / toUtf8）を保持したまま移植する。日本語データ入力（`hack.h` 由来の UTF-8 テキスト）を扱う箇所では絶対に Latin-1 を復活させない。
 
-### 19. Qt ポートのステータス「名前+称号」行およびダンジョン階層表示の日本語化
+### 23. Qt ポートのステータス「名前+称号」行およびダンジョン階層表示の日本語化
 * **背景**:
   Qt6 ステータスウィンドウの名前行が `rank_of()` による英文称号（例: `テスト the Plunder`）を表示しており、ダンジョン階層表示も `describe_level()` の戻り値を誤解した常時フォールバック（`The Dungeons of Doom, level N`）になっていた。
 * **修正内容** (`win/Qt/qt_stat.cpp`):
@@ -752,7 +752,7 @@ Xaw AsciiText の `XtNinternational=True` は WSLg/XWayland + fcitx5 構成で I
 * **対応ファイル**: `win/Qt/qt_stat.cpp`
 * **アップストリーム追従手順**: X11 ポート (`win/X11/winstat.c`) にも同種の英文フォールバック（`the ...`, `, level N`）が残るが Qt スコープ外として残置。上流で称号/階層表示が変わった場合はコアの日本語表示関数を維持したまま追従する。
 
-### 20. Qt ポートのセーブデータ選択と墓石表示の修復（UTF-8 / セーブ復帰）
+### 24. Qt ポートのセーブデータ選択と墓石表示の修復（UTF-8 / セーブ復帰）
 * **背景**:
   Qt6 ポートで以下の問題が発生した。
   1. セーブデータ選択ダイアログ (`NetHackQtSavedGameSelector`) で保存キャラクターを選ぶと、`"名前-職-種族-性別-属性"` の複合文字列をそのまま `svp.plname[]` に代入していた（`str_copy(svp.plname, saved[ch], ...)`）。`plnamesuffix()` は職/種/性/属性コードとして有効なので全く別の職業（Rogue 等）での新規ゲームが始まり、ステータスの名前欄も複合文字列そのままになる。
@@ -770,9 +770,9 @@ Xaw AsciiText の `XtNinternational=True` は WSLg/XWayland + fcitx5 構成で I
 * **アップストリーム追従手順**:
   上流で Qt のセーブ選択に `restore_menu()` 相当の統一処理が入った場合、本 `qt_bind.cpp` の差分を取り消して追従する。`rip_utf8_*` ヘルパーは上流に同名関数が無いため extern 化を維持する（名前衝突時は `jp_rip_utf8_` 等へリネーム検討）。
 
-### 21. X11 ポートのステータス「名前+称号」「ダンジョン階層」の日本語形式統一
+### 25. X11 ポートのステータス「名前+称号」「ダンジョン階層」の日本語形式統一
 * **背景**:
-  Qt6 ポートで確定した形式（§4.19：名前行は「<名前> <称号>」並列形式、ダンジョンは「<ダンジョン名>: 階層<深さ>」）を X11 ポートにも適用した。X11 (`win/X11/winstat.c::update_val`) は称号 (`jp_rank_of_for_display`) のみ日本語で形式が「<名前> the <称号>」・階層フォールバックが「<英文ダンジョン名>, level N」のままだった。
+  Qt6 ポートで確定した形式（§4.23：名前行は「<名前> <称号>」並列形式、ダンジョンは「<ダンジョン名>: 階層<深さ>」）を X11 ポートにも適用した。X11 (`win/X11/winstat.c::update_val`) は称号 (`jp_rank_of_for_display`) のみ日本語で形式が「<名前> the <称号>」・階層フォールバックが「<英文ダンジョン名>, level N」のままだった。
 * **修正内容** (`win/X11/winstat.c`):
   1. `F_NAME`： `highc()` 頭文字大文字化と Upolyd 時の英文語順補正ループを削除し、`copynchars()` による単純結合で「<名前> <称号>」形式に変更（Upolyd 時は「<名前> <日本語モンスター名>`）。Qt と同様に `gp.plnamelen` による複合 plname（"名前-職-種族-性別-属性"）の切り詰めも追加。
   2. `F_DLEVEL`： `describe_level()` が 0 を返した場合の英文フォールバック（`", level %d"`）を `jp_dungeon_name_by_dnum(u.uz.dnum)` + `" : 階層%d"`（運命の大迷宮: 階層3）に変更。
@@ -784,9 +784,9 @@ Xaw AsciiText の `XtNinternational=True` は WSLg/XWayland + fcitx5 構成で I
 * **アップストリーム追従手順**:
   上流 NetHack-5.0 の X11 ステータス変更 (update_val) との差分には本節の日本語形式（『名前 <称号>』『ダンジョン名: 階層N』『conditions[] 参照』）を維持したまま移植する。
 
-### 22. X11 ポートのプレイヤー選択 (plsel) ダイアログ・プロンプトの日本語化
+### 26. X11 ポートのプレイヤー選択 (plsel) ダイアログ・プロンプトの日本語化
 * **背景**:
-  X11 ポートの plsel (`win/X11/winmisc.c`) はラベル / ラジオボタン / コマンドボタンの英語文字列がそのまま表示されていた。日本語 GUI の一貫性のため Qt ポート (§4.18 系列) と同等の日本語化を行った。
+  X11 ポートの plsel (`win/X11/winmisc.c`) はラベル / ラジオボタン / コマンドボタンの英語文字列がそのまま表示されていた。日本語 GUI の一貫性のため Qt ポート (§4.22 系列) と同等の日本語化を行った。
 * **修正内容** (`win/X11/winmisc.c`):
   1. モーダルダイアログ方式 (`X11_player_selection_dialog`)： 明示ラベル (`XtNlabel`) を日本語化（名前/種族/職業/性別/属性、ランダム/開始/終了、タイトル「プレイヤー選択」）。職業・種族・性別・属性のラジオボタンラベルはコア表示ヘルパー（`jp_role_name_for_display()` / `jp_race_noun_for_display()` / `jp_gender_for_display()` / `jp_align_for_display()`）を使用。
   2. **キー選択互換の維持**: ウィジェット名 (`XtCreateManagedWidget` の第1引数) は英字のまま維持し、`XtNlabel` のみ日本語化した（XIM 仕様どおり ASCII 1バイト選択の従来挙動を保持）。性別切替・ランダム化・setupOthers 経由の職業ラベル更新は `plsel_update_role_labels(g)` ヘルパー（女性形 / 無効名はコア側が処理）で統一。`XawToggleSetCurrent()` はコールバックを発火しないためラベル更新を各所で明示呼び出し。
@@ -797,7 +797,7 @@ Xaw AsciiText の `XtNinternational=True` は WSLg/XWayland + fcitx5 構成で I
 * **マーカータグ**: `/* NetHackJP: Japanese labels */` / `/* NetHackJP: display label in Japanese; widget name stays English ... */` / `/* NetHackJP: refresh every role radio widget's Japanese label ... */` 等。
 * **対応ファイル**: `win/X11/winmisc.c`
 * **検証**: WSL (Ubuntu 26.04) で X11 ビルド成功。`./playground/nethack -wX11` で plsel ダイアログ / prompts 経路の両方の目視確認を行う予定（従来キー操作の互換性も確認）。
-### 23. Wizardモードにおける未配置フォートノックス砦への階層テレポート選択許可と安全な自動配置
+### 27. Wizardモードにおける未配置フォートノックス砦への階層テレポート選択許可と安全な自動配置
 * **背景**:
   Wizard（デバッグ）モードにおいて、階層テレポートコマンド `^V` を実行し、`?` を入力して表示されるダンジョン一覧メニューにおいて、フォートノックス砦（Fort Ludios）が一覧に表示されているにもかかわらず選択できない（セレクタ記号が付かない）問題がありました。
   これはフォートノックスがメインダンジョンにポータル出現する前は未配置（unplaced floater）として扱われ、`unreachable_level()` が一律 `TRUE` を返していたためです。
@@ -815,7 +815,7 @@ Xaw AsciiText の `XtNinternational=True` は WSLg/XWayland + fcitx5 構成で I
 * **アップストリーム追従手順**:
   上流 NetHack-5.0 で `unreachable_level` や浮動ブランチのテレポート制御が改修された場合は、本マーカータグのブロックを確認し、フォートノックスへの到達性と安全接続処理を維持した状態で競合解決を行ってください。
 
-### 24. makedefs および sftags における fgetline() バッファ拡張オフセットバグ修正
+### 28. makedefs および sftags における fgetline() バッファ拡張オフセットバグ修正
 * **背景**:
   `util/makedefs.c` および `util/sftags.c` の `fgetline()` において、1行が初期バッファサイズ（`makedefs` では 144 バイト、`sftags` では 256 バイト）を超える場合、バッファを拡張して次のチャンクを読み込むオフセット計算 `c + len - inc` にバグがありました。1 回目の `fgets` が末尾に置いた `\0` が残ったまま後ろに追記されるため、`strchr(c, '\n')` が 1 回目の `\0` で探索を終了して改行を永久に見つけられず、ファイルを終端（EOF）まで一気に読み飛ばして対象行を 143 バイトで強制切断し、かつ後続の行（`epitaph.txt` では 23 行目〜437 行目の全 415 行）をすべて消失させていました。
   また、切断された行の末尾でマルチバイト文字（UTF-8）のバイト列が分断され、墓石の碑文を読んだ際に文字化け（`ü`）が発生していました。
@@ -831,7 +831,7 @@ Xaw AsciiText の `XtNinternational=True` は WSLg/XWayland + fcitx5 構成で I
 * **アップストリーム追従手順**:
   本修正はアップストリーム（本家 NetHack）に存在する潜在バグの先行修正です。アップストリームで `fgetline()` のバッファ拡張処理が修正された場合は、本マーカータグのブロックを確認し、関数のインターフェース互換性を維持したままアップストリーム版の実装に追従してください。
 
-### 25. マップ記号を見る (clicklook) の実物名表示・メッセージ履歴化と dotherecmdmenu における座標クリア順序の修復
+### 29. マップ記号を見る (clicklook) の実物名表示・メッセージ履歴化と dotherecmdmenu における座標クリア順序の修復
 
 マウス操作やコマンドメニューから指定マスのマップ記号・エンティティを説明する `clicklook` 機能において、記号候補一覧のノイズを除去して実際の実物名（`firstmatch`）のみを通常メッセージとして表示し、メニュー経由時の引数座標誤クリアを防止するための独自修復です。
 
@@ -850,6 +850,58 @@ Xaw AsciiText の `XtNinternational=True` は WSLg/XWayland + fcitx5 構成で I
 * **アップストリーム追従手順**:
   1. アップストリームで `clicklook` の実物説明化やメッセージ履歴保持、および `there_cmd_menu` の `clicklook_cc` ライフサイクルバグ修正が入った場合は、差分を確認して追従する。
   2. 日本語メッセージ出力（`pline("%s", firstmatch)`）については、NetHackJP の標準出力仕様として維持する。
+
+### 30. 移動可能な隣接マスに対する「ここに移動する」メニュー項目の追加
+
+マウス操作やカーソル選択による対象マス指定メニュー（`there_cmd_menu`）において、プレイヤーの隣接マスで移動可能な地形・マスである場合に、そのマスへ直接移動する「ここに移動する」コマンド（`MCMD_MOVE`）を選択できるようにした独自拡張です。
+
+* **マーカータグ**: `/* DartHack/NetHackJP: Add explicit move option for passable adjacent squares. If an adjacent square is passable, allow moving directly to it from the there-menu. */`
+* **対象ファイル**: `src/cmd.c`
+* **概要**:
+  - `src/cmd.c` の `there_cmd_menu_next2u()` において、対象マスがプレイヤーの隣接マスかつ通過可能（`passable(x, y)`）である場合、メニューの先頭項目として `MCMD_MOVE`（「ここに移動する」）を追加。
+  - これにより、GUI ポートやマウス操作時に移動したいマスをクリックして即座に移動コマンドを発行できるようになり、操作性を大幅に向上させた。
+* **アップストリーム追従手順**:
+  - アップストリーム側で `there_cmd_menu` への移動コマンド追加やマウス移動インターフェースの刷新が行われた場合は、本マーカータグのブロックを確認し、操作性の利便性を維持した状態でアップストリーム実装に追従する。
+
+### 31. 対話プロンプトにおける全角英数字・記号入力の正規化および自然な日本語入力の受理
+
+ゲーム内の各種対話プロンプトにおいて、日本語入力（IME）が有効な状態のまま全角で入力された数字・英字・記号を自動的に ASCII 半角へ正規化し、また「はい」「いいえ」「ヘルプ」「ランダム」などの自然な日本語表現をそのまま認識・受理できるようにした独自拡張です。
+
+* **マーカータグ**:
+  - `/* NetHackJP: normalize full-width digits ... */`
+  - `/* NetHackJP: normalize full-width and accept Japanese words */`
+  - `/* NetHackJP: normalize full-width class symbols */`
+  - `/* NetHackJP: normalize full-width letters */`
+* **対象ファイル**:
+  1. **`src/minion.c`**: `bribe()`（僧侶・悪魔への寄付・買収金額プロンプトにて、全角数字を `normalize_fullwidth_to_ascii()` で正規化し、ESC で安全にキャンセル可能化）。
+  2. **`src/cmd.c`**: `paranoid_query()`（危険行動の確認プロンプトにて、全角正規化を行うとともに、「`はい`」「`いいえ`」「`やめる`」「`中止`」を直接認識）。
+  3. **`src/music.c`**: `do_play_instrument()`（城の跳ね橋の合言葉旋律プロンプトにて、全角英字を正規化）。
+  4. **`src/zap.c`**: `makewish()`（願いのプロンプトにて、全角正規化を行うとともに、「`ヘルプ`」「`たすけて`」で文法ヘルプを表示）。
+  5. **`src/pickup.c`**: `query_classes()`（アイテムクラス選択プロンプトにて、全角記号・文字を正規化）。
+  6. **`src/invent.c`**: `ggetobj()`（所持品アイテム文字指定プロンプトにて、全角英字を正規化）。
+  7. **`src/botl.c`**: `status_hilite_menu_add()`（ステータスハイライトの閾値入力プロンプトにて、全角数字を正規化）。
+  8. **`src/mon.c`**: `wiz_force_cham_form()`（カメレオン変身指定プロンプトにて、全角正規化および「`ランダム`」入力を認識）。
+  9. **`src/read.c`**: `create_particular()`（特定モンスター生成プロンプトにて、全角正規化）。
+  10. **`include/hacklib.h` / `src/hacklib.c`**: 全角から ASCII への文字変換テーブルを提供する `normalize_fullwidth_to_ascii()` を活用。
+  11. **`docs/input_guide_jp.md`**: 全シーンの解説と具体例をドキュメント化。
+* **アップストリーム追従手順**:
+  - 本件は全角入力が一般的な日本語環境特有のユーザビリティ改善であるため、アップストリームコードとの競合時は本正規化処理および日本語キーワード認識ロジックを維持して競合解決を行う。
+
+### 32. Windows コンソール（MSVC）における active サブ構造体追従および Win32 ANSI API 型整合対応
+
+上流 NetHack-5.0 における Windows コンソール構造体（`console_t`）の内部設計刷新（`orig` および `active` サブ構造体の新設）に追従し、同時に MSVC UNICODE ビルド環境における ANSI API の型不一致警告（C4133）を解消するための修復です。
+
+* **背景**:
+  - 上流コミット `d1c60860f` ("Windows: add orig and active console substruct") により、`console.attr`, `console.current_nhcolor`, `console.current_nhbkcolor` などのメンバー変数が `console.active.*` 配下に再配置された。
+  - また、MSVC において `UNICODE` / `_UNICODE` が定義された環境で Win32 API の汎用マクロ（`GetConsoleTitle`, `SetConsoleTitle`, `GetModuleFileName`）を呼び出すと、引数が `char *`（ASCII）であるのに対し Windows SDK 側で `LPCWSTR`（ワイド文字）が要求され、コンパイル警告 `warning C4133: 'function': incompatible types` が発生していた。
+* **修正内容**:
+  1. **`sys/windows/consoletty.c`**:
+     - `console.attr`, `console.current_nhcolor`, `console.current_nhbkcolor` への参照を `console.active.*` に追従更新。
+     - `GetConsoleTitle()` および `SetConsoleTitle()` を明示的に `GetConsoleTitleA()` / `SetConsoleTitleA()` に変更し、C4133 警告を排除。
+  2. **`util/recover.c`**:
+     - `GetModuleFileName()` を明示的に `GetModuleFileNameA()` に変更し、C4133 警告を排除。
+* **アップストリーム追従手順**:
+  - 上流でコンソール構造体や API 呼び出しの型安全性がさらに整理された場合は、差分を確認して追従する。char* バッファを渡す Win32 API 呼び出しには ANSI 版 (`...A`) を維持する。
 ---
 
 ## 5. ライセンスと NetHack License 2(a) への対応方針

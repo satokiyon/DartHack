@@ -1,3 +1,7 @@
+# Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-09.
+# $NHDT-Header: NetHack 5.0 uu2wav.sh 2023/02/04_19:28:59 NetHack-5.0:1.3 $
+# Copyright (c) Michael Allison 2023.
+# NetHack may be freely redistributed.  See license for details.
 #
 # decode the uu files in this directory
 #

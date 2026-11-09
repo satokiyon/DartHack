@@ -1,4 +1,9 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-13. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-09. */
+/*
+ * $NHDT-Header: NetHack 5.0 font.c 2026/06/12_15:00:28 NetHack-5.0:1.4 $
+ * Copyright (c) Michael Allison 2022.
+ * NetHack may be freely redistributed.  See license for details.
+ */
 /* Maintain a data structure describing a monospaced bitmap font */
 
 #include "hack.h"

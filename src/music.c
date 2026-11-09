@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-04. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-09. */
 /* $NHDT-Header: NetHack 5.0 music.c 2026/06/20_22:26:43 NetHack-5.0:1.128 $ */
 /*      Copyright (c) 1989 by Jean-Christophe Collet */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -791,6 +791,7 @@ do_play_instrument(struct obj *instr)
         Strcpy(buf, svt.tune);
     } else {
         getlin("どんな旋律を演奏しますか? [5音, A-G]", buf);
+        jp_normalize_zenkaku(buf);
         (void) mungspaces(buf);
         if (*buf == '\033')
             goto nevermind;

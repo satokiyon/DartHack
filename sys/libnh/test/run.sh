@@ -1,5 +1,8 @@
-# Modified by NetHackJP contributor @satokiyon; latest change date: 2026-10-01.
+# Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-09.
 #!/bin/bash -x
+# $NHDT-Header: NetHack 5.0 run.sh 2026/09/25_13:07:53 NetHack-5.0:1.8 $
+# Copyright (c) Michael Allison 2020.
+# NetHack may be freely redistributed.  See license for details.
 
 if [ x$1 == "xlib" ]; then
     echo Doing lib...

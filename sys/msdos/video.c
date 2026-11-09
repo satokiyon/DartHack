@@ -1,5 +1,6 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-08. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-09. */
 /* $NHDT-Header: NetHack 5.0 video.c 2020/08/03_23:44:37 NetHack-5.0:1.43 $ */
+/*   Copyright (c) Michael Allison 1993.                            */
 /*   Copyright (c) NetHack PC Development Team 1993, 1994, 2001     */
 /*   NetHack may be freely redistributed.  See license for details. */
 

@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-08. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-09. */
 /* $NHDT-Header: NetHack 5.0 teleport.c 2026/06/20_16:31:09 NetHack-5.0:1.250 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2011. */
@@ -1222,7 +1222,7 @@ level_tele(void)
             } else if (!strcmp(buf, "\033")) { /* cancelled */
                 return;
             }
-            if (wizard && (protolev = find_level(jp_level_name_to_en(buf))) != 0) {
+            if (wizard && (protolev = find_level_substr(jp_level_name_to_en(buf))) != 0) {
                 newlevel.dnum = protolev->dlevel.dnum;
                 newlevel.dlevel = protolev->dlevel.dlevel;
                 newlev = depth(&u.uz);

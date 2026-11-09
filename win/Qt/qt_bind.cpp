@@ -1,4 +1,5 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-10-19. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-09. */
+// $NHDT-Header: NetHack 5.0 qt_bind.cpp 2026/10/17_14:49:13 NetHack-5.0:1.99 $
 // Copyright (c) Warwick Allison, 1999.
 // Qt4 conversion copyright (c) Ray Chason, 2012-2014.
 // NetHack may be freely redistributed.  See license for details.

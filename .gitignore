@@ -125,6 +125,7 @@ sys/lib/
 !/docs/wizloadlua_guide.md
 !/docs/plan_fix_save_filename_consistency.md
 !/docs/guidebook-translation-guide-ja.md
+!/docs/input_guide_jp.md
 !/docs/scripts/
 !/docs/scripts/**
 

@@ -1,4 +1,5 @@
-/* NetHack 5.0  stripbs.c                                         */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-09. */
+/* $NHDT-Header: NetHack 5.0 stripbs.c 2026/04/26_14:10:05 NetHack-5.0:1.4 $ */
 /* Copyright (c) Michael Allison, 2025.                                */
 /* NetHack may be freely redistributed.  See license for details. */
 

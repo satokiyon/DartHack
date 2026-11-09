@@ -1,3 +1,10 @@
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-09. */
+/*
+ * $NHDT-Header: NetHack 5.0 libtest.c 2020/10/11_17:33:51 NetHack-5.0:1.3 $
+ * Copyright (c) Michael Allison 2020.
+ * NetHack may be freely redistributed.  See license for details.
+ */
+
 #include <stdio.h>
 #include <stdarg.h>
 

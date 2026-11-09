@@ -1,5 +1,5 @@
 NOTICE: Modified by NetHackJP contributor @satokiyon; latest change date: 2026-10-01.
-$NHDT-Header$
+$NHDT-Header: NetHack 5.0 build-msys2.txt 2026/09/30_15:33:28 NetHack-5.0:1.9 $
 Copyright (c) Michael Allison, 2024
 NetHack may be freely redistributed.  See license for details.
 Building NetHack using MSYS2

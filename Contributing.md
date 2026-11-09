@@ -1,4 +1,4 @@
-<!-- Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-08. -->
+<!-- Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-09. -->
 If you are making a GitHub pull request for NetHack, please follow these guidelines:
 
 1. The 50/72 Rule: Keep the subject line (the first line) under 50 characters

@@ -1,4 +1,7 @@
--- Modified by NetHackJP contributor @satokiyon; latest change date: 2026-10-15.
+-- Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-09.
+-- $NHDT-Header: NetHack 5.0 testwish.lua 2024/03/16_15:09:54 NetHack-5.0:1.9 $
+-- Copyright (c) Pasi Kallinen 2021.
+-- NetHack may be freely redistributed.  See license for details.
 
 local wishtest_objects = {
    ["a rock"] = { otyp_name = "rock", quan = 1, oclass = "*" },

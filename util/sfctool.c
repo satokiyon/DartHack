@@ -1,5 +1,6 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-09-01. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-09. */
 /* NetHack 5.0	sfctool.c */
+/* $NHDT-Header: NetHack 5.0 sfctool.c 2026/04/26_16:34:02 NetHack-5.0:1.12 $ */
 /* Copyright (c) Michael Allison, 2025.                           */
 /* NetHack may be freely redistributed.  See license for details. */
 
