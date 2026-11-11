@@ -711,7 +711,7 @@ void main() {
       expect(find.text('Tap for details'), findsNothing);
     });
 
-    testWidgets('ScoreDetailDialog が flags=0x4 を日英で「骨ファイル未遭遇」/「No Bones Loaded」と表示すること', (tester) async {
+    testWidgets('ScoreDetailDialog が重複する「ゲーム条件 / Flags」行を表示せず「骨ファイル / リロール」を表示すること', (tester) async {
       final line = 'version=5.0.1\tpoints=1500\tdeathdnum=0\tdeathlev=3\tmaxlvl=4\t'
           'hp=0\tmaxhp=30\tdeaths=1\tdeathdate=20261111\tbirthdate=20261111\t'
           'uid=10470\trole=Wiz\trace=Elf\tgender=Mal\talign=Cha\tname=BonesHero\t'
@@ -734,8 +734,9 @@ void main() {
           home: Scaffold(body: ScoreDetailDialog(entry: entry, isJp: true)),
         ),
       );
-      expect(find.text('骨ファイル未遭遇'), findsOneWidget);
-      expect(find.text('骨ファイル無効'), findsNothing);
+      expect(find.text('骨ファイル: 0 / リロール: 0'), findsOneWidget);
+      expect(find.text('ゲーム条件'), findsNothing);
+      expect(find.text('骨ファイル未遭遇'), findsNothing);
 
       await tester.pumpWidget(
         MaterialApp(
@@ -743,8 +744,9 @@ void main() {
           home: Scaffold(body: ScoreDetailDialog(entry: entry, isJp: false)),
         ),
       );
-      expect(find.text('No Bones Loaded'), findsOneWidget);
-      expect(find.text('Bones Disabled'), findsNothing);
+      expect(find.text('Bones: 0 / Rerolls: 0'), findsOneWidget);
+      expect(find.text('Flags'), findsNothing);
+      expect(find.text('No Bones Loaded'), findsNothing);
     });
 
     testWidgets('TextOverlay で同一ミュータブル List 参照がインプレース更新されても墓石から TopTenWidget へ切り替わること', (tester) async {
@@ -898,7 +900,9 @@ void main() {
 
       expect(find.byType(ScoreDetailDialog), findsOneWidget);
       expect(find.text('456'), findsOneWidget);
-      expect(find.text('骨ファイル未遭遇'), findsOneWidget);
+      expect(find.text('骨ファイル: 0 / リロール: 0'), findsOneWidget);
+      expect(find.text('ゲーム条件'), findsNothing);
+      expect(find.text('骨ファイル未遭遇'), findsNothing);
     });
 
     testWidgets('英語一般テキストの部分一致やエントリ0件ヘッダーでは TopTenWidget へ誤遷移せずプレーンテキスト表示を維持すること', (tester) async {

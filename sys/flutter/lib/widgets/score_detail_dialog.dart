@@ -509,11 +509,6 @@ class _ScoreDetailDialogState extends State<ScoreDetailDialog> {
                                     ? '骨ファイル: ${xlog.bones} / リロール: ${xlog.rerolls}'
                                     : 'Bones: ${xlog.bones} / Rerolls: ${xlog.rerolls}',
                               ),
-                              if (XLogEntry.decodeFlags(xlog.flags, jaMode).isNotEmpty)
-                                _buildInfoRow(
-                                  jaMode ? 'ゲーム条件' : 'Flags',
-                                  XLogEntry.decodeFlags(xlog.flags, jaMode).join(', '),
-                                ),
                               if (xlog.version.isNotEmpty)
                                 _buildInfoRow(
                                   jaMode ? 'バージョン' : 'Version',
