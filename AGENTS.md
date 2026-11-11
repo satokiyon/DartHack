@@ -168,6 +168,20 @@ Flutter ポートにおけるハイスコア・スコアボード表示には、
    - `TopTenEntry.parse()` でスコア一覧の 2行目をスキャンする際、2行目に HP 情報 (例: ` 12 [30]` や ` - [25]`) が含まれる場合は、2行目に死因テキストが存在しない場合であっても、必ず現在のエントリーの続き行として消費 (`consumedNextLine = true` → `index++`) してください。
    - 2行目を消費しない場合、2行目の HP 数値が次のループで誤って独立したスコアエントリーとしてパースされる危険があります。
 
+4. **英語ヘッダー検知における単語境界必須化と安全フォールバック原則**:
+   - 英語スコアヘッダーの判定 (`sys/flutter/lib/widgets/overlays/text_overlay.dart`) で `line.contains('no')` のような部分一致を使うと、通常テキスト中の `"unknown"` 等に誤反応して通常ウィンドウをスコアカードUIへ誤遷移させます。
+   - 必ず単語境界 (`RegExp(r'\bno\b')` 等) で `no`・`points`・`name` を検知し、さらに `TopTenEntry.parse()` の結果が `isNotEmpty` である場合のみ `TopTenWidget` を選択（空ならプレーンテキスト表示へ安全にフォールバック）させてください。
+
+5. **`TextOverlay` におけるミュータブル `List` 参照キャッシュ無効化バグの防止**:
+   - `sys/flutter/lib/main.dart` はテキストウィンドウ遷移時（例: 死亡墓石 `endwin` → スコア一覧 `toptenwin`）に既存の `_screen.textLines` リストを破壊的変更（in-place `clear`/`add`）する場合があります。
+   - `TextOverlay` 側で `oldWidget.textLines == widget.textLines` による参照比較のみを行うと、同一 `List` インスタンス上で中身が書き換わった際に変更を検知できず、スコア一覧がプレーンテキストのまま表示される重大な回帰が発生します。
+   - 呼び出し側は `List.unmodifiable(...)` と単調増加する `windowRevision` (`textWindowRevision`) を渡し、`TextOverlay` 側は `List<String>.of(...)` によるスナップショット保持、`windowRevision` 変化、`listEquals` で再パース要否を判定してウィンドウ切替時にスクロール位置もリセットしてください。
+
+6. **`topten.c` の `rank == 0`・二重強調出力規約と圏外UI・自動センタリング原則**:
+   - C コアの `topten.c` は、同一キャラ/職業の上限 (`PERSMAX`) 超過で記録更新に失敗した場合は**既存記録 (`rank >= 1`) と今回の圏外行 (`rank == 0`) の2件とも** `ATR_BOLD` (`isCurrent = true`) で出力し、101位以下や0点終了時は末尾に `rank == 0` 行を出力します。
+   - `TopTenWidget` (`sys/flutter/lib/widgets/topten_widget.dart`) は `entries.lastIndexWhere((e) => e.isCurrent)` を対象にして初回レイアウト確定時のみ中央付近へ自動スクロール（同内容のリビルド時はユーザーの手動スクロール位置を維持）し、`rank <= 0` の順位バッジには `"0"` ではなく `"-"` を描画してください。
+   - 圏外・未記録時は `TopTenEntry.extractUnrecordedNotice()` で抽出した案内文（または圏外フォールバック案内）をリスト上部のヘッダー直下に固定バナーとして表示してください。
+
 ## Flutter UI 自動セーブ表示・ダイアログ処理における FFI メモリ安全とプレフィックス切除原則
 
 1. **UTF-8 マルチバイトプレフィックス切除時の `strlen()` 動的算出**:
@@ -1548,4 +1562,22 @@ PC（Google Play Games 等）や物理キーボード操作環境におけるキ
 4. **Widget テストにおけるキーボード／タッチモードの明示的シミュレーション**:
    - 物理キーボード操作を検証するテストでは、`await tester.tap(...)` でセクションを展開した直後にプログラマティックな `focusNode.requestFocus()` を呼ぶだけでは、テスト環境の `highlightMode` が直前の `tap` による `touch` のまま残る。
    - テスト内でキーボード操作中であることを明示するため、フォーカス移動前または検証前に `await tester.sendKeyEvent(LogicalKeyboardKey.select);` 等のキーイベントを送信するか、キーボード操作でフォーカスを遷移させて検証すること。
+
+## 59. xlogfile / logfile と record の 1 対 1 同期・日英コア独自実装揃え・SYSCF 実効値確認原則
+
+1. **`record`・`logfile`・`xlogfile` の 1 対 1 同期と `USE_FCNTL` ロック前ファイル確保**:
+   - `c_core/nethack_jp/src/topten.c` および `c_core/nethack_en/src/topten.c` における `sync_logfile_with_topten` / `sync_xlogfile_with_topten` は、`wizard` / `discover` 除外後の `if (flg)` 確定時（かつ `tt_head` 解放前）にのみ実行し、非Top100や対象外プレイでログが不整合に増えないよう `record` と 1 対 1 で同期維持すること。
+   - `USE_FCNTL` 環境の `lock_file()` は対象ファイルが未存在だと `O_RDWR` で失敗するため、書き込み対象が存在する場合のみ事前に `"a"` モードで空ファイルを作成する `ensure_score_logfile_exists()` を経由し、並行時のデータ切り詰めを防ぐこと。
+   - Flutter 起動時同期 (`sys/flutter/lib/nethack_assets.dart` の `_syncLogsWithRecord`) でも肥大化した既存ログのみをトリムし、存在しない `logfile` / `xlogfile` を空ファイルで新規作成しないこと。
+
+2. **英語コア（`nethack_en`）への日本語コア互換独自実装時のコメント明示義務**:
+   - `c_core/nethack_en` に日本語コア（`c_core/nethack_jp`）仕様へ合わせる独自ロジック（プレイヤー名の文字数カウント・UTF-8 文字境界切り詰め `utf8_char_truncate`、構造体ゼロ初期化、ログ同期など）を導入する際は、将来の Git Subtree 同期時にアップストリームとの差分意図を判別できるよう、必ず `/* DartHack (日本語コア NetHackJP に合わせた独自実装): ... */` 形式のコメントを併記すること。
+
+3. **`SYSCF` 実行時上書き（`PERSMAX` 等）の実効値確認原則**:
+   - `PERSMAX`（同一名前・職業あたりの最大記録数）や `ENTRYMAX` 等のスコア設定値を調査・説明・変更する際は、`include/config.h`（例: コンパイル時デフォルト `PERSMAX 3`）のみを見て結論づけてはならない。
+   - `#define SYSCF` 有効ビルドでは実行時設定ファイルが優先されるため、必ず `sys/flutter/config/sysconf` および `sys/flutter/android/app/src/main/cpp/winflutter.c` 内の起動時動的生成コード（実効値 `PERSMAX=10` 等）まで合わせて確認すること。
+
+4. **`xlogfile` 条件ビット（`flags`）の正確な解釈と縛りプレイ訳語の統一**:
+   - `xlogfile` の `flags` bit 2 (`0x4`) は `!u.uroleplay.numbones`（そのプレイ中に骨ファイルを1度も読み込んでいない＝「骨ファイル未遭遇 / No Bones Loaded」）を表し、オプションで無効化した場合の `conductX` `'bonesless'`（「骨ファイルなし」）とは明確に区別して扱うこと (`sys/flutter/lib/models/xlog_entry.dart`)。
+   - 縛りプレイ `'genocideless'` の日本語表示名は NetHackJP 準拠の `'虐殺なし'` で統一すること（`'ジェノサイドなし'` を使用しない）。
 
