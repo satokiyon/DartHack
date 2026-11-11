@@ -4198,9 +4198,9 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
   Widget _buildTextOverlay() {
     return TextOverlay(
       key: _textOverlayKey,
-      textLines: _screen.textLines,
-      textAttrs: _screen.textAttrs,
-      textTiles: _screen.textTiles,
+      textLines: List<String>.unmodifiable(_screen.textLines),
+      textAttrs: List<int>.unmodifiable(_screen.textAttrs),
+      textTiles: List<int>.unmodifiable(_screen.textTiles),
       isPlainDialog: _screen.isPlainDialog,
       plainType: _screen.plainType,
       tombstoneDisplayMode: _tombstoneDisplayMode,
@@ -4211,6 +4211,9 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
       tileImage: _tileImage,
       tileWidth: _tileWidth,
       tileHeight: _tileHeight,
+      assetsPath: _assetsPath,
+      onRestoreGameFocus: _ensureGameFocus,
+      windowRevision: _screen.textWindowRevision,
     );
   }
 

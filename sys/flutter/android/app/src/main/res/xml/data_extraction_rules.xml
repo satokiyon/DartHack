@@ -3,10 +3,12 @@
     <cloud-backup>
         <!-- nethackdir 内（スコアファイル record, logfile、骨ファイル bon* 等）をバックアップ対象にする -->
         <include domain="file" path="nethackdir" />
-        <!-- 死亡して削除されたセーブデータのゾンビ復活を防止するためクラウドバックアップから除外 -->
+        <!-- 死亡して削除されたセーブデータや一時レベルファイルのゾンビ復活を防止するためクラウドバックアップから除外 -->
         <exclude domain="file" path="nethackdir/save" />
+        <exclude domain="file" path="nethackdir/levels" />
 
-        <!-- アプリ設定（音量、キーバインド、パッド配置等） -->
+        <!-- アプリ設定（Jetpack DataStore および 旧 SharedPreferences XML） -->
+        <include domain="file" path="datastore" />
         <include domain="sharedpref" path="." />
 
         <!-- ユーザーインポート済みのカスタムタイル・フォント -->
@@ -15,8 +17,9 @@
     </cloud-backup>
 
     <device-transfer>
-        <!-- 機種変更時の直接移行では進行中のセーブデータも含めて丸ごと引き継ぐ -->
+        <!-- 機種変更時の直接移行では進行中のセーブデータ・一時レベルも含めて丸ごと引き継ぐ -->
         <include domain="file" path="nethackdir" />
+        <include domain="file" path="datastore" />
         <include domain="sharedpref" path="." />
         <include domain="root" path="app_flutter/custom_tiles" />
         <include domain="root" path="app_flutter/custom_fonts" />

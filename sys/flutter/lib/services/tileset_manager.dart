@@ -40,13 +40,24 @@ class TilesetManager extends ChangeNotifier {
   /// カスタムタイルセットのみの一覧
   List<TilesetInfo> get customTilesets => List.unmodifiable(_customTilesets);
 
+  @visibleForTesting
+  void resetForTesting() {
+    _customTilesets.clear();
+    _customTilesDir = null;
+    _initialized = false;
+  }
+
   /// 初期化処理（Prefsからのカスタムタイルセット読み込みと実体ファイル検証）
-  Future<void> init() async {
+  Future<void> init({Directory? customTilesDir}) async {
     if (_initialized) return;
 
     try {
-      final appDocDir = await getApplicationDocumentsDirectory();
-      _customTilesDir = Directory('${appDocDir.path}/custom_tiles');
+      if (customTilesDir != null) {
+        _customTilesDir = customTilesDir;
+      } else {
+        final appDocDir = await getApplicationDocumentsDirectory();
+        _customTilesDir = Directory('${appDocDir.path}/custom_tiles');
+      }
       if (!await _customTilesDir!.exists()) {
         await _customTilesDir!.create(recursive: true);
       }
@@ -74,9 +85,29 @@ class TilesetManager extends ChangeNotifier {
         try {
           final map = item as Map<String, dynamic>;
           var info = TilesetInfo.fromJson(map);
-          // 実ファイルが存在するか検証（存在しない孤立レコードはスキップ）
+          // 実ファイルが存在するか検証（パス変更時は _customTilesDir 配下の同名ファイルで補完）
           if (info.localFilePath != null) {
-            final file = File(info.localFilePath!);
+            var file = File(info.localFilePath!);
+            if (!await file.exists() && _customTilesDir != null) {
+              final fileName = info.localFilePath!.split(RegExp(r'[/\\]')).last;
+              final fallbackFile = File('${_customTilesDir!.path}/$fileName');
+              if (await fallbackFile.exists()) {
+                file = fallbackFile;
+                info = TilesetInfo(
+                  id: info.id,
+                  displayName: info.displayName,
+                  tileWidth: info.tileWidth,
+                  tileHeight: info.tileHeight,
+                  author: info.author,
+                  url: fallbackFile.path,
+                  assetPath: info.assetPath,
+                  isBuiltIn: info.isBuiltIn,
+                  localFilePath: fallbackFile.path,
+                  isTransparent: info.isTransparent,
+                );
+                needsResave = true;
+              }
+            }
             if (await file.exists()) {
               // 既存データで透過情報が未保持の場合、画像から自動判定して補完
               if (!map.containsKey('isTransparent')) {

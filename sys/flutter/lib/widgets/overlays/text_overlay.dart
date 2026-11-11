@@ -1,4 +1,5 @@
 import 'dart:ui' as ui;
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import '../../l10n/app_localizations.dart';
 import '../../utils/text_formatter.dart';
@@ -31,6 +32,9 @@ class TextOverlay extends StatefulWidget {
   final ui.Image? tileImage;
   final int tileWidth;
   final int tileHeight;
+  final String? assetsPath;
+  final VoidCallback? onRestoreGameFocus;
+  final int windowRevision;
 
   const TextOverlay({
     super.key,
@@ -47,6 +51,9 @@ class TextOverlay extends StatefulWidget {
     required this.tileImage,
     required this.tileWidth,
     required this.tileHeight,
+    this.assetsPath,
+    this.onRestoreGameFocus,
+    this.windowRevision = 0,
   });
 
   @override
@@ -54,8 +61,20 @@ class TextOverlay extends StatefulWidget {
 }
 
 class TextOverlayState extends State<TextOverlay> {
+  static final RegExp _enScoreHeaderNoRegExp = RegExp(r'\bno\b');
+
   late ScrollController _scrollController;
   TextOverlayFocusTarget _currentFocusTarget = TextOverlayFocusTarget.none;
+  bool _cachedIsTopTen = false;
+  List<TopTenEntry> _cachedTopTenEntries = const [];
+  String? _cachedUnrecordedMessage;
+  bool? _cachedIsJp;
+  // 呼び出し元からミュータブル List 参照が渡されても内容変化を確実に検知できるよう、
+  // キャッシュ算出時のスナップショットとウィンドウリビジョンを保持する。
+  List<String> _cachedSourceLines = const [];
+  List<int> _cachedSourceAttrs = const [];
+  String? _cachedAssetsPath;
+  int _cachedWindowRevision = -1;
 
   ScrollController get scrollController => _scrollController;
   TextOverlayFocusTarget get currentFocusTarget => _currentFocusTarget;
@@ -64,6 +83,86 @@ class TextOverlayState extends State<TextOverlay> {
   void initState() {
     super.initState();
     _scrollController = ScrollController();
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final isJp = Localizations.localeOf(context).languageCode == 'ja';
+    if (_cachedIsJp != isJp || _needsCacheRefresh(isJp)) {
+      _refreshTopTenCache(isJp);
+    }
+  }
+
+  @override
+  void didUpdateWidget(covariant TextOverlay oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    final isJp = Localizations.localeOf(context).languageCode == 'ja';
+    final revisionChanged =
+        widget.windowRevision > 0 && _cachedWindowRevision != widget.windowRevision;
+    if (revisionChanged || _needsCacheRefresh(isJp)) {
+      final prevIsTopTen = _cachedIsTopTen;
+      _refreshTopTenCache(isJp);
+      if (revisionChanged || prevIsTopTen != _cachedIsTopTen) {
+        _currentFocusTarget = TextOverlayFocusTarget.none;
+        if (_scrollController.hasClients) {
+          // 通常テキスト画面は先頭へ戻す。TopTenWidget 表示時は直後のポストフレームで
+          // TopTenWidget 側の自動スクロール処理が今回スコア位置（中央／末尾）へ補正する。
+          _scrollController.jumpTo(0.0);
+        }
+      }
+    }
+  }
+
+  bool _needsCacheRefresh(bool isJp) {
+    return _cachedIsJp != isJp ||
+        _cachedWindowRevision != widget.windowRevision ||
+        _cachedAssetsPath != widget.assetsPath ||
+        !listEquals(_cachedSourceLines, widget.textLines) ||
+        !listEquals(_cachedSourceAttrs, widget.textAttrs);
+  }
+
+  void _refreshTopTenCache(bool isJp) {
+    _cachedIsJp = isJp;
+    _cachedSourceLines = List<String>.of(widget.textLines);
+    _cachedSourceAttrs = List<int>.of(widget.textAttrs);
+    _cachedAssetsPath = widget.assetsPath;
+    _cachedWindowRevision = widget.windowRevision;
+
+    final hasScoreHeader = widget.textLines.any((line) {
+      final l = line.toLowerCase();
+      return (line.contains('順位') && line.contains('点数') && line.contains('名前')) ||
+          (_enScoreHeaderNoRegExp.hasMatch(l) &&
+              l.contains('points') &&
+              l.contains('name'));
+    });
+
+    if (!hasScoreHeader) {
+      _cachedIsTopTen = false;
+      _cachedTopTenEntries = const [];
+      _cachedUnrecordedMessage = null;
+      return;
+    }
+
+    final parsed = TopTenEntry.parse(widget.textLines, widget.textAttrs, isJp: isJp);
+    if (parsed.isEmpty) {
+      _cachedIsTopTen = false;
+      _cachedTopTenEntries = const [];
+      _cachedUnrecordedMessage = null;
+      return;
+    }
+
+    _cachedIsTopTen = true;
+    _cachedUnrecordedMessage = TopTenEntry.extractUnrecordedNotice(
+      widget.textLines,
+      parsed,
+      isJp: isJp,
+    );
+    _cachedTopTenEntries = enrichTopTenEntriesWithXLog(
+      parsed,
+      assetsPath: widget.assetsPath,
+      isJp: isJp,
+    );
   }
 
   @override
@@ -230,16 +329,16 @@ class TextOverlayState extends State<TextOverlay> {
                       );
                     }
 
-                    final isTopTen = widget.textLines.any((line) {
-                      final l = line.toLowerCase();
-                      return (line.contains('順位') && line.contains('点数') && line.contains('名前')) ||
-                          (l.contains('no') && l.contains('points') && l.contains('name'));
-                    });
-
-                    if (isTopTen) {
-                      final isJp = Localizations.localeOf(context).languageCode == 'ja';
-                      final data = TopTenEntry.parse(widget.textLines, widget.textAttrs, isJp: isJp);
-                      return TopTenWidget(entries: data, isJp: isJp, scrollController: _scrollController);
+                    if (_cachedIsTopTen) {
+                      final isJp = _cachedIsJp ??
+                          (Localizations.localeOf(context).languageCode == 'ja');
+                      return TopTenWidget(
+                        entries: _cachedTopTenEntries,
+                        isJp: isJp,
+                        scrollController: _scrollController,
+                        onDetailClosed: widget.onRestoreGameFocus,
+                        unrecordedMessage: _cachedUnrecordedMessage,
+                      );
                     }
 
                     final hasAnyTile = widget.useTiles && widget.tileImage != null && widget.textTiles.any((t) => t >= 0);

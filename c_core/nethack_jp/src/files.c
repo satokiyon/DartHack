@@ -360,6 +360,18 @@ fqname(const char *basenam,
 #endif
 
 #ifndef PREFIXES_IN_USE
+#if defined(FLUTTER_PORT)
+    /* Flutter/Android ポートでは一時レベルファイルを levels/ ディレクトリへ分離 */
+    if (whichprefix == LEVELPREFIX && basenam && *basenam && !strchr(basenam, '/')
+        && !strchr(basenam, '\\')) {
+        static char flutter_lvl_buf[4][FQN_MAX_FILENAME];
+        int idx = (buffnum >= 0 && buffnum < 4) ? buffnum : 0;
+        if (strlen("levels/") + strlen(basenam) < FQN_MAX_FILENAME) {
+            Sprintf(flutter_lvl_buf[idx], "levels/%s", basenam);
+            return flutter_lvl_buf[idx];
+        }
+    }
+#endif
     return basenam;
 #else
     if (!basenam || whichprefix < 0 || whichprefix >= PREFIX_COUNT)
@@ -1683,7 +1695,21 @@ get_saved_games(void)
     struct dirent **namelist;
     struct dirent **namelist2;
     int n1 = scandir("save", &namelist, 0, 0);
-    int n2 = scandir(".", &namelist2, filter_running, 0);
+    const char *level_dir = ".";
+#ifdef PREFIXES_IN_USE
+    char level_dir_buf[FQN_MAX_FILENAME];
+    if (gf.fqn_prefix[LEVELPREFIX] && *gf.fqn_prefix[LEVELPREFIX]) {
+        size_t l;
+        Strcpy(level_dir_buf, gf.fqn_prefix[LEVELPREFIX]);
+        l = strlen(level_dir_buf);
+        if (l > 1 && (level_dir_buf[l - 1] == '/' || level_dir_buf[l - 1] == '\\'))
+            level_dir_buf[l - 1] = '\0';
+        level_dir = level_dir_buf;
+    }
+#elif defined(FLUTTER_PORT)
+    level_dir = "levels";
+#endif
+    int n2 = scandir(level_dir, &namelist2, filter_running, 0);
     if(n1 < 0) n1 = 0;
     if(n2 < 0) n2 = 0;
     int i,uid;
@@ -1748,7 +1774,7 @@ get_saved_games(void)
         if ( sscanf( namelist2[i]->d_name, "%d%63[^.].0", &uid, name ) == 2 ) {
             if ( uid == myuid ) {
                 char* r;
-                r = plname_from_running(namelist2[i]->d_name);
+                r = plname_from_running(fqname(namelist2[i]->d_name, LEVELPREFIX, 0));
                 if ( r )
                     result[j++] = r;
             }

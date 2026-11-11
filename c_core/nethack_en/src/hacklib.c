@@ -1139,4 +1139,38 @@ utf8_truncate(char *str, size_t maxbytes)
     str[utf8_truncation_point(str, maxbytes)] = '\0';
 }
 
+/* DartHack (日本語コア NetHackJP に合わせた独自実装):
+   UTF-8 文字数ベース（半角・全角・絵文字いずれも 1 文字）で文字境界を壊さず
+   切り詰める関数群。アップストリーム (NetHack-5.0) で文字数単位の UTF-8
+   切り詰め API が導入された場合は上流実装に追従し、未導入であれば維持する。 */
+size_t
+utf8_char_truncation_point(const char *str, size_t maxchars)
+{
+    size_t cut = 0;
+    size_t char_count = 0;
+    int cp_len;
+
+    if (maxchars == 0)
+        return 0;
+
+    while (str[cut] && char_count < maxchars) {
+        cp_len = utf8_sequence_expected_len((uchar) str[cut]);
+        if (cp_len <= 0)
+            break; /* invalid UTF-8 lead byte */
+
+        cut += (size_t) cp_len;
+        char_count++;
+    }
+    return cut;
+}
+
+/* in-place truncate to at most maxchars UTF-8 characters,
+   preserving UTF-8 boundaries.  The destination buffer must be large
+   enough to hold maxchars characters (worst case 4 bytes each). */
+void
+utf8_char_truncate(char *str, size_t maxchars)
+{
+    str[utf8_char_truncation_point(str, maxchars)] = '\0';
+}
+
 /*hacklib.c*/

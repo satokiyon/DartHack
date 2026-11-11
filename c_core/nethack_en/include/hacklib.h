@@ -81,6 +81,12 @@ extern unsigned Strlen_(const char *, const char *, int) NONNULLPTRS;
 extern int unicodeval_to_utf8str(int, uint8 *, size_t);
 extern size_t utf8_truncation_point(const char *, size_t) NONNULLARG1;
 extern void utf8_truncate(char *, size_t) NONNULLARG1;
+/* DartHack (日本語コア NetHackJP に合わせた独自実装):
+   UTF-8 文字数単位での切り詰めユーティリティ宣言。
+   アップストリーム (NetHack-5.0) マージ時に同等 API が追加された場合は
+   上流 API に統合・追従し、未導入であれば本宣言を維持する。 */
+extern size_t utf8_char_truncation_point(const char *, size_t) NONNULLARG1;
+extern void utf8_char_truncate(char *, size_t) NONNULLARG1;
 extern boolean utf8_decode_codepoint(const char *, unsigned *, int *) NONNULLPTRS;
 extern boolean copy_bytes(int, int);
 extern const char *datamodel(int);

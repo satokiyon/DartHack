@@ -1,8 +1,11 @@
+import 'dart:convert';
 import 'dart:ffi';
 import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:path_provider/path_provider.dart';
+import 'models/topten_entry.dart';
+import 'models/xlog_entry.dart';
 import 'utils/app_prefs.dart';
 import 'utils/defaults_helper.dart';
 
@@ -41,11 +44,23 @@ class NetHackAssets {
       await saveDir.create(recursive: true);
     }
 
+    // 一時レベルファイル用ディレクトリの作成（クラウドバックアップ対象外へ分離）
+    final levelsDir = Directory('${dstDir.path}/levels');
+    if (!await levelsDir.exists()) {
+      await levelsDir.create(recursive: true);
+    }
+
     // 旧バージョンの各種ユーザーデータ（セーブ、スコアログ、defaults.nh等）を包括的マイグレーション
     await _migrateAllLegacyUserData(dstDir, docDir);
 
     // 旧バージョンのセーブファイル (uid=1) を現行 UID に安全マイグレーション
     await _migrateLegacySaveFiles(saveDir);
+
+    // 旧バージョン等で nethackdir 直下に残っていた一時レベルファイルを levels/ へ移行整理
+    await _migrateLegacyLevelFiles(dstDir, levelsDir);
+
+    // 既存の肥大化した logfile / xlogfile があれば record の有効レコードに合わせてトリム整理
+    await _syncLogsWithRecord(dstDir);
 
     // 1. アセット側のバージョンを取得 (assets/ver)
     String assetVerStr = "0";
@@ -66,10 +81,13 @@ class NetHackAssets {
 
     debugPrint("NetHackAssets: Asset ver = $assetVer (Deployed: $deployedVer), Build ID = $buildIdToUse (Deployed: $deployedBuildId)");
 
-    // 3. バージョンまたは Cコア Build ID の変更チェック
+    // 3. バージョンまたは Cコア Build ID の変更、および必須アセットファイルの存在チェック
     final bool isVersionUpdated = deployedVer < assetVer;
     final bool isBuildIdUpdated = buildIdToUse != "unknown" && buildIdToUse != deployedBuildId;
-    final bool isCoreUpdated = isVersionUpdated || isBuildIdUpdated;
+    final bool hasCoreDataFiles = await File('${dstDir.path}/data').exists() &&
+        await File('${dstDir.path}/rumors').exists() &&
+        await File('${dstDir.path}/defaults.nh').exists();
+    final bool isCoreUpdated = isVersionUpdated || isBuildIdUpdated || !hasCoreDataFiles;
 
     if (isCoreUpdated) {
       wasUpdated = true;
@@ -94,6 +112,9 @@ class NetHackAssets {
       debugPrint("NetHackAssets: Core & asset update completed.");
     } else {
       wasUpdated = false;
+      if (prefs.getString(_dataDirKey) != dstDir.path) {
+        await prefs.setString(_dataDirKey, dstDir.path);
+      }
       debugPrint("NetHackAssets: Assets are up to date.");
     }
 
@@ -398,6 +419,65 @@ class NetHackAssets {
     }
   }
 
+  @visibleForTesting
+  static Future<void> migrateLegacyLevelFilesForTesting(
+    Directory dstDir,
+    Directory levelsDir, {
+    int? currentUidOverride,
+  }) =>
+      _migrateLegacyLevelFiles(
+        dstDir,
+        levelsDir,
+        currentUidOverride: currentUidOverride,
+      );
+
+  /// 旧バージョン等で nethackdir 直下に残っていた一時レベルファイル（`<UID><Name>.<lev>`）を整理する。
+  /// 現行のアプリ UID と一致するファイルは進行中ゲーム保護のため levels/ へ移動し、
+  /// 別 UID の残骸（再インストール・別端末リストア等の孤立データ）は安全に削除する。
+  static Future<void> _migrateLegacyLevelFiles(
+    Directory dstDir,
+    Directory levelsDir, {
+    int? currentUidOverride,
+  }) async {
+    if (!await dstDir.exists()) return;
+    final currentUid = currentUidOverride ?? _getCurrentUid();
+    final regExp = RegExp(r'^(\d+).+\.(\d+)$');
+
+    try {
+      final entries = await dstDir.list().toList();
+      for (final entry in entries) {
+        if (entry is! File) continue;
+        final fileName = entry.path.split(Platform.pathSeparator).last;
+        final match = regExp.firstMatch(fileName);
+        if (match == null) continue;
+
+        final int? fileUid = int.tryParse(match.group(1)!);
+        if (fileUid == null) continue;
+
+        if (fileUid == currentUid) {
+          final targetFile = File('${levelsDir.path}/$fileName');
+          if (!await targetFile.exists()) {
+            await entry.rename(targetFile.path);
+            debugPrint("NetHackAssets: Migrated active level file '$fileName' -> 'levels/$fileName'");
+          } else {
+            final targetMod = await targetFile.lastModified();
+            final srcMod = await entry.lastModified();
+            if (srcMod.isAfter(targetMod)) {
+              await entry.copy(targetFile.path);
+            }
+            await entry.delete();
+            debugPrint("NetHackAssets: Cleaned up duplicate legacy level file '$fileName'");
+          }
+        } else {
+          await entry.delete();
+          debugPrint("NetHackAssets: Removed orphaned level file from different UID: '$fileName'");
+        }
+      }
+    } catch (e) {
+      debugPrint("Warning: Exception during legacy level file cleanup: $e");
+    }
+  }
+
   static int _getCurrentUid() {
     if (Platform.isAndroid || Platform.isLinux) {
       try {
@@ -409,6 +489,138 @@ class NetHackAssets {
       }
     }
     return 10470;
+  }
+
+  /// テスト用エントリーポイント: logfile / xlogfile の record 同期処理を直接実行する
+  @visibleForTesting
+  static Future<void> syncLogsWithRecordForTesting(Directory nethackDir) {
+    return _syncLogsWithRecord(nethackDir);
+  }
+
+  /// 既存の logfile / xlogfile が存在する場合に限り、record の有効行に合わせてトリム整理する
+  static Future<void> _syncLogsWithRecord(Directory nethackDir) async {
+    try {
+      final logFile = File('${nethackDir.path}/logfile');
+      final xlogFile = File('${nethackDir.path}/xlogfile');
+      final hasLog = await logFile.exists();
+      final hasXLog = await xlogFile.exists();
+      if (!hasLog && !hasXLog) return;
+
+      final recordFile = File('${nethackDir.path}/record');
+      final List<RecordLogEntry> recordEntries;
+      if (await recordFile.exists()) {
+        final recBytes = await recordFile.readAsBytes();
+        final recText = utf8.decode(recBytes, allowMalformed: true);
+        recordEntries = parseRecordLines(const LineSplitter().convert(recText));
+      } else {
+        recordEntries = const [];
+      }
+
+      if (hasLog) {
+        final logBytes = await logFile.readAsBytes();
+        final logText = utf8.decode(logBytes, allowMalformed: true);
+        final normalizedOrig = logText.replaceAll('\r\n', '\n');
+        String newLogText;
+
+        if (recordEntries.isEmpty) {
+          newLogText = '';
+        } else {
+          final logEntries = parseRecordLines(const LineSplitter().convert(logText));
+          final consumed = List<bool>.filled(logEntries.length, false);
+          final keptLines = <String>[];
+
+          for (final rec in recordEntries) {
+            for (int j = 0; j < logEntries.length; j++) {
+              if (consumed[j]) continue;
+              final le = logEntries[j];
+              if (le.points == rec.points &&
+                  le.dnum == rec.dnum &&
+                  le.dlev == rec.dlev &&
+                  le.maxlvl == rec.maxlvl &&
+                  le.hp == rec.hp &&
+                  le.maxhp == rec.maxhp &&
+                  le.deaths == rec.deaths &&
+                  le.deathdate == rec.deathdate &&
+                  le.birthdate == rec.birthdate &&
+                  le.uid == rec.uid &&
+                  le.role == rec.role &&
+                  le.race == rec.race &&
+                  le.gend == rec.gend &&
+                  le.align == rec.align &&
+                  le.name == rec.name) {
+                consumed[j] = true;
+                keptLines.add(le.rawLine);
+                break;
+              }
+            }
+          }
+          newLogText = keptLines.isEmpty ? '' : '${keptLines.join('\n')}\n';
+        }
+
+        if (normalizedOrig != newLogText) {
+          await logFile.writeAsString(newLogText, flush: true);
+          debugPrint("NetHackAssets: Synced logfile with ${recordEntries.length} record entries.");
+        }
+      }
+
+      if (hasXLog) {
+        final xlogBytes = await xlogFile.readAsBytes();
+        final xlogText = utf8.decode(xlogBytes, allowMalformed: true);
+        final normalizedOrig = xlogText.replaceAll('\r\n', '\n');
+        String newXLogText;
+
+        if (recordEntries.isEmpty) {
+          newXLogText = '';
+        } else {
+          final xlogLines = const LineSplitter().convert(xlogText);
+          final parsedXLogs = <XLogEntry>[];
+          for (final line in xlogLines) {
+            final parsed = XLogEntry.parseLine(line);
+            if (parsed != null) {
+              parsedXLogs.add(parsed);
+            }
+          }
+          final consumed = List<bool>.filled(parsedXLogs.length, false);
+          final keptLines = <String>[];
+
+          for (final rec in recordEntries) {
+            for (int j = 0; j < parsedXLogs.length; j++) {
+              if (consumed[j]) continue;
+              final xl = parsedXLogs[j];
+              if (xl.matchesRecordFields(
+                points: rec.points,
+                deathdnum: rec.dnum,
+                deathlev: rec.dlev,
+                maxlvl: rec.maxlvl,
+                hp: rec.hp,
+                maxhp: rec.maxhp,
+                deaths: rec.deaths,
+                deathdate: rec.deathdate,
+                birthdate: rec.birthdate,
+                uid: rec.uid,
+                role: rec.role,
+                race: rec.race,
+                gender: rec.gend,
+                align: rec.align,
+                name: rec.name,
+              )) {
+                consumed[j] = true;
+                keptLines.add(xl.rawLine);
+                break;
+              }
+            }
+          }
+          newXLogText = keptLines.isEmpty ? '' : '${keptLines.join('\n')}\n';
+        }
+
+        if (normalizedOrig != newXLogText) {
+          await xlogFile.writeAsString(newXLogText, flush: true);
+          debugPrint("NetHackAssets: Synced xlogfile with ${recordEntries.length} record entries.");
+        }
+      }
+    } catch (e) {
+      debugPrint("Warning: Exception during syncLogsWithRecord: $e");
+    }
   }
 }
 

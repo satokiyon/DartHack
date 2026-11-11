@@ -1,12 +1,18 @@
 // NOTICE: Modified by NetHackJP contributor @satokiyon; latest change date: 2026-08-07.
+import 'dart:convert';
 import 'dart:io';
+import 'xlog_entry.dart';
 
 class TopTenEntry {
+  static final RegExp _enScoreHeaderNoRegExp = RegExp(r'\bno\b');
+
   final int rank;
   final String score;
   final String nameAndProfile;
   final List<String> details;
   final bool isCurrent;
+  final RecordLogEntry? rawRecord;
+  final XLogEntry? xlog;
 
   TopTenEntry({
     required this.rank,
@@ -14,7 +20,25 @@ class TopTenEntry {
     required this.nameAndProfile,
     required this.details,
     required this.isCurrent,
+    this.rawRecord,
+    this.xlog,
   });
+
+  /// record / xlogfile 詳細情報を付与したコピーを生成する
+  TopTenEntry copyWith({
+    RecordLogEntry? rawRecord,
+    XLogEntry? xlog,
+  }) {
+    return TopTenEntry(
+      rank: rank,
+      score: score,
+      nameAndProfile: nameAndProfile,
+      details: details,
+      isCurrent: isCurrent,
+      rawRecord: rawRecord ?? this.rawRecord,
+      xlog: xlog ?? this.xlog,
+    );
+  }
 
   static List<TopTenEntry> parse(List<String> lines, List<int> attrs, {bool isJp = true}) {
     final entries = <TopTenEntry>[];
@@ -173,6 +197,65 @@ class TopTenEntry {
 
     return entries;
   }
+
+  /// Cコアの出力行とパース済みエントリ一覧から、今回のスコアがランキングに
+  /// 記録されなかった場合（「100位圏外」「0点」「前回自己記録未更新」）の
+  /// 通知メッセージを抽出・生成する。
+  static String? extractUnrecordedNotice(
+    List<String> lines,
+    List<TopTenEntry> entries, {
+    bool isJp = true,
+  }) {
+    // 1. ヘッダー行より前に出力される Cコアの自己記録未更新メッセージを検出
+    for (final rawLine in lines) {
+      final trimmed = rawLine.trim();
+      if (trimmed.isEmpty) continue;
+      final lower = trimmed.toLowerCase();
+      final isHeader = (trimmed.contains('順位') &&
+              trimmed.contains('点数') &&
+              trimmed.contains('名前')) ||
+          (_enScoreHeaderNoRegExp.hasMatch(lower) &&
+              lower.contains('points') &&
+              lower.contains('name'));
+      if (isHeader) {
+        break;
+      }
+
+      if (trimmed.contains('前回の自己記録') && trimmed.contains('更新できなかった')) {
+        return isJp
+            ? '$trimmed 今回のスコアはランキングに記録されませんでした。'
+            : '$trimmed This score was not recorded.';
+      }
+      if (lower.contains("didn't beat your previous score")) {
+        return isJp
+            ? '$trimmed（自己記録未更新のためランキングには記録されませんでした）'
+            : '$trimmed This score was not recorded.';
+      }
+    }
+
+    // 2. 今回の強調カードの中に圏外 (rank <= 0) エントリがあるか確認
+    TopTenEntry? unrankedCurrent;
+    for (final entry in entries) {
+      if (entry.isCurrent && entry.rank <= 0) {
+        unrankedCurrent = entry;
+        break;
+      }
+    }
+    if (unrankedCurrent == null) {
+      return null;
+    }
+
+    final numericScore = int.tryParse(unrankedCurrent.score.trim());
+    if (numericScore != null && numericScore <= 0) {
+      return isJp
+          ? '0点（最低点未満）のため、スコア記録には保存されませんでした。'
+          : 'Scores of 0 points are not recorded on the scoreboard.';
+    }
+
+    return isJp
+        ? 'トップ100圏外のため、スコア記録には保存されませんでした。'
+        : 'Your score did not make the top 100 and was not recorded.';
+  }
 }
 
 class TopTenEntryBuilder {
@@ -200,33 +283,48 @@ class TopTenEntryBuilder {
   }
 }
 
-class _RecordRawEntry {
+/// record ファイル 1 行分の生データモデル
+class RecordLogEntry {
+  final int originalIndex;
+  final String version;
   final int points;
   final int dnum;
   final int dlev;
   final int maxlvl;
   final int hp;
   final int maxhp;
+  final int deaths;
+  final int deathdate;
+  final int birthdate;
+  final int uid;
   final String role;
   final String race;
   final String gend;
   final String align;
   final String name;
   final String death;
+  final String rawLine;
 
-  _RecordRawEntry({
+  RecordLogEntry({
+    required this.originalIndex,
+    required this.version,
     required this.points,
     required this.dnum,
     required this.dlev,
     required this.maxlvl,
     required this.hp,
     required this.maxhp,
+    required this.deaths,
+    required this.deathdate,
+    required this.birthdate,
+    required this.uid,
     required this.role,
     required this.race,
     required this.gend,
     required this.align,
     required this.name,
     required this.death,
+    required this.rawLine,
   });
 }
 
@@ -2606,58 +2704,151 @@ String _translateDeathTextInternal(String death, bool isJp) {
   return _translateMonsterOrItemName(death);
 }
 
-List<TopTenEntry> parseRecordFile(String filePath, {bool isJp = true}) {
+/// record ファイルと同じディレクトリ配下の補助ログファイルパスを返す（存在しなければ null）
+String? findSiblingLogFilePath(String recordPath, String fileName) {
+  final parent = File(recordPath).parent;
+  final candidate = File('${parent.path}/$fileName');
+  if (candidate.existsSync()) {
+    return candidate.path;
+  }
+  return null;
+}
+
+/// 性別コードを日英表示へ翻訳する公開ヘルパー
+String translateGendCodeForDisplay(String code, bool isJp) => _translateGendCode(code, isJp);
+
+/// 属性コードを日英表示へ翻訳する公開ヘルパー
+String translateAlignCodeForDisplay(String code, bool isJp) => _translateAlignCode(code, isJp);
+
+/// 職業コードを日英表示へ翻訳する公開ヘルパー
+String translateRoleCodeForDisplay(String code, bool isJp) => _translateRoleCode(code, isJp);
+
+/// 種族コードを日英表示へ翻訳する公開ヘルパー
+String translateRaceCodeForDisplay(String code, bool isJp) => _translateRaceCode(code, isJp);
+
+/// 死因テキストを日英表示へ翻訳する公開ヘルパー
+String translateDeathTextForDisplay(String death, bool isJp) => _translateDeathText(death, isJp);
+
+/// ダンジョン番号と階層から到達・死亡場所文字列を組み立てる
+String translateDeathLocationForDisplay(int dnum, int dlev, bool isJp) {
+  if (dnum == 7 || dlev < 0) {
+    return _translateEndgameLevel(dlev, isJp);
+  }
+  final dungeonName = _translateDungeonName(dnum, isJp);
+  return isJp ? '$dungeonName $dlev階' : '$dungeonName level $dlev';
+}
+
+/// `record` ファイルの行群から有効レコード（`points > 0`, `<eod>` 除外）を解析して返す
+List<RecordLogEntry> parseRecordLines(List<String> lines) {
+  final tokenRegex = RegExp(r'\S+');
+  final rawEntries = <RecordLogEntry>[];
+
+  for (int idx = 0; idx < lines.length; idx++) {
+    final trimmed = lines[idx].trim();
+    if (trimmed.isEmpty) continue;
+
+    final matches = tokenRegex.allMatches(trimmed).take(15).toList();
+    if (matches.length < 15) continue;
+
+    final parts = matches.map((m) => m.group(0)!).toList();
+    final version = parts[0];
+    final points = int.tryParse(parts[1]) ?? 0;
+    if (points <= 0) continue; // <eod> ダミー行や 0 点の無効行を除外
+
+    final dnum = int.tryParse(parts[2]) ?? 0;
+    final dlev = int.tryParse(parts[3]) ?? 1;
+    final maxlvl = int.tryParse(parts[4]) ?? 1;
+    final hp = int.tryParse(parts[5]) ?? 0;
+    final maxhp = int.tryParse(parts[6]) ?? 0;
+    final deaths = int.tryParse(parts[7]) ?? 0;
+    final deathdate = int.tryParse(parts[8]) ?? 0;
+    final birthdate = int.tryParse(parts[9]) ?? 0;
+    final uid = int.tryParse(parts[10]) ?? 0;
+    final role = parts[11];
+    final race = parts[12];
+    final gend = parts[13];
+    final align = parts[14];
+
+    final rest = trimmed.substring(matches[14].end).trimLeft();
+    String name = rest;
+    String death = '';
+    final commaIdx = rest.indexOf(',');
+    if (commaIdx != -1) {
+      name = rest.substring(0, commaIdx).trim();
+      death = rest.substring(commaIdx + 1).trim();
+    }
+
+    rawEntries.add(RecordLogEntry(
+      originalIndex: idx,
+      version: version,
+      points: points,
+      dnum: dnum,
+      dlev: dlev,
+      maxlvl: maxlvl,
+      hp: hp,
+      maxhp: maxhp,
+      deaths: deaths,
+      deathdate: deathdate,
+      birthdate: birthdate,
+      uid: uid,
+      role: role,
+      race: race,
+      gend: gend,
+      align: align,
+      name: name,
+      death: death,
+      rawLine: trimmed,
+    ));
+  }
+
+  return rawEntries;
+}
+
+/// xlogfile を安全に読み込みパース済みエントリ一覧を返す
+List<XLogEntry> parseXLogFile(String filePath) {
   final file = File(filePath);
   if (!file.existsSync()) return [];
 
   try {
-    final lines = file.readAsLinesSync();
-    final rawEntries = <_RecordRawEntry>[];
-
+    final content = utf8.decode(file.readAsBytesSync(), allowMalformed: true);
+    final lines = const LineSplitter().convert(content);
+    final entries = <XLogEntry>[];
     for (final line in lines) {
-      final trimmed = line.trim();
-      if (trimmed.isEmpty) continue;
-
-      final parts = trimmed.split(RegExp(r'\s+'));
-      if (parts.length < 15) continue;
-
-      final points = int.tryParse(parts[1]) ?? 0;
-      final dnum = int.tryParse(parts[2]) ?? 0;
-      final dlev = int.tryParse(parts[3]) ?? 1;
-      final maxlvl = int.tryParse(parts[4]) ?? 1;
-      final hp = int.tryParse(parts[5]) ?? 0;
-      final maxhp = int.tryParse(parts[6]) ?? 0;
-      final role = parts[11];
-      final race = parts[12];
-      final gend = parts[13];
-      final align = parts[14];
-
-      final rest = parts.sublist(15).join(' ');
-      String name = rest;
-      String death = '';
-      final commaIdx = rest.indexOf(',');
-      if (commaIdx != -1) {
-        name = rest.substring(0, commaIdx).trim();
-        death = rest.substring(commaIdx + 1).trim();
+      final parsed = XLogEntry.parseLine(line);
+      if (parsed != null) {
+        entries.add(parsed);
       }
-
-      rawEntries.add(_RecordRawEntry(
-        points: points,
-        dnum: dnum,
-        dlev: dlev,
-        maxlvl: maxlvl,
-        hp: hp,
-        maxhp: maxhp,
-        role: role,
-        race: race,
-        gend: gend,
-        align: align,
-        name: name,
-        death: death,
-      ));
     }
+    return entries;
+  } catch (_) {
+    return [];
+  }
+}
 
-    rawEntries.sort((a, b) => b.points.compareTo(a.points));
+List<TopTenEntry> parseRecordFile(String filePath, {bool isJp = true, bool loadXLog = true}) {
+  final file = File(filePath);
+  if (!file.existsSync()) return [];
+
+  try {
+    final content = utf8.decode(file.readAsBytesSync(), allowMalformed: true);
+    final lines = const LineSplitter().convert(content);
+    final rawEntries = parseRecordLines(lines);
+
+    // 同点時は元の順位（先着順）を維持する安定ソート
+    rawEntries.sort((a, b) {
+      final cmp = b.points.compareTo(a.points);
+      return cmp != 0 ? cmp : a.originalIndex.compareTo(b.originalIndex);
+    });
+
+    List<XLogEntry> xlogEntries = const [];
+    List<bool> xlogConsumed = const [];
+    if (loadXLog) {
+      final xlogPath = findSiblingLogFilePath(filePath, 'xlogfile');
+      if (xlogPath != null) {
+        xlogEntries = parseXLogFile(xlogPath);
+        xlogConsumed = List<bool>.filled(xlogEntries.length, false);
+      }
+    }
 
     final entries = <TopTenEntry>[];
     for (int i = 0; i < rawEntries.length; i++) {
@@ -2672,13 +2863,7 @@ List<TopTenEntry> parseRecordFile(String filePath, {bool isJp = true}) {
       final nameAndProfile = '${e.name} $profile';
 
       final deathStr = _translateDeathText(e.death, isJp);
-      String locationStr;
-      if (e.dnum == 7 || e.dlev < 0) {
-        locationStr = _translateEndgameLevel(e.dlev, isJp);
-      } else {
-        final dungeonName = _translateDungeonName(e.dnum, isJp);
-        locationStr = isJp ? '$dungeonName ${e.dlev}階' : '$dungeonName level ${e.dlev}';
-      }
+      final locationStr = translateDeathLocationForDisplay(e.dnum, e.dlev, isJp);
 
       final details = <String>[];
       if (deathStr.isNotEmpty) {
@@ -2691,12 +2876,41 @@ List<TopTenEntry> parseRecordFile(String filePath, {bool isJp = true}) {
       final hpInfo = isJp ? 'HP/最大HP: $hpValStr/${e.maxhp}' : 'HP/Max HP: $hpValStr/${e.maxhp}';
       details.add(hpInfo);
 
+      XLogEntry? matchedXLog;
+      for (int j = 0; j < xlogEntries.length; j++) {
+        if (xlogConsumed[j]) continue;
+        final xl = xlogEntries[j];
+        if (xl.matchesRecordFields(
+          points: e.points,
+          deathdnum: e.dnum,
+          deathlev: e.dlev,
+          maxlvl: e.maxlvl,
+          hp: e.hp,
+          maxhp: e.maxhp,
+          deaths: e.deaths,
+          deathdate: e.deathdate,
+          birthdate: e.birthdate,
+          uid: e.uid,
+          role: e.role,
+          race: e.race,
+          gender: e.gend,
+          align: e.align,
+          name: e.name,
+        )) {
+          matchedXLog = xl;
+          xlogConsumed[j] = true;
+          break;
+        }
+      }
+
       entries.add(TopTenEntry(
         rank: rank,
         score: '${e.points}',
         nameAndProfile: nameAndProfile,
         details: details,
         isCurrent: false,
+        rawRecord: e,
+        xlog: matchedXLog,
       ));
     }
 
@@ -2704,4 +2918,41 @@ List<TopTenEntry> parseRecordFile(String filePath, {bool isJp = true}) {
   } catch (e) {
     return [];
   }
+}
+
+/// TextOverlay 等でテキスト出力からパースされた TopTenEntry 一覧に対し、
+/// ディスク上の record / xlogfile から詳細データを紐付ける
+List<TopTenEntry> enrichTopTenEntriesWithXLog(
+  List<TopTenEntry> entries, {
+  String? assetsPath,
+  bool isJp = true,
+}) {
+  if (entries.isEmpty) return entries;
+  final recordPath = findRecordFilePath(assetsPath);
+  if (recordPath == null) return entries;
+
+  final recordEntries = parseRecordFile(recordPath, isJp: isJp, loadXLog: true);
+  if (recordEntries.isEmpty) return entries;
+
+  final byRank = <int, TopTenEntry>{
+    for (final r in recordEntries) r.rank: r,
+  };
+
+  return entries.map((entry) {
+    if (entry.rank <= 0) return entry;
+    final rec = byRank[entry.rank];
+    if (rec == null || rec.score != entry.score) return entry;
+
+    final rawName = rec.rawRecord?.name ?? '';
+    if (rawName.isNotEmpty &&
+        rawName != '_' &&
+        !entry.nameAndProfile.startsWith(rawName)) {
+      return entry;
+    }
+
+    return entry.copyWith(
+      rawRecord: rec.rawRecord,
+      xlog: rec.xlog,
+    );
+  }).toList();
 }

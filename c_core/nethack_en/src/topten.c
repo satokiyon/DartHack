@@ -29,9 +29,18 @@ static long final_fpos; /* [note: do not move this to the 'g' struct] */
 #define newttentry() (struct toptenentry *) alloc(sizeof (struct toptenentry))
 #define dealloc_ttentry(ttent) free((genericptr_t) (ttent))
 #ifndef NAMSZ
-/* Changing NAMSZ can break your existing record/logfile */
-#define NAMSZ 10
+/* DartHack (日本語コア NetHackJP に合わせた独自実装):
+   NAMSZ はハイスコアレコード (record ファイル) におけるプレイヤー名
+   フィールドのバッファサイズ (バイト単位) である。NAMSZ_CHARS (10 UTF-8文字)
+   分のマルチバイト文字 (最大 4 バイト/文字) を保持できるよう 10 -> 40 へ拡張した。
+   テキスト行ベース形式のため既存の 10 バイト上限 record/logfile とも互換性がある。
+   アップストリーム (NetHack-5.0) マージ時に上流で NAMSZ 拡大や UTF-8 文字数対応が
+   導入された場合は上流実装に追従し、未導入であれば本定義を維持すること。 */
+#define NAMSZ 40
 #endif
+/* NAMSZ_CHARS はレコードに保存するプレイヤー名の最大 UTF-8 文字数。
+   半角・全角・絵文字のいずれも 1 文字として数える。 */
+#define NAMSZ_CHARS 10
 #define DTHSZ 100
 #define ROLESZ 3
 
@@ -54,9 +63,14 @@ struct toptenentry {
     char death[DTHSZ + 1];
 };
 static struct toptenentry *tt_head;
+/* DartHack (日本語コア NetHackJP に合わせた独自実装):
+   record 1 行先頭の数値ヘッダー分を TT_HDR_MAX (80) として SCANBUFSZ に加算し、
+   名前拡張時に fgets による行末欠落が起きないようにしている。
+   アップストリームで同様の SCANBUFSZ 拡張が入った場合は上流に追従すること。 */
+#define TT_HDR_MAX 80
 /* size big enough to read in all the string fields at once; includes
    room for separating space or trailing newline plus string terminator */
-#define SCANBUFSZ (4 * (ROLESZ + 1) + (NAMSZ + 1) + (DTHSZ + 1) + 1)
+#define SCANBUFSZ (TT_HDR_MAX + 4 * (ROLESZ + 1) + (NAMSZ + 1) + (DTHSZ + 1) + 1)
 
 static struct toptenentry zerott;
 
@@ -67,8 +81,15 @@ staticfn void outentry(int, struct toptenentry *, boolean);
 staticfn void discardexcess(FILE *);
 staticfn void readentry(FILE *, struct toptenentry *);
 staticfn void writeentry(FILE *, struct toptenentry *);
+#ifdef LOGFILE
+staticfn void sync_logfile_with_topten(struct toptenentry *);
+#endif
 #ifdef XLOGFILE
 staticfn void writexlentry(FILE *, struct toptenentry *, int);
+staticfn char *xlog_read_line(FILE *);
+staticfn boolean xlog_match_entry(const char *, const struct toptenentry *);
+staticfn void sync_xlogfile_with_topten(struct toptenentry *,
+                                        struct toptenentry *, boolean, int);
 staticfn long encodexlogflags(void);
 staticfn long encodeconduct(void);
 staticfn long encodeachieve(boolean);
@@ -263,6 +284,10 @@ readentry(FILE *rfile, struct toptenentry *tt)
                 tt->plrole[1] = tt->plgend[1] = '\0'; /* read via %c */
                 copynchars(tt->name, s1, (int) (sizeof tt->name) - 1);
                 copynchars(tt->death, s2, (int) (sizeof tt->death) - 1);
+                /* DartHack (日本語コア NetHackJP に合わせた独自実装):
+                   旧バージョン record でも UTF-8 文字数上限 (NAMSZ_CHARS) を
+                   強制して後段処理の不整合を防ぐ。上流で導入された場合は追従する。 */
+                utf8_char_truncate(tt->name, NAMSZ_CHARS);
             } else
                 tt->points = 0;
             tt->plrole[1] = '\0';
@@ -278,6 +303,11 @@ readentry(FILE *rfile, struct toptenentry *tt)
             copynchars(tt->plalign, s4, (int) (sizeof tt->plalign) - 1);
             copynchars(tt->name, s5, (int) (sizeof tt->name) - 1);
             copynchars(tt->death, s6, (int) (sizeof tt->death) - 1);
+            /* DartHack (日本語コア NetHackJP に合わせた独自実装):
+               読込名前が破損または旧形式であっても UTF-8 文字数上限 (NAMSZ_CHARS)
+               を強制し、strncmp や表示処理への不整合伝播を防ぐ。
+               アップストリームで UTF-8 切り詰め対応が入った場合は上流に追従すること。 */
+            utf8_char_truncate(tt->name, NAMSZ_CHARS);
         } else
             tt->points = 0;
 #ifdef NO_SCAN_BRACK
@@ -332,6 +362,58 @@ writeentry(FILE *rfile, struct toptenentry *tt)
 }
 
 RESTORE_WARNING_FORMAT_NONLITERAL
+
+#if defined(LOGFILE) || defined(XLOGFILE)
+/* DartHack: USE_FCNTL 環境の lock_file() は対象ファイルが未存在だと O_RDWR で
+   失敗するため、書き込み対象がある場合はロック前に空ファイルを作成する。"a" で開くため
+   万一の競合時も既存内容を切り詰めない。戻り値: 存在（ロック試行可）なら TRUE。 */
+staticfn boolean
+ensure_score_logfile_exists(const char *fname, boolean create_if_missing)
+{
+    FILE *fp = fopen_datafile(fname, "r", SCOREPREFIX);
+
+    if (fp) {
+        (void) fclose(fp);
+        return TRUE;
+    }
+    if (!create_if_missing)
+        return FALSE;
+    fp = fopen_datafile(fname, "a", SCOREPREFIX);
+    if (!fp)
+        return FALSE;
+    (void) fclose(fp);
+    return TRUE;
+}
+#endif /* LOGFILE || XLOGFILE */
+
+#ifdef LOGFILE
+/* record (head) に残った上位エントリのみで logfile を再構築し肥大化を防ぐ */
+staticfn void
+sync_logfile_with_topten(struct toptenentry *head)
+{
+    FILE *lfile;
+    struct toptenentry *t1;
+    boolean has_entries = (head && head->points > 0L) ? TRUE : FALSE;
+
+    if (!ensure_score_logfile_exists(LOGFILE, has_entries))
+        return;
+
+    if (!lock_file(LOGFILE, SCOREPREFIX, 10))
+        return;
+    if (!(lfile = fopen_datafile(LOGFILE, "w", SCOREPREFIX))) {
+#ifdef HANGUPHANDLING
+        if (!program_state.done_hup)
+#endif
+            raw_print("Cannot open log file!");
+    } else {
+        for (t1 = head; t1 && t1->points > 0L; t1 = t1->tt_next) {
+            writeentry(lfile, t1);
+        }
+        (void) fclose(lfile);
+    }
+    unlock_file(LOGFILE);
+}
+#endif /* LOGFILE */
 
 #ifdef XLOGFILE
 
@@ -609,6 +691,226 @@ encode_extended_conducts(char *buf)
     return buf;
 }
 
+/* xlogfile 1行を改行まで動的バッファで読み込む（長い achieveX 行の切り捨て防止） */
+staticfn char *
+xlog_read_line(FILE *fp)
+{
+    size_t cap = 4096;
+    size_t len = 0;
+    char *buf;
+    int ch;
+
+    buf = (char *) alloc((unsigned int) cap);
+    while ((ch = fgetc(fp)) != EOF) {
+        if (ch == '\n')
+            break;
+        if (ch == '\r')
+            continue;
+        if (len + 1 >= cap) {
+            if (cap < 65536) {
+                size_t newcap = cap * 2;
+                char *newbuf = (char *) alloc((unsigned int) newcap);
+                memcpy(newbuf, buf, len);
+                free((genericptr_t) buf);
+                buf = newbuf;
+                cap = newcap;
+            } else {
+                continue;
+            }
+        }
+        buf[len++] = (char) ch;
+    }
+    if (ch == EOF && len == 0) {
+        free((genericptr_t) buf);
+        return (char *) 0;
+    }
+    buf[len] = '\0';
+    return buf;
+}
+
+/* xlogfile の1行が record エントリ tt と一致するか照合する */
+staticfn boolean
+xlog_match_entry(const char *line, const struct toptenentry *tt)
+{
+    const char *p = line;
+    unsigned found_mask = 0;
+
+    if (!line || !tt || tt->points <= 0L)
+        return FALSE;
+
+    while (*p) {
+        const char *sep = strchr(p, '\t');
+        size_t tok_len = sep ? (size_t) (sep - p) : strlen(p);
+        const char *eq = (const char *) memchr(p, '=', tok_len);
+
+        if (eq) {
+            size_t klen = (size_t) (eq - p);
+            const char *val = eq + 1;
+            size_t vlen = tok_len - klen - 1;
+            char vbuf[128];
+            size_t cpy = (vlen < sizeof(vbuf) - 1) ? vlen : (sizeof(vbuf) - 1);
+
+            memcpy(vbuf, val, cpy);
+            vbuf[cpy] = '\0';
+
+            if (klen == 6 && strncmp(p, "points", 6) == 0) {
+                if (atol(vbuf) != tt->points) return FALSE;
+                found_mask |= (1U << 0);
+            } else if (klen == 9 && strncmp(p, "deathdnum", 9) == 0) {
+                if (atoi(vbuf) != tt->deathdnum) return FALSE;
+                found_mask |= (1U << 1);
+            } else if (klen == 8 && strncmp(p, "deathlev", 8) == 0) {
+                if (atoi(vbuf) != tt->deathlev) return FALSE;
+                found_mask |= (1U << 2);
+            } else if (klen == 6 && strncmp(p, "maxlvl", 6) == 0) {
+                if (atoi(vbuf) != tt->maxlvl) return FALSE;
+                found_mask |= (1U << 3);
+            } else if (klen == 2 && strncmp(p, "hp", 2) == 0) {
+                if (atoi(vbuf) != tt->hp) return FALSE;
+                found_mask |= (1U << 4);
+            } else if (klen == 5 && strncmp(p, "maxhp", 5) == 0) {
+                if (atoi(vbuf) != tt->maxhp) return FALSE;
+                found_mask |= (1U << 5);
+            } else if (klen == 6 && strncmp(p, "deaths", 6) == 0) {
+                if (atoi(vbuf) != tt->deaths) return FALSE;
+                found_mask |= (1U << 6);
+            } else if (klen == 9 && strncmp(p, "deathdate", 9) == 0) {
+                if (atol(vbuf) != tt->deathdate) return FALSE;
+                found_mask |= (1U << 7);
+            } else if (klen == 9 && strncmp(p, "birthdate", 9) == 0) {
+                if (atol(vbuf) != tt->birthdate) return FALSE;
+                found_mask |= (1U << 8);
+            } else if (klen == 3 && strncmp(p, "uid", 3) == 0) {
+                if (atoi(vbuf) != tt->uid) return FALSE;
+                found_mask |= (1U << 9);
+            } else if (klen == 4 && strncmp(p, "role", 4) == 0) {
+                if (strcmp(vbuf, tt->plrole) != 0) return FALSE;
+                found_mask |= (1U << 10);
+            } else if (klen == 4 && strncmp(p, "race", 4) == 0) {
+                if (strcmp(vbuf, tt->plrace) != 0) return FALSE;
+                found_mask |= (1U << 11);
+            } else if (klen == 6 && strncmp(p, "gender", 6) == 0) {
+                if (strcmp(vbuf, tt->plgend) != 0) return FALSE;
+                found_mask |= (1U << 12);
+            } else if (klen == 5 && strncmp(p, "align", 5) == 0) {
+                if (strcmp(vbuf, tt->plalign) != 0) return FALSE;
+                found_mask |= (1U << 13);
+            } else if (klen == 4 && strncmp(p, "name", 4) == 0) {
+                char xname[NAMSZ + 1];
+                size_t xcpy = (vlen < NAMSZ) ? vlen : NAMSZ;
+
+                memcpy(xname, val, xcpy);
+                xname[xcpy] = '\0';
+                /* DartHack (日本語コア NetHackJP に合わせた独自実装):
+                   record 側と一致させるため xlogfile 側の名前も UTF-8 文字数
+                   上限 (NAMSZ_CHARS) で切り詰めてから比較する。
+                   アップストリームで UTF-8 名前比較が入った場合は追従する。 */
+                utf8_char_truncate(xname, NAMSZ_CHARS);
+                if (strcmp(xname, tt->name) != 0) {
+                    if (!(strcmp(tt->name, "_") == 0 && onlyspace(xname)))
+                        return FALSE;
+                }
+                found_mask |= (1U << 14);
+            }
+        }
+
+        if (!sep)
+            break;
+        p = sep + 1;
+    }
+
+    return (found_mask == ((1U << 15) - 1U)) ? TRUE : FALSE;
+}
+
+/* record (head) と1対1で同期するよう xlogfile を再構築する */
+staticfn void
+sync_xlogfile_with_topten(struct toptenentry *head, struct toptenentry *t0,
+                          boolean t0_used, int how)
+{
+    FILE *xlfile;
+    struct toptenentry *t1;
+    struct toptenentry **tt_arr = (struct toptenentry **) 0;
+    char **matched_lines = (char **) 0;
+    int count = 0;
+    int i;
+
+    for (t1 = head; t1 && t1->points > 0L; t1 = t1->tt_next)
+        count++;
+
+    if (!ensure_score_logfile_exists(XLOGFILE, (boolean) (count > 0)))
+        return;
+
+    if (!lock_file(XLOGFILE, SCOREPREFIX, 10))
+        return;
+
+    if (count > 0) {
+        tt_arr = (struct toptenentry **) alloc(
+            (unsigned int) (sizeof(struct toptenentry *) * (size_t) count));
+        matched_lines = (char **) alloc(
+            (unsigned int) (sizeof(char *) * (size_t) count));
+        for (i = 0, t1 = head; i < count && t1 && t1->points > 0L;
+             i++, t1 = t1->tt_next) {
+            tt_arr[i] = t1;
+            matched_lines[i] = (char *) 0;
+        }
+
+        /* 新規インストール直後等で xlogfile が未存在 ("r" が NULL) の場合は
+           過去行 0 件としてエラー中断せず新規作成へ進む */
+        xlfile = fopen_datafile(XLOGFILE, "r", SCOREPREFIX);
+        if (xlfile) {
+            char *line;
+            while ((line = xlog_read_line(xlfile)) != (char *) 0) {
+                boolean kept = FALSE;
+                if (line[0] != '\0') {
+                    for (i = 0; i < count; i++) {
+                        if (t0_used && tt_arr[i] == t0)
+                            continue;
+                        if (matched_lines[i] != (char *) 0)
+                            continue;
+                        if (xlog_match_entry(line, tt_arr[i])) {
+                            matched_lines[i] = line;
+                            kept = TRUE;
+                            break;
+                        }
+                    }
+                }
+                if (!kept)
+                    free((genericptr_t) line);
+            }
+            (void) fclose(xlfile);
+        }
+    }
+
+    if (!(xlfile = fopen_datafile(XLOGFILE, "w", SCOREPREFIX))) {
+#ifdef HANGUPHANDLING
+        if (!program_state.done_hup)
+#endif
+            raw_print("Cannot open extended log file!");
+    } else {
+        for (i = 0; i < count; i++) {
+            if (t0_used && tt_arr[i] == t0) {
+                writexlentry(xlfile, t0, how);
+            } else if (matched_lines[i] != (char *) 0) {
+                fputs(matched_lines[i], xlfile);
+                fputc('\n', xlfile);
+            }
+        }
+        (void) fclose(xlfile);
+    }
+
+    if (matched_lines) {
+        for (i = 0; i < count; i++) {
+            if (matched_lines[i])
+                free((genericptr_t) matched_lines[i]);
+        }
+        free((genericptr_t) matched_lines);
+    }
+    if (tt_arr)
+        free((genericptr_t) tt_arr);
+
+    unlock_file(XLOGFILE);
+}
+
 #endif /* XLOGFILE */
 
 staticfn void
@@ -630,12 +932,6 @@ topten(int how, time_t when)
     struct toptenentry *t0, *tprev;
     struct toptenentry *t1;
     FILE *rfile;
-#ifdef LOGFILE
-    FILE *lfile;
-#endif
-#ifdef XLOGFILE
-    FILE *xlfile;
-#endif
     int uid = getuid();
     int rank, rank0 = -1, rank1 = 0;
     int occ_cnt = sysopt.persmax;
@@ -690,7 +986,11 @@ topten(int how, time_t when)
     copynchars(t0->plrace, gu.urace.filecode, ROLESZ);
     copynchars(t0->plgend, genders[flags.female].filecode, ROLESZ);
     copynchars(t0->plalign, aligns[1 - u.ualign.type].filecode, ROLESZ);
+    /* DartHack (日本語コア NetHackJP に合わせた独自実装):
+       プレイヤー名は最大 NAMSZ_CHARS (10) UTF-8 文字まで保存し、マルチバイト
+       文字の途中切断を防ぐ。アップストリームで UTF-8 切り詰めが入った場合は追従する。 */
     copynchars(t0->name, svp.plname, NAMSZ);
+    utf8_char_truncate(t0->name, NAMSZ_CHARS);
     formatkiller(t0->death, sizeof t0->death, how, TRUE);
     t0->birthdate = yyyymmdd(ubirthday);
     t0->deathdate = yyyymmdd(when);
@@ -698,29 +998,6 @@ topten(int how, time_t when)
 #ifdef UPDATE_RECORD_IN_PLACE
     t0->fpos = -1L;
 #endif
-
-#ifdef LOGFILE /* used for debugging (who dies of what, where) */
-    if (lock_file(LOGFILE, SCOREPREFIX, 10)) {
-        if (!(lfile = fopen_datafile(LOGFILE, "a", SCOREPREFIX))) {
-            HUP raw_print("Cannot open log file!");
-        } else {
-            writeentry(lfile, t0);
-            (void) fclose(lfile);
-        }
-        unlock_file(LOGFILE);
-    }
-#endif /* LOGFILE */
-#ifdef XLOGFILE
-    if (lock_file(XLOGFILE, SCOREPREFIX, 10)) {
-        if (!(xlfile = fopen_datafile(XLOGFILE, "a", SCOREPREFIX))) {
-            HUP raw_print("Cannot open extended log file!");
-        } else {
-            writexlentry(xlfile, t0, how);
-            (void) fclose(xlfile);
-        }
-        unlock_file(XLOGFILE);
-    }
-#endif /* XLOGFILE */
 
     if (wizard || discover) {
         if (how != PANICKED)
@@ -758,6 +1035,11 @@ topten(int how, time_t when)
         t0->points = 0;
 
     t1 = tt_head = newttentry();
+    /* DartHack (日本語コア NetHackJP に合わせた独自実装):
+       NAMSZ を 40 に拡大したため、NUL 終端以降の未初期化バイトが残らないよう
+       構造体全体をゼロ初期化しておく (strncmp による誤比較防止)。
+       アップストリームで同様のゼロ初期化が導入された場合は上流に追従する。 */
+    *t1 = zerott;
     tprev = 0;
     /* rank0: -1 undefined, 0 not_on_list, n n_th on list */
     for (rank = 1; ; ) {
@@ -805,6 +1087,8 @@ topten(int how, time_t when)
         }
         if (rank <= sysopt.entrymax) {
             t1->tt_next = newttentry();
+            /* DartHack (日本語コア NetHackJP に合わせた独自実装): 新規ノードもゼロ初期化 */
+            *t1->tt_next = zerott;
             t1 = t1->tt_next;
             rank++;
         }
@@ -903,6 +1187,16 @@ topten(int how, time_t when)
 #endif /* UPDATE_RECORD_IN_PLACE */
     (void) fclose(rfile);
     unlock_file(RECORD);
+    if (flg) {
+        /* record 更新と同期し、showwin (display_nhwindow) より前に
+           logfile / xlogfile の確定内容を書き出す */
+#ifdef LOGFILE
+        sync_logfile_with_topten(tt_head);
+#endif
+#ifdef XLOGFILE
+        sync_xlogfile_with_topten(tt_head, t0, t0_used, how);
+#endif
+    }
     free_ttlist(tt_head);
 
  showwin:
@@ -956,8 +1250,11 @@ outentry(int rank, struct toptenentry *t1, boolean so)
     else
         Strcat(linebuf, "   ");
 
-    Sprintf(eos(linebuf), " %10ld  %.10s", t1->points ? t1->points : u.urexp,
-            t1->name);
+    /* DartHack (日本語コア NetHackJP に合わせた独自実装):
+       名前が最大 NAMSZ_CHARS (10) UTF-8 文字・最大 NAMSZ (40) バイト保持されるため、
+       %.10s の 10 バイト切断によるマルチバイト途中破損を防ぐ。上流対応時は追従する。 */
+    Sprintf(eos(linebuf), " %10ld  %.*s", t1->points ? t1->points : u.urexp,
+            (int) NAMSZ, t1->name);
     Sprintf(eos(linebuf), "-%s", t1->plrole);
     if (t1->plrace[0] != '?')
         Sprintf(eos(linebuf), "-%s", t1->plrace);
@@ -1272,6 +1569,8 @@ prscore(int argc, char **argv)
     raw_print("");
 
     t1 = tt_head = newttentry();
+    /* DartHack (日本語コア NetHackJP に合わせた独自実装): 構造体ゼロ初期化 */
+    *t1 = zerott;
     for (rank = 1; ; rank++) {
         readentry(rfile, t1);
         if (t1->points == 0)
@@ -1280,6 +1579,7 @@ prscore(int argc, char **argv)
             && score_wanted(current_ver, rank, t1, playerct, players, uid))
             match_found = TRUE;
         t1->tt_next = newttentry();
+        *t1->tt_next = zerott;
         t1 = t1->tt_next;
     }
 

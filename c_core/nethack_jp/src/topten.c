@@ -83,8 +83,15 @@ staticfn void outentry(int, struct toptenentry *, boolean);
 staticfn void discardexcess(FILE *);
 staticfn void readentry(FILE *, struct toptenentry *);
 staticfn void writeentry(FILE *, struct toptenentry *);
+#ifdef LOGFILE
+staticfn void sync_logfile_with_topten(struct toptenentry *);
+#endif
 #ifdef XLOGFILE
 staticfn void writexlentry(FILE *, struct toptenentry *, int);
+staticfn char *xlog_read_line(FILE *);
+staticfn boolean xlog_match_entry(const char *, const struct toptenentry *);
+staticfn void sync_xlogfile_with_topten(struct toptenentry *,
+                                        struct toptenentry *, boolean, int);
 staticfn long encodexlogflags(void);
 staticfn long encodeconduct(void);
 staticfn long encodeachieve(boolean);
@@ -2243,6 +2250,59 @@ writeentry(FILE *rfile, struct toptenentry *tt)
 
 RESTORE_WARNING_FORMAT_NONLITERAL
 
+#if defined(LOGFILE) || defined(XLOGFILE)
+/* USE_FCNTL 環境の lock_file() は対象ファイルが未存在だと O_RDWR で失敗する
+   ため、書き込み対象がある場合はロック前に空ファイルを作成する。"a" モードで
+   開くため、万一並行書込と競合しても既存データを切り詰めない。
+   戻り値: ファイルが存在する（ロック試行可能）なら TRUE、未存在なら FALSE。 */
+staticfn boolean
+ensure_score_logfile_exists(const char *fname, boolean create_if_missing)
+{
+    FILE *fp = fopen_datafile(fname, "r", SCOREPREFIX);
+
+    if (fp) {
+        (void) fclose(fp);
+        return TRUE;
+    }
+    if (!create_if_missing)
+        return FALSE;
+    fp = fopen_datafile(fname, "a", SCOREPREFIX);
+    if (!fp)
+        return FALSE;
+    (void) fclose(fp);
+    return TRUE;
+}
+#endif /* LOGFILE || XLOGFILE */
+
+#ifdef LOGFILE
+/* record (head) に残った上位エントリのみで logfile を再構築し肥大化を防ぐ */
+staticfn void
+sync_logfile_with_topten(struct toptenentry *head)
+{
+    FILE *lfile;
+    struct toptenentry *t1;
+    boolean has_entries = (head && head->points > 0L) ? TRUE : FALSE;
+
+    if (!ensure_score_logfile_exists(LOGFILE, has_entries))
+        return;
+
+    if (!lock_file(LOGFILE, SCOREPREFIX, 10))
+        return;
+    if (!(lfile = fopen_datafile(LOGFILE, "w", SCOREPREFIX))) {
+#ifdef HANGUPHANDLING
+        if (!program_state.done_hup)
+#endif
+            raw_print("ログファイルを開けない。");
+    } else {
+        for (t1 = head; t1 && t1->points > 0L; t1 = t1->tt_next) {
+            writeentry(lfile, t1);
+        }
+        (void) fclose(lfile);
+    }
+    unlock_file(LOGFILE);
+}
+#endif /* LOGFILE */
+
 #ifdef XLOGFILE
 
 /* as tab is never used in eg. svp.plname or death, no need to mangle those. */
@@ -2519,6 +2579,223 @@ encode_extended_conducts(char *buf)
     return buf;
 }
 
+/* xlogfile 1行を改行まで動的バッファで読み込む（長い achieveX 行の切り捨て防止） */
+staticfn char *
+xlog_read_line(FILE *fp)
+{
+    size_t cap = 4096;
+    size_t len = 0;
+    char *buf;
+    int ch;
+
+    buf = (char *) alloc((unsigned int) cap);
+    while ((ch = fgetc(fp)) != EOF) {
+        if (ch == '\n')
+            break;
+        if (ch == '\r')
+            continue;
+        if (len + 1 >= cap) {
+            if (cap < 65536) {
+                size_t newcap = cap * 2;
+                char *newbuf = (char *) alloc((unsigned int) newcap);
+                memcpy(newbuf, buf, len);
+                free((genericptr_t) buf);
+                buf = newbuf;
+                cap = newcap;
+            } else {
+                /* 異常長行の残りは読み飛ばす */
+                continue;
+            }
+        }
+        buf[len++] = (char) ch;
+    }
+    if (ch == EOF && len == 0) {
+        free((genericptr_t) buf);
+        return (char *) 0;
+    }
+    buf[len] = '\0';
+    return buf;
+}
+
+/* xlogfile の1行が record エントリ tt と一致するか照合する */
+staticfn boolean
+xlog_match_entry(const char *line, const struct toptenentry *tt)
+{
+    const char *p = line;
+    unsigned found_mask = 0;
+
+    if (!line || !tt || tt->points <= 0L)
+        return FALSE;
+
+    while (*p) {
+        const char *sep = strchr(p, '\t');
+        size_t tok_len = sep ? (size_t) (sep - p) : strlen(p);
+        const char *eq = (const char *) memchr(p, '=', tok_len);
+
+        if (eq) {
+            size_t klen = (size_t) (eq - p);
+            const char *val = eq + 1;
+            size_t vlen = tok_len - klen - 1;
+            char vbuf[128];
+            size_t cpy = (vlen < sizeof(vbuf) - 1) ? vlen : (sizeof(vbuf) - 1);
+
+            memcpy(vbuf, val, cpy);
+            vbuf[cpy] = '\0';
+
+            if (klen == 6 && strncmp(p, "points", 6) == 0) {
+                if (atol(vbuf) != tt->points) return FALSE;
+                found_mask |= (1U << 0);
+            } else if (klen == 9 && strncmp(p, "deathdnum", 9) == 0) {
+                if (atoi(vbuf) != tt->deathdnum) return FALSE;
+                found_mask |= (1U << 1);
+            } else if (klen == 8 && strncmp(p, "deathlev", 8) == 0) {
+                if (atoi(vbuf) != tt->deathlev) return FALSE;
+                found_mask |= (1U << 2);
+            } else if (klen == 6 && strncmp(p, "maxlvl", 6) == 0) {
+                if (atoi(vbuf) != tt->maxlvl) return FALSE;
+                found_mask |= (1U << 3);
+            } else if (klen == 2 && strncmp(p, "hp", 2) == 0) {
+                if (atoi(vbuf) != tt->hp) return FALSE;
+                found_mask |= (1U << 4);
+            } else if (klen == 5 && strncmp(p, "maxhp", 5) == 0) {
+                if (atoi(vbuf) != tt->maxhp) return FALSE;
+                found_mask |= (1U << 5);
+            } else if (klen == 6 && strncmp(p, "deaths", 6) == 0) {
+                if (atoi(vbuf) != tt->deaths) return FALSE;
+                found_mask |= (1U << 6);
+            } else if (klen == 9 && strncmp(p, "deathdate", 9) == 0) {
+                if (atol(vbuf) != tt->deathdate) return FALSE;
+                found_mask |= (1U << 7);
+            } else if (klen == 9 && strncmp(p, "birthdate", 9) == 0) {
+                if (atol(vbuf) != tt->birthdate) return FALSE;
+                found_mask |= (1U << 8);
+            } else if (klen == 3 && strncmp(p, "uid", 3) == 0) {
+                if (atoi(vbuf) != tt->uid) return FALSE;
+                found_mask |= (1U << 9);
+            } else if (klen == 4 && strncmp(p, "role", 4) == 0) {
+                if (strcmp(vbuf, tt->plrole) != 0) return FALSE;
+                found_mask |= (1U << 10);
+            } else if (klen == 4 && strncmp(p, "race", 4) == 0) {
+                if (strcmp(vbuf, tt->plrace) != 0) return FALSE;
+                found_mask |= (1U << 11);
+            } else if (klen == 6 && strncmp(p, "gender", 6) == 0) {
+                if (strcmp(vbuf, tt->plgend) != 0) return FALSE;
+                found_mask |= (1U << 12);
+            } else if (klen == 5 && strncmp(p, "align", 5) == 0) {
+                if (strcmp(vbuf, tt->plalign) != 0) return FALSE;
+                found_mask |= (1U << 13);
+            } else if (klen == 4 && strncmp(p, "name", 4) == 0) {
+                char xname[NAMSZ + 1];
+                size_t xcpy = (vlen < NAMSZ) ? vlen : NAMSZ;
+
+                memcpy(xname, val, xcpy);
+                xname[xcpy] = '\0';
+                utf8_char_truncate(xname, NAMSZ_CHARS);
+                if (strcmp(xname, tt->name) != 0) {
+                    if (!(strcmp(tt->name, "_") == 0 && onlyspace(xname)))
+                        return FALSE;
+                }
+                found_mask |= (1U << 14);
+            }
+        }
+
+        if (!sep)
+            break;
+        p = sep + 1;
+    }
+
+    return (found_mask == ((1U << 15) - 1U)) ? TRUE : FALSE;
+}
+
+/* record (head) と1対1で同期するよう xlogfile を再構築する */
+staticfn void
+sync_xlogfile_with_topten(struct toptenentry *head, struct toptenentry *t0,
+                          boolean t0_used, int how)
+{
+    FILE *xlfile;
+    struct toptenentry *t1;
+    struct toptenentry **tt_arr = (struct toptenentry **) 0;
+    char **matched_lines = (char **) 0;
+    int count = 0;
+    int i;
+
+    for (t1 = head; t1 && t1->points > 0L; t1 = t1->tt_next)
+        count++;
+
+    if (!ensure_score_logfile_exists(XLOGFILE, (boolean) (count > 0)))
+        return;
+
+    if (!lock_file(XLOGFILE, SCOREPREFIX, 10))
+        return;
+
+    if (count > 0) {
+        tt_arr = (struct toptenentry **) alloc(
+            (unsigned int) (sizeof(struct toptenentry *) * (size_t) count));
+        matched_lines = (char **) alloc(
+            (unsigned int) (sizeof(char *) * (size_t) count));
+        for (i = 0, t1 = head; i < count && t1 && t1->points > 0L;
+             i++, t1 = t1->tt_next) {
+            tt_arr[i] = t1;
+            matched_lines[i] = (char *) 0;
+        }
+
+        /* 既存 xlogfile があればストリーミング読込して一致行を1対1消費する。
+           新規インストール直後等で未存在 ("r" が NULL) の場合はエラーにせず新規作成へ進む。 */
+        xlfile = fopen_datafile(XLOGFILE, "r", SCOREPREFIX);
+        if (xlfile) {
+            char *line;
+            while ((line = xlog_read_line(xlfile)) != (char *) 0) {
+                boolean kept = FALSE;
+                if (line[0] != '\0') {
+                    for (i = 0; i < count; i++) {
+                        if (t0_used && tt_arr[i] == t0)
+                            continue;
+                        if (matched_lines[i] != (char *) 0)
+                            continue;
+                        if (xlog_match_entry(line, tt_arr[i])) {
+                            matched_lines[i] = line;
+                            kept = TRUE;
+                            break;
+                        }
+                    }
+                }
+                if (!kept)
+                    free((genericptr_t) line);
+            }
+            (void) fclose(xlfile);
+        }
+    }
+
+    if (!(xlfile = fopen_datafile(XLOGFILE, "w", SCOREPREFIX))) {
+#ifdef HANGUPHANDLING
+        if (!program_state.done_hup)
+#endif
+            raw_print("拡張ログファイルを開けない。");
+    } else {
+        for (i = 0; i < count; i++) {
+            if (t0_used && tt_arr[i] == t0) {
+                writexlentry(xlfile, t0, how);
+            } else if (matched_lines[i] != (char *) 0) {
+                fputs(matched_lines[i], xlfile);
+                fputc('\n', xlfile);
+            }
+        }
+        (void) fclose(xlfile);
+    }
+
+    if (matched_lines) {
+        for (i = 0; i < count; i++) {
+            if (matched_lines[i])
+                free((genericptr_t) matched_lines[i]);
+        }
+        free((genericptr_t) matched_lines);
+    }
+    if (tt_arr)
+        free((genericptr_t) tt_arr);
+
+    unlock_file(XLOGFILE);
+}
+
 #endif /* XLOGFILE */
 
 staticfn void
@@ -2540,12 +2817,6 @@ topten(int how, time_t when)
     struct toptenentry *t0, *tprev;
     struct toptenentry *t1;
     FILE *rfile;
-#ifdef LOGFILE
-    FILE *lfile;
-#endif
-#ifdef XLOGFILE
-    FILE *xlfile;
-#endif
     int uid = getuid();
     int rank, rank0 = -1, rank1 = 0;
     int occ_cnt = sysopt.persmax;
@@ -2613,29 +2884,6 @@ topten(int how, time_t when)
 #ifdef UPDATE_RECORD_IN_PLACE
     t0->fpos = -1L;
 #endif
-
-#ifdef LOGFILE /* used for debugging (who dies of what, where) */
-    if (lock_file(LOGFILE, SCOREPREFIX, 10)) {
-        if (!(lfile = fopen_datafile(LOGFILE, "a", SCOREPREFIX))) {
-            HUP raw_print("ログファイルを開けない。");
-        } else {
-            writeentry(lfile, t0);
-            (void) fclose(lfile);
-        }
-        unlock_file(LOGFILE);
-    }
-#endif /* LOGFILE */
-#ifdef XLOGFILE
-    if (lock_file(XLOGFILE, SCOREPREFIX, 10)) {
-        if (!(xlfile = fopen_datafile(XLOGFILE, "a", SCOREPREFIX))) {
-            HUP raw_print("拡張ログファイルを開けない。");
-        } else {
-            writexlentry(xlfile, t0, how);
-            (void) fclose(xlfile);
-        }
-        unlock_file(XLOGFILE);
-    }
-#endif /* XLOGFILE */
 
     if (wizard || discover) {
         if (how != PANICKED)
@@ -2822,6 +3070,16 @@ topten(int how, time_t when)
 #endif /* UPDATE_RECORD_IN_PLACE */
     (void) fclose(rfile);
     unlock_file(RECORD);
+    if (flg) {
+        /* record 更新と同期し、showwin (display_nhwindow) より前に
+           logfile / xlogfile の確定内容を書き出す */
+#ifdef LOGFILE
+        sync_logfile_with_topten(tt_head);
+#endif
+#ifdef XLOGFILE
+        sync_xlogfile_with_topten(tt_head, t0, t0_used, how);
+#endif
+    }
     free_ttlist(tt_head);
 
  showwin:

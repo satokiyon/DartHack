@@ -2,10 +2,12 @@
 <full-backup-content>
     <!-- nethackdir 内（スコアファイル record, logfile、骨ファイル bon* 等）をバックアップ対象にする -->
     <include domain="file" path="nethackdir" />
-    <!-- 死亡して削除されたセーブデータのゾンビ復活を防止するため除外 -->
+    <!-- 死亡して削除されたセーブデータや一時レベルファイルのゾンビ復活を防止するため除外 -->
     <exclude domain="file" path="nethackdir/save" />
+    <exclude domain="file" path="nethackdir/levels" />
 
-    <!-- アプリ設定（音量、操作設定等） -->
+    <!-- アプリ設定（Jetpack DataStore および 旧 SharedPreferences XML） -->
+    <include domain="file" path="datastore" />
     <include domain="sharedpref" path="." />
 
     <!-- ユーザーインポート済みのカスタムタイル・フォント -->
