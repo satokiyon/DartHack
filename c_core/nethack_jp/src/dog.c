@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-04. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-12. */
 /* $NHDT-Header: NetHack 5.0 dog.c 2026/08/23_22:51:13 NetHack-5.0:1.200 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2011. */
@@ -1017,6 +1017,8 @@ dogfood(struct monst *mon, struct obj *obj)
 
         if (obj->otyp == CORPSE && is_rider(fptr))
             return TABU;
+        if (obj->otyp == CORPSE && obj_has_timer(obj, ZOMBIFY_MON))
+            return POISON;
         if ((obj->otyp == CORPSE || obj->otyp == EGG)
             && flesh_petrifies(fptr) /* c*ckatrice or Medusa */
             && !resists_ston(mon))

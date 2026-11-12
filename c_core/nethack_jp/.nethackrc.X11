@@ -23,6 +23,8 @@ OPTIONS=tiled_map
 
 # General options
 OPTIONS=time,showexp,number_pad:0,lit_corridor,mouse_support:1
+# マウスボタン割り当て（左クリック: 移動・状況別行動 / 右クリック: コマンドメニュー）
+BINDINGS=mouse1:mouseaction,mouse2:therecmdmenu
 OPTIONS=force_invmenu
 OPTIONS=suppress_alert:3.3.1
 

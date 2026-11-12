@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-08. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-12. */
 /* $NHDT-Header: NetHack 5.0 wincurs.h 2026/10/03_12:08:42 NetHack-5.0:1.62 $ */
 /* Copyright (c) Karl Garrison, 2010. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -156,6 +156,7 @@ extern boolean curses_map_borders(int *sx, int *sy, int *ex, int *ey,
 
 extern int curses_getch(void);
 extern int curses_read_char(void);
+extern int curses_read_poskey(void);
 extern void curses_toggle_color_attr(WINDOW *win, int color, int attr,
                                      int onoff);
 extern void curses_menu_color_attr(WINDOW *, int, int, int);

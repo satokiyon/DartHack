@@ -124,6 +124,9 @@ MENUCOLOR="未払い" = blue
 # or 2(on,legacy-mode) which causes 5='g', alt-5='G', alt-0='I'
 OPTIONS=time,showexp,number_pad:0,lit_corridor,mouse_support:1
 
+# マウスボタン割り当て（左クリック: 移動・状況別行動 / 右クリック: コマンドメニュー）
+BINDINGS=mouse1:mouseaction,mouse2:therecmdmenu
+
 # Make commands that ask for an inventory item pop up a menu
 OPTIONS=force_invmenu
 

@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-09. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-12. */
 /* $NHDT-Header: NetHack 5.0 extern.h 2026/10/17_14:49:13 NetHack-5.0:1.1583 $ */
 /* Copyright (c) Steve Creps, 1988.                               */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -2066,7 +2066,8 @@ extern int dosuspend(void);
 extern void nt_regularize(char *);
 extern int(*nt_kbhit)(void);
 extern void Delay(int);
-boolean get_user_home_folder(char *, size_t);
+extern boolean get_user_home_folder(char *, size_t);
+extern boolean WindowsTerminalActive(void);
 # ifdef CRASHREPORT
 struct CRctxt;
 extern struct CRctxt *ctxp;
@@ -2235,6 +2236,7 @@ extern void tty_ibmgraphics_fixup(void);
 #ifdef WIN32CON
 extern const char *win32con_topl_fixup(const char *);
 #endif
+extern boolean wincon_WindowsTerminalActive(void);
 #endif /* WIN32 */
 
 /* ### o_init.c ### */

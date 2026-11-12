@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-09. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-12. */
 /* vim:set cin ft=c sw=4 sts=4 ts=8 et ai cino=Ls\:0t0(0 : -*- mode:c;fill-column:80;tab-width:8;c-basic-offset:4;indent-tabs-mode:nil;c-file-style:"k&r" -*-*/
 /* $NHDT-Header: NetHack 5.0 cursmisc.h 2026/11/07_00:30:42 NetHack-5.0:1.17 $ */
 /* Copyright (c) Karl Garrison, 2010. */
@@ -13,6 +13,7 @@
 
 int curses_getch(void);
 int curses_read_char(void);
+int curses_read_poskey(void);
 boolean curses_has_256color(void);
 void curses_toggle_color_attr(WINDOW *win, int color, int attr, int onoff);
 void curses_menu_color_attr(WINDOW *win, int color, int attr, int onoff);

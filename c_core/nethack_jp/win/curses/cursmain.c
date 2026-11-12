@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-09. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-12. */
 /* vim:set cin ft=c sw=4 sts=4 ts=8 et ai cino=Ls\:0t0(0 : -*- mode:c;fill-column:80;tab-width:8;c-basic-offset:4;indent-tabs-mode:nil;c-file-style:"k&r" -*-*/
 /* $NHDT-Header: NetHack 5.0 cursmain.c 2026/11/07_00:19:58 NetHack-5.0:1.141 $ */
 /* Copyright (c) Karl Garrison, 2010. */
@@ -1117,7 +1117,15 @@ int nh_poskey(coordxy *x, coordxy *y, int *mod)
 int
 curses_nh_poskey(coordxy *x, coordxy *y, int *mod)
 {
-    int key = curses_nhgetch();
+    int key = 0;
+
+    if (!activemenu)
+        curses_prehousekeeping();
+
+    key = curses_read_poskey();
+
+    if (!activemenu)
+        curses_posthousekeeping();
 
 #ifdef NCURSES_MOUSE_VERSION
     /* Mouse event if mouse_support is true */
