@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-04. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-12. */
 /* $NHDT-Header: NetHack 5.0 do_wear.c 2026/06/20_22:26:43 NetHack-5.0:1.214 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
@@ -2585,9 +2585,7 @@ glibr(void)
            with something else in the other hand and also that it's
            a weapon or weptool rather than something unusual, plus
            we don't need to compare its type with the primary */
-        otherwep = is_sword(otmp) ? c_sword : weapon_descr(otmp);
-        if (otmp->quan > 1L)
-            otherwep = makeplural(otherwep);
+        otherwep = is_sword(otmp) ? c_sword : weapon_descr_jp(otmp);
         hand = jp_body_part(HAND);
         which = URIGHTY ? "左" : "右";  /* text for the off hand */
            Your("%sが%s%s%sから滑り落ちた.", otherwep, xfl ? "さらに" : "", which,
@@ -2601,27 +2599,14 @@ glibr(void)
     }
     otmp = uwep;
     if (otmp && otmp->otyp != AKLYS && !welded(otmp)) {
-        long savequan = otmp->quan;
-
-        /* nice wording if both weapons are the same type */
-        thiswep = is_sword(otmp) ? c_sword : weapon_descr(otmp);
-        if (otherwep && strcmp(thiswep, makesingular(otherwep)))
+        /* 両手の武器が同種なら表現を自然にまとめる（日本語では複数形変化なし） */
+        thiswep = is_sword(otmp) ? c_sword : weapon_descr_jp(otmp);
+        if (otherwep && strcmp(thiswep, otherwep))
             otherwep = 0;
-        if (otmp->quan > 1L) {
-            /* most class names for unconventional wielded items
-               are ok, but if wielding multiple apples or rations
-               we don't want "your foods slip", so force non-corpse
-               food to be singular; skipping makeplural() isn't
-               enough--we need to fool otense() too */
-            if (!strcmp(thiswep, "food"))
-                otmp->quan = 1L;
-            else
-                thiswep = makeplural(thiswep);
-        }
         hand = jp_body_part(HAND);
         which = "";
         if (bimanual(otmp)) {
-            hand = makeplural(hand);
+            hand = jp_body_part_plural(HAND);
         } else if (wastwoweap) {
             /* preceding msg was about non-dominant hand */
                         which = URIGHTY ? "左の" : "右の";
@@ -2630,7 +2615,6 @@ glibr(void)
                             otherwep ? "もう片方の" : "あなたの",
                             thiswep, which, hand, xfl ? "さらに" : "");
         /* xfl++; */
-        otmp->quan = savequan;
         setuwep((struct obj *) 0);
         cmdq_clear(CQ_CANNED);
         if (canletgo(otmp, ""))
