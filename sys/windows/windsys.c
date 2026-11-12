@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-04. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-12. */
 /* $NHDT-Header: NetHack 5.0 windsys.c 2026/05/16_16:15:20 NetHack-5.0:1.121 $ */
 /* Copyright (c) Michael Allison, 2026 */
 /* Copyright (c) NetHack PC Development Team 1993, 1994 */
@@ -581,15 +581,6 @@ free_nhuuid(void)
 }
 
 #ifdef WIN32CON
-#undef kbhit
-#include <conio.h>
-
-int
-windows_console_custom_nhgetch(void)
-{
-    return _getch();
-}
-
 extern int windows_console_custom_nhgetch(void);
 
 void
@@ -611,6 +602,17 @@ getreturn(const char *str)
     return;
 }
 #endif
+
+boolean
+WindowsTerminalActive(void)
+{
+#ifdef WIN32CON
+    return wincon_WindowsTerminalActive();
+#else
+    return FALSE;
+#endif
+}
+
 
 /* nethack_enter_windows() is called from main immediately after
    initializing the window port */

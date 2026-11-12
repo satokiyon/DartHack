@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-09. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-12. */
 /* $NHDT-Header: NetHack 5.0 windmain.c 2026/07/31_12:59:20 NetHack-5.0:1.236 $ */
 /* Copyright (c) Derek S. Ray, 2015. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -234,6 +234,9 @@ _CrtSetReportFile(_CRT_ASSERT, _CRTDBG_FILE_STDERR);*/
 
     program_state.early_options = 1;
 
+#ifdef WIN32CON
+    rcfile_only_this_option(opt_windowsterminal);
+#endif
 #if !defined(MSWIN_GRAPHICS)
     nethack_enter_consoletty();
     consoletty_open(1);
