@@ -99,8 +99,8 @@ class NetHackScreen extends ChangeNotifier {
     }
   }
 
-  // ステータス (通常2行)
-  final List<String> _statusLines = ["", ""];
+  // ステータス (1〜3行対応)
+  final List<String> _statusLines = ["", "", ""];
   List<String> get statusLines => _statusLines;
 
   // マップ (21行 x 80列)
@@ -199,8 +199,9 @@ class NetHackScreen extends ChangeNotifier {
     } else if (type == nhwMessage) {
       _messages.clear();
     } else if (type == nhwStatus) {
-      _statusLines[0] = "";
-      _statusLines[1] = "";
+      for (int i = 0; i < _statusLines.length; i++) {
+        _statusLines[i] = "";
+      }
     } else if (type == nhwText || type == nhwMenu) {
       _textLines.clear();
       _textAttrs.clear();
@@ -289,19 +290,7 @@ class NetHackScreen extends ChangeNotifier {
         }
       }
     } else if (type == nhwStatus || winId == 2 /* WIN_STATUS */) {
-      if (_statusCursorY >= 0 && _statusCursorY < _statusLines.length) {
-        _statusLines[_statusCursorY] = text;
-      } else {
-        // フォールバック
-        if (_statusLines[0].isEmpty) {
-          _statusLines[0] = text;
-        } else if (_statusLines[1].isEmpty) {
-          _statusLines[1] = text;
-        } else {
-          _statusLines[0] = _statusLines[1];
-          _statusLines[1] = text;
-        }
-      }
+      _putStatusLine(text);
     } else if (type == nhwText || type == nhwMenu) {
       final lines = text.split(RegExp(r'[\r\n]+'));
       for (final l in lines) {
@@ -346,25 +335,29 @@ class NetHackScreen extends ChangeNotifier {
         }
       }
     } else if (type == nhwStatus || winId == 2 /* WIN_STATUS */) {
-      if (_statusCursorY >= 0 && _statusCursorY < _statusLines.length) {
-        _statusLines[_statusCursorY] = text;
-      } else {
-        // フォールバック
-        if (_statusLines[0].isEmpty) {
-          _statusLines[0] = text;
-        } else if (_statusLines[1].isEmpty) {
-          _statusLines[1] = text;
-        } else {
-          _statusLines[0] = _statusLines[1];
-          _statusLines[1] = text;
-        }
-      }
+      _putStatusLine(text);
     } else if (type == nhwText || type == nhwMenu) {
       _textLines.add(text);
       _textAttrs.add(attr);
       _textTiles.add(tile);
     }
     notifyListeners();
+  }
+
+  void _putStatusLine(String text) {
+    if (_statusCursorY >= 0 && _statusCursorY < _statusLines.length) {
+      _statusLines[_statusCursorY] = text;
+      return;
+    }
+    final emptyIdx = _statusLines.indexWhere((line) => line.isEmpty);
+    if (emptyIdx != -1) {
+      _statusLines[emptyIdx] = text;
+      return;
+    }
+    for (int i = 0; i < _statusLines.length - 1; i++) {
+      _statusLines[i] = _statusLines[i + 1];
+    }
+    _statusLines[_statusLines.length - 1] = text;
   }
 
   void displayWindow(int winId, bool blocking, {bool isPlain = false, int plainType = 0}) {

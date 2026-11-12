@@ -1628,4 +1628,60 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get usePhysicalKeyboardNotationSub =>
       'Show shortcut keys (y:, n:, Esc:, etc.) on buttons. When ON, press F1 or M-h (Alt-h) to display controls help';
+
+  @override
+  String get statusFontSize => 'Font Size';
+
+  @override
+  String statusFontSizeLabel(Object size) {
+    return 'Current: $size pt';
+  }
+
+  @override
+  String get statusLineLayoutTitle => 'Status lines & layout';
+
+  @override
+  String get statusLineLayoutSub =>
+      'Choose 1 to 3 lines (ultra compact keeps essential combat fields only)';
+
+  @override
+  String get statusLineLayoutCompact1 => '1 line (Ultra compact)';
+
+  @override
+  String get statusLineLayoutSingleAll => '1 line (All fields)';
+
+  @override
+  String get statusLineLayoutTwo => '2 lines (Standard)';
+
+  @override
+  String get statusLineLayoutThree => '3 lines (Expanded)';
+
+  @override
+  String get optWeaponstatus => 'Wielded Weapon (weaponstatus)';
+
+  @override
+  String get weaponstatusSub =>
+      'Show wielded weapon summary on status bar (tap or long-press for full equipment)';
+
+  @override
+  String get optArmorstatus => 'Worn Armor (armorstatus)';
+
+  @override
+  String get armorstatusSub =>
+      'Show worn armor summary on status bar (tap or long-press for full equipment)';
+
+  @override
+  String get optTerrainstatus => 'Current Terrain (terrainstatus)';
+
+  @override
+  String get terrainstatusSub =>
+      'Show current floor/terrain name on status bar';
+
+  @override
+  String get statusSingleAllNote =>
+      'Note: \'1 line (All fields)\' works best with Variable Height or wide screens.';
+
+  @override
+  String get statusCompactHiddenHint =>
+      '* Hidden in 1 line (Ultra compact) mode';
 }

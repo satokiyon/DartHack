@@ -205,6 +205,30 @@ typedef LookupKeyDescriptionDart = void Function(int code);
 typedef RequestSymsetChangeFunc = Void Function(Pointer<Utf8> symsetName, Int32 isRogue);
 typedef RequestSymsetChangeDart = void Function(Pointer<Utf8> symsetName, int isRogue);
 
+typedef SetStatusLayoutFunc = Void Function(Int32 layout);
+typedef SetStatusLayoutDart = void Function(int layout);
+
+typedef RequestStatusOptionsChangeFunc = Void Function(
+    Int32 hitpointbar,
+    Int32 hiliteStatus,
+    Int32 timeOpt,
+    Int32 showexp,
+    Int32 statuslines,
+    Int32 weaponstatus,
+    Int32 armorstatus,
+    Int32 terrainstatus,
+    Int32 statusLayout);
+typedef RequestStatusOptionsChangeDart = void Function(
+    int hitpointbar,
+    int hiliteStatus,
+    int timeOpt,
+    int showexp,
+    int statuslines,
+    int weaponstatus,
+    int armorstatus,
+    int terrainstatus,
+    int statusLayout);
+
 class NetHackFfi {
   late DynamicLibrary _lib;
 
@@ -235,6 +259,8 @@ class NetHackFfi {
   late final SetAutosaveSettingsDart setAutosaveSettings;
   late final LookupKeyDescriptionDart lookupKeyDescription;
   late final RequestSymsetChangeDart requestSymsetChangeNative;
+  late final SetStatusLayoutDart setStatusLayoutNative;
+  late final RequestStatusOptionsChangeDart requestStatusOptionsChangeNative;
 
   NetHackFfi([String? langCode]) {
     final effectiveLang = langCode ?? NetHackCoreLoader.currentLanguage;
@@ -394,6 +420,70 @@ class NetHackFfi {
           .asFunction<RequestSymsetChangeDart>();
     } catch (e) {
       requestSymsetChangeNative = (_, _) {};
+    }
+
+    try {
+      setStatusLayoutNative = _lib
+          .lookup<NativeFunction<SetStatusLayoutFunc>>('SetStatusLayoutFlutter')
+          .asFunction<SetStatusLayoutDart>();
+    } catch (e) {
+      setStatusLayoutNative = (_) {};
+    }
+
+    try {
+      requestStatusOptionsChangeNative = _lib
+          .lookup<NativeFunction<RequestStatusOptionsChangeFunc>>('RequestStatusOptionsChangeFlutter')
+          .asFunction<RequestStatusOptionsChangeDart>();
+    } catch (e) {
+      requestStatusOptionsChangeNative = (_, _, _, _, _, _, _, _, _) {};
+    }
+  }
+
+  /// ステータス行レイアウト種別文字列を C 側定数へ変換
+  static int statusLayoutToCode(String layout) {
+    switch (layout) {
+      case 'single_all':
+        return 1;
+      case 'single_compact':
+        return 2;
+      default:
+        return 0;
+    }
+  }
+
+  void setStatusLayout(String layout) {
+    try {
+      setStatusLayoutNative(statusLayoutToCode(layout));
+    } catch (e) {
+      debugPrint("Warning: Failed to set status layout: $e");
+    }
+  }
+
+  void requestStatusOptionsChange({
+    required bool hitpointbar,
+    required bool hiliteStatus,
+    required bool timeOpt,
+    required bool showexp,
+    int statuslines = 2,
+    bool weaponstatus = false,
+    bool armorstatus = false,
+    bool terrainstatus = false,
+    String statusLayout = 'standard',
+  }) {
+    try {
+      requestStatusOptionsChangeNative(
+        hitpointbar ? 1 : 0,
+        hiliteStatus ? 1 : 0,
+        timeOpt ? 1 : 0,
+        showexp ? 1 : 0,
+        statuslines >= 3 ? 3 : 2,
+        weaponstatus ? 1 : 0,
+        armorstatus ? 1 : 0,
+        terrainstatus ? 1 : 0,
+        statusLayoutToCode(statusLayout),
+      );
+    } catch (e) {
+      debugPrint("Warning: Failed to request status options change: $e");
     }
   }
 

@@ -1089,12 +1089,12 @@ static struct istat_s initblstats[MAXBLSTATS] = {
     INIT_BLSTAT("condition", "%s", ANY_MASK32, 0, BL_CONDITION),
     /* weapon and armor are constructed strings with no particular numeric
        equivalent */
-    INIT_BLSTAT("weapon", " 武器:%s", ANY_STR, 20, BL_WEAPON),
-    INIT_BLSTAT("armor", " 防具:%s", ANY_STR, 20, BL_ARMOR),
+    INIT_BLSTAT("weapon", " 武器:%s", ANY_STR, MAXVALWIDTH, BL_WEAPON),
+    INIT_BLSTAT("armor", " 防具:%s", ANY_STR, MAXVALWIDTH, BL_ARMOR),
     /* terrain is tracked by a number but designating it as type 'int'
        isn't useful; using type 'string' allows highlighting based on text
        matching which is potentially useful */
-    INIT_BLSTAT("terrain", " 地形:%s", ANY_STR, 20, BL_TERRAIN),
+    INIT_BLSTAT("terrain", " 地形:%s", ANY_STR, MAXVALWIDTH, BL_TERRAIN),
     /* optional; once set it doesn't change unless 'showvers' option is
        toggled or player modifies the 'versinfo' option;
        available mostly for screenshots or someone looking over shoulder;

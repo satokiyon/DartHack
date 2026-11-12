@@ -18,7 +18,6 @@ import 'nethack_ffi.dart';
 import 'nethack_core_loader.dart';
 import 'settings_page.dart';
 import 'utils/defaults_helper.dart';
-import 'utils/nethack_colors.dart';
 import 'utils/app_prefs.dart';
 import 'utils/map_camera.dart';
 import 'amount_selector_dialog.dart';
@@ -51,6 +50,14 @@ import 'widgets/overlays/any_key_overlay.dart';
 import 'widgets/overlays/getline_overlay.dart';
 import 'widgets/overlays/askname_overlay.dart';
 import 'widgets/overlays/text_overlay.dart';
+import 'widgets/status_bar_view.dart';
+
+export 'widgets/status_bar_view.dart'
+    show
+        StatusBarInteractiveView,
+        HpBarClipper,
+        splitVerticalStatusFields,
+        parseStatusLine;
 import 'l10n/app_localizations.dart';
 import 'screens/start_screen.dart';
 import 'screens/end_screen.dart';
@@ -181,6 +188,7 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
   final NetHackScreen _screen = NetHackScreen();
   
   SendPort? _workerSendPort;
+  Isolate? _workerIsolate;
   bool _isGameRunning = false;
   bool _isGameFinished = false;
   bool _waitingForInput = false;
@@ -258,6 +266,8 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
   double _shortcutPadEffectiveScale = 1.0;
   double _cmdPanelEffectiveScale = 1.0;
   int _statusDisplayMode = 0; // 0: 領域に合わせて文字サイズ縮小(Fit), 1: 領域の可変高さ(Wrap)
+  double _statusFontSize = 13.0; // ステータス領域フォントサイズ (pt)
+  String _statusLineLayout = 'standard'; // 'standard', 'single_all', 'single_compact'
   int _tombstoneDisplayMode = 0; // 0: 画像+文字オーバーレイ, 1: Cコア出力そのまま(テキスト)
   ScreenMode _screenMode = ScreenMode.normal; // 0: 通常, 1: イマーシブ
   String _drawerPosition = 'left';
@@ -377,6 +387,12 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
       _shortcutPadScale = prefs.getDouble('shortcut_pad_scale') ?? 1.0;
       _cmdPanelScale = prefs.getDouble('cmd_panel_scale') ?? 1.0;
       _statusDisplayMode = prefs.getInt('status_display_mode') ?? 0;
+      _statusFontSize = (prefs.getDouble('status_font_size') ?? 13.0).clamp(8.0, 32.0);
+      final rawStatusLayout = prefs.getString('status_line_layout') ?? 'standard';
+      _statusLineLayout =
+          const ['standard', 'single_all', 'single_compact'].contains(rawStatusLayout)
+              ? rawStatusLayout
+              : 'standard';
       _tombstoneDisplayMode = _loadTombstoneDisplayMode(prefs.getInt('tombstone_display_mode'));
       _screenMode = _loadScreenMode(prefs.getInt('screen_mode'));
       _showPanelNames = prefs.getBool('show_panel_names') ?? true;
@@ -426,7 +442,7 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
       // メッセージ領域設定のロード
       _msgLineCount = prefs.getInt('msg_line_count') ?? 5;
       _msgOpacity = prefs.getDouble('msg_opacity') ?? 0.70;
-      _msgFontSize = prefs.getDouble('msg_font_size') ?? 13.0;
+      _msgFontSize = (prefs.getDouble('msg_font_size') ?? 13.0).clamp(8.0, 32.0);
 
       // 言語設定のロード
       _selectedLanguage = prefs.getString('selected_language') ?? 'ja';
@@ -1956,6 +1972,31 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
     });
   }
 
+  Future<void> _sendStatusOptionsToWorker({
+    required bool hitpointbar,
+    required bool hiliteStatus,
+    required bool timeOpt,
+    required bool showexp,
+    required int statuslines,
+    required bool weaponstatus,
+    required bool armorstatus,
+    required bool terrainstatus,
+    required String statusLineLayout,
+  }) async {
+    _workerSendPort?.send({
+      'type': 'request_status_options_change',
+      'hitpointbar': hitpointbar,
+      'hilite_status': hiliteStatus,
+      'time': timeOpt,
+      'showexp': showexp,
+      'statuslines': statuslines,
+      'weaponstatus': weaponstatus,
+      'armorstatus': armorstatus,
+      'terrainstatus': terrainstatus,
+      'status_line_layout': statusLineLayout,
+    });
+  }
+
   void _centerOnPlayer(Size viewportSize) {
     if (!_isGameRunning) return;
 
@@ -2414,13 +2455,29 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
     });
   }
 
-  Future<void> _showCoreLoadErrorDialog(String libraryName, String errorDetails) async {
+  Future<void> _showCoreLoadErrorDialog(String libraryName, String errorDetails) {
+    final presentation = WorkerStartupErrorPresentation.fromWorkerMessage(
+      message: {
+        'phase': WorkerErrorPhase.coreLoad,
+        'coreStarted': false,
+        'error': errorDetails,
+      },
+      libraryName: libraryName,
+      isJapanese: _selectedLanguage == 'ja',
+    );
+    return _showStartupErrorDialog(
+      title: presentation.title,
+      msg: presentation.message,
+      errorDetails: presentation.details,
+    );
+  }
+
+  Future<void> _showStartupErrorDialog({
+    required String title,
+    required String msg,
+    required String errorDetails,
+  }) async {
     if (!mounted) return;
-    final isJp = (_selectedLanguage == 'ja');
-    final title = isJp ? 'コア読込エラー' : 'Core Load Error';
-    final msg = isJp
-        ? 'NetHack コアライブラリ ($libraryName) の読み込みに失敗したため、ゲームを開始できません。'
-        : 'Failed to load NetHack core library ($libraryName). Cannot start the game.';
 
     await showDialog<void>(
       context: context,
@@ -2631,10 +2688,22 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
     });
 
     _applyScreenMode(_screenMode);
+    _workerIsolate = null;
+    _workerSendPort = null;
+
+    // 二重起動防止のため _isGameRunning = true の確定後に設定を読み出す
+    final prefs = await AppPrefs.getInstance();
+    final initialAutosaveEnabled = prefs.getBool('autosave_enabled') ?? true;
+    final initialAutosaveInterval = prefs.getInt('autosave_interval') ?? 50;
+    if (!mounted) {
+      _isGameRunning = false;
+      return;
+    }
 
     _addLog("Spawning NetHack Worker Isolate...");
 
     final receivePort = ReceivePort();
+    bool workerStartupAborted = false;
 
     receivePort.listen((message) {
       if (message is Map) {
@@ -2643,24 +2712,47 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
         if (type == 'worker_log') {
           print("[WorkerIsolate Log] ${message['text']}");
         } else if (type == 'worker_error') {
-          print("[UI WORKER ERROR] ${message['error']}\n${message['stack']}");
-          _addLog("Worker Exception: ${message['error']}");
-          if (mounted) {
-            setState(() {
-              _isGameRunning = false;
-              _isMainGameStarted = false;
-            });
-            final libName = NetHackCoreLoader.getLibraryName(langCode: _selectedLanguage);
-            _showCoreLoadErrorDialog(libName, message['error']?.toString() ?? 'Unknown core error');
+          debugPrint(
+            "[UI WORKER ERROR] phase=${message['phase']} coreStarted=${message['coreStarted']} "
+            "${message['error']}\n${message['stack']}",
+          );
+          _addLog("Worker Exception (${message['phase']}): ${message['error']}");
+          final libName = NetHackCoreLoader.getLibraryName(langCode: _selectedLanguage);
+          final presentation = WorkerStartupErrorPresentation.fromWorkerMessage(
+            message: message,
+            libraryName: libName,
+            isJapanese: _selectedLanguage == 'ja',
+          );
+          if (presentation.shouldTerminateWorker) {
+            // Cスレッド未起動時の失敗のみ安全にIsolate/Portを解放してタイトル画面へ戻す
+            workerStartupAborted = true;
+            _workerIsolate?.kill(priority: Isolate.immediate);
+            _workerIsolate = null;
+            _workerSendPort = null;
+            receivePort.close();
+            if (mounted) {
+              setState(() {
+                _isGameRunning = false;
+                _isMainGameStarted = false;
+              });
+              _showStartupErrorDialog(
+                title: presentation.title,
+                msg: presentation.message,
+                errorDetails: presentation.details,
+              );
+            }
           }
         } else if (type == 'ready') {
+          if (workerStartupAborted) return;
           _workerSendPort = message['sendPort'];
           _addLog("Worker Isolate Ready. Starting Game...");
-          _sendAutosaveSettingsToWorker();
           _workerSendPort?.send({
             'type': 'start',
             'assetsPath': _assetsPath,
             'langCode': _selectedLanguage,
+            'status_line_layout': _statusLineLayout,
+            'autosave_enabled': initialAutosaveEnabled,
+            'autosave_interval': initialAutosaveInterval,
           });
         } else if (type == 'createWindow') {
           _screen.createWindow(message['winId'], message['winType']);
@@ -2917,7 +3009,38 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
       }
     });
 
-    await Isolate.spawn(NetHackWorker.start, receivePort.sendPort);
+    try {
+      final spawnedIsolate = await Isolate.spawn(NetHackWorker.start, receivePort.sendPort);
+      if (workerStartupAborted || !mounted) {
+        spawnedIsolate.kill(priority: Isolate.immediate);
+      } else {
+        _workerIsolate = spawnedIsolate;
+      }
+    } catch (e) {
+      receivePort.close();
+      _workerIsolate = null;
+      _workerSendPort = null;
+      if (mounted) {
+        final presentation = WorkerStartupErrorPresentation.fromWorkerMessage(
+          message: {
+            'phase': WorkerErrorPhase.workerInit,
+            'coreStarted': false,
+            'error': e.toString(),
+          },
+          libraryName: NetHackCoreLoader.getLibraryName(langCode: _selectedLanguage),
+          isJapanese: _selectedLanguage == 'ja',
+        );
+        setState(() {
+          _isGameRunning = false;
+          _isMainGameStarted = false;
+        });
+        await _showStartupErrorDialog(
+          title: presentation.title,
+          msg: presentation.message,
+          errorDetails: presentation.details,
+        );
+      }
+    }
   }
 
   void _stopGame() {
@@ -4023,50 +4146,13 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
                 }
               }
             });
-            return GestureDetector(
-              behavior: HitTestBehavior.opaque,
-              onTap: _isGameRunning && _isMainGameStarted && _waitingForInput
-                  ? () => _sendShortcutToC('#attributes\n')
-                  : null,
-              child: _statusDisplayMode == 0
-                  ? Container(
-                      height: 38,
-                      width: double.infinity,
-                      color: Colors.black,
-                      padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
-                      alignment: Alignment.centerLeft,
-                      child: FittedBox(
-                        fit: BoxFit.scaleDown,
-                        alignment: Alignment.centerLeft,
-                        child: Text.rich(
-                          TextSpan(
-                            children: _screen.statusLines.map((line) => _parseStatusLine(line)).toList().fold<List<InlineSpan>>([], (prev, element) {
-                              if (prev.isNotEmpty) {
-                                prev.add(const TextSpan(text: '\n'));
-                              }
-                              prev.add(element);
-                              return prev;
-                            }),
-                          ),
-                        ),
-                      ),
-                    )
-                  : Container(
-                      width: double.infinity,
-                      color: Colors.black,
-                      padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
-                      child: Text.rich(
-                        TextSpan(
-                          children: _screen.statusLines.map((line) => _parseStatusLine(line)).toList().fold<List<InlineSpan>>([], (prev, element) {
-                            if (prev.isNotEmpty) {
-                              prev.add(const TextSpan(text: '\n'));
-                            }
-                            prev.add(element);
-                            return prev;
-                          }),
-                        ),
-                      ),
-                    ),
+            final canInteract = _isGameRunning && _isMainGameStarted && _waitingForInput;
+            return StatusBarInteractiveView(
+              statusLines: _screen.statusLines,
+              statusDisplayMode: _statusDisplayMode,
+              statusFontSize: _statusFontSize,
+              onStatusTap: canInteract ? () => _sendShortcutToC('#attributes\n') : null,
+              onEquipmentTap: canInteract ? () => _sendShortcutToC('#seeall\n') : null,
             );
           },
         );
@@ -4140,20 +4226,22 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
           }
         });
 
-        final statusText = _screen.statusLines.join('\n');
-        final lines = statusText.split(RegExp(r'[\n\r]+')).expand((l) {
-          // 1行に複数項目がスペース区切りで入っている場合、適度に改行に分割する
-          final parts = l.split(RegExp(r'\s{2,}')).where((p) => p.trim().isNotEmpty);
-          return parts.isEmpty ? [l] : parts;
-        }).toList();
+        final lines = splitVerticalStatusFields(_screen.statusLines);
+        final VoidCallback? tapHandler =
+            (_isGameRunning && _isMainGameStarted && _waitingForInput)
+                ? () => _sendShortcutToC('#attributes\n')
+                : null;
+        final VoidCallback? equipmentTapHandler =
+            (_isGameRunning && _isMainGameStarted && _waitingForInput)
+                ? () => _sendShortcutToC('#seeall\n')
+                : null;
 
         return GestureDetector(
           behavior: HitTestBehavior.opaque,
-          onTap: _isGameRunning && _isMainGameStarted && _waitingForInput
-              ? () => _sendShortcutToC('#attributes\n')
-              : null,
+          onTap: tapHandler,
+          onLongPress: equipmentTapHandler,
           child: Container(
-            width: 115.0,
+            width: (115.0 * (_statusFontSize / 13.0)).clamp(100.0, MediaQuery.of(context).size.width * 0.42),
             height: double.infinity,
             color: Colors.black.withValues(alpha: 0.85),
             padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 8),
@@ -4165,7 +4253,9 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
                 children: lines.map((line) {
                   return Padding(
                     padding: const EdgeInsets.symmetric(vertical: 1.5),
-                    child: Text.rich(_parseStatusLine(line)),
+                    child: Text.rich(
+                      _parseStatusLine(line, onEquipmentTap: equipmentTapHandler),
+                    ),
                   );
                 }).toList(),
               ),
@@ -4177,22 +4267,68 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
   }
 
   void _showSettingsDialog() {
-    Navigator.of(context).push(
+    unawaited(_openSettingsDialogAsync());
+  }
+
+  Future<void> _openSettingsDialogAsync() async {
+    final beforePrefs = await AppPrefs.getInstance();
+    final beforeHpBar = beforePrefs.getBool('nh_opt_hitpointbar') ?? true;
+    final beforeHilite = beforePrefs.getBool('nh_opt_hilite_status') ?? true;
+    final beforeTime = beforePrefs.getBool('nh_opt_time') ?? true;
+    final beforeShowexp = beforePrefs.getBool('nh_opt_showexp') ?? true;
+    final beforeStatuslines = (beforePrefs.getInt('nh_opt_statuslines') ?? 2) == 3 ? 3 : 2;
+    final beforeWeaponstatus = beforePrefs.getBool('nh_opt_weaponstatus') ?? false;
+    final beforeArmorstatus = beforePrefs.getBool('nh_opt_armorstatus') ?? false;
+    final beforeTerrainstatus = beforePrefs.getBool('nh_opt_terrainstatus') ?? false;
+    final beforeStatusLayout = beforePrefs.getString('status_line_layout') ?? 'standard';
+
+    if (!mounted) return;
+    await Navigator.of(context).push(
       MaterialPageRoute(
         builder: (context) => SettingsPage(
           defaultsFilePath: '$_assetsPath/defaults.nh',
           dataDirString: _assetsPath,
         ),
       ),
-    ).then((_) {
-      _loadPreferences().then((_) {
-        if (_isGameRunning) {
-          _applyScreenMode(_screenMode);
-          _sendAutosaveSettingsToWorker();
-          _triggerCameraUpdate(force: true);
-        }
-      });
-    });
+    );
+
+    await _loadPreferences();
+    if (_isGameRunning) {
+      _applyScreenMode(_screenMode);
+      _sendAutosaveSettingsToWorker();
+      final afterPrefs = await AppPrefs.getInstance();
+      final afterHpBar = afterPrefs.getBool('nh_opt_hitpointbar') ?? true;
+      final afterHilite = afterPrefs.getBool('nh_opt_hilite_status') ?? true;
+      final afterTime = afterPrefs.getBool('nh_opt_time') ?? true;
+      final afterShowexp = afterPrefs.getBool('nh_opt_showexp') ?? true;
+      final afterStatuslines = (afterPrefs.getInt('nh_opt_statuslines') ?? 2) == 3 ? 3 : 2;
+      final afterWeaponstatus = afterPrefs.getBool('nh_opt_weaponstatus') ?? false;
+      final afterArmorstatus = afterPrefs.getBool('nh_opt_armorstatus') ?? false;
+      final afterTerrainstatus = afterPrefs.getBool('nh_opt_terrainstatus') ?? false;
+      final afterStatusLayout = afterPrefs.getString('status_line_layout') ?? 'standard';
+      if (beforeHpBar != afterHpBar ||
+          beforeHilite != afterHilite ||
+          beforeTime != afterTime ||
+          beforeShowexp != afterShowexp ||
+          beforeStatuslines != afterStatuslines ||
+          beforeWeaponstatus != afterWeaponstatus ||
+          beforeArmorstatus != afterArmorstatus ||
+          beforeTerrainstatus != afterTerrainstatus ||
+          beforeStatusLayout != afterStatusLayout) {
+        await _sendStatusOptionsToWorker(
+          hitpointbar: afterHpBar,
+          hiliteStatus: afterHilite,
+          timeOpt: afterTime,
+          showexp: afterShowexp,
+          statuslines: afterStatuslines,
+          weaponstatus: afterWeaponstatus,
+          armorstatus: afterArmorstatus,
+          terrainstatus: afterTerrainstatus,
+          statusLineLayout: afterStatusLayout,
+        );
+      }
+      _triggerCameraUpdate(force: true);
+    }
   }
 
   Widget _buildTextOverlay() {
@@ -4777,125 +4913,8 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
 }
 
   // ステータス行のマークアップパース処理
-  TextSpan _parseStatusLine(String line) => parseStatusLine(line);
-}
-
-/// HPバーのクリッピング領域を計算する CustomClipper
-class HpBarClipper extends CustomClipper<Rect> {
-  final double fraction;
-  const HpBarClipper(this.fraction);
-
-  @override
-  Rect getClip(Size size) {
-    return Rect.fromLTWH(0, 0, size.width * fraction, size.height);
-  }
-
-  @override
-  bool shouldReclip(HpBarClipper oldClipper) => oldClipper.fraction != fraction;
-}
-
-/// ステータス行の \CXXXXXXXX, \c, \BXXXXXXXX,PPP:...\b マークアップパース処理
-TextSpan parseStatusLine(String line) {
-  // 1. まず、金貨のエスケープ \G が残っていれば $: に置換する (フォールバック)
-  var processedLine = line.replaceAll(RegExp(r'\\G([0-9a-fA-F]{8}):?'), '\$:');
-  
-  // 2. マークアップをパースして TextSpan を構築
-  // \BXXXXXXXX,PPP:...\b (HPバー) または \CXXXXXXXX (文字色) または \c (リセット)
-  final spans = <InlineSpan>[];
-  final regex = RegExp(r'\\B([0-9a-fA-F]{8}),([0-9]{1,3}):(.*?)\\b|\\C([0-9a-fA-F]{8})|\\c');
-  
-  int lastIndex = 0;
-  Color currentColor = Colors.white;
-  
-  for (final match in regex.allMatches(processedLine)) {
-    if (match.start > lastIndex) {
-      spans.add(TextSpan(
-        text: processedLine.substring(lastIndex, match.start),
-        style: TextStyle(color: currentColor),
-      ));
-    }
-    
-    final matchedText = match.group(0);
-    if (matchedText == '\\c') {
-      currentColor = Colors.white;
-    } else if (match.group(1) != null && match.group(2) != null && match.group(3) != null) {
-      // HPバーマークアップ: \B<color8>,<percent3>:<titleText>\b
-      final hexStr = match.group(1)!;
-      final percent = (int.tryParse(match.group(2)!) ?? 100).clamp(0, 100);
-      final titleText = match.group(3)!;
-      final colorIndex = int.tryParse(hexStr, radix: 16) ?? 15;
-      final barColor = NethackColors.getNhColor(colorIndex);
-
-      spans.add(
-        WidgetSpan(
-          alignment: PlaceholderAlignment.middle,
-          child: ConstrainedBox(
-            constraints: const BoxConstraints(minWidth: 100),
-            child: Stack(
-              children: [
-                // 1. ベースレイヤー: 黒背景 + 通常白文字
-                Container(
-                  color: Colors.black,
-                  child: Text(
-                    titleText,
-                    style: FontManager.instance.getStyle(
-                      FontTarget.status,
-                      fontSize: 13,
-                      height: 1.0,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white,
-                    ),
-                  ),
-                ),
-                // 2. クリップレイヤー: HP% 幅だけクリッピング + バー色背景 + 反転黒文字
-                if (percent > 0)
-                  Positioned.fill(
-                    child: ClipRect(
-                      clipper: HpBarClipper(percent / 100.0),
-                      child: Container(
-                        color: barColor,
-                        child: Text(
-                          titleText,
-                          style: FontManager.instance.getStyle(
-                            FontTarget.status,
-                            fontSize: 13,
-                            height: 1.0,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.black,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-              ],
-            ),
-          ),
-        ),
-      );
-    } else if (match.group(4) != null) {
-      // 通常の \CXXXXXXXX 文字色マークアップ
-      final hexStr = match.group(4)!;
-      final colorIndex = int.tryParse(hexStr, radix: 16) ?? 15;
-      currentColor = NethackColors.getNhColor(colorIndex);
-    }
-    
-    lastIndex = match.end;
-  }
-  
-  if (lastIndex < processedLine.length) {
-    spans.add(TextSpan(
-      text: processedLine.substring(lastIndex),
-      style: TextStyle(color: currentColor),
-    ));
-  }
-  
-  return TextSpan(
-    style: FontManager.instance.getStyle(
-      FontTarget.status,
-      fontSize: 13,
-    ),
-    children: spans,
-  );
+  TextSpan _parseStatusLine(String line, {VoidCallback? onEquipmentTap}) =>
+      parseStatusLine(line, fontSize: _statusFontSize, onEquipmentTap: onEquipmentTap);
 }
 
 

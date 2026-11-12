@@ -66,6 +66,7 @@ void debuglog(const char *fmt, ...) {
 // 前方宣言
 static int flutter_nhgetch(void);
 static void flutter_nhbell(void);
+static void flutter_status_enablefield(int fieldidx, const char *nm, const char *fmt, boolean enable);
 extern char *decode_mixed(char *, const char *); // src/windows.c の関数 (\GXXXXNNNN → showsym 1 文字)
 extern boolean bind_mousebtn(int, const char *); // src/cmd.c のマウスバインディング関数
 
@@ -108,7 +109,7 @@ struct window_procs and_procs = {
     "and",
     (enum wp_ids) 0,
     WC_COLOR | WC_HILITE_PET | WC_INVERSE | WC_EIGHT_BIT_IN,
-    WC2_HILITE_STATUS | WC2_FLUSH_STATUS | WC2_SUPPRESS_HIST,
+    WC2_HILITE_STATUS | WC2_FLUSH_STATUS | WC2_SUPPRESS_HIST | WC2_STATUSLINES | WC2_EXTRASTATUS,
     {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0},
 };
 /* DartHack: implement quit_possible as a proper function stub instead of an int variable */
@@ -423,7 +424,7 @@ static struct window_procs flutter_procs = {
     "flutter",
     (enum wp_ids) 0,
     WC_COLOR | WC_HILITE_PET | WC_INVERSE | WC_EIGHT_BIT_IN,
-    WC2_HILITE_STATUS | WC2_FLUSH_STATUS | WC2_SUPPRESS_HIST | WC2_U_UTF8STR | WC2_EXTRACOLORS,
+    WC2_HILITE_STATUS | WC2_FLUSH_STATUS | WC2_SUPPRESS_HIST | WC2_U_UTF8STR | WC2_EXTRACOLORS | WC2_STATUSLINES | WC2_EXTRASTATUS,
     {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0},
 };
 
@@ -1781,12 +1782,99 @@ static void check_and_apply_pending_symset(void) {
     }
 }
 
+// ステータスレイアウト種別（ステップ2追加）
+#define FLUTTER_STATUS_LAYOUT_STANDARD 0
+#define FLUTTER_STATUS_LAYOUT_SINGLE_ALL 1
+#define FLUTTER_STATUS_LAYOUT_SINGLE_COMPACT 2
+
+// ステータスオプション変更のペンディング状態（ステップ1・ステップ2リアルタイム反映用）
+static volatile int g_status_opts_change_requested = 0;
+static int g_pending_opt_hitpointbar = 1;
+static int g_pending_opt_hilite_status = 1;
+static int g_pending_opt_time = 1;
+static int g_pending_opt_showexp = 1;
+static int g_pending_opt_statuslines = 2;
+static int g_pending_opt_weaponstatus = 0;
+static int g_pending_opt_armorstatus = 0;
+static int g_pending_opt_terrainstatus = 0;
+static int g_pending_opt_status_layout = FLUTTER_STATUS_LAYOUT_STANDARD;
+static int g_flutter_hilite_status_enabled = 1;
+static int g_flutter_status_layout = FLUTTER_STATUS_LAYOUT_STANDARD;
+
+static int clamp_status_layout(int layout) {
+    if (layout < FLUTTER_STATUS_LAYOUT_STANDARD || layout > FLUTTER_STATUS_LAYOUT_SINGLE_COMPACT) {
+        return FLUTTER_STATUS_LAYOUT_STANDARD;
+    }
+    return layout;
+}
+
+// ゲーム開始前（ready時）などにレイアウトモードだけ先に設定するためのエントリポイント
+NH_EXPORT void SetStatusLayoutFlutter(int layout) {
+    int normalized = clamp_status_layout(layout);
+    g_flutter_status_layout = normalized;
+    g_pending_opt_status_layout = normalized;
+    debuglog("SetStatusLayoutFlutter: layout=%d", normalized);
+}
+
+NH_EXPORT void RequestStatusOptionsChangeFlutter(
+    int hitpointbar,
+    int hilite_status,
+    int time_opt,
+    int showexp,
+    int statuslines,
+    int weaponstatus,
+    int armorstatus,
+    int terrainstatus,
+    int status_layout
+) {
+    g_pending_opt_hitpointbar = hitpointbar ? 1 : 0;
+    g_pending_opt_hilite_status = hilite_status ? 1 : 0;
+    g_pending_opt_time = time_opt ? 1 : 0;
+    g_pending_opt_showexp = showexp ? 1 : 0;
+    g_pending_opt_statuslines = (statuslines >= 3) ? 3 : 2;
+    g_pending_opt_weaponstatus = weaponstatus ? 1 : 0;
+    g_pending_opt_armorstatus = armorstatus ? 1 : 0;
+    g_pending_opt_terrainstatus = terrainstatus ? 1 : 0;
+    g_pending_opt_status_layout = clamp_status_layout(status_layout);
+    g_status_opts_change_requested = 1;
+    debuglog("RequestStatusOptionsChangeFlutter: hpbar=%d hilite=%d time=%d exp=%d lines=%d wep=%d arm=%d ter=%d layout=%d",
+             g_pending_opt_hitpointbar, g_pending_opt_hilite_status,
+             g_pending_opt_time, g_pending_opt_showexp,
+             g_pending_opt_statuslines, g_pending_opt_weaponstatus,
+             g_pending_opt_armorstatus, g_pending_opt_terrainstatus,
+             g_pending_opt_status_layout);
+}
+
+static void check_and_apply_pending_status_options(void) {
+    if (!g_status_opts_change_requested) return;
+    g_status_opts_change_requested = 0;
+
+    iflags.wc2_hitpointbar = g_pending_opt_hitpointbar ? TRUE : FALSE;
+    g_flutter_hilite_status_enabled = g_pending_opt_hilite_status ? 1 : 0;
+    flags.time = g_pending_opt_time ? TRUE : FALSE;
+    flags.showexp = g_pending_opt_showexp ? TRUE : FALSE;
+    iflags.wc2_statuslines = (g_pending_opt_statuslines >= 3) ? 3 : 2;
+    flags.weaponstatus = g_pending_opt_weaponstatus ? TRUE : FALSE;
+    flags.armorstatus = g_pending_opt_armorstatus ? TRUE : FALSE;
+    flags.terrainstatus = g_pending_opt_terrainstatus ? TRUE : FALSE;
+    g_flutter_status_layout = g_pending_opt_status_layout;
+
+    if (flags.terrainstatus) {
+        classify_terrain();
+    }
+    if (iflags.window_inited && gb.blinit) {
+        status_initialize(REASSESS_ONLY);
+        bot();
+    }
+}
+
 // ユーザー入力待ち (キー取得)
 static int flutter_nhgetch(void) {
     debuglog("flutter_nhgetch called. Waiting for key...");
 
     check_and_perform_autosave();
     check_and_apply_pending_symset();
+    check_and_apply_pending_status_options();
 
     if (g_poscmd_count > 0) {
         PosCmdEntry cmd = g_poscmd_queue[g_poscmd_head];
@@ -1849,6 +1937,7 @@ static int flutter_nhgetch(void) {
     while (!g_key_available) {
         check_and_perform_autosave();
         check_and_apply_pending_symset();
+        check_and_apply_pending_status_options();
         if (g_poscmd_count > 0) {
             PosCmdEntry cmd = g_poscmd_queue[g_poscmd_head];
             g_poscmd_head = (g_poscmd_head + 1) % FLUTTER_MAX_POSCMD;
@@ -2587,7 +2676,7 @@ static void HijackWindowProcs(void) {
     // ステータス表示用のハンドラを Flutter 専用実装 (ハイライト対応) に設定
     flutter_procs.win_status_init = genl_status_init;
     flutter_procs.win_status_finish = genl_status_finish;
-    flutter_procs.win_status_enablefield = genl_status_enablefield;
+    flutter_procs.win_status_enablefield = flutter_status_enablefield;
     flutter_procs.win_status_update = flutter_status_update;
     flutter_procs.win_getmsghistory = flutter_getmsghistory;
     flutter_procs.win_putmsghistory = flutter_putmsghistory;
@@ -2596,7 +2685,7 @@ static void HijackWindowProcs(void) {
     flutter_procs.win_update_inventory = flutter_update_inventory;
     flutter_procs.win_ctrl_nhwindow = flutter_ctrl_nhwindow;
 
-    flutter_procs.wincap2 |= (WC2_HILITE_STATUS | WC2_FLUSH_STATUS | WC2_HITPOINTBAR);
+    flutter_procs.wincap2 |= (WC2_HILITE_STATUS | WC2_FLUSH_STATUS | WC2_HITPOINTBAR | WC2_STATUSLINES | WC2_EXTRASTATUS);
 
     and_procs = flutter_procs;
     and_procs.name = "and";
@@ -2620,7 +2709,72 @@ extern void genl_status_init(void);
 extern void genl_status_finish(void);
 extern void genl_status_enablefield(int, const char *, const char *, boolean);
 
-static void append_status_field(char* buf, int idx, int* is_first) {
+static void flutter_status_enablefield(int fieldidx, const char *nm, const char *fmt, boolean enable) {
+    genl_status_enablefield(fieldidx, nm, fmt, enable);
+    if (!enable && fieldidx >= 0 && fieldidx < MAXBLSTATS) {
+        flutter_status_vals[fieldidx][0] = '\0';
+        flutter_status_colors[fieldidx] = NO_COLOR;
+    }
+}
+
+// バッファ上限を超えないように文字列を連結するヘルパー
+static void append_str_bounded(char *dst, size_t dst_size, const char *src) {
+    if (!dst || dst_size == 0 || !src || !*src) return;
+    size_t cur_len = strlen(dst);
+    if (cur_len >= dst_size - 1) return;
+    size_t remain = dst_size - 1 - cur_len;
+    strncat(dst, src, remain);
+    dst[dst_size - 1] = '\0';
+}
+
+// コロン以降の値を先頭空白除去して抽出する（無ければ全体から先頭空白除去）
+static void extract_after_colon_trimmed(const char *src, char *out, size_t out_size) {
+    if (!out || out_size == 0) return;
+    out[0] = '\0';
+    if (!src || !*src) return;
+    const char *colon = strchr(src, ':');
+    const char *p = colon ? (colon + 1) : src;
+    while (*p == ' ') p++;
+    snprintf(out, out_size, "%s", p);
+    size_t len = strlen(out);
+    while (len > 0 && out[len - 1] == ' ') {
+        out[--len] = '\0';
+    }
+}
+
+// 括弧内の値を抽出する（例: "(16)" -> "16"）
+static void extract_in_parens(const char *src, char *out, size_t out_size) {
+    if (!out || out_size == 0) return;
+    out[0] = '\0';
+    if (!src || !*src) return;
+    const char *open = strchr(src, '(');
+    if (!open) return;
+    open++;
+    const char *close = strchr(open, ')');
+    size_t len = close ? (size_t)(close - open) : strlen(open);
+    if (len >= out_size) len = out_size - 1;
+    memcpy(out, open, len);
+    out[len] = '\0';
+}
+
+// 色指定付きテキストをステータス行へ安全に追記する（コンパクト表示用）
+static void append_colored_segment(char *buf, size_t buf_size, int raw_color, const char *text, int *is_first) {
+    if (!text || !*text) return;
+    if (!*is_first) {
+        append_str_bounded(buf, buf_size, " ");
+    }
+    int color = g_flutter_hilite_status_enabled ? (raw_color & 0xFF) : NO_COLOR;
+    if (color == NO_COLOR || color == CLR_WHITE) {
+        append_str_bounded(buf, buf_size, text);
+    } else {
+        char markup[512];
+        snprintf(markup, sizeof(markup), "\\C%08X%s\\c", color, text);
+        append_str_bounded(buf, buf_size, markup);
+    }
+    *is_first = 0;
+}
+
+static void append_status_field(char* buf, size_t buf_size, int idx, int* is_first) {
     if (idx == BL_CONDITION) {
         long active_conds = 0;
         sscanf(flutter_status_vals[idx], "%ld", &active_conds);
@@ -2628,9 +2782,9 @@ static void append_status_field(char* buf, int idx, int* is_first) {
         for (int i = 0; i < CONDITION_COUNT; i++) {
             unsigned long mask = conditions[i].mask;
             if (active_conds & mask) {
-                strcat(buf, " ");
+                append_str_bounded(buf, buf_size, " ");
                 int color = CLR_WHITE;
-                if (flutter_cond_hilites) {
+                if (g_flutter_hilite_status_enabled && flutter_cond_hilites) {
                     for (int c = 0; c < CLR_MAX; c++) {
                         if (flutter_cond_hilites[c] & mask) {
                             color = c;
@@ -2638,23 +2792,39 @@ static void append_status_field(char* buf, int idx, int* is_first) {
                         }
                     }
                 }
-                char markup[64];
-                sprintf(markup, "\\C%08X%s\\c", color, conditions[i].text[1]);
-                strcat(buf, markup);
+                if (color == NO_COLOR || color == CLR_WHITE) {
+                    append_str_bounded(buf, buf_size, conditions[i].text[1]);
+                } else {
+                    char markup[128];
+                    snprintf(markup, sizeof(markup), "\\C%08X%s\\c", color, conditions[i].text[1]);
+                    append_str_bounded(buf, buf_size, markup);
+                }
             }
         }
     } else {
+        if ((idx == BL_WEAPON && !flags.weaponstatus) ||
+            (idx == BL_ARMOR && !flags.armorstatus) ||
+            (idx == BL_TERRAIN && !flags.terrainstatus)) {
+            return;
+        }
         const char* val = flutter_status_vals[idx];
         if (!val || !*val) return;
+        
+        // 空白のみの文字列であれば出力をスキップ（平常時の空飢餓・空負荷等による末尾余白防止）
+        const char* trimmed_check = val;
+        while (*trimmed_check == ' ') {
+            trimmed_check++;
+        }
+        if (!*trimmed_check) return;
         
         if (*is_first && *val == ' ') {
             val++;
         } else if (idx == BL_LEVELDESC && !*is_first) {
-            strcat(buf, " ");
+            append_str_bounded(buf, buf_size, " ");
         }
         
         while (*val == ' ') {
-            strcat(buf, " ");
+            append_str_bounded(buf, buf_size, " ");
             val++;
         }
         
@@ -2668,46 +2838,35 @@ static void append_status_field(char* buf, int idx, int* is_first) {
             if (hp_pct < 0) hp_pct = 0;
             if (hp_pct > 100) hp_pct = 100;
             snprintf(markup, sizeof(markup), "\\B%08X,%03d:%s\\b", hp_color, hp_pct, val);
-            strcat(buf, markup);
+            append_str_bounded(buf, buf_size, markup);
             *is_first = 0;
             return;
         }
         
-        int color = flutter_status_colors[idx] & 0xFF;
+        int color = g_flutter_hilite_status_enabled ? (flutter_status_colors[idx] & 0xFF) : NO_COLOR;
+        const int is_equip_link = (idx == BL_WEAPON || idx == BL_ARMOR);
+        char segment[512];
         if (color == NO_COLOR || color == CLR_WHITE) {
-            strcat(buf, val);
+            snprintf(segment, sizeof(segment), "%s", val);
         } else {
-            char markup[512];
-            sprintf(markup, "\\C%08X%s\\c", color, val);
-            strcat(buf, markup);
+            snprintf(segment, sizeof(segment), "\\C%08X%s\\c", color, val);
+        }
+        if (is_equip_link) {
+            char wrapped[600];
+            snprintf(wrapped, sizeof(wrapped), "\\Lequipment:%s\\l", segment);
+            append_str_bounded(buf, buf_size, wrapped);
+        } else {
+            append_str_bounded(buf, buf_size, segment);
         }
         *is_first = 0;
     }
 }
 
-static void flutter_status_flush(void) {
-    char line1[1024] = "";
-    char line2[1024] = "";
+// フィールド配列に従って1行分のステータス文字列を構築する共通ヘルパー
+static void append_field_sequence(char *buf, size_t buf_size, const enum statusfields *fields) {
     int is_first = 1;
-    
-    static enum statusfields fieldorder_line1[] = {
-        BL_TITLE, BL_STR, BL_DX, BL_CO, BL_IN, BL_WI, BL_CH, BL_ALIGN, BL_SCORE,
-        BL_FLUSH
-    };
-    
-    static enum statusfields fieldorder_line2[] = {
-        BL_LEVELDESC, BL_GOLD, BL_HP, BL_HPMAX, BL_ENE, BL_ENEMAX, BL_AC, BL_XP,
-        BL_EXP, BL_HD, BL_TIME, BL_HUNGER, BL_CAP, BL_CONDITION, BL_FLUSH
-    };
-    
-    is_first = 1;
-    for (int i = 0; fieldorder_line1[i] != BL_FLUSH; i++) {
-        append_status_field(line1, fieldorder_line1[i], &is_first);
-    }
-    
-    is_first = 1;
-    for (int i = 0; fieldorder_line2[i] != BL_FLUSH; i++) {
-        int idx = fieldorder_line2[i];
+    for (int i = 0; fields[i] != BL_FLUSH; i++) {
+        int idx = fields[i];
         if (idx == BL_HPMAX) {
             int color = flutter_status_colors[BL_HPMAX] & 0xFF;
             if (color == NO_COLOR) {
@@ -2719,7 +2878,172 @@ static void flutter_status_flush(void) {
                 flutter_status_colors[BL_ENEMAX] = flutter_status_colors[BL_ENE];
             }
         }
-        append_status_field(line2, idx, &is_first);
+        append_status_field(buf, buf_size, idx, &is_first);
+    }
+}
+
+// 超コンパクト1行モード用の構築処理（階層・HP・Pw・AC・Xp/HD・空腹・負荷・状態異常のみ）
+static void build_single_compact_status_line(char *line1, size_t line1_size) {
+    int is_first = 1;
+
+    // 1. 階層（階層:1 / Dlvl:1 -> Dlvl:1、特殊階名は末尾空白を除去してそのまま出力）
+    const char *raw_lvl = flutter_status_vals[BL_LEVELDESC];
+    if (raw_lvl && *raw_lvl) {
+        while (*raw_lvl == ' ') raw_lvl++;
+        char lvl_buf[128];
+        const char *lvl_num = NULL;
+        if (strncmp(raw_lvl, "階層:", strlen("階層:")) == 0) {
+            lvl_num = raw_lvl + strlen("階層:");
+        } else if (strncmp(raw_lvl, "Dlvl:", 5) == 0) {
+            lvl_num = raw_lvl + 5;
+        } else if (strncmp(raw_lvl, "迷宮:", strlen("迷宮:")) == 0) {
+            lvl_num = raw_lvl + strlen("迷宮:");
+        }
+        if (lvl_num) {
+            while (*lvl_num == ' ') lvl_num++;
+            snprintf(lvl_buf, sizeof(lvl_buf), "Dlvl:%s", lvl_num);
+        } else {
+            snprintf(lvl_buf, sizeof(lvl_buf), "%s", raw_lvl);
+        }
+        size_t llen = strlen(lvl_buf);
+        while (llen > 0 && lvl_buf[llen - 1] == ' ') {
+            lvl_buf[--llen] = '\0';
+        }
+        append_colored_segment(line1, line1_size, flutter_status_colors[BL_LEVELDESC], lvl_buf, &is_first);
+    }
+
+    // 2. HP（hitpointbar ON 時は HP:cur/max 自体に HPバーを重ねる）
+    {
+        char hp_cur[64];
+        char hp_max[64];
+        extract_after_colon_trimmed(flutter_status_vals[BL_HP], hp_cur, sizeof(hp_cur));
+        extract_in_parens(flutter_status_vals[BL_HPMAX], hp_max, sizeof(hp_max));
+        if (*hp_cur) {
+            char hp_txt[140];
+            if (*hp_max) {
+                snprintf(hp_txt, sizeof(hp_txt), "HP:%s/%s", hp_cur, hp_max);
+            } else {
+                snprintf(hp_txt, sizeof(hp_txt), "HP:%s", hp_cur);
+            }
+            if (iflags.wc2_hitpointbar) {
+                int hp_color = flutter_hp_color & 0xFF;
+                int hp_pct = flutter_hp_percent;
+                if (hp_pct < 0) hp_pct = 0;
+                if (hp_pct > 100) hp_pct = 100;
+                if (!is_first) {
+                    append_str_bounded(line1, line1_size, " ");
+                }
+                char markup[256];
+                snprintf(markup, sizeof(markup), "\\B%08X,%03d:%s\\b", hp_color, hp_pct, hp_txt);
+                append_str_bounded(line1, line1_size, markup);
+                is_first = 0;
+            } else {
+                append_colored_segment(line1, line1_size, flutter_status_colors[BL_HP], hp_txt, &is_first);
+            }
+        }
+    }
+
+    // 3. Pw（魔力）
+    {
+        char ene_cur[64];
+        char ene_max[64];
+        extract_after_colon_trimmed(flutter_status_vals[BL_ENE], ene_cur, sizeof(ene_cur));
+        extract_in_parens(flutter_status_vals[BL_ENEMAX], ene_max, sizeof(ene_max));
+        if (*ene_cur) {
+            char pw_txt[140];
+            if (*ene_max) {
+                snprintf(pw_txt, sizeof(pw_txt), "Pw:%s/%s", ene_cur, ene_max);
+            } else {
+                snprintf(pw_txt, sizeof(pw_txt), "Pw:%s", ene_cur);
+            }
+            int pw_color = flutter_status_colors[BL_ENE];
+            if ((pw_color & 0xFF) == NO_COLOR) {
+                pw_color = flutter_status_colors[BL_ENEMAX];
+            }
+            append_colored_segment(line1, line1_size, pw_color, pw_txt, &is_first);
+        }
+    }
+
+    // 4. AC
+    {
+        char ac_val[64];
+        extract_after_colon_trimmed(flutter_status_vals[BL_AC], ac_val, sizeof(ac_val));
+        if (*ac_val) {
+            char ac_txt[80];
+            snprintf(ac_txt, sizeof(ac_txt), "AC:%s", ac_val);
+            append_colored_segment(line1, line1_size, flutter_status_colors[BL_AC], ac_txt, &is_first);
+        }
+    }
+
+    // 5. Xp / HD（経験値実数は省略）
+    {
+        char hd_val[64];
+        char xp_val[64];
+        extract_after_colon_trimmed(flutter_status_vals[BL_HD], hd_val, sizeof(hd_val));
+        extract_after_colon_trimmed(flutter_status_vals[BL_XP], xp_val, sizeof(xp_val));
+        if (*hd_val) {
+            char hd_txt[80];
+            snprintf(hd_txt, sizeof(hd_txt), "HD:%s", hd_val);
+            append_colored_segment(line1, line1_size, flutter_status_colors[BL_HD], hd_txt, &is_first);
+        } else if (*xp_val) {
+            char xp_txt[80];
+            snprintf(xp_txt, sizeof(xp_txt), "Xp:%s", xp_val);
+            append_colored_segment(line1, line1_size, flutter_status_colors[BL_XP], xp_txt, &is_first);
+        }
+    }
+
+    // 6. 空腹・負荷・状態異常（平常時空なら何も出力されない）
+    append_status_field(line1, line1_size, BL_HUNGER, &is_first);
+    append_status_field(line1, line1_size, BL_CAP, &is_first);
+    append_status_field(line1, line1_size, BL_CONDITION, &is_first);
+}
+
+static void flutter_status_flush(void) {
+    char line1[2048] = "";
+    char line2[2048] = "";
+    char line3[2048] = "";
+    
+    static const enum statusfields twoline_row1[] = {
+        BL_TITLE, BL_STR, BL_DX, BL_CO, BL_IN, BL_WI, BL_CH, BL_ALIGN, BL_SCORE,
+        BL_FLUSH
+    };
+    static const enum statusfields twoline_row2[] = {
+        BL_LEVELDESC, BL_GOLD, BL_HP, BL_HPMAX, BL_ENE, BL_ENEMAX, BL_AC, BL_XP,
+        BL_EXP, BL_HD, BL_TIME, BL_HUNGER, BL_CAP, BL_CONDITION,
+        BL_WEAPON, BL_ARMOR, BL_TERRAIN, BL_VERS, BL_FLUSH
+    };
+
+    static const enum statusfields threeline_row1[] = {
+        BL_TITLE, BL_STR, BL_DX, BL_CO, BL_IN, BL_WI, BL_CH, BL_SCORE,
+        BL_FLUSH
+    };
+    static const enum statusfields threeline_row2[] = {
+        BL_ALIGN, BL_GOLD, BL_HP, BL_HPMAX, BL_ENE, BL_ENEMAX, BL_AC, BL_XP,
+        BL_EXP, BL_HD, BL_HUNGER, BL_CAP, BL_FLUSH
+    };
+    static const enum statusfields threeline_row3[] = {
+        BL_LEVELDESC, BL_TIME, BL_CONDITION, BL_WEAPON, BL_ARMOR, BL_TERRAIN,
+        BL_VERS, BL_FLUSH
+    };
+
+    static const enum statusfields singleline_all[] = {
+        BL_TITLE, BL_STR, BL_DX, BL_CO, BL_IN, BL_WI, BL_CH, BL_ALIGN, BL_SCORE,
+        BL_LEVELDESC, BL_GOLD, BL_HP, BL_HPMAX, BL_ENE, BL_ENEMAX, BL_AC, BL_XP,
+        BL_EXP, BL_HD, BL_TIME, BL_HUNGER, BL_CAP, BL_CONDITION,
+        BL_WEAPON, BL_ARMOR, BL_TERRAIN, BL_VERS, BL_FLUSH
+    };
+
+    if (g_flutter_status_layout == FLUTTER_STATUS_LAYOUT_SINGLE_COMPACT) {
+        build_single_compact_status_line(line1, sizeof(line1));
+    } else if (g_flutter_status_layout == FLUTTER_STATUS_LAYOUT_SINGLE_ALL) {
+        append_field_sequence(line1, sizeof(line1), singleline_all);
+    } else if (iflags.wc2_statuslines >= 3) {
+        append_field_sequence(line1, sizeof(line1), threeline_row1);
+        append_field_sequence(line2, sizeof(line2), threeline_row2);
+        append_field_sequence(line3, sizeof(line3), threeline_row3);
+    } else {
+        append_field_sequence(line1, sizeof(line1), twoline_row1);
+        append_field_sequence(line2, sizeof(line2), twoline_row2);
     }
     
     flutter_curs(2 /* WIN_STATUS */, 1, 0);
@@ -2727,6 +3051,9 @@ static void flutter_status_flush(void) {
     
     flutter_curs(2 /* WIN_STATUS */, 1, 1);
     flutter_putstr(2 /* WIN_STATUS */, 0, line2);
+
+    flutter_curs(2 /* WIN_STATUS */, 1, 2);
+    flutter_putstr(2 /* WIN_STATUS */, 0, line3);
 }
 
 static void flutter_status_update(int idx, genericptr_t ptr, int chg, int percent, int color, unsigned long *colormasks) {
@@ -2743,7 +3070,7 @@ static void flutter_status_update(int idx, genericptr_t ptr, int chg, int percen
             long *condptr = (long *) ptr;
             long cond = condptr ? *condptr : 0L;
             flutter_cond_hilites = colormasks;
-            sprintf(flutter_status_vals[idx], "%ld", cond);
+            snprintf(flutter_status_vals[idx], sizeof(flutter_status_vals[idx]), "%ld", cond);
             flutter_status_colors[idx] = color;
         } else if (idx == BL_GOLD && text) {
             const char *val_only = strchr(text, ':') ? strchr(text, ':') + 1 : text;
@@ -2751,16 +3078,16 @@ static void flutter_status_update(int idx, genericptr_t ptr, int chg, int percen
             if (strstr(fmt, "金貨")) {
                 // 日本語モード: status_fieldfmt[BL_GOLD] は " 金貨:%s"
                 // val_only ("7") を適用して " 金貨:7" とし、二重コロンを防止する
-                sprintf(flutter_status_vals[idx], fmt, val_only);
+                snprintf(flutter_status_vals[idx], sizeof(flutter_status_vals[idx]), fmt, val_only);
             } else {
                 // 英語モード: status_fieldfmt[BL_GOLD] は " %s"
                 // NetHack本家標準の "$:<gold>" (例: " $:7") を構成する
-                sprintf(flutter_status_vals[idx], " $:%s", val_only);
+                snprintf(flutter_status_vals[idx], sizeof(flutter_status_vals[idx]), " $:%s", val_only);
             }
             flutter_status_colors[idx] = color;
         } else {
             const char* fmt = status_fieldfmt[idx] ? status_fieldfmt[idx] : "%s";
-            sprintf(flutter_status_vals[idx], fmt, text ? text : "");
+            snprintf(flutter_status_vals[idx], sizeof(flutter_status_vals[idx]), fmt, text ? text : "");
             flutter_status_colors[idx] = color;
         }
     }

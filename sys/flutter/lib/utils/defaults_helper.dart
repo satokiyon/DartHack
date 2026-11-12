@@ -31,6 +31,10 @@ class DefaultsHelper {
     'symset',
     'roguesymset',
     'runmode',
+    'statuslines',
+    'weaponstatus',
+    'armorstatus',
+    'terrainstatus',
   };
 
   /// NetHack 5.0 symbols で定義されている有効な通常階層用シンボルセット名
@@ -149,6 +153,12 @@ class DefaultsHelper {
             _options[key] = boolVal ? '1' : '0';
           } else {
             _options[key] = val;
+          }
+        } else if (key == 'statuslines') {
+          if (isBool) {
+            _options[key] = '2';
+          } else {
+            _options[key] = val.trim() == '3' ? '3' : '2';
           }
         } else if (isBool) {
           _options[key] = boolVal ? 'true' : 'false';
@@ -315,6 +325,8 @@ class DefaultsHelper {
 
             if (key == 'number_pad') {
               updatedTokens.add('number_pad:${val.trim()}');
+            } else if (key == 'statuslines') {
+              updatedTokens.add('statuslines:${val.trim() == '3' ? '3' : '2'}');
             } else if (key == 'tutorial' || key == 'tutorial_mode') {
               if (val == 'always_tutorial' || val == 'true') {
                 updatedTokens.add('tutorial');
@@ -388,6 +400,8 @@ class DefaultsHelper {
 
       if (key == 'number_pad') {
         pendingLines.add('OPTIONS=number_pad:$val');
+      } else if (key == 'statuslines') {
+        pendingLines.add('OPTIONS=statuslines:${val.trim() == '3' ? '3' : '2'}');
       } else if (val.toLowerCase() == 'true') {
         pendingLines.add('OPTIONS=$key');
       } else if (val.toLowerCase() == 'false') {
@@ -584,6 +598,29 @@ class DefaultsHelper {
     } else if (!prefs.containsKey('nh_opt_runmode')) {
       await prefs.setString('nh_opt_runmode', 'walk');
     }
+
+    // ステータス行数 (statuslines): int型 (2 or 3, デフォルト: 2)
+    final statuslinesVal = getOption('statuslines');
+    if (statuslinesVal != null) {
+      final parsedLines = (int.tryParse(statuslinesVal.trim()) ?? 2) >= 3 ? 3 : 2;
+      await prefs.setInt('nh_opt_statuslines', parsedLines);
+    } else if (!prefs.containsKey('nh_opt_statuslines')) {
+      await prefs.setInt('nh_opt_statuslines', 2);
+    }
+
+    // 追加ステータス項目 (weaponstatus / armorstatus / terrainstatus): デフォルト false
+    for (final entry in const {
+      'weaponstatus': 'nh_opt_weaponstatus',
+      'armorstatus': 'nh_opt_armorstatus',
+      'terrainstatus': 'nh_opt_terrainstatus',
+    }.entries) {
+      final val = getOption(entry.key);
+      if (val != null) {
+        await prefs.setBool(entry.value, val.toLowerCase() == 'true');
+      } else if (!prefs.containsKey(entry.value)) {
+        await prefs.setBool(entry.value, false);
+      }
+    }
   }
 
   /// SharedPreferences の現在値を defaults.nh ファイルに反映保存する
@@ -663,6 +700,23 @@ class DefaultsHelper {
     if (prefs.containsKey('nh_opt_bones')) {
       setBoolOption('bones', prefs.getBool('nh_opt_bones') ?? true);
     }
+    if (prefs.containsKey('nh_opt_statuslines')) {
+      final rawLines = prefs.getInt('nh_opt_statuslines') ?? 2;
+      final safeLines = rawLines >= 3 ? 3 : 2;
+      setOption('statuslines', safeLines.toString());
+      if (rawLines != safeLines) {
+        await prefs.setInt('nh_opt_statuslines', safeLines);
+      }
+    }
+    if (prefs.containsKey('nh_opt_weaponstatus')) {
+      setBoolOption('weaponstatus', prefs.getBool('nh_opt_weaponstatus') ?? false);
+    }
+    if (prefs.containsKey('nh_opt_armorstatus')) {
+      setBoolOption('armorstatus', prefs.getBool('nh_opt_armorstatus') ?? false);
+    }
+    if (prefs.containsKey('nh_opt_terrainstatus')) {
+      setBoolOption('terrainstatus', prefs.getBool('nh_opt_terrainstatus') ?? false);
+    }
 
     final prefSymset = prefs.getString('nh_opt_symset');
     if (prefSymset != null && prefSymset.isNotEmpty) {
@@ -732,6 +786,9 @@ class DefaultsHelper {
           if (optKey == 'number_pad' || optKey == 'tutorial_mode') {
             final int iVal = int.tryParse(defaultVal) ?? 0;
             await prefs.setInt(prefKey, iVal);
+          } else if (optKey == 'statuslines') {
+            final int iVal = (int.tryParse(defaultVal) ?? 2) >= 3 ? 3 : 2;
+            await prefs.setInt(prefKey, iVal);
           } else if (optKey == 'name' || optKey == 'pickup_types' || optKey == 'dogname' || optKey == 'catname' || optKey == 'horsename' || optKey == 'fruit' || optKey == 'symset' || optKey == 'roguesymset' || optKey == 'runmode') {
             await prefs.setString(prefKey, defaultVal);
           } else {
@@ -739,13 +796,22 @@ class DefaultsHelper {
             await prefs.setBool(prefKey, bVal);
           }
           debugPrint("DefaultsHelper: Added new option '$prefKey' = $defaultVal");
+        } else if (optKey == 'statuslines') {
+          await prefs.setInt(prefKey, 2);
+          debugPrint("DefaultsHelper: Added default option '$prefKey' = 2");
         } else if (optKey == 'runmode') {
           await prefs.setString(prefKey, 'walk');
           debugPrint("DefaultsHelper: Added default option '$prefKey' = walk");
         } else if (optKey == 'bones') {
           await prefs.setBool(prefKey, true);
           debugPrint("DefaultsHelper: Added default option '$prefKey' = true");
-        } else if (optKey == 'blind' || optKey == 'nudist' || optKey == 'deaf' || optKey == 'pauper') {
+        } else if (optKey == 'blind' ||
+            optKey == 'nudist' ||
+            optKey == 'deaf' ||
+            optKey == 'pauper' ||
+            optKey == 'weaponstatus' ||
+            optKey == 'armorstatus' ||
+            optKey == 'terrainstatus') {
           await prefs.setBool(prefKey, false);
           debugPrint("DefaultsHelper: Added default option '$prefKey' = false");
         }
@@ -755,6 +821,11 @@ class DefaultsHelper {
           final currentVal = prefs.getInt(prefKey);
           if (currentVal == null || currentVal < -1 || currentVal > 4) {
             await prefs.setInt(prefKey, 0);
+          }
+        } else if (optKey == 'statuslines') {
+          final currentVal = prefs.getInt(prefKey);
+          if (currentVal == null || (currentVal != 2 && currentVal != 3)) {
+            await prefs.setInt(prefKey, 2);
           }
         } else if (optKey == 'tutorial_mode') {
           final currentVal = prefs.getInt(prefKey);

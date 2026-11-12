@@ -432,4 +432,39 @@ OPTIONS=boulder:0
     expect(savedContent.contains('OPTIONS=symset:IBMGraphics_2, runmode:walk'), isTrue);
     expect(prefs.getString('nh_opt_runmode'), equals('walk'));
   });
+
+  test('statuslines, weaponstatus, armorstatus, terrainstatus の同期と範囲サニタイズ検証', () async {
+    final initialContent = '''
+OPTIONS=time,showexp
+OPTIONS=statuslines:3, weaponstatus, armorstatus, terrainstatus
+''';
+    final file = File(testFilePath);
+    await file.writeAsString(initialContent);
+
+    await AppPrefs.setMockInitialValues({});
+
+    final helper = DefaultsHelper();
+    await helper.syncFromFileToPrefs(testFilePath);
+    final prefs = await AppPrefs.getInstance();
+
+    expect(prefs.getInt('nh_opt_statuslines'), equals(3));
+    expect(prefs.getBool('nh_opt_weaponstatus'), isTrue);
+    expect(prefs.getBool('nh_opt_armorstatus'), isTrue);
+    expect(prefs.getBool('nh_opt_terrainstatus'), isTrue);
+
+    // 無効値 (statuslines:1 等) を渡した場合は安全な 2 にサニタイズして保存されること
+    await prefs.setInt('nh_opt_statuslines', 1);
+    await prefs.setBool('nh_opt_weaponstatus', false);
+    await prefs.setBool('nh_opt_armorstatus', true);
+    await prefs.setBool('nh_opt_terrainstatus', false);
+    await helper.syncFromPrefsToFile(testFilePath);
+
+    final saved = await file.readAsString();
+    expect(saved.contains('statuslines:2'), isTrue);
+    expect(saved.contains('statuslines:1'), isFalse);
+    expect(saved.contains('!weaponstatus'), isTrue);
+    expect(saved.contains('armorstatus'), isTrue);
+    expect(saved.contains('!terrainstatus'), isTrue);
+    expect(prefs.getInt('nh_opt_statuslines'), equals(2));
+  });
 }

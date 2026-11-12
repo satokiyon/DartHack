@@ -23,6 +23,7 @@ import 'package:file_picker/file_picker.dart';
 import 'services/font_manager.dart';
 import 'services/tileset_manager.dart';
 import 'widgets/keyboard_help_dialog.dart';
+import 'widgets/status_bar_view.dart';
 
 
 /// 設定画面内の操作モード（物理キーボード操作中か、画面タップ操作中か）を子孫へ伝播する InheritedNotifier
@@ -131,6 +132,8 @@ class _SettingsPageState extends State<SettingsPage> {
   String _selectedSymset = 'IBMGraphics_2';
   String _selectedRogueSymset = 'Default';
   int _statusDisplayMode = 0;
+  double _statusFontSize = 13.0; // ステータス領域フォントサイズ (pt)
+  String _statusLineLayout = 'standard'; // 'standard', 'single_all', 'single_compact'
   int _tombstoneDisplayMode = 0; // 0: 画像+文字オーバーレイ, 1: Cコア出力そのまま(テキスト)
   bool _adFeaturesEnabled = true;
   bool _adFeatureNewLevelRest = true;
@@ -187,6 +190,10 @@ class _SettingsPageState extends State<SettingsPage> {
   bool _optHitpointbar = true;
   bool _optHiliteStatus = true;
   bool _optMenucolor = true;
+  int _optStatuslines = 2;
+  bool _optWeaponstatus = false;
+  bool _optArmorstatus = false;
+  bool _optTerrainstatus = false;
   String _optName = '';
   String _optDogname = '';
   String _optCatname = '';
@@ -380,6 +387,12 @@ class _SettingsPageState extends State<SettingsPage> {
         _selectedRogueSymset = 'Default';
       }
       _statusDisplayMode = prefs.getInt('status_display_mode') ?? 0;
+      _statusFontSize = (prefs.getDouble('status_font_size') ?? 13.0).clamp(8.0, 32.0);
+      final rawLayout = prefs.getString('status_line_layout') ?? 'standard';
+      _statusLineLayout =
+          const ['standard', 'single_all', 'single_compact'].contains(rawLayout)
+              ? rawLayout
+              : 'standard';
       final tombstoneModeRaw = prefs.getInt('tombstone_display_mode');
       _tombstoneDisplayMode = (tombstoneModeRaw == 1) ? 1 : 0;
       _adFeaturesEnabled = prefs.getBool('ad_features_enabled') ?? true;
@@ -442,7 +455,7 @@ class _SettingsPageState extends State<SettingsPage> {
       // メッセージ領域設定のロード
       _msgLineCount = prefs.getInt('msg_line_count') ?? 5;
       _msgOpacity = prefs.getDouble('msg_opacity') ?? 0.40;
-      _msgFontSize = prefs.getDouble('msg_font_size') ?? 13.0;
+      _msgFontSize = (prefs.getDouble('msg_font_size') ?? 13.0).clamp(8.0, 32.0);
 
       // サウンド設定のロード
       _soundMasterEnabled = !(prefs.getBool('sound_muted') ?? false);
@@ -463,6 +476,10 @@ class _SettingsPageState extends State<SettingsPage> {
       _optHitpointbar = prefs.getBool('nh_opt_hitpointbar') ?? true;
       _optHiliteStatus = prefs.getBool('nh_opt_hilite_status') ?? true;
       _optMenucolor = prefs.getBool('nh_opt_menucolor') ?? true;
+      _optStatuslines = (prefs.getInt('nh_opt_statuslines') ?? 2) == 3 ? 3 : 2;
+      _optWeaponstatus = prefs.getBool('nh_opt_weaponstatus') ?? false;
+      _optArmorstatus = prefs.getBool('nh_opt_armorstatus') ?? false;
+      _optTerrainstatus = prefs.getBool('nh_opt_terrainstatus') ?? false;
       _optName = prefs.getString('nh_opt_name') ?? '';
       _optDogname = prefs.getString('nh_opt_dogname') ?? '';
       _optCatname = prefs.getString('nh_opt_catname') ?? '';
@@ -650,6 +667,7 @@ class _SettingsPageState extends State<SettingsPage> {
         'dpad_scale',
         'shortcut_pad_scale',
         'cmd_panel_scale',
+        'status_font_size',
         'msg_opacity',
         'msg_font_size',
         'sound_bgm_volume',
@@ -677,6 +695,7 @@ class _SettingsPageState extends State<SettingsPage> {
         }
       }
 
+      await DefaultsHelper().syncFromPrefsToFile(widget.defaultsFilePath);
       await _loadAllSettings();
       await SoundManager.instance.syncFromPrefs();
 
@@ -1019,6 +1038,42 @@ class _SettingsPageState extends State<SettingsPage> {
     );
   }
 
+  String get _statusLayoutSelection {
+    if (_statusLineLayout == 'single_compact') return '1_compact';
+    if (_statusLineLayout == 'single_all') return '1_all';
+    return _optStatuslines == 3 ? '3' : '2';
+  }
+
+  Future<void> _setStatusLayoutSelection(String selection) async {
+    final String nextLayout;
+    final int nextStatuslines;
+    switch (selection) {
+      case '1_compact':
+        nextLayout = 'single_compact';
+        nextStatuslines = 2;
+        break;
+      case '1_all':
+        nextLayout = 'single_all';
+        nextStatuslines = 2;
+        break;
+      case '3':
+        nextLayout = 'standard';
+        nextStatuslines = 3;
+        break;
+      case '2':
+      default:
+        nextLayout = 'standard';
+        nextStatuslines = 2;
+        break;
+    }
+    setState(() {
+      _statusLineLayout = nextLayout;
+      _optStatuslines = nextStatuslines;
+    });
+    await _saveSetting('status_line_layout', nextLayout);
+    await _saveGameOption('nh_opt_statuslines', nextStatuslines);
+  }
+
   /// ステータス領域設定セクション（独立項目）
   Widget _buildStatusSection() {
     final l10n = AppLocalizations.of(context)!;
@@ -1044,7 +1099,258 @@ class _SettingsPageState extends State<SettingsPage> {
               }
             },
           ),
+          _buildDropdownSettingTile<String>(
+            title: l10n.statusLineLayoutTitle,
+            description: l10n.statusLineLayoutSub,
+            value: _statusLayoutSelection,
+            items: [
+              DropdownMenuItem(value: '1_compact', child: Text(l10n.statusLineLayoutCompact1)),
+              DropdownMenuItem(value: '1_all', child: Text(l10n.statusLineLayoutSingleAll)),
+              DropdownMenuItem(value: '2', child: Text(l10n.statusLineLayoutTwo)),
+              DropdownMenuItem(value: '3', child: Text(l10n.statusLineLayoutThree)),
+            ],
+            onChanged: (val) {
+              if (val != null) {
+                _setStatusLayoutSelection(val);
+              }
+            },
+          ),
+          if (_statusLayoutSelection == '1_all')
+            Padding(
+              padding: const EdgeInsets.fromLTRB(16, 6, 16, 8),
+              child: Text(
+                l10n.statusSingleAllNote,
+                style: const TextStyle(fontSize: 12, color: Colors.amberAccent),
+              ),
+            ),
+          // ステータス領域フォントサイズスライダー（8〜32）
+          _SettingsSliderTile(
+            child: ListTile(
+              title: Text(l10n.statusFontSize),
+              subtitle: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  _SettingsSlider(
+                    child: Slider(
+                      value: _statusFontSize,
+                      min: 8.0,
+                      max: 32.0,
+                      divisions: 24,
+                      label: '${_statusFontSize.round()} pt',
+                      onChanged: (val) {
+                        setState(() => _statusFontSize = val);
+                        _saveSetting('status_font_size', val);
+                      },
+                    ),
+                  ),
+                  Text(
+                    l10n.statusFontSizeLabel(_statusFontSize.round().toString()),
+                    style: const TextStyle(fontSize: 12, color: Colors.white54),
+                  ),
+                ],
+              ),
+            ),
+          ),
+          _SettingsSwitchTile(
+            title: Text(l10n.optHitpointbar),
+            subtitle: Text(l10n.hitpointbarSub),
+            value: _optHitpointbar,
+            onChanged: (val) {
+              setState(() => _optHitpointbar = val);
+              _saveGameOption('nh_opt_hitpointbar', val);
+            },
+          ),
+          _SettingsSwitchTile(
+            title: Text(l10n.optHiliteStatus),
+            subtitle: Text(l10n.hiliteStatusSub),
+            value: _optHiliteStatus,
+            onChanged: (val) {
+              setState(() => _optHiliteStatus = val);
+              _saveGameOption('nh_opt_hilite_status', val);
+            },
+          ),
+          _buildCompactAwareSwitchTile(
+            title: l10n.optTime,
+            subtitle: l10n.timeSub,
+            value: _optTime,
+            isHiddenInCompact: _statusLayoutSelection == '1_compact',
+            l10n: l10n,
+            onChanged: (val) {
+              setState(() => _optTime = val);
+              _saveGameOption('nh_opt_time', val);
+            },
+          ),
+          _buildCompactAwareSwitchTile(
+            title: l10n.optShowexp,
+            subtitle: l10n.showexpSub,
+            value: _optShowexp,
+            isHiddenInCompact: _statusLayoutSelection == '1_compact',
+            l10n: l10n,
+            onChanged: (val) {
+              setState(() => _optShowexp = val);
+              _saveGameOption('nh_opt_showexp', val);
+            },
+          ),
+          _buildCompactAwareSwitchTile(
+            title: l10n.optWeaponstatus,
+            subtitle: l10n.weaponstatusSub,
+            value: _optWeaponstatus,
+            isHiddenInCompact: _statusLayoutSelection == '1_compact',
+            l10n: l10n,
+            onChanged: (val) {
+              setState(() => _optWeaponstatus = val);
+              _saveGameOption('nh_opt_weaponstatus', val);
+            },
+          ),
+          _buildCompactAwareSwitchTile(
+            title: l10n.optArmorstatus,
+            subtitle: l10n.armorstatusSub,
+            value: _optArmorstatus,
+            isHiddenInCompact: _statusLayoutSelection == '1_compact',
+            l10n: l10n,
+            onChanged: (val) {
+              setState(() => _optArmorstatus = val);
+              _saveGameOption('nh_opt_armorstatus', val);
+            },
+          ),
+          _buildCompactAwareSwitchTile(
+            title: l10n.optTerrainstatus,
+            subtitle: l10n.terrainstatusSub,
+            value: _optTerrainstatus,
+            isHiddenInCompact: _statusLayoutSelection == '1_compact',
+            l10n: l10n,
+            onChanged: (val) {
+              setState(() => _optTerrainstatus = val);
+              _saveGameOption('nh_opt_terrainstatus', val);
+            },
+          ),
+          _buildStatusPreview(l10n),
         ]),
+      ),
+    );
+  }
+
+  /// 「1行（超コンパクト）」時に非表示となるトグル項目を半透明減光＋注記付きで構築
+  Widget _buildCompactAwareSwitchTile({
+    required String title,
+    required String subtitle,
+    required bool value,
+    required bool isHiddenInCompact,
+    required AppLocalizations l10n,
+    required ValueChanged<bool> onChanged,
+  }) {
+    final tile = _SettingsSwitchTile(
+      title: Text(title),
+      subtitle: isHiddenInCompact
+          ? Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(subtitle),
+                const SizedBox(height: 2),
+                Text(
+                  l10n.statusCompactHiddenHint,
+                  style: const TextStyle(fontSize: 11, color: Colors.amberAccent),
+                ),
+              ],
+            )
+          : Text(subtitle),
+      value: value,
+      onChanged: onChanged,
+    );
+    return isHiddenInCompact ? Opacity(opacity: 0.52, child: tile) : tile;
+  }
+
+  /// ステータス領域の設定プレビュー
+  Widget _buildStatusPreview(AppLocalizations l10n) {
+    final isEn = _selectedLanguage == 'en' || l10n.localeName.startsWith('en');
+    String hilite(String colorCode8, String text) =>
+        _optHiliteStatus ? '\\C$colorCode8$text\\c' : text;
+
+    // プレビューは HP 75% (12/16) の状態を例示するため、defaults.nh 準拠で
+    // hilite_status ON 時は <100% の brightgreen (0x0A)、OFF 時は NO_COLOR (0x08) を使う
+    final hpBarColorHex = _optHiliteStatus ? '0000000A' : '00000008';
+    String hpBarOrText(String text, String fallbackColorHex) => _optHitpointbar
+        ? '\\B$hpBarColorHex,075:$text\\b'
+        : hilite(fallbackColorHex, text);
+
+    final selection = _statusLayoutSelection;
+    final titleText = isEn ? 'Hero the Stripling' : '主人公 若き盾乙女';
+    final statsStr = isEn
+        ? 'St:18 Dx:14 Co:15 In:10 Wi:12 Ch:9'
+        : '筋力:18 器用:14 耐久:15 知力:10 賢明:12 魅力:9';
+    final alignStr = isEn ? 'Lawful' : '属性:秩序';
+    final dlvlText = isEn ? 'Dlvl:1' : '階層:1';
+    final hpMaxText = isEn ? 'HP:12(16)' : '体力:12(16)';
+    final pwAcText = isEn ? 'Pw:5(5) AC:6' : '魔力:5(5) 防御(AC):6';
+    final xpLabel = isEn ? 'Xp:2' : 'レベル:2';
+    final expPart = _optShowexp ? '/42' : '';
+    final turnPart = _optTime ? (isEn ? ' T:120' : ' ターン:120') : '';
+    final hungryToken = hilite('00000009', isEn ? 'Hungry' : '空腹');
+    final blindToken = hilite('0000000B', isEn ? 'Blnd' : '盲目');
+
+    final extraParts = <String>[
+      if (_optWeaponstatus) '\\Lequipment:${isEn ? 'Sword' : '武器:剣'}\\l',
+      if (_optArmorstatus) '\\Lequipment:${isEn ? 'GCA+' : '防具:GCA+'}\\l',
+      if (_optTerrainstatus) isEn ? 'Floor' : '地形:床',
+    ];
+    final extraSuffix = extraParts.isEmpty ? '' : ' ${extraParts.join(' ')}';
+
+    // 実機 Cコア (botl.c / winflutter.c) と同じマークアップ境界で組み立てる
+    final vitalsToken =
+        '${hilite('0000000A', hpMaxText)} $pwAcText ${hilite('00000002', xpLabel)}$expPart';
+    final titleWithStats = '${hpBarOrText(titleText, '0000000F')} $statsStr';
+
+    final List<String> previewLines;
+    if (selection == '1_compact') {
+      previewLines = [
+        'Dlvl:1 ${hpBarOrText('HP:12/16', '0000000A')} Pw:5/5 AC:6 '
+            '${hilite('00000002', 'Xp:2')} $hungryToken $blindToken',
+      ];
+    } else if (selection == '1_all') {
+      previewLines = [
+        '$titleWithStats $alignStr $dlvlText \$:50 '
+            '$vitalsToken$turnPart $hungryToken $blindToken$extraSuffix',
+      ];
+    } else if (selection == '3') {
+      previewLines = [
+        titleWithStats,
+        '$alignStr \$:50 $vitalsToken $hungryToken',
+        '$dlvlText$turnPart $blindToken$extraSuffix',
+      ];
+    } else {
+      previewLines = [
+        '$titleWithStats $alignStr',
+        '$dlvlText \$:50 $vitalsToken$turnPart $hungryToken $blindToken$extraSuffix',
+      ];
+    }
+
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(16, 4, 16, 12),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            l10n.preview,
+            style: const TextStyle(fontSize: 12, color: Colors.white38),
+          ),
+          const SizedBox(height: 4),
+          Container(
+            width: double.infinity,
+            decoration: BoxDecoration(
+              color: Colors.black,
+              borderRadius: BorderRadius.circular(6),
+              border: Border.all(color: Colors.white12),
+            ),
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(5),
+              child: StatusBarInteractiveView(
+                statusLines: previewLines,
+                statusDisplayMode: _statusDisplayMode,
+                statusFontSize: _statusFontSize,
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -2112,7 +2418,7 @@ class _SettingsPageState extends State<SettingsPage> {
               ),
             ),
           ),
-          // フォントサイズスライダー（8〜24）
+          // フォントサイズスライダー（8〜32）
           _SettingsSliderTile(
             child: ListTile(
               title: Text(l10n.msgFontSize),
@@ -2123,8 +2429,8 @@ class _SettingsPageState extends State<SettingsPage> {
                     child: Slider(
                       value: _msgFontSize,
                       min: 8.0,
-                      max: 24.0,
-                      divisions: 16,
+                      max: 32.0,
+                      divisions: 24,
                       label: '${_msgFontSize.round()} pt',
                       onChanged: (val) {
                         setState(() => _msgFontSize = val);
@@ -3134,48 +3440,12 @@ class _SettingsPageState extends State<SettingsPage> {
             onTap: _optAutopickup ? _editPickupTypes : null,
           ),
           _SettingsSwitchTile(
-            title: Text(l10n.optTime),
-            subtitle: Text(l10n.timeSub),
-            value: _optTime,
-            onChanged: (val) {
-              setState(() => _optTime = val);
-              _saveGameOption('nh_opt_time', val);
-            },
-          ),
-          _SettingsSwitchTile(
-            title: Text(l10n.optShowexp),
-            subtitle: Text(l10n.showexpSub),
-            value: _optShowexp,
-            onChanged: (val) {
-              setState(() => _optShowexp = val);
-              _saveGameOption('nh_opt_showexp', val);
-            },
-          ),
-          _SettingsSwitchTile(
             title: Text(l10n.optPriceQuotes),
             subtitle: Text(l10n.priceQuotesSub),
             value: _optPriceQuotes,
             onChanged: (val) {
               setState(() => _optPriceQuotes = val);
               _saveGameOption('nh_opt_price_quotes', val);
-            },
-          ),
-          _SettingsSwitchTile(
-            title: Text(l10n.optHitpointbar),
-            subtitle: Text(l10n.hitpointbarSub),
-            value: _optHitpointbar,
-            onChanged: (val) {
-              setState(() => _optHitpointbar = val);
-              _saveGameOption('nh_opt_hitpointbar', val);
-            },
-          ),
-          _SettingsSwitchTile(
-            title: Text(l10n.optHiliteStatus),
-            subtitle: Text(l10n.hiliteStatusSub),
-            value: _optHiliteStatus,
-            onChanged: (val) {
-              setState(() => _optHiliteStatus = val);
-              _saveGameOption('nh_opt_hilite_status', val);
             },
           ),
           _SettingsSwitchTile(

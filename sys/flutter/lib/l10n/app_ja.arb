@@ -601,5 +601,21 @@
   "optAdFeatureExitHighlightSub": "ゲーム終了時に今回の冒険のハイライトを表示します",
   "gameEndDialogTitle": "ゲーム終了",
   "usePhysicalKeyboardNotation": "物理キーボード用ヘルプを有効化",
-  "usePhysicalKeyboardNotationSub": "ボタンに割り当てキー（y:、n:、Esc:等）を表示します。ON時はF1またはM-h (Alt-h)キーで操作ヘルプを表示できます"
+  "usePhysicalKeyboardNotationSub": "ボタンに割り当てキー（y:、n:、Esc:等）を表示します。ON時はF1またはM-h (Alt-h)キーで操作ヘルプを表示できます",
+  "statusFontSize": "フォントサイズ",
+  "statusFontSizeLabel": "現在: {size} pt",
+  "statusLineLayoutTitle": "ステータス行数・構成",
+  "statusLineLayoutSub": "1行〜3行の表示構成を選択します（超コンパクトは最小項目のみ表示）",
+  "statusLineLayoutCompact1": "1行（超コンパクト）",
+  "statusLineLayoutSingleAll": "1行（全項目を1行表示）",
+  "statusLineLayoutTwo": "2行（標準）",
+  "statusLineLayoutThree": "3行（拡張）",
+  "optWeaponstatus": "装備武器表示 (weaponstatus)",
+  "weaponstatusSub": "装備中の武器種別をステータス欄に表示します（タップまたは長押しで装備一覧）",
+  "optArmorstatus": "装備防具表示 (armorstatus)",
+  "armorstatusSub": "装備中の防具要約をステータス欄に表示します（タップまたは長押しで装備一覧）",
+  "optTerrainstatus": "足元地形表示 (terrainstatus)",
+  "terrainstatusSub": "現在立っている場所の地形名をステータス欄に表示します",
+  "statusSingleAllNote": "※「1行（全項目を1行表示）」は項目が多いため、「可変高さ」表示または横長画面での利用を推奨します",
+  "statusCompactHiddenHint": "※「1行（超コンパクト）」選択中は表示されません"
 }

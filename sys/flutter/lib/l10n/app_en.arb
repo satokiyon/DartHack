@@ -600,5 +600,21 @@
   "optAdFeatureExitHighlightSub": "Display run highlights with banner ad when the game ends",
   "gameEndDialogTitle": "Game Over",
   "usePhysicalKeyboardNotation": "Enable Physical Keyboard Help",
-  "usePhysicalKeyboardNotationSub": "Show shortcut keys (y:, n:, Esc:, etc.) on buttons. When ON, press F1 or M-h (Alt-h) to display controls help"
+  "usePhysicalKeyboardNotationSub": "Show shortcut keys (y:, n:, Esc:, etc.) on buttons. When ON, press F1 or M-h (Alt-h) to display controls help",
+  "statusFontSize": "Font Size",
+  "statusFontSizeLabel": "Current: {size} pt",
+  "statusLineLayoutTitle": "Status lines & layout",
+  "statusLineLayoutSub": "Choose 1 to 3 lines (ultra compact keeps essential combat fields only)",
+  "statusLineLayoutCompact1": "1 line (Ultra compact)",
+  "statusLineLayoutSingleAll": "1 line (All fields)",
+  "statusLineLayoutTwo": "2 lines (Standard)",
+  "statusLineLayoutThree": "3 lines (Expanded)",
+  "optWeaponstatus": "Wielded Weapon (weaponstatus)",
+  "weaponstatusSub": "Show wielded weapon summary on status bar (tap or long-press for full equipment)",
+  "optArmorstatus": "Worn Armor (armorstatus)",
+  "armorstatusSub": "Show worn armor summary on status bar (tap or long-press for full equipment)",
+  "optTerrainstatus": "Current Terrain (terrainstatus)",
+  "terrainstatusSub": "Show current floor/terrain name on status bar",
+  "statusSingleAllNote": "Note: '1 line (All fields)' works best with Variable Height or wide screens.",
+  "statusCompactHiddenHint": "* Hidden in 1 line (Ultra compact) mode"
 }

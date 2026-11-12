@@ -3097,6 +3097,102 @@ abstract class AppLocalizations {
   /// In ja, this message translates to:
   /// **'ボタンに割り当てキー（y:、n:、Esc:等）を表示します。ON時はF1またはM-h (Alt-h)キーで操作ヘルプを表示できます'**
   String get usePhysicalKeyboardNotationSub;
+
+  /// No description provided for @statusFontSize.
+  ///
+  /// In ja, this message translates to:
+  /// **'フォントサイズ'**
+  String get statusFontSize;
+
+  /// No description provided for @statusFontSizeLabel.
+  ///
+  /// In ja, this message translates to:
+  /// **'現在: {size} pt'**
+  String statusFontSizeLabel(Object size);
+
+  /// No description provided for @statusLineLayoutTitle.
+  ///
+  /// In ja, this message translates to:
+  /// **'ステータス行数・構成'**
+  String get statusLineLayoutTitle;
+
+  /// No description provided for @statusLineLayoutSub.
+  ///
+  /// In ja, this message translates to:
+  /// **'1行〜3行の表示構成を選択します（超コンパクトは最小項目のみ表示）'**
+  String get statusLineLayoutSub;
+
+  /// No description provided for @statusLineLayoutCompact1.
+  ///
+  /// In ja, this message translates to:
+  /// **'1行（超コンパクト）'**
+  String get statusLineLayoutCompact1;
+
+  /// No description provided for @statusLineLayoutSingleAll.
+  ///
+  /// In ja, this message translates to:
+  /// **'1行（全項目を1行表示）'**
+  String get statusLineLayoutSingleAll;
+
+  /// No description provided for @statusLineLayoutTwo.
+  ///
+  /// In ja, this message translates to:
+  /// **'2行（標準）'**
+  String get statusLineLayoutTwo;
+
+  /// No description provided for @statusLineLayoutThree.
+  ///
+  /// In ja, this message translates to:
+  /// **'3行（拡張）'**
+  String get statusLineLayoutThree;
+
+  /// No description provided for @optWeaponstatus.
+  ///
+  /// In ja, this message translates to:
+  /// **'装備武器表示 (weaponstatus)'**
+  String get optWeaponstatus;
+
+  /// No description provided for @weaponstatusSub.
+  ///
+  /// In ja, this message translates to:
+  /// **'装備中の武器種別をステータス欄に表示します（タップまたは長押しで装備一覧）'**
+  String get weaponstatusSub;
+
+  /// No description provided for @optArmorstatus.
+  ///
+  /// In ja, this message translates to:
+  /// **'装備防具表示 (armorstatus)'**
+  String get optArmorstatus;
+
+  /// No description provided for @armorstatusSub.
+  ///
+  /// In ja, this message translates to:
+  /// **'装備中の防具要約をステータス欄に表示します（タップまたは長押しで装備一覧）'**
+  String get armorstatusSub;
+
+  /// No description provided for @optTerrainstatus.
+  ///
+  /// In ja, this message translates to:
+  /// **'足元地形表示 (terrainstatus)'**
+  String get optTerrainstatus;
+
+  /// No description provided for @terrainstatusSub.
+  ///
+  /// In ja, this message translates to:
+  /// **'現在立っている場所の地形名をステータス欄に表示します'**
+  String get terrainstatusSub;
+
+  /// No description provided for @statusSingleAllNote.
+  ///
+  /// In ja, this message translates to:
+  /// **'※「1行（全項目を1行表示）」は項目が多いため、「可変高さ」表示または横長画面での利用を推奨します'**
+  String get statusSingleAllNote;
+
+  /// No description provided for @statusCompactHiddenHint.
+  ///
+  /// In ja, this message translates to:
+  /// **'※「1行（超コンパクト）」選択中は表示されません'**
+  String get statusCompactHiddenHint;
 }
 
 class _AppLocalizationsDelegate

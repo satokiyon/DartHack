@@ -1591,4 +1591,55 @@ class AppLocalizationsJa extends AppLocalizations {
   @override
   String get usePhysicalKeyboardNotationSub =>
       'ボタンに割り当てキー（y:、n:、Esc:等）を表示します。ON時はF1またはM-h (Alt-h)キーで操作ヘルプを表示できます';
+
+  @override
+  String get statusFontSize => 'フォントサイズ';
+
+  @override
+  String statusFontSizeLabel(Object size) {
+    return '現在: $size pt';
+  }
+
+  @override
+  String get statusLineLayoutTitle => 'ステータス行数・構成';
+
+  @override
+  String get statusLineLayoutSub => '1行〜3行の表示構成を選択します（超コンパクトは最小項目のみ表示）';
+
+  @override
+  String get statusLineLayoutCompact1 => '1行（超コンパクト）';
+
+  @override
+  String get statusLineLayoutSingleAll => '1行（全項目を1行表示）';
+
+  @override
+  String get statusLineLayoutTwo => '2行（標準）';
+
+  @override
+  String get statusLineLayoutThree => '3行（拡張）';
+
+  @override
+  String get optWeaponstatus => '装備武器表示 (weaponstatus)';
+
+  @override
+  String get weaponstatusSub => '装備中の武器種別をステータス欄に表示します（タップまたは長押しで装備一覧）';
+
+  @override
+  String get optArmorstatus => '装備防具表示 (armorstatus)';
+
+  @override
+  String get armorstatusSub => '装備中の防具要約をステータス欄に表示します（タップまたは長押しで装備一覧）';
+
+  @override
+  String get optTerrainstatus => '足元地形表示 (terrainstatus)';
+
+  @override
+  String get terrainstatusSub => '現在立っている場所の地形名をステータス欄に表示します';
+
+  @override
+  String get statusSingleAllNote =>
+      '※「1行（全項目を1行表示）」は項目が多いため、「可変高さ」表示または横長画面での利用を推奨します';
+
+  @override
+  String get statusCompactHiddenHint => '※「1行（超コンパクト）」選択中は表示されません';
 }

@@ -2,7 +2,292 @@ import 'dart:convert';
 import 'dart:ffi';
 import 'dart:isolate';
 import 'package:ffi/ffi.dart';
+import 'package:flutter/foundation.dart';
 import 'nethack_ffi.dart';
+
+/// Worker Isolate で発生したエラーのフェーズ識別定数
+abstract final class WorkerErrorPhase {
+  static const String coreLoad = 'core_load';
+  static const String workerInit = 'worker_init';
+  static const String workerRuntime = 'worker_runtime';
+}
+
+/// Worker Isolate の起動エラーを UI ダイアログ表示用に整形する記述子
+class WorkerStartupErrorPresentation {
+  final String title;
+  final String message;
+  final String details;
+  final bool shouldTerminateWorker;
+
+  const WorkerStartupErrorPresentation({
+    required this.title,
+    required this.message,
+    required this.details,
+    required this.shouldTerminateWorker,
+  });
+
+  /// Worker からの `worker_error` メッセージを解析してダイアログ表示内容を返す
+  static WorkerStartupErrorPresentation fromWorkerMessage({
+    required Map<dynamic, dynamic> message,
+    required String libraryName,
+    required bool isJapanese,
+  }) {
+    final phase = message['phase']?.toString() ?? WorkerErrorPhase.workerRuntime;
+    final coreStarted = message['coreStarted'] == true;
+    final errorDetails = message['error']?.toString() ?? 'Unknown core error';
+
+    if (phase == WorkerErrorPhase.coreLoad) {
+      return WorkerStartupErrorPresentation(
+        title: isJapanese ? 'コア読込エラー' : 'Core Load Error',
+        message: isJapanese
+            ? 'NetHack コアライブラリ ($libraryName) の読み込みに失敗したため、ゲームを開始できません。'
+            : 'Failed to load NetHack core library ($libraryName). Cannot start the game.',
+        details: errorDetails,
+        shouldTerminateWorker: !coreStarted,
+      );
+    }
+
+    return WorkerStartupErrorPresentation(
+      title: isJapanese ? 'ゲーム初期化エラー' : 'Game Initialization Error',
+      message: isJapanese
+          ? 'ゲームワーカーの初期化中にエラーが発生したため、ゲームを開始できませんでした。'
+          : 'An error occurred while initializing the game worker. Cannot start the game.',
+      details: errorDetails,
+      shouldTerminateWorker: !coreStarted,
+    );
+  }
+}
+
+/// Worker Isolate の状態とメッセージ処理を管理するセッション
+///
+/// ネイティブライブラリを伴わないユニットテストでも起動順やガードを検証できるよう分離している。
+@visibleForTesting
+class NetHackWorkerSession {
+  NetHackFfi? ffi;
+  bool isCoreThreadStarted = false;
+  String currentPhase = WorkerErrorPhase.workerInit;
+
+  final void Function(String) onLog;
+  final void Function(Map<String, dynamic>) onSendToUi;
+  final NetHackFfi Function(String langCode) ffiFactory;
+  final void Function(NetHackFfi ffi) registerCallbacks;
+
+  NetHackWorkerSession({
+    required this.onLog,
+    required this.onSendToUi,
+    NetHackFfi Function(String langCode)? ffiFactory,
+    required this.registerCallbacks,
+  }) : ffiFactory = ffiFactory ?? ((langCode) => NetHackFfi(langCode));
+
+  /// UI Isolate から受信したメッセージを処理する
+  void handleMessage(dynamic message) {
+    try {
+      onLog("Received message in Worker Isolate: $message");
+      if (message is! Map) return;
+
+      final type = message['type'];
+      if (type == 'start') {
+        if (ffi != null) {
+          onLog("Ignoring duplicate 'start' message (already initialized)");
+          return;
+        }
+        final assetsPath = message['assetsPath'] as String;
+        final langCode = (message['langCode'] as String?) ?? 'ja';
+        final initialLayout = message['status_line_layout'] as String? ?? 'standard';
+        final initialAutosaveEnabled = (message['autosave_enabled'] as bool? ?? true) ? 1 : 0;
+        final initialAutosaveInterval = message['autosave_interval'] as int? ?? 50;
+
+        currentPhase = WorkerErrorPhase.coreLoad;
+        onLog("Initializing NetHackFfi for langCode='$langCode' and registering callbacks via struct...");
+        final loadedFfi = ffiFactory(langCode);
+        ffi = loadedFfi;
+
+        currentPhase = WorkerErrorPhase.workerInit;
+        registerCallbacks(loadedFfi);
+
+        onLog("Setting C core language mode for langCode='$langCode'");
+        loadedFfi.setLanguageMode(langCode == 'ja' ? 1 : 0);
+
+        onLog(
+          "Applying initial settings before startNetHack: "
+          "layout='$initialLayout', autosave=($initialAutosaveEnabled, $initialAutosaveInterval)",
+        );
+        loadedFfi.setStatusLayout(initialLayout);
+        loadedFfi.setAutosaveSettings(initialAutosaveEnabled, initialAutosaveInterval);
+
+        final pathPtr = assetsPath.toNativeUtf8();
+        final userPtr = "Player".toNativeUtf8();
+        try {
+          onLog("Calling ffi.startNetHack with path='$assetsPath'...");
+          loadedFfi.startNetHack(pathPtr, userPtr);
+          isCoreThreadStarted = true;
+          currentPhase = WorkerErrorPhase.workerRuntime;
+          onLog("ffi.startNetHack returned.");
+        } finally {
+          calloc.free(pathPtr);
+          calloc.free(userPtr);
+        }
+        return;
+      }
+
+      // 'start' 未完了（ffi 未初期化）のメッセージは一括ガードして LateInitializationError を防ぐ
+      final activeFfi = ffi;
+      if (activeFfi == null) {
+        onLog("Ignoring '$type' message before 'start' completes.");
+        return;
+      }
+
+      if (type == 'key') {
+        final key = message['key'] as int;
+        activeFfi.sendKeyToC(key);
+      } else if (type == 'keys') {
+        final raw = message['keys'];
+        if (raw is List) {
+          final int length = raw.length;
+          if (length > 0) {
+            final Pointer<Int32> ptr = calloc<Int32>(length);
+            try {
+              for (int i = 0; i < length; i++) {
+                ptr[i] = raw[i] as int;
+              }
+              activeFfi.sendKeysToC(ptr, length);
+            } finally {
+              calloc.free(ptr);
+            }
+          }
+        }
+      } else if (type == 'shortcut') {
+        final raw = message['keys'];
+        if (raw is List) {
+          final int length = raw.length;
+          if (length > 0) {
+            final Pointer<Int32> ptr = calloc<Int32>(length);
+            try {
+              for (int i = 0; i < length; i++) {
+                ptr[i] = raw[i] as int;
+              }
+              activeFfi.sendShortcutToC(ptr, length);
+            } finally {
+              calloc.free(ptr);
+            }
+          }
+        }
+      } else if (type == 'pos_cmd') {
+        final x = message['x'] as int;
+        final y = message['y'] as int;
+        final mod = message['mod'] as int? ?? 1;
+        activeFfi.sendPosCmdToC(x, y, mod);
+      } else if (type == 'menu_cancel') {
+        activeFfi.sendMenuCancel();
+      } else if (type == 'menu_select') {
+        final ident = message['ident'] as int;
+        final count = message['count'] as int? ?? -1;
+        activeFfi.sendMenuSelection(ident, count);
+      } else if (type == 'menu_selects') {
+        final selections = message['selections'] as List<dynamic>? ?? const <dynamic>[];
+        final List<String> pairs = [];
+        for (final sel in selections) {
+          if (sel is Map) {
+            final id = sel['ident'] as int;
+            final count = sel['count'] as int? ?? 1;
+            pairs.add('$id:$count');
+          }
+        }
+        final csv = pairs.join(',').toNativeUtf8();
+        try {
+          activeFfi.sendMenuSelections(csv);
+        } finally {
+          calloc.free(csv);
+        }
+      } else if (type == 'yn_result') {
+        final result = message['result'] as int;
+        activeFfi.sendYnResult(result);
+      } else if (type == 'lookup_key') {
+        final code = message['code'] as int;
+        onLog("lookup_key invoked for code: $code");
+        activeFfi.lookupKeyDescription(code);
+      } else if (type == 'new_level_rest_result') {
+        final rewardAmount = message['rewardAmount'] as int? ?? 0;
+        activeFfi.sendNewLevelRestResult(rewardAmount);
+      } else if (type == 'getline_result') {
+        final result = message['result'] as String?;
+        if (result != null) {
+          final resultPtr = result.toNativeUtf8();
+          try {
+            activeFfi.sendGetLineResult(resultPtr);
+          } finally {
+            calloc.free(resultPtr);
+          }
+        } else {
+          activeFfi.sendGetLineResult(nullptr);
+        }
+      } else if (type == 'askname_result') {
+        final result = message['result'] as String?;
+        final mode = (message['mode'] as int?) ?? 0;
+        if (result != null) {
+          final resultPtr = result.toNativeUtf8();
+          try {
+            activeFfi.sendAskNameResult(resultPtr, mode);
+          } finally {
+            calloc.free(resultPtr);
+          }
+        } else {
+          activeFfi.sendAskNameResult(nullptr, mode);
+        }
+      } else if (type == 'set_autosave_settings') {
+        final enabled = (message['enabled'] as bool? ?? true) ? 1 : 0;
+        final interval = message['interval'] as int? ?? 50;
+        onLog("set_autosave_settings message received: enabled=$enabled, interval=$interval");
+        activeFfi.setAutosaveSettings(enabled, interval);
+      } else if (type == 'set_status_layout') {
+        final layout = message['status_line_layout'] as String? ?? 'standard';
+        onLog("set_status_layout message received: layout=$layout");
+        activeFfi.setStatusLayout(layout);
+      } else if (type == 'request_status_options_change') {
+        final hitpointbar = message['hitpointbar'] as bool? ?? true;
+        final hiliteStatus = message['hilite_status'] as bool? ?? true;
+        final timeOpt = message['time'] as bool? ?? true;
+        final showexp = message['showexp'] as bool? ?? true;
+        final statuslines = message['statuslines'] as int? ?? 2;
+        final weaponstatus = message['weaponstatus'] as bool? ?? false;
+        final armorstatus = message['armorstatus'] as bool? ?? false;
+        final terrainstatus = message['terrainstatus'] as bool? ?? false;
+        final statusLayout = message['status_line_layout'] as String? ?? 'standard';
+        onLog(
+          "request_status_options_change: hpbar=$hitpointbar hilite=$hiliteStatus "
+          "time=$timeOpt exp=$showexp lines=$statuslines wep=$weaponstatus "
+          "arm=$armorstatus ter=$terrainstatus layout=$statusLayout",
+        );
+        activeFfi.requestStatusOptionsChange(
+          hitpointbar: hitpointbar,
+          hiliteStatus: hiliteStatus,
+          timeOpt: timeOpt,
+          showexp: showexp,
+          statuslines: statuslines,
+          weaponstatus: weaponstatus,
+          armorstatus: armorstatus,
+          terrainstatus: terrainstatus,
+          statusLayout: statusLayout,
+        );
+      } else if (type == 'trigger_database_search') {
+        onLog("trigger_database_search message received in worker isolate");
+        activeFfi.triggerDatabaseSearch();
+      }
+    } catch (e, st) {
+      if (!isCoreThreadStarted && currentPhase != WorkerErrorPhase.workerRuntime) {
+        ffi = null;
+      }
+      onLog("[NetHackWorker ERROR] Exception in Worker Isolate: $e\n$st");
+      onSendToUi({
+        'type': 'worker_error',
+        'error': e.toString(),
+        'stack': st.toString(),
+        'phase': currentPhase,
+        'coreStarted': isCoreThreadStarted,
+      });
+    }
+  }
+}
 
 class NetHackWorker {
   /// 不正なバイトを含む文字列でもクラッシュさせずにデコードする安全なヘルパー
@@ -25,7 +310,7 @@ class NetHackWorker {
   static void start(SendPort uiSendPort) {
     final receivePort = ReceivePort();
 
-    late final NetHackFfi ffi;
+    NetHackWorkerSession? session;
 
     // FFI コールバック用 NativeCallable
     late final NativeCallable<CreateWindowCallback> createCallable;
@@ -143,7 +428,7 @@ class NetHackWorker {
     });
 
     inputCallable = NativeCallable<NotifyInputCallback>.listener((int requestId) {
-      final gameover = ffi.getIsGameOver() != 0;
+      final gameover = (session?.ffi?.getIsGameOver() ?? 0) != 0;
       wlog("inputCallable: requestId=$requestId, gameover=$gameover");
       uiSendPort.send({
         'type': 'request_input',
@@ -320,170 +605,62 @@ class NetHackWorker {
       });
     });
 
+    final activeSession = NetHackWorkerSession(
+      onLog: wlog,
+      onSendToUi: uiSendPort.send,
+      registerCallbacks: (loadedFfi) {
+        loadedFfi.registerDartLog(logCallable.nativeFunction);
+
+        final structPtr = calloc<FlutterCallbacksStruct>();
+        try {
+          structPtr.ref.createCb = createCallable.nativeFunction;
+          structPtr.ref.clearCb = clearCallable.nativeFunction;
+          structPtr.ref.displayCb = displayCallable.nativeFunction;
+          structPtr.ref.destroyCb = destroyCallable.nativeFunction;
+          structPtr.ref.cursCb = cursCallable.nativeFunction;
+          structPtr.ref.putstrCb = putstrCallable.nativeFunction;
+          structPtr.ref.glyphCb = glyphCallable.nativeFunction;
+          structPtr.ref.inputCb = inputCallable.nativeFunction;
+          structPtr.ref.startMenuCb = startMenuCallable.nativeFunction;
+          structPtr.ref.addMenuCb = addMenuCallable.nativeFunction;
+          structPtr.ref.endMenuCb = endMenuCallable.nativeFunction;
+          structPtr.ref.selectMenuCb = selectMenuCallable.nativeFunction;
+          structPtr.ref.ynCb = ynCallable.nativeFunction;
+          structPtr.ref.getlineCb = getlineCallable.nativeFunction;
+          structPtr.ref.asknameCb = asknameCallable.nativeFunction;
+          structPtr.ref.exitCb = exitCallable.nativeFunction;
+          structPtr.ref.numberPadCb = numberPadCallable.nativeFunction;
+          structPtr.ref.cliparoundCb = cliparoundCallable.nativeFunction;
+          structPtr.ref.putMixedCb = putMixedCallable.nativeFunction;
+          structPtr.ref.newLevelRestCb = newLevelRestCallable.nativeFunction;
+          structPtr.ref.soundEventCb = soundEventCallable.nativeFunction;
+
+          wlog("Calling ffi.registerCallbacksStruct...");
+          loadedFfi.registerCallbacksStruct(structPtr);
+          wlog("ffi.registerCallbacksStruct returned.");
+        } finally {
+          wlog("Freeing structPtr...");
+          calloc.free(structPtr);
+          wlog("calloc.free completed.");
+        }
+      },
+    );
+    session = activeSession;
+
+    receivePort.listen(activeSession.handleMessage);
+
     wlog("Sending ready message to UI Isolate...");
     uiSendPort.send({'type': 'ready', 'sendPort': receivePort.sendPort});
     wlog("uiSendPort.send ready completed.");
-
-    receivePort.listen((message) {
-      try {
-        wlog("Received message in Worker Isolate: $message");
-        if (message is Map) {
-          final type = message['type'];
-          if (type == 'start') {
-            final assetsPath = message['assetsPath'] as String;
-            final langCode = (message['langCode'] as String?) ?? 'ja';
-
-            wlog("Initializing NetHackFfi for langCode='$langCode' and registering callbacks via struct...");
-            ffi = NetHackFfi(langCode);
-
-            ffi.registerDartLog(logCallable.nativeFunction);
-
-            final structPtr = calloc<FlutterCallbacksStruct>();
-            structPtr.ref.createCb = createCallable.nativeFunction;
-            structPtr.ref.clearCb = clearCallable.nativeFunction;
-            structPtr.ref.displayCb = displayCallable.nativeFunction;
-            structPtr.ref.destroyCb = destroyCallable.nativeFunction;
-            structPtr.ref.cursCb = cursCallable.nativeFunction;
-            structPtr.ref.putstrCb = putstrCallable.nativeFunction;
-            structPtr.ref.glyphCb = glyphCallable.nativeFunction;
-            structPtr.ref.inputCb = inputCallable.nativeFunction;
-            structPtr.ref.startMenuCb = startMenuCallable.nativeFunction;
-            structPtr.ref.addMenuCb = addMenuCallable.nativeFunction;
-            structPtr.ref.endMenuCb = endMenuCallable.nativeFunction;
-            structPtr.ref.selectMenuCb = selectMenuCallable.nativeFunction;
-            structPtr.ref.ynCb = ynCallable.nativeFunction;
-            structPtr.ref.getlineCb = getlineCallable.nativeFunction;
-            structPtr.ref.asknameCb = asknameCallable.nativeFunction;
-            structPtr.ref.exitCb = exitCallable.nativeFunction;
-            structPtr.ref.numberPadCb = numberPadCallable.nativeFunction;
-            structPtr.ref.cliparoundCb = cliparoundCallable.nativeFunction;
-            structPtr.ref.putMixedCb = putMixedCallable.nativeFunction;
-            structPtr.ref.newLevelRestCb = newLevelRestCallable.nativeFunction;
-            structPtr.ref.soundEventCb = soundEventCallable.nativeFunction;
-
-            wlog("Calling ffi.registerCallbacksStruct...");
-            ffi.registerCallbacksStruct(structPtr);
-            wlog("ffi.registerCallbacksStruct returned.");
-
-            wlog("Freeing structPtr...");
-            calloc.free(structPtr);
-            wlog("calloc.free completed.");
-
-            wlog("Setting C core language mode for langCode='$langCode'");
-            ffi.setLanguageMode(langCode == 'ja' ? 1 : 0);
-
-            final pathPtr = assetsPath.toNativeUtf8();
-            final userPtr = "Player".toNativeUtf8();
-
-            wlog("Calling ffi.startNetHack with path='$assetsPath'...");
-            ffi.startNetHack(pathPtr, userPtr);
-            wlog("ffi.startNetHack returned.");
-          } else if (type == 'key') {
-          final key = message['key'] as int;
-          ffi.sendKeyToC(key);
-        } else if (type == 'keys') {
-          final raw = message['keys'];
-          if (raw is List) {
-            final int length = raw.length;
-            if (length > 0) {
-              final Pointer<Int32> ptr = calloc<Int32>(length);
-              try {
-                for (int i = 0; i < length; i++) {
-                  ptr[i] = raw[i] as int;
-                }
-                ffi.sendKeysToC(ptr, length);
-              } finally {
-                calloc.free(ptr);
-              }
-            }
-          }
-        } else if (type == 'shortcut') {
-          final raw = message['keys'];
-          if (raw is List) {
-            final int length = raw.length;
-            if (length > 0) {
-              final Pointer<Int32> ptr = calloc<Int32>(length);
-              try {
-                for (int i = 0; i < length; i++) {
-                  ptr[i] = raw[i] as int;
-                }
-                ffi.sendShortcutToC(ptr, length);
-              } finally {
-                calloc.free(ptr);
-              }
-            }
-          }
-        } else if (type == 'pos_cmd') {
-          final x = message['x'] as int;
-          final y = message['y'] as int;
-          final mod = message['mod'] as int? ?? 1;
-          ffi.sendPosCmdToC(x, y, mod);
-        } else if (type == 'menu_cancel') {
-          ffi.sendMenuCancel();
-        } else if (type == 'menu_select') {
-          final ident = message['ident'] as int;
-          final count = message['count'] as int? ?? -1;
-          ffi.sendMenuSelection(ident, count);
-        } else if (type == 'menu_selects') {
-          final selections = message['selections'] as List<dynamic>? ?? const <dynamic>[];
-          final List<String> pairs = [];
-          for (final sel in selections) {
-            if (sel is Map) {
-              final id = sel['ident'] as int;
-              final count = sel['count'] as int? ?? 1;
-              pairs.add('$id:$count');
-            }
-          }
-          final csv = pairs.join(',').toNativeUtf8();
-          ffi.sendMenuSelections(csv);
-          calloc.free(csv);
-        } else if (type == 'yn_result') {
-          final result = message['result'] as int;
-          ffi.sendYnResult(result);
-        } else if (type == 'lookup_key') {
-          final code = message['code'] as int;
-          wlog("lookup_key invoked for code: $code");
-          ffi.lookupKeyDescription(code);
-        } else if (type == 'new_level_rest_result') {
-          final rewardAmount = message['rewardAmount'] as int? ?? 0;
-          ffi.sendNewLevelRestResult(rewardAmount);
-        } else if (type == 'getline_result') {
-          final result = message['result'] as String?;
-          if (result != null) {
-            final resultPtr = result.toNativeUtf8();
-            ffi.sendGetLineResult(resultPtr);
-            calloc.free(resultPtr);
-          } else {
-            ffi.sendGetLineResult(nullptr);
-          }
-        } else if (type == 'askname_result') {
-          final result = message['result'] as String?;
-          final mode = (message['mode'] as int?) ?? 0;
-          if (result != null) {
-            final resultPtr = result.toNativeUtf8();
-            ffi.sendAskNameResult(resultPtr, mode);
-            calloc.free(resultPtr);
-          } else {
-            ffi.sendAskNameResult(nullptr, mode);
-          }
-        } else if (type == 'set_autosave_settings') {
-          final enabled = (message['enabled'] as bool? ?? true) ? 1 : 0;
-          final interval = message['interval'] as int? ?? 50;
-          wlog("set_autosave_settings message received: enabled=$enabled, interval=$interval");
-          ffi.setAutosaveSettings(enabled, interval);
-        } else if (type == 'trigger_database_search') {
-          wlog("trigger_database_search message received in worker isolate");
-          ffi.triggerDatabaseSearch();
-        }
-        }
-      } catch (e, st) {
-        print("[NetHackWorker ERROR] Exception in Worker Isolate: $e\n$st");
-        uiSendPort.send({'type': 'worker_error', 'error': e.toString(), 'stack': st.toString()});
-      }
-    });
     } catch (e, st) {
       wlog("FATAL WORKER INIT ERROR: $e\n$st");
-      uiSendPort.send({'type': 'worker_error', 'error': e.toString(), 'stack': st.toString()});
+      uiSendPort.send({
+        'type': 'worker_error',
+        'error': e.toString(),
+        'stack': st.toString(),
+        'phase': WorkerErrorPhase.workerInit,
+        'coreStarted': false,
+      });
     }
   }
 }
