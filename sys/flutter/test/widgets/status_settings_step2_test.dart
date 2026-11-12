@@ -219,7 +219,7 @@ void main() {
 
     // プレビューに武器・防具・地形のサンプルが表示されること
     expect(find.textContaining('武器:剣', findRichText: true), findsWidgets);
-    expect(find.textContaining('防具:GCA+', findRichText: true), findsWidgets);
+    expect(find.textContaining('防具:手外鎧+', findRichText: true), findsWidgets);
     expect(find.textContaining('地形:床', findRichText: true), findsWidgets);
   });
 
@@ -707,7 +707,7 @@ void main() {
         expect(weaponSegOn.style?.decoration, equals(TextDecoration.underline));
         expect(weaponSegOn.style?.decorationStyle, equals(TextDecorationStyle.dotted));
 
-        final armorSegOn = segmentExact(segsOn, '防具:GCA+');
+        final armorSegOn = segmentExact(segsOn, '防具:手外鎧+');
         expect(armorSegOn.style?.color, equals(Colors.white));
         expect(armorSegOn.style?.decoration, equals(TextDecoration.underline));
         expect(armorSegOn.style?.decorationStyle, equals(TextDecorationStyle.dotted));
@@ -738,7 +738,7 @@ void main() {
         expect(segmentContaining(segsOff, '空腹').style?.color, equals(Colors.white));
         expect(segmentContaining(segsOff, '盲目').style?.color, equals(Colors.white));
         expect(segmentExact(segsOff, '武器:剣').style?.color, equals(Colors.white));
-        expect(segmentExact(segsOff, '防具:GCA+').style?.color, equals(Colors.white));
+        expect(segmentExact(segsOff, '防具:手外鎧+').style?.color, equals(Colors.white));
         expect(segmentContaining(segsOff, '地形:床').style?.color, equals(Colors.white));
       },
     );

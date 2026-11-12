@@ -1290,7 +1290,7 @@ class _SettingsPageState extends State<SettingsPage> {
 
     final extraParts = <String>[
       if (_optWeaponstatus) '\\Lequipment:${isEn ? 'Sword' : '武器:剣'}\\l',
-      if (_optArmorstatus) '\\Lequipment:${isEn ? 'GCA+' : '防具:GCA+'}\\l',
+      if (_optArmorstatus) '\\Lequipment:${isEn ? 'GCA+' : '防具:手外鎧+'}\\l',
       if (_optTerrainstatus) isEn ? 'Floor' : '地形:床',
     ];
     final extraSuffix = extraParts.isEmpty ? '' : ' ${extraParts.join(' ')}';
