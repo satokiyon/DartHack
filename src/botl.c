@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-09. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-12. */
 /* $NHDT-Header: NetHack 5.0 botl.c 2026/06/20_16:30:42 NetHack-5.0:1.289 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2006. */
@@ -891,16 +891,17 @@ weapon_status(char *outbuf)
                 res = "一角角";
                 break;
             default:
-                res = weapon_descr(uwep);
-                /* [should this be moved into weapon_descr()?] */
-                if (!strcmpi(res, "food") && uwep->otyp == CREAM_PIE)
+                res = weapon_descr_jp(uwep);
+                /* [should this be moved into weapon_descr_jp()?] */
+                if (uwep->otyp == CREAM_PIE)
                     res = "パイ";
                 break;
             }
         }
 
         if ((uwep->oclass == WEAPON_CLASS || is_weptool(uwep))
-            && bimanual(uwep) && *res != '2' && strncmpi(res, "two", 3))
+            && bimanual(uwep) && *res != '2' && strncmpi(res, "two", 3)
+            && strncmp(res, "両手", sizeof("両手") - 1) != 0)
             Strcat(outbuf, "両手-");
         Strcpy(p = eos(outbuf), res), res = outbuf;
         *p = highc(*p);
@@ -934,26 +935,26 @@ armor_status(char *armbuf)
                                                                  : uarms ? "盾"
                                    : ""); /* not possible */
     } else { /* more than one piece */
-        char *p = armbuf;
+        static const char *const armor_abbrs[] = {
+            "手", /* gloves */
+            "外", /* cloak */
+            "鎧", /* suit */
+            "下", /* shirt / underwear */
+            "兜", /* hat / helm */
+            "靴", /* boots */
+            "盾", /* shield */
+        };
+        const struct obj *const equipped_armors[] = {
+            uarmg, uarmc, uarm, uarmu, uarmh, uarmf, uarms,
+        };
+        int i;
 
-        /* gloves first since this is expected to follow weapon_status();
-           cloak next since it tends to provide the most protection
-           aside from raw AC */
-        if (uarmg)
-            *p++ = 'G'; /* gloves */
-        if (uarmc)
-            *p++ = 'C'; /* cloak */
-        if (uarm)
-            *p++ = 'A'; /* suit but 's' is for shield */
-        if (uarmu)
-            *p++ = 'U'; /* underwear? => shirt */
-        if (uarmh)
-            *p++ = 'H'; /* hat/helm */
-        if (uarmf)
-            *p++ = 'B'; /* footwear => boots */
-        if (uarms)
-            *p++ = 'S'; /* shield */
-        *p = '\0';
+        armbuf[0] = '\0';
+        /* 手袋を先頭、外套を次とし、以降の装備部位を漢字1文字で連結する */
+        for (i = 0; i < SIZE(equipped_armors); ++i) {
+            if (equipped_armors[i])
+                Strcat(armbuf, armor_abbrs[i]);
+        }
     }
     /*
      * Add a hint about MC by appending a plus sign if that's augmented.
@@ -1089,12 +1090,12 @@ static struct istat_s initblstats[MAXBLSTATS] = {
     INIT_BLSTAT("condition", "%s", ANY_MASK32, 0, BL_CONDITION),
     /* weapon and armor are constructed strings with no particular numeric
        equivalent */
-    INIT_BLSTAT("weapon", " 武器:%s", ANY_STR, 20, BL_WEAPON),
-    INIT_BLSTAT("armor", " 防具:%s", ANY_STR, 20, BL_ARMOR),
+    INIT_BLSTAT("weapon", " 武器:%s", ANY_STR, MAXVALWIDTH, BL_WEAPON),
+    INIT_BLSTAT("armor", " 防具:%s", ANY_STR, MAXVALWIDTH, BL_ARMOR),
     /* terrain is tracked by a number but designating it as type 'int'
        isn't useful; using type 'string' allows highlighting based on text
        matching which is potentially useful */
-    INIT_BLSTAT("terrain", " 地形:%s", ANY_STR, 20, BL_TERRAIN),
+    INIT_BLSTAT("terrain", " 地形:%s", ANY_STR, MAXVALWIDTH, BL_TERRAIN),
     /* optional; once set it doesn't change unless 'showvers' option is
        toggled or player modifies the 'versinfo' option;
        available mostly for screenshots or someone looking over shoulder;

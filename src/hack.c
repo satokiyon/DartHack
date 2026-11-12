@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-08. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-12. */
 /* $NHDT-Header: NetHack 5.0 hack.c 2026/06/20_16:30:50 NetHack-5.0:1.512 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Derek S. Ray, 2015. */
@@ -2034,26 +2034,13 @@ domove_fight_web(coordxy x, coordxy y)
 
             /* when dual wielding, second weapon will only be mentioned
                if it has a different type description from primary */
-            Strcpy(uwepbuf, weapon_descr(uwep));
-            Strcpy(scndbuf, u.twoweap ? weapon_descr(uswapwep) : "");
+            Strcpy(uwepbuf, weapon_descr_jp(uwep));
+            Strcpy(scndbuf, u.twoweap ? weapon_descr_jp(uswapwep) : "");
             onewep = !*scndbuf || !strcmp(uwepbuf, scndbuf);
-            if (!strcmpi(uwepbuf, "armor") || !strcmpi(uwepbuf, "food")
-                || !strcmpi(uwepbuf, "venom")) { /* as-is */
-                /* non-weapon item wielded, of a type where an() would
-                   result in weird phrasing; dual wield not possible */
-                uwepstr = uwepbuf;
-            } else if (uwep->quan == 1L /* singular */
-                       /* unless secondary is suppressed due to same type */
-                       && !(u.twoweap && onewep)) {
-                uwepstr = an(uwepbuf);
-            } else { /* plural */
-                uwepstr = makeplural(uwepbuf);
-            }
-            if (!onewep) {
-                assert(uswapwep != NULL);
-                scndstr = (uswapwep->quan == 1L) ? an(scndbuf)
-                                                 : makeplural(scndbuf);
-            }
+            /* 日本語名詞に英語の冠詞(an)・複数形(makeplural)は適用しない */
+            uwepstr = uwepbuf;
+            if (!onewep)
+                scndstr = scndbuf;
             You_cant("%s%s%sでは巣を切れなかった!", uwepstr,
                      !onewep ? "または" : "", !onewep ? scndstr : "");
             return TRUE;
