@@ -308,9 +308,9 @@ class NetHackFfi {
           .lookup<NativeFunction<RegisterCallbacksStructFunc>>('RegisterFlutterCallbacksStruct')
           .asFunction<RegisterCallbacksStructDart>();
     } catch (e) {
-      print("[FFI ERROR] Failed to lookup RegisterFlutterCallbacksStruct: $e");
+      debugPrint("[FFI ERROR] Failed to lookup RegisterFlutterCallbacksStruct: $e");
       registerCallbacksStruct = (ptr) {
-        print("[FFI FATAL] registerCallbacksStruct dummy fallback called! Symbol missing in SO!");
+        debugPrint("[FFI FATAL] registerCallbacksStruct dummy fallback called! Symbol missing in SO!");
       };
     }
 

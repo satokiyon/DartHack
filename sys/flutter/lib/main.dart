@@ -2573,6 +2573,7 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
     final dialogMessage = message.trim().isEmpty ? defaultMsg : message.trim();
 
     final prefs = await AppPrefs.getInstance();
+    if (!mounted) return;
     final adFeaturesEnabled = prefs.getBool('ad_features_enabled') ?? true;
     final exitHighlightEnabled = prefs.getBool('ad_feature_exit_highlight') ?? true;
 
@@ -2616,6 +2617,7 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
     }
 
     final prefs = await AppPrefs.getInstance();
+    if (!mounted) return;
     final adFeaturesEnabled = prefs.getBool('ad_features_enabled') ?? true;
     final newLevelRestEnabled = prefs.getBool('ad_feature_new_level_rest') ?? true;
 
@@ -2674,7 +2676,6 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
   }
 
   Future<void> _startGame() async {
-    print("[UI] _startGame called! _isGameRunning=$_isGameRunning, assetsPath='$_assetsPath'");
     if (_isGameRunning) return;
 
     // Cコアのロード可能性を事前検証（ロード失敗時はゲーム開始を阻止）
@@ -2723,10 +2724,7 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
     receivePort.listen((message) {
       if (message is Map) {
         final type = message['type'];
-        print("[UI Msg] received message type='$type'");
-        if (type == 'worker_log') {
-          print("[WorkerIsolate Log] ${message['text']}");
-        } else if (type == 'worker_error') {
+        if (type == 'worker_error') {
           debugPrint(
             "[UI WORKER ERROR] phase=${message['phase']} coreStarted=${message['coreStarted']} "
             "${message['error']}\n${message['stack']}",
@@ -3002,7 +3000,6 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
           _screen.endMenu(message['winId'], message['prompt']);
         } else if (type == 'selectMenu') {
           _screen.selectMenu(message['winId'], message['how']);
-          print("[UI Render] selectMenu received! prompt='${_screen.menuPrompt}', items=${_screen.menuItems.length}, isMenuVisible=${_screen.isMenuWindowVisible}");
           setState(() {
             _waitingForInput = true;
             _extCmdMenuFilter = "";

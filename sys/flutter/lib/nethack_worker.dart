@@ -351,7 +351,6 @@ class NetHackWorker {
     late final NativeCallable<DartSoundEventCallback> soundEventCallable;
 
     void wlog(String text) {
-      print("[WorkerLog Direct] $text");
       uiSendPort.send({'type': 'worker_log', 'text': text});
     }
 
