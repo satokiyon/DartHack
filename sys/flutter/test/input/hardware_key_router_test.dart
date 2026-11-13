@@ -717,7 +717,7 @@ void main() {
         equals(const TextScroll(-1)),
       );
 
-      // Enter / ESC -> DismissText()
+      // Enter / ArrowRight -> SubmitText(), ESC / q -> DismissText()
       final enterEvent = const KeyDownEvent(
         physicalKey: PhysicalKeyboardKey.enter,
         logicalKey: LogicalKeyboardKey.enter,
@@ -725,7 +725,17 @@ void main() {
       );
       expect(
         HardwareKeyRouter.route(event: enterEvent, context: KeyInputContext.textWindow),
-        equals(const DismissText()),
+        equals(const SubmitText()),
+      );
+
+      final rightEvent = const KeyDownEvent(
+        physicalKey: PhysicalKeyboardKey.arrowRight,
+        logicalKey: LogicalKeyboardKey.arrowRight,
+        timeStamp: Duration.zero,
+      );
+      expect(
+        HardwareKeyRouter.route(event: rightEvent, context: KeyInputContext.textWindow),
+        equals(const SubmitText()),
       );
 
       final escEvent = const KeyDownEvent(
@@ -735,6 +745,17 @@ void main() {
       );
       expect(
         HardwareKeyRouter.route(event: escEvent, context: KeyInputContext.textWindow),
+        equals(const DismissText()),
+      );
+
+      final qEvent = const KeyDownEvent(
+        physicalKey: PhysicalKeyboardKey.keyQ,
+        logicalKey: LogicalKeyboardKey.keyQ,
+        character: 'q',
+        timeStamp: Duration.zero,
+      );
+      expect(
+        HardwareKeyRouter.route(event: qEvent, context: KeyInputContext.textWindow),
         equals(const DismissText()),
       );
 

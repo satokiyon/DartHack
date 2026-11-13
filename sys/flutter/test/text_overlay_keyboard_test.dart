@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:darthack/l10n/app_localizations.dart';
 import 'package:darthack/widgets/overlays/text_overlay.dart';
+import 'package:darthack/widgets/score_detail_dialog.dart';
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
@@ -102,5 +103,119 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(dismissed, isTrue);
+  });
+
+  group('TextOverlay TopTen Scoreboard Mode Tests', () {
+    const scoreLines = [
+      ' 順位      点数  名前',
+      '    1      5000  Player-Val-Hum-Fem-Law',
+      '                 地下 3 階でコボルドに倒された',
+      '    2      3000  Player2-Wiz-Elf-Mal-Cha',
+      '                 地下 2 階でジャッカルに倒された',
+    ];
+
+    testWidgets('TopTen 表示時に Tab 循環でカード・OKボタン・履歴ボタン間を移動すること', (tester) async {
+      final overlayKey = GlobalKey<TextOverlayState>();
+
+      await tester.pumpWidget(MaterialApp(
+        localizationsDelegates: AppLocalizations.localizationsDelegates,
+        supportedLocales: AppLocalizations.supportedLocales,
+        locale: const Locale('ja'),
+        home: Scaffold(
+          body: Stack(
+            children: [
+              TextOverlay(
+                key: overlayKey,
+                textLines: scoreLines,
+                textAttrs: List.filled(scoreLines.length, 0),
+                textTiles: List.filled(scoreLines.length, -1),
+                isPlainDialog: false,
+                plainType: 0,
+                tombstoneDisplayMode: 0,
+                useTiles: false,
+                tileImage: null,
+                tileWidth: 32,
+                tileHeight: 32,
+                onDismiss: () {},
+                onShowMsgHistory: () {},
+                bottomInset: 0,
+                usePhysicalKeyboardNotation: true,
+              ),
+            ],
+          ),
+        ),
+      ));
+      await tester.pumpAndSettle();
+
+      expect(overlayKey.currentState?.isTopTen, isTrue);
+      // usePhysicalKeyboardNotation が有効なため Enter:OK と表示されること
+      expect(find.widgetWithText(ElevatedButton, 'Enter:OK'), findsOneWidget);
+
+      // 初期状態ではカード 0 にフォーカス、ボタンターゲットは none
+      expect(overlayKey.currentState?.currentFocusTarget, equals(TextOverlayFocusTarget.none));
+
+      // Tab -> カード 1
+      overlayKey.currentState?.cycleFocus(true);
+      await tester.pumpAndSettle();
+      expect(overlayKey.currentState?.currentFocusTarget, equals(TextOverlayFocusTarget.none));
+
+      // Tab -> リスト末尾を超えて OK ボタンへ
+      overlayKey.currentState?.cycleFocus(true);
+      await tester.pumpAndSettle();
+      expect(overlayKey.currentState?.currentFocusTarget, equals(TextOverlayFocusTarget.ok));
+
+      // Tab -> 履歴ボタンへ
+      overlayKey.currentState?.cycleFocus(true);
+      await tester.pumpAndSettle();
+      expect(overlayKey.currentState?.currentFocusTarget, equals(TextOverlayFocusTarget.history));
+
+      // Tab -> カード先頭 (none) へ循環
+      overlayKey.currentState?.cycleFocus(true);
+      await tester.pumpAndSettle();
+      expect(overlayKey.currentState?.currentFocusTarget, equals(TextOverlayFocusTarget.none));
+    });
+
+    testWidgets('TopTen 表示時にカード選択状態で submit すると詳細ダイアログが開くこと', (tester) async {
+      final overlayKey = GlobalKey<TextOverlayState>();
+      bool dismissed = false;
+
+      await tester.pumpWidget(MaterialApp(
+        localizationsDelegates: AppLocalizations.localizationsDelegates,
+        supportedLocales: AppLocalizations.supportedLocales,
+        locale: const Locale('ja'),
+        home: Scaffold(
+          body: Stack(
+            children: [
+              TextOverlay(
+                key: overlayKey,
+                textLines: scoreLines,
+                textAttrs: List.filled(scoreLines.length, 0),
+                textTiles: List.filled(scoreLines.length, -1),
+                isPlainDialog: false,
+                plainType: 0,
+                tombstoneDisplayMode: 0,
+                useTiles: false,
+                tileImage: null,
+                tileWidth: 32,
+                tileHeight: 32,
+                onDismiss: () => dismissed = true,
+                onShowMsgHistory: () {},
+                bottomInset: 0,
+                usePhysicalKeyboardNotation: true,
+              ),
+            ],
+          ),
+        ),
+      ));
+      await tester.pumpAndSettle();
+
+      // カード0が選択された状態で submit()
+      overlayKey.currentState?.submit();
+      await tester.pumpAndSettle();
+
+      // 詳細ダイアログが表示され、onDismiss は呼ばれていないこと
+      expect(find.byType(ScoreDetailDialog), findsOneWidget);
+      expect(dismissed, isFalse);
+    });
   });
 }

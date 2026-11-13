@@ -96,6 +96,21 @@ class DismissText extends KeyAction {
   int get hashCode => runtimeType.hashCode;
 }
 
+/// テキスト画面での確定・詳細実行（Enter / → 等）
+class SubmitText extends KeyAction {
+  const SubmitText();
+
+  @override
+  String toString() => 'SubmitText()';
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) || other is SubmitText;
+
+  @override
+  int get hashCode => runtimeType.hashCode;
+}
+
 /// メニューのアクセラレータキー選択
 class MenuAccelerator extends KeyAction {
   final int code;
@@ -383,23 +398,25 @@ class TextScroll extends KeyAction {
   int get hashCode => direction.hashCode;
 }
 
-/// テキスト画面のページ送り（1: 次、-1: 前）
+/// テキスト画面のページ送り（1: 次、-1: 前、step: 移動ステップ倍率）
 class TextPage extends KeyAction {
   final int direction;
-  const TextPage(this.direction);
+  final int step;
+  const TextPage(this.direction, [this.step = 1]);
 
   @override
-  String toString() => 'TextPage($direction)';
+  String toString() => 'TextPage($direction, step: $step)';
 
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
       other is TextPage &&
           runtimeType == other.runtimeType &&
-          direction == other.direction;
+          direction == other.direction &&
+          step == other.step;
 
   @override
-  int get hashCode => direction.hashCode;
+  int get hashCode => Object.hash(direction, step);
 }
 
 /// テキスト画面の先頭・末尾ジャンプ（toTop: true=先頭, false=末尾）
@@ -1002,14 +1019,23 @@ class HardwareKeyRouter {
       if (event.logicalKey == LogicalKeyboardKey.arrowUp) {
         return const TextScroll(-1);
       }
+      if (event.logicalKey == LogicalKeyboardKey.arrowRight) {
+        return (event is KeyDownEvent)
+            ? const SubmitText()
+            : const SwallowKey();
+      }
       if (event.logicalKey == LogicalKeyboardKey.tab && !isAltPressed) {
         return (event is KeyDownEvent)
             ? TextOverlayTab(forward: !isShiftPressed)
             : const SwallowKey();
       }
       if (event.logicalKey == LogicalKeyboardKey.enter ||
-          event.logicalKey == LogicalKeyboardKey.numpadEnter ||
-          event.logicalKey == LogicalKeyboardKey.escape) {
+          event.logicalKey == LogicalKeyboardKey.numpadEnter) {
+        return (event is KeyDownEvent)
+            ? const SubmitText()
+            : const SwallowKey();
+      }
+      if (event.logicalKey == LogicalKeyboardKey.escape) {
         return (event is KeyDownEvent)
             ? const DismissText()
             : const SwallowKey();
@@ -1018,8 +1044,13 @@ class HardwareKeyRouter {
       String? char = event.character;
       if (char != null && char.isNotEmpty) {
         char = normalizeCharacter(char);
-        if (char == '>') return const TextPage(1);
-        if (char == '<') return const TextPage(-1);
+        if (!isControlPressed && (char == 'q' || char == 'Q')) {
+          return (event is KeyDownEvent)
+              ? const DismissText()
+              : const SwallowKey();
+        }
+        if (char == '>') return const TextPage(1, 2);
+        if (char == '<') return const TextPage(-1, 2);
         if (char == '^') return const TextJumpEdge(true);
         if (char == '|') return const TextJumpEdge(false);
       }

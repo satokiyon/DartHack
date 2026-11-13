@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import '../models/topten_entry.dart';
+import '../utils/app_prefs.dart';
+import 'keyboard_help_dialog.dart';
 import 'score_detail_dialog.dart';
 
 class TopTenWidget extends StatefulWidget {
@@ -9,6 +11,7 @@ class TopTenWidget extends StatefulWidget {
   final ScrollController? scrollController;
   final VoidCallback? onDetailClosed;
   final String? unrecordedMessage;
+  final bool? usePhysicalKeyboardNotation;
 
   const TopTenWidget({
     super.key,
@@ -17,20 +20,27 @@ class TopTenWidget extends StatefulWidget {
     this.scrollController,
     this.onDetailClosed,
     this.unrecordedMessage,
+    this.usePhysicalKeyboardNotation,
   });
 
   @override
-  State<TopTenWidget> createState() => _TopTenWidgetState();
+  TopTenWidgetState createState() => TopTenWidgetState();
 }
 
-class _TopTenWidgetState extends State<TopTenWidget> {
+class TopTenWidgetState extends State<TopTenWidget> {
   static const int _maxSeekAttempts = 24;
 
   ScrollController? _internalScrollController;
   final GlobalKey _currentCardKey = GlobalKey();
+  final GlobalKey _focusedCardKey = GlobalKey();
   final Set<int> _mountedIndices = <int>{};
   int _targetCurrentIndex = -1;
   int _autoCenterGeneration = 0;
+  int _focusedIndex = 0;
+  bool _isKeyboardMode = true;
+
+  int get focusedIndex => _focusedIndex;
+  bool get isKeyboardMode => _isKeyboardMode;
 
   ScrollController get _effectiveScrollController {
     if (widget.scrollController != null) {
@@ -44,7 +54,10 @@ class _TopTenWidgetState extends State<TopTenWidget> {
     super.initState();
     _targetCurrentIndex = widget.entries.lastIndexWhere((e) => e.isCurrent);
     if (_targetCurrentIndex >= 0) {
+      _focusedIndex = _targetCurrentIndex;
       _scheduleAutoCenter(generation: _autoCenterGeneration);
+    } else {
+      _focusedIndex = widget.entries.isNotEmpty ? 0 : -1;
     }
   }
 
@@ -61,7 +74,10 @@ class _TopTenWidgetState extends State<TopTenWidget> {
       _targetCurrentIndex = widget.entries.lastIndexWhere((e) => e.isCurrent);
       _autoCenterGeneration++;
       if (_targetCurrentIndex >= 0) {
+        _focusedIndex = _targetCurrentIndex;
         _scheduleAutoCenter(generation: _autoCenterGeneration);
+      } else {
+        _focusedIndex = widget.entries.isNotEmpty ? 0 : -1;
       }
     }
   }
@@ -71,6 +87,107 @@ class _TopTenWidgetState extends State<TopTenWidget> {
     _autoCenterGeneration++;
     _internalScrollController?.dispose();
     super.dispose();
+  }
+
+  void moveFocus(int delta) {
+    if (widget.entries.isEmpty) return;
+    _isKeyboardMode = true;
+    final newIndex = (_focusedIndex < 0)
+        ? (delta > 0 ? 0 : widget.entries.length - 1)
+        : (_focusedIndex + delta).clamp(0, widget.entries.length - 1);
+    if (newIndex != _focusedIndex) {
+      setState(() => _focusedIndex = newIndex);
+      _scrollToCard(newIndex);
+    }
+  }
+
+  void jumpFocus(bool toTop) {
+    if (widget.entries.isEmpty) return;
+    _isKeyboardMode = true;
+    final newIndex = toTop ? 0 : widget.entries.length - 1;
+    if (newIndex != _focusedIndex) {
+      setState(() => _focusedIndex = newIndex);
+      _scrollToCard(newIndex);
+    }
+  }
+
+  /// Tab / Shift+Tab によるフォーカス巡回。
+  /// カード一覧内に留まる場合は true、リスト端から抜けて下部ボタンへ遷移する場合は false を返す。
+  bool cycleFocus(bool forward) {
+    if (widget.entries.isEmpty) return false;
+    _isKeyboardMode = true;
+    if (_focusedIndex < 0) {
+      // 下部ボタンからカード一覧へ遷移
+      final newIndex = forward ? 0 : widget.entries.length - 1;
+      setState(() => _focusedIndex = newIndex);
+      _scrollToCard(newIndex);
+      return true;
+    }
+
+    if (forward) {
+      if (_focusedIndex < widget.entries.length - 1) {
+        setState(() => _focusedIndex++);
+        _scrollToCard(_focusedIndex);
+        return true;
+      } else {
+        // 末尾を超えたため下部ボタンへ
+        setState(() => _focusedIndex = -1);
+        return false;
+      }
+    } else {
+      if (_focusedIndex > 0) {
+        setState(() => _focusedIndex--);
+        _scrollToCard(_focusedIndex);
+        return true;
+      } else {
+        // 先頭を超えたため下部ボタンへ
+        setState(() => _focusedIndex = -1);
+        return false;
+      }
+    }
+  }
+
+  void clearCardFocus() {
+    if (_focusedIndex != -1) {
+      setState(() => _focusedIndex = -1);
+    }
+  }
+
+  bool openDetail(BuildContext context) {
+    if (_focusedIndex >= 0 && _focusedIndex < widget.entries.length) {
+      final jaMode = widget.isJp ?? (Localizations.localeOf(context).languageCode == 'ja');
+      _openDetailDialog(context, widget.entries[_focusedIndex], jaMode);
+      return true;
+    }
+    return false;
+  }
+
+  void _scrollToCard(int targetIndex) {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      final ctx = _focusedCardKey.currentContext ?? _currentCardKey.currentContext;
+      if (ctx != null) {
+        Scrollable.ensureVisible(
+          ctx,
+          duration: const Duration(milliseconds: 120),
+          alignment: 0.5,
+          curve: Curves.easeOut,
+        );
+      } else {
+        final controller = _effectiveScrollController;
+        if (controller.hasClients && widget.entries.isNotEmpty) {
+          final maxExtent = controller.position.maxScrollExtent;
+          if (maxExtent > 0) {
+            final ratio = targetIndex / (widget.entries.length - 1);
+            controller.animateTo(
+              (maxExtent * ratio).clamp(0.0, maxExtent),
+              duration: const Duration(milliseconds: 120),
+              curve: Curves.easeOut,
+            );
+          }
+        }
+      }
+    });
   }
 
   bool _areEntriesEquivalent(List<TopTenEntry> a, List<TopTenEntry> b) {
@@ -178,7 +295,11 @@ class _TopTenWidgetState extends State<TopTenWidget> {
   void _openDetailDialog(BuildContext context, TopTenEntry entry, bool jaMode) {
     showDialog<void>(
       context: context,
-      builder: (context) => ScoreDetailDialog(entry: entry, isJp: jaMode),
+      builder: (context) => ScoreDetailDialog(
+        entry: entry,
+        isJp: jaMode,
+        usePhysicalKeyboardNotation: widget.usePhysicalKeyboardNotation,
+      ),
     ).then((_) {
       widget.onDetailClosed?.call();
     });
@@ -264,25 +385,39 @@ class _TopTenWidgetState extends State<TopTenWidget> {
               final entry = widget.entries[index];
               final isCurrent = entry.isCurrent;
               final isScrollTarget = index == _targetCurrentIndex;
+              final isFocused = _isKeyboardMode && _focusedIndex == index;
+              final cardKey = isScrollTarget
+                  ? _currentCardKey
+                  : (isFocused ? _focusedCardKey : null);
 
               return _MountedIndexTracker(
                 index: index,
                 onVisibilityChanged: _onItemVisibilityChanged,
                 child: Card(
-                  key: isScrollTarget ? _currentCardKey : null,
+                  key: cardKey,
                   margin: const EdgeInsets.symmetric(vertical: 6, horizontal: 2),
-                  color: isCurrent ? const Color(0xFF2C2214) : const Color(0xFF1E222B),
+                  color: isFocused
+                      ? (isCurrent ? const Color(0xFF382A16) : const Color(0xFF262C38))
+                      : (isCurrent ? const Color(0xFF2C2214) : const Color(0xFF1E222B)),
                   clipBehavior: Clip.antiAlias,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(10),
                     side: BorderSide(
-                      color: isCurrent ? const Color(0xFFFFB300) : Colors.white12,
-                      width: isCurrent ? 2.0 : 1.0,
+                      color: isFocused
+                          ? const Color(0xFFFFB300)
+                          : (isCurrent ? const Color(0xFFFFB300) : Colors.white12),
+                      width: isFocused ? 2.5 : (isCurrent ? 2.0 : 1.0),
                     ),
                   ),
-                  elevation: isCurrent ? 6 : 2,
+                  elevation: isFocused ? 8 : (isCurrent ? 6 : 2),
                   child: InkWell(
-                    onTap: () => _openDetailDialog(context, entry, jaMode),
+                    onTap: () {
+                      setState(() {
+                        _isKeyboardMode = false;
+                        _focusedIndex = index;
+                      });
+                      _openDetailDialog(context, entry, jaMode);
+                    },
                     child: Padding(
                       padding: const EdgeInsets.all(12),
                       child: Column(
@@ -472,11 +607,13 @@ class _MountedIndexTrackerState extends State<_MountedIndexTracker> {
 class ScoreboardDialog extends StatefulWidget {
   final List<TopTenEntry> entries;
   final bool? isJp;
+  final bool? usePhysicalKeyboardNotation;
 
   const ScoreboardDialog({
     super.key,
     required this.entries,
     this.isJp,
+    this.usePhysicalKeyboardNotation,
   });
 
   @override
@@ -486,13 +623,21 @@ class ScoreboardDialog extends StatefulWidget {
 class _ScoreboardDialogState extends State<ScoreboardDialog> {
   late final ScrollController _scrollController;
   late final FocusNode _focusNode;
+  final GlobalKey<TopTenWidgetState> _topTenKey = GlobalKey<TopTenWidgetState>();
   bool _isCloseButtonFocused = false;
+  bool _usePhysicalKeyboardNotation = false;
 
   @override
   void initState() {
     super.initState();
     _scrollController = ScrollController();
     _focusNode = FocusNode();
+    if (widget.usePhysicalKeyboardNotation != null) {
+      _usePhysicalKeyboardNotation = widget.usePhysicalKeyboardNotation!;
+    } else if (AppPrefs.instance != null) {
+      _usePhysicalKeyboardNotation =
+          AppPrefs.instance!.getBool('use_physical_keyboard_notation') ?? false;
+    }
   }
 
   @override
@@ -500,36 +645,6 @@ class _ScoreboardDialogState extends State<ScoreboardDialog> {
     _scrollController.dispose();
     _focusNode.dispose();
     super.dispose();
-  }
-
-  void _scrollBy(double delta) {
-    if (!_scrollController.hasClients) return;
-    final target = (_scrollController.offset + delta).clamp(
-      0.0,
-      _scrollController.position.maxScrollExtent,
-    );
-    _scrollController.animateTo(
-      target,
-      duration: const Duration(milliseconds: 100),
-      curve: Curves.easeOut,
-    );
-  }
-
-  void _pageScroll(int direction) {
-    if (!_scrollController.hasClients) return;
-    final viewport = _scrollController.position.viewportDimension;
-    final step = viewport > 0 ? viewport * 0.85 : 320.0;
-    _scrollBy(direction * step);
-  }
-
-  void _jumpToEdge(bool toTop) {
-    if (!_scrollController.hasClients) return;
-    final target = toTop ? 0.0 : _scrollController.position.maxScrollExtent;
-    _scrollController.animateTo(
-      target,
-      duration: const Duration(milliseconds: 150),
-      curve: Curves.easeOut,
-    );
   }
 
   KeyEventResult _onKeyEvent(FocusNode node, KeyEvent event) {
@@ -540,6 +655,20 @@ class _ScoreboardDialogState extends State<ScoreboardDialog> {
     final key = event.logicalKey;
     final isShift = HardwareKeyboard.instance.isShiftPressed;
     final isCtrl = HardwareKeyboard.instance.isControlPressed;
+    final jaMode = widget.isJp ?? (Localizations.localeOf(context).languageCode == 'ja');
+
+    // 操作ヘルプ: F1 / Alt+h
+    if (key == LogicalKeyboardKey.f1 ||
+        (key == LogicalKeyboardKey.keyH && HardwareKeyboard.instance.isAltPressed)) {
+      if (isDown) {
+        KeyboardHelpDialog.show(
+          context,
+          helpContext: KeyboardHelpContext.scoreboard,
+          isJapanese: jaMode,
+        );
+      }
+      return KeyEventResult.handled;
+    }
 
     // 閉じる: Escape / q
     if (key == LogicalKeyboardKey.escape || (key == LogicalKeyboardKey.keyQ && !isCtrl)) {
@@ -547,70 +676,119 @@ class _ScoreboardDialogState extends State<ScoreboardDialog> {
       return KeyEventResult.handled;
     }
 
-    // 決定: Enter / numpadEnter
-    if (key == LogicalKeyboardKey.enter || key == LogicalKeyboardKey.numpadEnter) {
-      if (isDown) Navigator.of(context).pop();
-      return KeyEventResult.handled;
-    }
-
-    // Tab / Shift+Tab: フォーカス循環 (none ↔ closeButton)
+    // Tab / Shift+Tab: フォーカス循環 (カード一覧 ↔ 閉じるボタン)
     if (key == LogicalKeyboardKey.tab) {
       if (isDown) {
-        setState(() {
-          _isCloseButtonFocused = !_isCloseButtonFocused;
-        });
+        if (_isCloseButtonFocused) {
+          setState(() => _isCloseButtonFocused = false);
+          _topTenKey.currentState?.cycleFocus(!isShift);
+        } else {
+          final inList = _topTenKey.currentState?.cycleFocus(!isShift) ?? false;
+          if (!inList) {
+            setState(() => _isCloseButtonFocused = true);
+          }
+        }
       }
       return KeyEventResult.handled;
     }
 
-    // 行スクロール: ↑ / k (上へ)
+    // 行移動: ↑ / k (上へ)
     if (key == LogicalKeyboardKey.arrowUp || (key == LogicalKeyboardKey.keyK && !isCtrl)) {
-      _scrollBy(-48.0);
+      if (isDown) {
+        if (_isCloseButtonFocused) {
+          setState(() => _isCloseButtonFocused = false);
+          _topTenKey.currentState?.jumpFocus(false);
+        } else {
+          _topTenKey.currentState?.moveFocus(-1);
+        }
+      }
       return KeyEventResult.handled;
     }
 
-    // 行スクロール: ↓ / j (下へ)
+    // 行移動: ↓ / j (下へ)
     if (key == LogicalKeyboardKey.arrowDown || (key == LogicalKeyboardKey.keyJ && !isCtrl)) {
-      _scrollBy(48.0);
+      if (isDown) {
+        if (_isCloseButtonFocused) {
+          setState(() => _isCloseButtonFocused = false);
+          _topTenKey.currentState?.jumpFocus(true);
+        } else {
+          _topTenKey.currentState?.moveFocus(1);
+        }
+      }
       return KeyEventResult.handled;
     }
 
-    // ページ下スクロール: PageDown / >
-    if (key == LogicalKeyboardKey.pageDown || event.character == '>' || (!isShift && key == LogicalKeyboardKey.period)) {
-      _pageScroll(1);
+    // ページ下移動 (5件): PageDown
+    if (key == LogicalKeyboardKey.pageDown) {
+      if (isDown) {
+        setState(() => _isCloseButtonFocused = false);
+        _topTenKey.currentState?.moveFocus(5);
+      }
       return KeyEventResult.handled;
     }
 
-    // ページ上スクロール: PageUp / <
-    if (key == LogicalKeyboardKey.pageUp || event.character == '<' || (!isShift && key == LogicalKeyboardKey.comma)) {
-      _pageScroll(-1);
+    // ページ上移動 (5件): PageUp
+    if (key == LogicalKeyboardKey.pageUp) {
+      if (isDown) {
+        setState(() => _isCloseButtonFocused = false);
+        _topTenKey.currentState?.moveFocus(-5);
+      }
       return KeyEventResult.handled;
     }
 
-    // 先頭へジャンプ: Home / ^
+    // 10件スキップ: > / < (カンマ / ピリオド含む)
+    if (event.character == '>' || key == LogicalKeyboardKey.period) {
+      if (isDown) {
+        setState(() => _isCloseButtonFocused = false);
+        _topTenKey.currentState?.moveFocus(10);
+      }
+      return KeyEventResult.handled;
+    }
+    if (event.character == '<' || key == LogicalKeyboardKey.comma) {
+      if (isDown) {
+        setState(() => _isCloseButtonFocused = false);
+        _topTenKey.currentState?.moveFocus(-10);
+      }
+      return KeyEventResult.handled;
+    }
+
+    // 先頭 / 末尾ジャンプ: Home / ^ , End / |
     if (key == LogicalKeyboardKey.home || event.character == '^' || key == LogicalKeyboardKey.caret) {
-      if (isDown) _jumpToEdge(true);
+      if (isDown) {
+        setState(() => _isCloseButtonFocused = false);
+        _topTenKey.currentState?.jumpFocus(true);
+      }
       return KeyEventResult.handled;
     }
-
-    // 末尾へジャンプ: End / |
     if (key == LogicalKeyboardKey.end || event.character == '|') {
-      if (isDown) _jumpToEdge(false);
+      if (isDown) {
+        setState(() => _isCloseButtonFocused = false);
+        _topTenKey.currentState?.jumpFocus(false);
+      }
       return KeyEventResult.handled;
     }
 
-    // Space / Shift+Space: ページスクロールまたは最下部での閉じる
+    // Space / Shift+Space: 5件移動（または閉じるボタン選択時は閉じる）
     if (key == LogicalKeyboardKey.space) {
       if (isDown) {
-        if (isShift) {
-          _pageScroll(-1);
+        if (_isCloseButtonFocused) {
+          Navigator.of(context).pop();
         } else {
-          if (_scrollController.hasClients &&
-              _scrollController.offset >= _scrollController.position.maxScrollExtent - 10) {
-            Navigator.of(context).pop();
-          } else {
-            _pageScroll(1);
-          }
+          _topTenKey.currentState?.moveFocus(isShift ? -5 : 5);
+        }
+      }
+      return KeyEventResult.handled;
+    }
+
+    // 決定 / 詳細表示: Enter / numpadEnter / arrowRight
+    if (key == LogicalKeyboardKey.enter ||
+        key == LogicalKeyboardKey.numpadEnter ||
+        key == LogicalKeyboardKey.arrowRight) {
+      if (isDown) {
+        if (_isCloseButtonFocused) {
+          Navigator.of(context).pop();
+        } else {
+          _topTenKey.currentState?.openDetail(context);
         }
       }
       return KeyEventResult.handled;
@@ -644,9 +822,11 @@ class _ScoreboardDialogState extends State<ScoreboardDialog> {
               Expanded(
                 child: widget.entries.isNotEmpty
                     ? TopTenWidget(
+                        key: _topTenKey,
                         entries: widget.entries,
                         isJp: jaMode,
                         scrollController: _scrollController,
+                        usePhysicalKeyboardNotation: _usePhysicalKeyboardNotation,
                         onDetailClosed: () {
                           if (mounted) _focusNode.requestFocus();
                         },
@@ -691,7 +871,9 @@ class _ScoreboardDialogState extends State<ScoreboardDialog> {
                     elevation: _isCloseButtonFocused ? 6 : 2,
                   ),
                   child: Text(
-                    jaMode ? '閉じる' : 'Close',
+                    _usePhysicalKeyboardNotation
+                        ? (jaMode ? 'Esc:閉じる' : 'Esc: Close')
+                        : (jaMode ? '閉じる' : 'Close'),
                     style: const TextStyle(fontWeight: FontWeight.bold),
                   ),
                 ),

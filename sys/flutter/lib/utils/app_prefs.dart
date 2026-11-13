@@ -28,6 +28,9 @@ class AppPrefs {
   static AppPrefs? _instance;
   static Completer<AppPrefs>? _initCompleter;
 
+  /// 初期化済みの AppPrefs シングルトンインスタンス（未初期化時は null）
+  static AppPrefs? get instance => _instance;
+
   final SharedPreferencesWithCache _prefs;
 
   AppPrefs._(this._prefs);

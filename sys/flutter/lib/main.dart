@@ -1396,10 +1396,21 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
         }
         return KeyEventResult.handled;
 
-      case DismissText():
+      case SubmitText():
         if (_screen.isTextWindowVisible) {
           if (_textOverlayKey.currentState != null) {
             _textOverlayKey.currentState!.submit();
+          } else {
+            _sendFfiKey(32, "Space");
+          }
+          return KeyEventResult.handled;
+        }
+        return KeyEventResult.handled;
+
+      case DismissText():
+        if (_screen.isTextWindowVisible) {
+          if (_textOverlayKey.currentState != null) {
+            _textOverlayKey.currentState!.dismiss();
           } else {
             _sendFfiKey(32, "Space");
           }
@@ -1421,9 +1432,9 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
         }
         return KeyEventResult.handled;
 
-      case TextPage(:final direction):
+      case TextPage(:final direction, :final step):
         if (_screen.isTextWindowVisible) {
-          _textOverlayKey.currentState?.pageScroll(direction);
+          _textOverlayKey.currentState?.pageScroll(direction, step);
           return KeyEventResult.handled;
         }
         return KeyEventResult.handled;
@@ -1659,7 +1670,11 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
         helpContext = KeyboardHelpContext.menu;
       }
     } else if (_screen.isTextWindowVisible) {
-      helpContext = KeyboardHelpContext.textWindow;
+      if (_textOverlayKey.currentState?.isTopTen == true) {
+        helpContext = KeyboardHelpContext.scoreboard;
+      } else {
+        helpContext = KeyboardHelpContext.textWindow;
+      }
     } else if (_isAnyKeyVisible) {
       helpContext = KeyboardHelpContext.anyKey;
     } else if (_isYnVisible) {
@@ -4205,7 +4220,11 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
 
     showDialog(
       context: context,
-      builder: (context) => ScoreboardDialog(entries: entries, isJp: isJp),
+      builder: (context) => ScoreboardDialog(
+        entries: entries,
+        isJp: isJp,
+        usePhysicalKeyboardNotation: _usePhysicalKeyboardNotation,
+      ),
     ).then((_) {
       _ensureGameFocus();
     });
@@ -4350,6 +4369,7 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
       assetsPath: _assetsPath,
       onRestoreGameFocus: _ensureGameFocus,
       windowRevision: _screen.textWindowRevision,
+      usePhysicalKeyboardNotation: _usePhysicalKeyboardNotation,
     );
   }
 

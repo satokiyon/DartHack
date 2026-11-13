@@ -35,6 +35,7 @@ class TextOverlay extends StatefulWidget {
   final String? assetsPath;
   final VoidCallback? onRestoreGameFocus;
   final int windowRevision;
+  final bool usePhysicalKeyboardNotation;
 
   const TextOverlay({
     super.key,
@@ -54,6 +55,7 @@ class TextOverlay extends StatefulWidget {
     this.assetsPath,
     this.onRestoreGameFocus,
     this.windowRevision = 0,
+    this.usePhysicalKeyboardNotation = false,
   });
 
   @override
@@ -64,6 +66,7 @@ class TextOverlayState extends State<TextOverlay> {
   static final RegExp _enScoreHeaderNoRegExp = RegExp(r'\bno\b');
 
   late ScrollController _scrollController;
+  final GlobalKey<TopTenWidgetState> _topTenKey = GlobalKey<TopTenWidgetState>();
   TextOverlayFocusTarget _currentFocusTarget = TextOverlayFocusTarget.none;
   bool _cachedIsTopTen = false;
   List<TopTenEntry> _cachedTopTenEntries = const [];
@@ -78,6 +81,7 @@ class TextOverlayState extends State<TextOverlay> {
 
   ScrollController get scrollController => _scrollController;
   TextOverlayFocusTarget get currentFocusTarget => _currentFocusTarget;
+  bool get isTopTen => _cachedIsTopTen;
 
   @override
   void initState() {
@@ -173,6 +177,37 @@ class TextOverlayState extends State<TextOverlay> {
 
   /// Tab キーによるフォーカス循環ナビゲーション
   void cycleFocus([bool forward = true]) {
+    if (_cachedIsTopTen) {
+      if (_currentFocusTarget == TextOverlayFocusTarget.none) {
+        // カード一覧内でフォーカス移動を試みる
+        final inList = _topTenKey.currentState?.cycleFocus(forward) ?? false;
+        if (!inList) {
+          // リストの境界を超えた場合、下部ボタン群へ遷移
+          setState(() {
+            _currentFocusTarget =
+                forward ? TextOverlayFocusTarget.ok : TextOverlayFocusTarget.history;
+          });
+        }
+      } else if (_currentFocusTarget == TextOverlayFocusTarget.ok) {
+        if (forward) {
+          setState(() => _currentFocusTarget = TextOverlayFocusTarget.history);
+        } else {
+          // 逆順でリスト末尾側へ戻る
+          setState(() => _currentFocusTarget = TextOverlayFocusTarget.none);
+          _topTenKey.currentState?.cycleFocus(false);
+        }
+      } else if (_currentFocusTarget == TextOverlayFocusTarget.history) {
+        if (forward) {
+          // 正順でリスト先頭側へ戻る
+          setState(() => _currentFocusTarget = TextOverlayFocusTarget.none);
+          _topTenKey.currentState?.cycleFocus(true);
+        } else {
+          setState(() => _currentFocusTarget = TextOverlayFocusTarget.ok);
+        }
+      }
+      return;
+    }
+
     final targets = <TextOverlayFocusTarget>[
       TextOverlayFocusTarget.none,
       TextOverlayFocusTarget.ok,
@@ -190,8 +225,31 @@ class TextOverlayState extends State<TextOverlay> {
     });
   }
 
+  /// 画面を閉じる
+  void dismiss() {
+    widget.onDismiss();
+  }
+
   /// Enter キーまたは決定操作による実行
   void submit() {
+    if (_cachedIsTopTen) {
+      if (_currentFocusTarget == TextOverlayFocusTarget.history) {
+        widget.onShowMsgHistory();
+        return;
+      }
+      if (_currentFocusTarget == TextOverlayFocusTarget.ok) {
+        widget.onDismiss();
+        return;
+      }
+      // カード一覧にフォーカスがある場合、選択カードの詳細を表示
+      final opened = _topTenKey.currentState?.openDetail(context) ?? false;
+      if (!opened) {
+        // カードが選択されていない場合は閉じる
+        widget.onDismiss();
+      }
+      return;
+    }
+
     if (_currentFocusTarget == TextOverlayFocusTarget.history) {
       widget.onShowMsgHistory();
       return;
@@ -202,6 +260,14 @@ class TextOverlayState extends State<TextOverlay> {
 
   /// Space キー処理: スクロール余地があれば1ページ下へ、最下部に達していれば閉じる
   void handleSpace() {
+    if (_cachedIsTopTen) {
+      if (_currentFocusTarget != TextOverlayFocusTarget.none) {
+        setState(() => _currentFocusTarget = TextOverlayFocusTarget.none);
+      }
+      _topTenKey.currentState?.moveFocus(5);
+      return;
+    }
+
     if (_scrollController.hasClients &&
         _scrollController.position.maxScrollExtent > 10.0 &&
         _scrollController.offset < _scrollController.position.maxScrollExtent - 5.0) {
@@ -221,6 +287,14 @@ class TextOverlayState extends State<TextOverlay> {
 
   /// 矢印キー（↑ / ↓）による行スクロール
   void scroll(int direction) {
+    if (_cachedIsTopTen) {
+      if (_currentFocusTarget != TextOverlayFocusTarget.none) {
+        setState(() => _currentFocusTarget = TextOverlayFocusTarget.none);
+      }
+      _topTenKey.currentState?.moveFocus(direction > 0 ? 1 : -1);
+      return;
+    }
+
     if (!_scrollController.hasClients) return;
     const step = 40.0;
     final nextOffset = (_scrollController.offset + direction * step)
@@ -233,11 +307,19 @@ class TextOverlayState extends State<TextOverlay> {
   }
 
   /// PageUp / PageDown / < / > によるページ送り
-  void pageScroll(int direction) {
+  void pageScroll(int direction, [int stepMultiplier = 1]) {
+    if (_cachedIsTopTen) {
+      if (_currentFocusTarget != TextOverlayFocusTarget.none) {
+        setState(() => _currentFocusTarget = TextOverlayFocusTarget.none);
+      }
+      _topTenKey.currentState?.moveFocus(direction * (stepMultiplier > 1 ? 10 : 5));
+      return;
+    }
+
     if (!_scrollController.hasClients) return;
     final viewport = _scrollController.position.viewportDimension;
     final step = viewport > 0 ? viewport * 0.85 : 320.0;
-    final nextOffset = (_scrollController.offset + direction * step)
+    final nextOffset = (_scrollController.offset + direction * step * stepMultiplier)
         .clamp(0.0, _scrollController.position.maxScrollExtent);
     _scrollController.animateTo(
       nextOffset,
@@ -248,6 +330,14 @@ class TextOverlayState extends State<TextOverlay> {
 
   /// 一覧の先頭 (toTop = true) または末尾 (toTop = false) にジャンプ
   void jumpToEdge(bool toTop) {
+    if (_cachedIsTopTen) {
+      if (_currentFocusTarget != TextOverlayFocusTarget.none) {
+        setState(() => _currentFocusTarget = TextOverlayFocusTarget.none);
+      }
+      _topTenKey.currentState?.jumpFocus(toTop);
+      return;
+    }
+
     if (!_scrollController.hasClients) return;
     final targetOffset = toTop ? 0.0 : _scrollController.position.maxScrollExtent;
     _scrollController.animateTo(
@@ -288,6 +378,7 @@ class TextOverlayState extends State<TextOverlay> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
+    final isJp = _cachedIsJp ?? (Localizations.localeOf(context).languageCode == 'ja');
     return Positioned.fill(
       child: Container(
         color: Colors.black.withValues(alpha: 0.92),
@@ -330,11 +421,11 @@ class TextOverlayState extends State<TextOverlay> {
                     }
 
                     if (_cachedIsTopTen) {
-                      final isJp = _cachedIsJp ??
-                          (Localizations.localeOf(context).languageCode == 'ja');
                       return TopTenWidget(
+                        key: _topTenKey,
                         entries: _cachedTopTenEntries,
                         isJp: isJp,
+                        usePhysicalKeyboardNotation: widget.usePhysicalKeyboardNotation,
                         scrollController: _scrollController,
                         onDetailClosed: widget.onRestoreGameFocus,
                         unrecordedMessage: _cachedUnrecordedMessage,
@@ -499,9 +590,11 @@ class TextOverlayState extends State<TextOverlay> {
                                 ? const BorderSide(color: Colors.amberAccent, width: 2.5)
                                 : null,
                           ),
-                          child: const Text(
-                            "OK",
-                            style: TextStyle(
+                          child: Text(
+                            (_cachedIsTopTen && widget.usePhysicalKeyboardNotation)
+                                ? (isJp ? "Enter:OK" : "Enter: OK")
+                                : "OK",
+                            style: const TextStyle(
                               fontSize: 16,
                               fontWeight: FontWeight.bold,
                             ),

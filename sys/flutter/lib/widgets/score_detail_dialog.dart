@@ -3,16 +3,20 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import '../models/topten_entry.dart';
 import '../models/xlog_entry.dart';
+import '../utils/app_prefs.dart';
+import 'keyboard_help_dialog.dart';
 
 /// スコアボードのレコードタップ時に表示する詳細スコアダイアログ（スクロール＆キーボード対応）
 class ScoreDetailDialog extends StatefulWidget {
   final TopTenEntry entry;
   final bool? isJp;
+  final bool? usePhysicalKeyboardNotation;
 
   const ScoreDetailDialog({
     super.key,
     required this.entry,
     this.isJp,
+    this.usePhysicalKeyboardNotation,
   });
 
   @override
@@ -23,12 +27,19 @@ class _ScoreDetailDialogState extends State<ScoreDetailDialog> {
   late final ScrollController _scrollController;
   late final FocusNode _focusNode;
   bool _isCloseButtonFocused = false;
+  bool _usePhysicalKeyboardNotation = false;
 
   @override
   void initState() {
     super.initState();
     _scrollController = ScrollController();
     _focusNode = FocusNode();
+    if (widget.usePhysicalKeyboardNotation != null) {
+      _usePhysicalKeyboardNotation = widget.usePhysicalKeyboardNotation!;
+    } else if (AppPrefs.instance != null) {
+      _usePhysicalKeyboardNotation =
+          AppPrefs.instance!.getBool('use_physical_keyboard_notation') ?? false;
+    }
   }
 
   @override
@@ -83,6 +94,20 @@ class _ScoreDetailDialogState extends State<ScoreDetailDialog> {
     final isShift = HardwareKeyboard.instance.isShiftPressed;
     final isCtrl = HardwareKeyboard.instance.isControlPressed;
 
+    // 操作ヘルプ: F1 / Alt+h
+    if (key == LogicalKeyboardKey.f1 ||
+        (key == LogicalKeyboardKey.keyH && HardwareKeyboard.instance.isAltPressed)) {
+      if (isDown) {
+        final jaMode = widget.isJp ?? (Localizations.localeOf(context).languageCode == 'ja');
+        KeyboardHelpDialog.show(
+          context,
+          helpContext: KeyboardHelpContext.scoreDetail,
+          isJapanese: jaMode,
+        );
+      }
+      return KeyEventResult.handled;
+    }
+
     // 閉じる: Escape / q / Enter / NumpadEnter
     if (key == LogicalKeyboardKey.escape ||
         (key == LogicalKeyboardKey.keyQ && !isCtrl) ||
@@ -131,7 +156,7 @@ class _ScoreDetailDialogState extends State<ScoreDetailDialog> {
     // ページ下スクロール: PageDown / > / .
     if (key == LogicalKeyboardKey.pageDown ||
         event.character == '>' ||
-        (!isShift && key == LogicalKeyboardKey.period)) {
+        key == LogicalKeyboardKey.period) {
       _pageScroll(1);
       return KeyEventResult.handled;
     }
@@ -139,7 +164,7 @@ class _ScoreDetailDialogState extends State<ScoreDetailDialog> {
     // ページ上スクロール: PageUp / < / ,
     if (key == LogicalKeyboardKey.pageUp ||
         event.character == '<' ||
-        (!isShift && key == LogicalKeyboardKey.comma)) {
+        key == LogicalKeyboardKey.comma) {
       _pageScroll(-1);
       return KeyEventResult.handled;
     }
@@ -641,7 +666,9 @@ class _ScoreDetailDialogState extends State<ScoreDetailDialog> {
                       elevation: _isCloseButtonFocused ? 6 : 2,
                     ),
                     child: Text(
-                      jaMode ? '閉じる' : 'Close',
+                      _usePhysicalKeyboardNotation
+                          ? (jaMode ? 'Esc:閉じる' : 'Esc: Close')
+                          : (jaMode ? '閉じる' : 'Close'),
                       style: const TextStyle(fontWeight: FontWeight.bold),
                     ),
                   ),

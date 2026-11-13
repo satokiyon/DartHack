@@ -227,6 +227,32 @@ void main() {
       expect(find.textContaining('スクロール'), findsWidgets);
     });
 
+    testWidgets('scoreboard コンテキストでスコアボード向け操作ヘルプが表示されること', (tester) async {
+      await tester.pumpWidget(buildTestWidget(
+        helpContext: KeyboardHelpContext.scoreboard,
+      ));
+
+      await tester.tap(find.text('Open Help'));
+      await tester.pumpAndSettle();
+
+      expect(find.byType(KeyboardHelpDialog), findsOneWidget);
+      expect(find.textContaining('Tab / Shift+Tab'), findsOneWidget);
+      expect(find.textContaining('前後のスコアを選択'), findsOneWidget);
+    });
+
+    testWidgets('scoreDetail コンテキストでスコア詳細画面向け操作ヘルプが表示されること', (tester) async {
+      await tester.pumpWidget(buildTestWidget(
+        helpContext: KeyboardHelpContext.scoreDetail,
+      ));
+
+      await tester.tap(find.text('Open Help'));
+      await tester.pumpAndSettle();
+
+      expect(find.byType(KeyboardHelpDialog), findsOneWidget);
+      expect(find.text('Space'), findsOneWidget);
+      expect(find.textContaining('1画面分下スクロール'), findsWidgets);
+    });
+
     testWidgets('Escape キー押下でダイアログが閉じること', (tester) async {
       await tester.pumpWidget(buildTestWidget(
         helpContext: KeyboardHelpContext.game,

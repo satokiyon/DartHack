@@ -15,6 +15,8 @@ enum KeyboardHelpContext {
   textWindow, // 長文テキスト (概要、怪物・所持品一覧、墓石、スコア等)
   anyKey,     // 1文字コマンド説明 (「&」コマンド / AnyKeyOverlay)
   fullMap,    // 階層の全体地図 (FullMapDialog)
+  scoreboard, // スコアボード (TopTen / ScoreboardDialog)
+  scoreDetail,// スコア詳細情報 (ScoreDetailDialog)
 }
 
 /// キーボード操作ヘルプダイアログ
@@ -506,6 +508,31 @@ class _KeyboardHelpDialogState extends State<KeyboardHelpDialog> {
           _HelpItem('Shift + 移動キー', isJp ? '2倍のスピードで高速パン移動' : 'Fast pan (2x speed)'),
           _HelpItem('Tab / Shift+Tab', isJp ? '閉じるボタンのフォーカス選択' : 'Focus Close button'),
           _HelpItem('Enter / Esc', isJp ? '全体マップを閉じる' : 'Close full map'),
+          _HelpItem('F1 / Alt-h', isJp ? '操作ヘルプの表示' : 'Show controls help'),
+        ];
+
+      case KeyboardHelpContext.scoreboard:
+        return [
+          _HelpItem('Tab / Shift+Tab', isJp ? 'カード・閉じるボタンの選択切り替え' : 'Cycle cards and Close button'),
+          _HelpItem('↑ / ↓ (k / j)', isJp ? '前後のスコアを選択' : 'Select previous / next score'),
+          _HelpItem('Space / Shift+Space', isJp ? '1ページ分（5件）移動' : 'Move 1 page (5 items)'),
+          _HelpItem('PageDown / PageUp', isJp ? '1ページ分（5件）移動' : 'Move 1 page (5 items)'),
+          _HelpItem('< / >', isJp ? '10件スキップ' : 'Skip 10 items'),
+          _HelpItem('Home / End', isJp ? '先頭 / 末尾のスコアへジャンプ' : 'Jump to top / bottom'),
+          _HelpItem('Enter / →', isJp ? '詳細情報(xlog)を表示 / 決定' : 'Show details (xlog) / execute'),
+          _HelpItem('Esc / q', isJp ? 'スコアボードを閉じる' : 'Close scoreboard'),
+          _HelpItem('F1 / Alt-h', isJp ? '操作ヘルプの表示' : 'Show controls help'),
+        ];
+
+      case KeyboardHelpContext.scoreDetail:
+        return [
+          _HelpItem('Space', isJp ? '1画面分下スクロール（最下部で閉じる）' : 'Scroll down 1 page (close at bottom)'),
+          _HelpItem('Shift+Space / < / PgUp', isJp ? '1画面分上スクロール' : 'Scroll up 1 page'),
+          _HelpItem('> / PgDown', isJp ? '1画面分下スクロール' : 'Scroll down 1 page'),
+          _HelpItem('↑ / ↓ (k / j)', isJp ? '1行ずつ上下スクロール' : 'Scroll 1 line up/down'),
+          _HelpItem('Home / End', isJp ? '最先頭 / 最末尾へジャンプ' : 'Jump to top / bottom'),
+          _HelpItem('Tab', isJp ? '閉じるボタンのフォーカス切替' : 'Toggle Close button focus'),
+          _HelpItem('Enter / Esc / q', isJp ? '詳細画面を閉じる' : 'Close details'),
           _HelpItem('F1 / Alt-h', isJp ? '操作ヘルプの表示' : 'Show controls help'),
         ];
     }
