@@ -1,0 +1,7492 @@
+{
+  "0": {
+    "tile_id": 0,
+    "desc": "giant ant,male",
+    "sheet": "Characters/Pest0.png",
+    "col": 0,
+    "row": 0
+  },
+  "1": {
+    "tile_id": 1,
+    "desc": "giant ant,female",
+    "sheet": "Characters/Pest0.png",
+    "col": 0,
+    "row": 0
+  },
+  "2": {
+    "tile_id": 2,
+    "desc": "killer bee,male",
+    "sheet": "Characters/Pest0.png",
+    "col": 1,
+    "row": 0
+  },
+  "3": {
+    "tile_id": 3,
+    "desc": "killer bee,female",
+    "sheet": "Characters/Pest0.png",
+    "col": 1,
+    "row": 0
+  },
+  "4": {
+    "tile_id": 4,
+    "desc": "soldier ant,male",
+    "sheet": "Characters/Pest0.png",
+    "col": 2,
+    "row": 0
+  },
+  "5": {
+    "tile_id": 5,
+    "desc": "soldier ant,female",
+    "sheet": "Characters/Pest0.png",
+    "col": 2,
+    "row": 0
+  },
+  "6": {
+    "tile_id": 6,
+    "desc": "fire ant,male",
+    "sheet": "Characters/Pest0.png",
+    "col": 3,
+    "row": 0
+  },
+  "7": {
+    "tile_id": 7,
+    "desc": "fire ant,female",
+    "sheet": "Characters/Pest0.png",
+    "col": 3,
+    "row": 0
+  },
+  "8": {
+    "tile_id": 8,
+    "desc": "giant beetle,male",
+    "sheet": "Characters/Pest0.png",
+    "col": 4,
+    "row": 0
+  },
+  "9": {
+    "tile_id": 9,
+    "desc": "giant beetle,female",
+    "sheet": "Characters/Pest0.png",
+    "col": 4,
+    "row": 0
+  },
+  "10": {
+    "tile_id": 10,
+    "desc": "queen bee,male",
+    "sheet": "Characters/Pest0.png",
+    "col": 5,
+    "row": 0
+  },
+  "11": {
+    "tile_id": 11,
+    "desc": "queen bee,female",
+    "sheet": "Characters/Pest0.png",
+    "col": 5,
+    "row": 0
+  },
+  "12": {
+    "tile_id": 12,
+    "desc": "acid blob,male",
+    "sheet": "Characters/Slime0.png",
+    "col": 0,
+    "row": 0
+  },
+  "13": {
+    "tile_id": 13,
+    "desc": "acid blob,female",
+    "sheet": "Characters/Slime0.png",
+    "col": 0,
+    "row": 0
+  },
+  "14": {
+    "tile_id": 14,
+    "desc": "quivering blob,male",
+    "sheet": "Characters/Slime0.png",
+    "col": 1,
+    "row": 0
+  },
+  "15": {
+    "tile_id": 15,
+    "desc": "quivering blob,female",
+    "sheet": "Characters/Slime0.png",
+    "col": 1,
+    "row": 0
+  },
+  "16": {
+    "tile_id": 16,
+    "desc": "gelatinous cube,male",
+    "sheet": "Characters/Slime0.png",
+    "col": 2,
+    "row": 0
+  },
+  "17": {
+    "tile_id": 17,
+    "desc": "gelatinous cube,female",
+    "sheet": "Characters/Slime0.png",
+    "col": 2,
+    "row": 0
+  },
+  "18": {
+    "tile_id": 18,
+    "desc": "chickatrice,male",
+    "sheet": "Characters/Avian0.png",
+    "col": 0,
+    "row": 0
+  },
+  "19": {
+    "tile_id": 19,
+    "desc": "chickatrice,female",
+    "sheet": "Characters/Avian0.png",
+    "col": 0,
+    "row": 0
+  },
+  "20": {
+    "tile_id": 20,
+    "desc": "cockatrice,male",
+    "sheet": "Characters/Avian0.png",
+    "col": 1,
+    "row": 0
+  },
+  "21": {
+    "tile_id": 21,
+    "desc": "cockatrice,female",
+    "sheet": "Characters/Avian0.png",
+    "col": 1,
+    "row": 0
+  },
+  "22": {
+    "tile_id": 22,
+    "desc": "pyrolisk,male",
+    "sheet": "Characters/Avian0.png",
+    "col": 2,
+    "row": 0
+  },
+  "23": {
+    "tile_id": 23,
+    "desc": "pyrolisk,female",
+    "sheet": "Characters/Avian0.png",
+    "col": 2,
+    "row": 0
+  },
+  "24": {
+    "tile_id": 24,
+    "desc": "jackal,male",
+    "sheet": "Characters/Dog0.png",
+    "col": 0,
+    "row": 0
+  },
+  "25": {
+    "tile_id": 25,
+    "desc": "jackal,female",
+    "sheet": "Characters/Dog0.png",
+    "col": 0,
+    "row": 0
+  },
+  "26": {
+    "tile_id": 26,
+    "desc": "fox,male",
+    "sheet": "Characters/Dog0.png",
+    "col": 1,
+    "row": 0
+  },
+  "27": {
+    "tile_id": 27,
+    "desc": "fox,female",
+    "sheet": "Characters/Dog0.png",
+    "col": 1,
+    "row": 0
+  },
+  "28": {
+    "tile_id": 28,
+    "desc": "coyote,male",
+    "sheet": "Characters/Dog0.png",
+    "col": 2,
+    "row": 0
+  },
+  "29": {
+    "tile_id": 29,
+    "desc": "coyote,female",
+    "sheet": "Characters/Dog0.png",
+    "col": 2,
+    "row": 0
+  },
+  "30": {
+    "tile_id": 30,
+    "desc": "werejackal,male",
+    "sheet": "Characters/Dog0.png",
+    "col": 3,
+    "row": 0
+  },
+  "31": {
+    "tile_id": 31,
+    "desc": "werejackal,female",
+    "sheet": "Characters/Dog0.png",
+    "col": 3,
+    "row": 0
+  },
+  "32": {
+    "tile_id": 32,
+    "desc": "little dog,male",
+    "sheet": "Characters/Dog0.png",
+    "col": 4,
+    "row": 0
+  },
+  "33": {
+    "tile_id": 33,
+    "desc": "little dog,female",
+    "sheet": "Characters/Dog0.png",
+    "col": 4,
+    "row": 0
+  },
+  "34": {
+    "tile_id": 34,
+    "desc": "dingo,male",
+    "sheet": "Characters/Dog0.png",
+    "col": 5,
+    "row": 0
+  },
+  "35": {
+    "tile_id": 35,
+    "desc": "dingo,female",
+    "sheet": "Characters/Dog0.png",
+    "col": 5,
+    "row": 0
+  },
+  "36": {
+    "tile_id": 36,
+    "desc": "dog,male",
+    "sheet": "Characters/Dog0.png",
+    "col": 0,
+    "row": 1
+  },
+  "37": {
+    "tile_id": 37,
+    "desc": "dog,female",
+    "sheet": "Characters/Dog0.png",
+    "col": 0,
+    "row": 1
+  },
+  "38": {
+    "tile_id": 38,
+    "desc": "large dog,male",
+    "sheet": "Characters/Dog0.png",
+    "col": 1,
+    "row": 1
+  },
+  "39": {
+    "tile_id": 39,
+    "desc": "large dog,female",
+    "sheet": "Characters/Dog0.png",
+    "col": 1,
+    "row": 1
+  },
+  "40": {
+    "tile_id": 40,
+    "desc": "wolf,male",
+    "sheet": "Characters/Dog0.png",
+    "col": 2,
+    "row": 1
+  },
+  "41": {
+    "tile_id": 41,
+    "desc": "wolf,female",
+    "sheet": "Characters/Dog0.png",
+    "col": 2,
+    "row": 1
+  },
+  "42": {
+    "tile_id": 42,
+    "desc": "werewolf,male",
+    "sheet": "Characters/Dog0.png",
+    "col": 3,
+    "row": 1
+  },
+  "43": {
+    "tile_id": 43,
+    "desc": "werewolf,female",
+    "sheet": "Characters/Dog0.png",
+    "col": 3,
+    "row": 1
+  },
+  "44": {
+    "tile_id": 44,
+    "desc": "winter wolf cub,male",
+    "sheet": "Characters/Dog0.png",
+    "col": 4,
+    "row": 1
+  },
+  "45": {
+    "tile_id": 45,
+    "desc": "winter wolf cub,female",
+    "sheet": "Characters/Dog0.png",
+    "col": 4,
+    "row": 1
+  },
+  "46": {
+    "tile_id": 46,
+    "desc": "warg,male",
+    "sheet": "Characters/Dog0.png",
+    "col": 0,
+    "row": 2
+  },
+  "47": {
+    "tile_id": 47,
+    "desc": "warg,female",
+    "sheet": "Characters/Dog0.png",
+    "col": 0,
+    "row": 2
+  },
+  "48": {
+    "tile_id": 48,
+    "desc": "winter wolf,male",
+    "sheet": "Characters/Dog0.png",
+    "col": 1,
+    "row": 2
+  },
+  "49": {
+    "tile_id": 49,
+    "desc": "winter wolf,female",
+    "sheet": "Characters/Dog0.png",
+    "col": 1,
+    "row": 2
+  },
+  "50": {
+    "tile_id": 50,
+    "desc": "hell hound pup,male",
+    "sheet": "Characters/Dog0.png",
+    "col": 0,
+    "row": 5
+  },
+  "51": {
+    "tile_id": 51,
+    "desc": "hell hound pup,female",
+    "sheet": "Characters/Dog0.png",
+    "col": 0,
+    "row": 5
+  },
+  "52": {
+    "tile_id": 52,
+    "desc": "hell hound,male",
+    "sheet": "Characters/Dog0.png",
+    "col": 1,
+    "row": 5
+  },
+  "53": {
+    "tile_id": 53,
+    "desc": "hell hound,female",
+    "sheet": "Characters/Dog0.png",
+    "col": 1,
+    "row": 5
+  },
+  "54": {
+    "tile_id": 54,
+    "desc": "Cerberus,male",
+    "sheet": "Characters/Dog0.png",
+    "col": 2,
+    "row": 5
+  },
+  "55": {
+    "tile_id": 55,
+    "desc": "Cerberus,female",
+    "sheet": "Characters/Dog0.png",
+    "col": 2,
+    "row": 5
+  },
+  "56": {
+    "tile_id": 56,
+    "desc": "gas spore,male",
+    "sheet": "Characters/Misc0.png",
+    "col": 0,
+    "row": 0
+  },
+  "57": {
+    "tile_id": 57,
+    "desc": "gas spore,female",
+    "sheet": "Characters/Misc0.png",
+    "col": 0,
+    "row": 0
+  },
+  "58": {
+    "tile_id": 58,
+    "desc": "floating eye,male",
+    "sheet": "Characters/Misc0.png",
+    "col": 1,
+    "row": 0
+  },
+  "59": {
+    "tile_id": 59,
+    "desc": "floating eye,female",
+    "sheet": "Characters/Misc0.png",
+    "col": 1,
+    "row": 0
+  },
+  "60": {
+    "tile_id": 60,
+    "desc": "freezing sphere,male",
+    "sheet": "Characters/Elemental0.png",
+    "col": 0,
+    "row": 5
+  },
+  "61": {
+    "tile_id": 61,
+    "desc": "freezing sphere,female",
+    "sheet": "Characters/Elemental0.png",
+    "col": 0,
+    "row": 5
+  },
+  "62": {
+    "tile_id": 62,
+    "desc": "flaming sphere,male",
+    "sheet": "Characters/Elemental0.png",
+    "col": 1,
+    "row": 5
+  },
+  "63": {
+    "tile_id": 63,
+    "desc": "flaming sphere,female",
+    "sheet": "Characters/Elemental0.png",
+    "col": 1,
+    "row": 5
+  },
+  "64": {
+    "tile_id": 64,
+    "desc": "shocking sphere,male",
+    "sheet": "Characters/Elemental0.png",
+    "col": 2,
+    "row": 5
+  },
+  "65": {
+    "tile_id": 65,
+    "desc": "shocking sphere,female",
+    "sheet": "Characters/Elemental0.png",
+    "col": 2,
+    "row": 5
+  },
+  "66": {
+    "tile_id": 66,
+    "desc": "beholder,male",
+    "sheet": "Characters/Misc0.png",
+    "col": 2,
+    "row": 0
+  },
+  "67": {
+    "tile_id": 67,
+    "desc": "beholder,female",
+    "sheet": "Characters/Misc0.png",
+    "col": 2,
+    "row": 0
+  },
+  "68": {
+    "tile_id": 68,
+    "desc": "kitten,male",
+    "sheet": "Characters/Cat0.png",
+    "col": 0,
+    "row": 0
+  },
+  "69": {
+    "tile_id": 69,
+    "desc": "kitten,female",
+    "sheet": "Characters/Cat0.png",
+    "col": 0,
+    "row": 0
+  },
+  "70": {
+    "tile_id": 70,
+    "desc": "housecat,male",
+    "sheet": "Characters/Cat0.png",
+    "col": 1,
+    "row": 0
+  },
+  "71": {
+    "tile_id": 71,
+    "desc": "housecat,female",
+    "sheet": "Characters/Cat0.png",
+    "col": 1,
+    "row": 0
+  },
+  "72": {
+    "tile_id": 72,
+    "desc": "jaguar,male",
+    "sheet": "Characters/Cat0.png",
+    "col": 2,
+    "row": 0
+  },
+  "73": {
+    "tile_id": 73,
+    "desc": "jaguar,female",
+    "sheet": "Characters/Cat0.png",
+    "col": 2,
+    "row": 0
+  },
+  "74": {
+    "tile_id": 74,
+    "desc": "lynx,male",
+    "sheet": "Characters/Cat0.png",
+    "col": 3,
+    "row": 0
+  },
+  "75": {
+    "tile_id": 75,
+    "desc": "lynx,female",
+    "sheet": "Characters/Cat0.png",
+    "col": 3,
+    "row": 0
+  },
+  "76": {
+    "tile_id": 76,
+    "desc": "panther,male",
+    "sheet": "Characters/Cat0.png",
+    "col": 0,
+    "row": 1
+  },
+  "77": {
+    "tile_id": 77,
+    "desc": "panther,female",
+    "sheet": "Characters/Cat0.png",
+    "col": 0,
+    "row": 1
+  },
+  "78": {
+    "tile_id": 78,
+    "desc": "large cat,male",
+    "sheet": "Characters/Cat0.png",
+    "col": 1,
+    "row": 1
+  },
+  "79": {
+    "tile_id": 79,
+    "desc": "large cat,female",
+    "sheet": "Characters/Cat0.png",
+    "col": 1,
+    "row": 1
+  },
+  "80": {
+    "tile_id": 80,
+    "desc": "tiger,male",
+    "sheet": "Characters/Cat0.png",
+    "col": 2,
+    "row": 1
+  },
+  "81": {
+    "tile_id": 81,
+    "desc": "tiger,female",
+    "sheet": "Characters/Cat0.png",
+    "col": 2,
+    "row": 1
+  },
+  "84": {
+    "tile_id": 84,
+    "desc": "gremlin,male",
+    "sheet": "Characters/Demon0.png",
+    "col": 0,
+    "row": 0
+  },
+  "85": {
+    "tile_id": 85,
+    "desc": "gremlin,female",
+    "sheet": "Characters/Demon0.png",
+    "col": 0,
+    "row": 0
+  },
+  "86": {
+    "tile_id": 86,
+    "desc": "gargoyle,male",
+    "sheet": "Characters/Demon0.png",
+    "col": 1,
+    "row": 0
+  },
+  "87": {
+    "tile_id": 87,
+    "desc": "gargoyle,female",
+    "sheet": "Characters/Demon0.png",
+    "col": 1,
+    "row": 0
+  },
+  "88": {
+    "tile_id": 88,
+    "desc": "winged gargoyle,male",
+    "sheet": "Characters/Demon0.png",
+    "col": 2,
+    "row": 0
+  },
+  "89": {
+    "tile_id": 89,
+    "desc": "winged gargoyle,female",
+    "sheet": "Characters/Demon0.png",
+    "col": 2,
+    "row": 0
+  },
+  "90": {
+    "tile_id": 90,
+    "desc": "hobbit,male",
+    "sheet": "Characters/Humanoid0.png",
+    "col": 0,
+    "row": 0
+  },
+  "91": {
+    "tile_id": 91,
+    "desc": "hobbit,female",
+    "sheet": "Characters/Humanoid0.png",
+    "col": 0,
+    "row": 0
+  },
+  "92": {
+    "tile_id": 92,
+    "desc": "dwarf,male",
+    "sheet": "Characters/Humanoid0.png",
+    "col": 1,
+    "row": 0
+  },
+  "93": {
+    "tile_id": 93,
+    "desc": "dwarf,female",
+    "sheet": "Characters/Humanoid0.png",
+    "col": 1,
+    "row": 0
+  },
+  "94": {
+    "tile_id": 94,
+    "desc": "bugbear,male",
+    "sheet": "Characters/Humanoid0.png",
+    "col": 2,
+    "row": 0
+  },
+  "95": {
+    "tile_id": 95,
+    "desc": "bugbear,female",
+    "sheet": "Characters/Humanoid0.png",
+    "col": 2,
+    "row": 0
+  },
+  "96": {
+    "tile_id": 96,
+    "desc": "dwarf leader,male",
+    "sheet": "Characters/Humanoid0.png",
+    "col": 1,
+    "row": 0
+  },
+  "97": {
+    "tile_id": 97,
+    "desc": "dwarf leader,female",
+    "sheet": "Characters/Humanoid0.png",
+    "col": 1,
+    "row": 0
+  },
+  "98": {
+    "tile_id": 98,
+    "desc": "dwarf ruler,male",
+    "sheet": "Characters/Humanoid0.png",
+    "col": 1,
+    "row": 0
+  },
+  "99": {
+    "tile_id": 99,
+    "desc": "dwarf ruler,female",
+    "sheet": "Characters/Humanoid0.png",
+    "col": 1,
+    "row": 0
+  },
+  "100": {
+    "tile_id": 100,
+    "desc": "mind flayer,male",
+    "sheet": "Characters/Humanoid0.png",
+    "col": 5,
+    "row": 0
+  },
+  "101": {
+    "tile_id": 101,
+    "desc": "mind flayer,female",
+    "sheet": "Characters/Humanoid0.png",
+    "col": 5,
+    "row": 0
+  },
+  "102": {
+    "tile_id": 102,
+    "desc": "master mind flayer,male",
+    "sheet": "Characters/Humanoid0.png",
+    "col": 6,
+    "row": 0
+  },
+  "103": {
+    "tile_id": 103,
+    "desc": "master mind flayer,female",
+    "sheet": "Characters/Humanoid0.png",
+    "col": 6,
+    "row": 0
+  },
+  "104": {
+    "tile_id": 104,
+    "desc": "manes,male",
+    "sheet": "Characters/Demon0.png",
+    "col": 0,
+    "row": 1
+  },
+  "105": {
+    "tile_id": 105,
+    "desc": "manes,female",
+    "sheet": "Characters/Demon0.png",
+    "col": 0,
+    "row": 1
+  },
+  "106": {
+    "tile_id": 106,
+    "desc": "homunculus,male",
+    "sheet": "Characters/Demon0.png",
+    "col": 1,
+    "row": 1
+  },
+  "107": {
+    "tile_id": 107,
+    "desc": "homunculus,female",
+    "sheet": "Characters/Demon0.png",
+    "col": 1,
+    "row": 1
+  },
+  "108": {
+    "tile_id": 108,
+    "desc": "imp,male",
+    "sheet": "Characters/Demon0.png",
+    "col": 2,
+    "row": 1
+  },
+  "109": {
+    "tile_id": 109,
+    "desc": "imp,female",
+    "sheet": "Characters/Demon0.png",
+    "col": 2,
+    "row": 1
+  },
+  "110": {
+    "tile_id": 110,
+    "desc": "lemure,male",
+    "sheet": "Characters/Demon0.png",
+    "col": 3,
+    "row": 1
+  },
+  "111": {
+    "tile_id": 111,
+    "desc": "lemure,female",
+    "sheet": "Characters/Demon0.png",
+    "col": 3,
+    "row": 1
+  },
+  "112": {
+    "tile_id": 112,
+    "desc": "quasit,male",
+    "sheet": "Characters/Demon0.png",
+    "col": 4,
+    "row": 1
+  },
+  "113": {
+    "tile_id": 113,
+    "desc": "quasit,female",
+    "sheet": "Characters/Demon0.png",
+    "col": 4,
+    "row": 1
+  },
+  "114": {
+    "tile_id": 114,
+    "desc": "tengu,male",
+    "sheet": "Characters/Demon0.png",
+    "col": 5,
+    "row": 1
+  },
+  "115": {
+    "tile_id": 115,
+    "desc": "tengu,female",
+    "sheet": "Characters/Demon0.png",
+    "col": 5,
+    "row": 1
+  },
+  "116": {
+    "tile_id": 116,
+    "desc": "blue jelly,male",
+    "sheet": "Characters/Slime0.png",
+    "col": 3,
+    "row": 0
+  },
+  "117": {
+    "tile_id": 117,
+    "desc": "blue jelly,female",
+    "sheet": "Characters/Slime0.png",
+    "col": 3,
+    "row": 0
+  },
+  "118": {
+    "tile_id": 118,
+    "desc": "spotted jelly,male",
+    "sheet": "Characters/Slime0.png",
+    "col": 4,
+    "row": 0
+  },
+  "119": {
+    "tile_id": 119,
+    "desc": "spotted jelly,female",
+    "sheet": "Characters/Slime0.png",
+    "col": 4,
+    "row": 0
+  },
+  "120": {
+    "tile_id": 120,
+    "desc": "ochre jelly,male",
+    "sheet": "Characters/Slime0.png",
+    "col": 0,
+    "row": 1
+  },
+  "121": {
+    "tile_id": 121,
+    "desc": "ochre jelly,female",
+    "sheet": "Characters/Slime0.png",
+    "col": 0,
+    "row": 1
+  },
+  "122": {
+    "tile_id": 122,
+    "desc": "kobold,male",
+    "sheet": "Characters/Humanoid0.png",
+    "col": 0,
+    "row": 1
+  },
+  "123": {
+    "tile_id": 123,
+    "desc": "kobold,female",
+    "sheet": "Characters/Humanoid0.png",
+    "col": 0,
+    "row": 1
+  },
+  "124": {
+    "tile_id": 124,
+    "desc": "large kobold,male",
+    "sheet": "Characters/Humanoid0.png",
+    "col": 1,
+    "row": 1
+  },
+  "125": {
+    "tile_id": 125,
+    "desc": "large kobold,female",
+    "sheet": "Characters/Humanoid0.png",
+    "col": 1,
+    "row": 1
+  },
+  "126": {
+    "tile_id": 126,
+    "desc": "kobold leader,male",
+    "sheet": "Characters/Humanoid0.png",
+    "col": 0,
+    "row": 1
+  },
+  "127": {
+    "tile_id": 127,
+    "desc": "kobold leader,female",
+    "sheet": "Characters/Humanoid0.png",
+    "col": 0,
+    "row": 1
+  },
+  "128": {
+    "tile_id": 128,
+    "desc": "kobold shaman,male",
+    "sheet": "Characters/Humanoid0.png",
+    "col": 3,
+    "row": 1
+  },
+  "129": {
+    "tile_id": 129,
+    "desc": "kobold shaman,female",
+    "sheet": "Characters/Humanoid0.png",
+    "col": 3,
+    "row": 1
+  },
+  "130": {
+    "tile_id": 130,
+    "desc": "leprechaun,male",
+    "sheet": "Characters/Humanoid0.png",
+    "col": 4,
+    "row": 1
+  },
+  "131": {
+    "tile_id": 131,
+    "desc": "leprechaun,female",
+    "sheet": "Characters/Humanoid0.png",
+    "col": 4,
+    "row": 1
+  },
+  "132": {
+    "tile_id": 132,
+    "desc": "small mimic,male",
+    "sheet": "Characters/Misc0.png",
+    "col": 0,
+    "row": 1
+  },
+  "133": {
+    "tile_id": 133,
+    "desc": "small mimic,female",
+    "sheet": "Characters/Misc0.png",
+    "col": 0,
+    "row": 1
+  },
+  "134": {
+    "tile_id": 134,
+    "desc": "large mimic,male",
+    "sheet": "Characters/Misc0.png",
+    "col": 1,
+    "row": 1
+  },
+  "135": {
+    "tile_id": 135,
+    "desc": "large mimic,female",
+    "sheet": "Characters/Misc0.png",
+    "col": 1,
+    "row": 1
+  },
+  "136": {
+    "tile_id": 136,
+    "desc": "giant mimic,male",
+    "sheet": "Characters/Misc0.png",
+    "col": 2,
+    "row": 1
+  },
+  "137": {
+    "tile_id": 137,
+    "desc": "giant mimic,female",
+    "sheet": "Characters/Misc0.png",
+    "col": 2,
+    "row": 1
+  },
+  "138": {
+    "tile_id": 138,
+    "desc": "wood nymph,male",
+    "sheet": "Characters/Humanoid0.png",
+    "col": 0,
+    "row": 2
+  },
+  "139": {
+    "tile_id": 139,
+    "desc": "wood nymph,female",
+    "sheet": "Characters/Humanoid0.png",
+    "col": 0,
+    "row": 2
+  },
+  "140": {
+    "tile_id": 140,
+    "desc": "water nymph,male",
+    "sheet": "Characters/Humanoid0.png",
+    "col": 1,
+    "row": 2
+  },
+  "141": {
+    "tile_id": 141,
+    "desc": "water nymph,female",
+    "sheet": "Characters/Humanoid0.png",
+    "col": 1,
+    "row": 2
+  },
+  "142": {
+    "tile_id": 142,
+    "desc": "mountain nymph,male",
+    "sheet": "Characters/Humanoid0.png",
+    "col": 2,
+    "row": 2
+  },
+  "143": {
+    "tile_id": 143,
+    "desc": "mountain nymph,female",
+    "sheet": "Characters/Humanoid0.png",
+    "col": 2,
+    "row": 2
+  },
+  "144": {
+    "tile_id": 144,
+    "desc": "goblin,male",
+    "sheet": "Characters/Humanoid0.png",
+    "col": 0,
+    "row": 3
+  },
+  "145": {
+    "tile_id": 145,
+    "desc": "goblin,female",
+    "sheet": "Characters/Humanoid0.png",
+    "col": 0,
+    "row": 3
+  },
+  "146": {
+    "tile_id": 146,
+    "desc": "hobgoblin,male",
+    "sheet": "Characters/Humanoid0.png",
+    "col": 1,
+    "row": 3
+  },
+  "147": {
+    "tile_id": 147,
+    "desc": "hobgoblin,female",
+    "sheet": "Characters/Humanoid0.png",
+    "col": 1,
+    "row": 3
+  },
+  "148": {
+    "tile_id": 148,
+    "desc": "orc,male",
+    "sheet": "Characters/Humanoid0.png",
+    "col": 2,
+    "row": 3
+  },
+  "149": {
+    "tile_id": 149,
+    "desc": "orc,female",
+    "sheet": "Characters/Humanoid0.png",
+    "col": 2,
+    "row": 3
+  },
+  "150": {
+    "tile_id": 150,
+    "desc": "hill orc,male",
+    "sheet": "Characters/Humanoid0.png",
+    "col": 3,
+    "row": 3
+  },
+  "151": {
+    "tile_id": 151,
+    "desc": "hill orc,female",
+    "sheet": "Characters/Humanoid0.png",
+    "col": 3,
+    "row": 3
+  },
+  "152": {
+    "tile_id": 152,
+    "desc": "Mordor orc,male",
+    "sheet": "Characters/Humanoid0.png",
+    "col": 4,
+    "row": 3
+  },
+  "153": {
+    "tile_id": 153,
+    "desc": "Mordor orc,female",
+    "sheet": "Characters/Humanoid0.png",
+    "col": 4,
+    "row": 3
+  },
+  "154": {
+    "tile_id": 154,
+    "desc": "Uruk-hai,male",
+    "sheet": "Characters/Humanoid0.png",
+    "col": 5,
+    "row": 3
+  },
+  "155": {
+    "tile_id": 155,
+    "desc": "Uruk-hai,female",
+    "sheet": "Characters/Humanoid0.png",
+    "col": 5,
+    "row": 3
+  },
+  "156": {
+    "tile_id": 156,
+    "desc": "orc shaman,male",
+    "sheet": "Characters/Humanoid0.png",
+    "col": 6,
+    "row": 3
+  },
+  "157": {
+    "tile_id": 157,
+    "desc": "orc shaman,female",
+    "sheet": "Characters/Humanoid0.png",
+    "col": 6,
+    "row": 3
+  },
+  "158": {
+    "tile_id": 158,
+    "desc": "orc-captain,male",
+    "sheet": "Characters/Humanoid0.png",
+    "col": 7,
+    "row": 3
+  },
+  "159": {
+    "tile_id": 159,
+    "desc": "orc-captain,female",
+    "sheet": "Characters/Humanoid0.png",
+    "col": 7,
+    "row": 3
+  },
+  "160": {
+    "tile_id": 160,
+    "desc": "rock piercer,male",
+    "sheet": "Characters/Misc0.png",
+    "col": 0,
+    "row": 2
+  },
+  "161": {
+    "tile_id": 161,
+    "desc": "rock piercer,female",
+    "sheet": "Characters/Misc0.png",
+    "col": 0,
+    "row": 2
+  },
+  "162": {
+    "tile_id": 162,
+    "desc": "iron piercer,male",
+    "sheet": "Characters/Misc0.png",
+    "col": 1,
+    "row": 2
+  },
+  "163": {
+    "tile_id": 163,
+    "desc": "iron piercer,female",
+    "sheet": "Characters/Misc0.png",
+    "col": 1,
+    "row": 2
+  },
+  "164": {
+    "tile_id": 164,
+    "desc": "glass piercer,male",
+    "sheet": "Characters/Misc0.png",
+    "col": 2,
+    "row": 2
+  },
+  "165": {
+    "tile_id": 165,
+    "desc": "glass piercer,female",
+    "sheet": "Characters/Misc0.png",
+    "col": 2,
+    "row": 2
+  },
+  "166": {
+    "tile_id": 166,
+    "desc": "rothe,male",
+    "sheet": "Characters/Quadraped0.png",
+    "col": 0,
+    "row": 0
+  },
+  "167": {
+    "tile_id": 167,
+    "desc": "rothe,female",
+    "sheet": "Characters/Quadraped0.png",
+    "col": 0,
+    "row": 0
+  },
+  "168": {
+    "tile_id": 168,
+    "desc": "mumak,male",
+    "sheet": "Characters/Quadraped0.png",
+    "col": 1,
+    "row": 0
+  },
+  "169": {
+    "tile_id": 169,
+    "desc": "mumak,female",
+    "sheet": "Characters/Quadraped0.png",
+    "col": 1,
+    "row": 0
+  },
+  "170": {
+    "tile_id": 170,
+    "desc": "leocrotta,male",
+    "sheet": "Characters/Quadraped0.png",
+    "col": 2,
+    "row": 0
+  },
+  "171": {
+    "tile_id": 171,
+    "desc": "leocrotta,female",
+    "sheet": "Characters/Quadraped0.png",
+    "col": 2,
+    "row": 0
+  },
+  "172": {
+    "tile_id": 172,
+    "desc": "wumpus,male",
+    "sheet": "Characters/Quadraped0.png",
+    "col": 3,
+    "row": 0
+  },
+  "173": {
+    "tile_id": 173,
+    "desc": "wumpus,female",
+    "sheet": "Characters/Quadraped0.png",
+    "col": 3,
+    "row": 0
+  },
+  "174": {
+    "tile_id": 174,
+    "desc": "titanothere,male",
+    "sheet": "Characters/Quadraped0.png",
+    "col": 4,
+    "row": 0
+  },
+  "175": {
+    "tile_id": 175,
+    "desc": "titanothere,female",
+    "sheet": "Characters/Quadraped0.png",
+    "col": 4,
+    "row": 0
+  },
+  "176": {
+    "tile_id": 176,
+    "desc": "baluchitherium,male",
+    "sheet": "Characters/Quadraped0.png",
+    "col": 5,
+    "row": 0
+  },
+  "177": {
+    "tile_id": 177,
+    "desc": "baluchitherium,female",
+    "sheet": "Characters/Quadraped0.png",
+    "col": 5,
+    "row": 0
+  },
+  "178": {
+    "tile_id": 178,
+    "desc": "mastodon,male",
+    "sheet": "Characters/Quadraped0.png",
+    "col": 6,
+    "row": 0
+  },
+  "179": {
+    "tile_id": 179,
+    "desc": "mastodon,female",
+    "sheet": "Characters/Quadraped0.png",
+    "col": 6,
+    "row": 0
+  },
+  "180": {
+    "tile_id": 180,
+    "desc": "sewer rat,male",
+    "sheet": "Characters/Rodent0.png",
+    "col": 0,
+    "row": 0
+  },
+  "181": {
+    "tile_id": 181,
+    "desc": "sewer rat,female",
+    "sheet": "Characters/Rodent0.png",
+    "col": 0,
+    "row": 0
+  },
+  "182": {
+    "tile_id": 182,
+    "desc": "giant rat,male",
+    "sheet": "Characters/Rodent0.png",
+    "col": 1,
+    "row": 0
+  },
+  "183": {
+    "tile_id": 183,
+    "desc": "giant rat,female",
+    "sheet": "Characters/Rodent0.png",
+    "col": 1,
+    "row": 0
+  },
+  "184": {
+    "tile_id": 184,
+    "desc": "rabid rat,male",
+    "sheet": "Characters/Rodent0.png",
+    "col": 2,
+    "row": 0
+  },
+  "185": {
+    "tile_id": 185,
+    "desc": "rabid rat,female",
+    "sheet": "Characters/Rodent0.png",
+    "col": 2,
+    "row": 0
+  },
+  "186": {
+    "tile_id": 186,
+    "desc": "wererat,male",
+    "sheet": "Characters/Rodent0.png",
+    "col": 3,
+    "row": 0
+  },
+  "187": {
+    "tile_id": 187,
+    "desc": "wererat,female",
+    "sheet": "Characters/Rodent0.png",
+    "col": 3,
+    "row": 0
+  },
+  "188": {
+    "tile_id": 188,
+    "desc": "rock mole,male",
+    "sheet": "Characters/Rodent0.png",
+    "col": 4,
+    "row": 0
+  },
+  "189": {
+    "tile_id": 189,
+    "desc": "rock mole,female",
+    "sheet": "Characters/Rodent0.png",
+    "col": 4,
+    "row": 0
+  },
+  "190": {
+    "tile_id": 190,
+    "desc": "woodchuck,male",
+    "sheet": "Characters/Rodent0.png",
+    "col": 0,
+    "row": 1
+  },
+  "191": {
+    "tile_id": 191,
+    "desc": "woodchuck,female",
+    "sheet": "Characters/Rodent0.png",
+    "col": 0,
+    "row": 1
+  },
+  "192": {
+    "tile_id": 192,
+    "desc": "cave spider,male",
+    "sheet": "Characters/Pest0.png",
+    "col": 0,
+    "row": 1
+  },
+  "193": {
+    "tile_id": 193,
+    "desc": "cave spider,female",
+    "sheet": "Characters/Pest0.png",
+    "col": 0,
+    "row": 1
+  },
+  "194": {
+    "tile_id": 194,
+    "desc": "centipede,male",
+    "sheet": "Characters/Pest0.png",
+    "col": 1,
+    "row": 1
+  },
+  "195": {
+    "tile_id": 195,
+    "desc": "centipede,female",
+    "sheet": "Characters/Pest0.png",
+    "col": 1,
+    "row": 1
+  },
+  "196": {
+    "tile_id": 196,
+    "desc": "giant spider,male",
+    "sheet": "Characters/Pest0.png",
+    "col": 2,
+    "row": 1
+  },
+  "197": {
+    "tile_id": 197,
+    "desc": "giant spider,female",
+    "sheet": "Characters/Pest0.png",
+    "col": 2,
+    "row": 1
+  },
+  "198": {
+    "tile_id": 198,
+    "desc": "scorpion,male",
+    "sheet": "Characters/Pest0.png",
+    "col": 3,
+    "row": 1
+  },
+  "199": {
+    "tile_id": 199,
+    "desc": "scorpion,female",
+    "sheet": "Characters/Pest0.png",
+    "col": 3,
+    "row": 1
+  },
+  "200": {
+    "tile_id": 200,
+    "desc": "lurker above,male",
+    "sheet": "Characters/Misc0.png",
+    "col": 0,
+    "row": 3
+  },
+  "201": {
+    "tile_id": 201,
+    "desc": "lurker above,female",
+    "sheet": "Characters/Misc0.png",
+    "col": 0,
+    "row": 3
+  },
+  "202": {
+    "tile_id": 202,
+    "desc": "trapper,male",
+    "sheet": "Characters/Misc0.png",
+    "col": 1,
+    "row": 3
+  },
+  "203": {
+    "tile_id": 203,
+    "desc": "trapper,female",
+    "sheet": "Characters/Misc0.png",
+    "col": 1,
+    "row": 3
+  },
+  "204": {
+    "tile_id": 204,
+    "desc": "pony,male",
+    "sheet": "Characters/Quadraped0.png",
+    "col": 0,
+    "row": 1
+  },
+  "205": {
+    "tile_id": 205,
+    "desc": "pony,female",
+    "sheet": "Characters/Quadraped0.png",
+    "col": 0,
+    "row": 1
+  },
+  "206": {
+    "tile_id": 206,
+    "desc": "white unicorn,male",
+    "sheet": "Characters/Quadraped0.png",
+    "col": 1,
+    "row": 1
+  },
+  "207": {
+    "tile_id": 207,
+    "desc": "white unicorn,female",
+    "sheet": "Characters/Quadraped0.png",
+    "col": 1,
+    "row": 1
+  },
+  "208": {
+    "tile_id": 208,
+    "desc": "gray unicorn,male",
+    "sheet": "Characters/Quadraped0.png",
+    "col": 2,
+    "row": 1
+  },
+  "209": {
+    "tile_id": 209,
+    "desc": "gray unicorn,female",
+    "sheet": "Characters/Quadraped0.png",
+    "col": 2,
+    "row": 1
+  },
+  "210": {
+    "tile_id": 210,
+    "desc": "black unicorn,male",
+    "sheet": "Characters/Quadraped0.png",
+    "col": 3,
+    "row": 1
+  },
+  "211": {
+    "tile_id": 211,
+    "desc": "black unicorn,female",
+    "sheet": "Characters/Quadraped0.png",
+    "col": 3,
+    "row": 1
+  },
+  "212": {
+    "tile_id": 212,
+    "desc": "horse,male",
+    "sheet": "Characters/Quadraped0.png",
+    "col": 4,
+    "row": 1
+  },
+  "213": {
+    "tile_id": 213,
+    "desc": "horse,female",
+    "sheet": "Characters/Quadraped0.png",
+    "col": 4,
+    "row": 1
+  },
+  "214": {
+    "tile_id": 214,
+    "desc": "warhorse,male",
+    "sheet": "Characters/Quadraped0.png",
+    "col": 5,
+    "row": 1
+  },
+  "215": {
+    "tile_id": 215,
+    "desc": "warhorse,female",
+    "sheet": "Characters/Quadraped0.png",
+    "col": 5,
+    "row": 1
+  },
+  "216": {
+    "tile_id": 216,
+    "desc": "fog cloud,male",
+    "sheet": "Characters/Elemental0.png",
+    "col": 0,
+    "row": 0
+  },
+  "217": {
+    "tile_id": 217,
+    "desc": "fog cloud,female",
+    "sheet": "Characters/Elemental0.png",
+    "col": 0,
+    "row": 0
+  },
+  "218": {
+    "tile_id": 218,
+    "desc": "dust vortex,male",
+    "sheet": "Characters/Elemental0.png",
+    "col": 1,
+    "row": 0
+  },
+  "219": {
+    "tile_id": 219,
+    "desc": "dust vortex,female",
+    "sheet": "Characters/Elemental0.png",
+    "col": 1,
+    "row": 0
+  },
+  "220": {
+    "tile_id": 220,
+    "desc": "ice vortex,male",
+    "sheet": "Characters/Elemental0.png",
+    "col": 2,
+    "row": 0
+  },
+  "221": {
+    "tile_id": 221,
+    "desc": "ice vortex,female",
+    "sheet": "Characters/Elemental0.png",
+    "col": 2,
+    "row": 0
+  },
+  "222": {
+    "tile_id": 222,
+    "desc": "energy vortex,male",
+    "sheet": "Characters/Elemental0.png",
+    "col": 3,
+    "row": 0
+  },
+  "223": {
+    "tile_id": 223,
+    "desc": "energy vortex,female",
+    "sheet": "Characters/Elemental0.png",
+    "col": 3,
+    "row": 0
+  },
+  "224": {
+    "tile_id": 224,
+    "desc": "steam vortex,male",
+    "sheet": "Characters/Elemental0.png",
+    "col": 4,
+    "row": 0
+  },
+  "225": {
+    "tile_id": 225,
+    "desc": "steam vortex,female",
+    "sheet": "Characters/Elemental0.png",
+    "col": 4,
+    "row": 0
+  },
+  "226": {
+    "tile_id": 226,
+    "desc": "fire vortex,male",
+    "sheet": "Characters/Elemental0.png",
+    "col": 5,
+    "row": 0
+  },
+  "227": {
+    "tile_id": 227,
+    "desc": "fire vortex,female",
+    "sheet": "Characters/Elemental0.png",
+    "col": 5,
+    "row": 0
+  },
+  "228": {
+    "tile_id": 228,
+    "desc": "baby long worm,male",
+    "sheet": "Characters/Reptile0.png",
+    "col": 0,
+    "row": 0
+  },
+  "229": {
+    "tile_id": 229,
+    "desc": "baby long worm,female",
+    "sheet": "Characters/Reptile0.png",
+    "col": 0,
+    "row": 0
+  },
+  "230": {
+    "tile_id": 230,
+    "desc": "baby purple worm,male",
+    "sheet": "Characters/Reptile0.png",
+    "col": 1,
+    "row": 0
+  },
+  "231": {
+    "tile_id": 231,
+    "desc": "baby purple worm,female",
+    "sheet": "Characters/Reptile0.png",
+    "col": 1,
+    "row": 0
+  },
+  "232": {
+    "tile_id": 232,
+    "desc": "long worm,male",
+    "sheet": "Characters/Reptile0.png",
+    "col": 2,
+    "row": 0
+  },
+  "233": {
+    "tile_id": 233,
+    "desc": "long worm,female",
+    "sheet": "Characters/Reptile0.png",
+    "col": 2,
+    "row": 0
+  },
+  "234": {
+    "tile_id": 234,
+    "desc": "purple worm,male",
+    "sheet": "Characters/Reptile0.png",
+    "col": 3,
+    "row": 0
+  },
+  "235": {
+    "tile_id": 235,
+    "desc": "purple worm,female",
+    "sheet": "Characters/Reptile0.png",
+    "col": 3,
+    "row": 0
+  },
+  "236": {
+    "tile_id": 236,
+    "desc": "grid bug,male",
+    "sheet": "Characters/Pest0.png",
+    "col": 4,
+    "row": 1
+  },
+  "237": {
+    "tile_id": 237,
+    "desc": "grid bug,female",
+    "sheet": "Characters/Pest0.png",
+    "col": 4,
+    "row": 1
+  },
+  "238": {
+    "tile_id": 238,
+    "desc": "xan,male",
+    "sheet": "Characters/Pest0.png",
+    "col": 5,
+    "row": 1
+  },
+  "239": {
+    "tile_id": 239,
+    "desc": "xan,female",
+    "sheet": "Characters/Pest0.png",
+    "col": 5,
+    "row": 1
+  },
+  "240": {
+    "tile_id": 240,
+    "desc": "yellow light,male",
+    "sheet": "Characters/Elemental0.png",
+    "col": 0,
+    "row": 1
+  },
+  "241": {
+    "tile_id": 241,
+    "desc": "yellow light,female",
+    "sheet": "Characters/Elemental0.png",
+    "col": 0,
+    "row": 1
+  },
+  "242": {
+    "tile_id": 242,
+    "desc": "black light,male",
+    "sheet": "Characters/Elemental0.png",
+    "col": 1,
+    "row": 1
+  },
+  "243": {
+    "tile_id": 243,
+    "desc": "black light,female",
+    "sheet": "Characters/Elemental0.png",
+    "col": 1,
+    "row": 1
+  },
+  "244": {
+    "tile_id": 244,
+    "desc": "zruty,male",
+    "sheet": "Characters/Quadraped0.png",
+    "col": 0,
+    "row": 2
+  },
+  "245": {
+    "tile_id": 245,
+    "desc": "zruty,female",
+    "sheet": "Characters/Quadraped0.png",
+    "col": 0,
+    "row": 2
+  },
+  "246": {
+    "tile_id": 246,
+    "desc": "couatl,male",
+    "sheet": "Characters/Reptile0.png",
+    "col": 4,
+    "row": 0
+  },
+  "247": {
+    "tile_id": 247,
+    "desc": "couatl,female",
+    "sheet": "Characters/Reptile0.png",
+    "col": 4,
+    "row": 0
+  },
+  "248": {
+    "tile_id": 248,
+    "desc": "Aleax,male",
+    "sheet": "Characters/Humanoid0.png",
+    "col": 0,
+    "row": 4
+  },
+  "249": {
+    "tile_id": 249,
+    "desc": "Aleax,female",
+    "sheet": "Characters/Humanoid0.png",
+    "col": 0,
+    "row": 4
+  },
+  "250": {
+    "tile_id": 250,
+    "desc": "Angel,male",
+    "sheet": "Characters/Humanoid0.png",
+    "col": 1,
+    "row": 4
+  },
+  "251": {
+    "tile_id": 251,
+    "desc": "Angel,female",
+    "sheet": "Characters/Humanoid0.png",
+    "col": 1,
+    "row": 4
+  },
+  "252": {
+    "tile_id": 252,
+    "desc": "ki-rin,male",
+    "sheet": "Characters/Quadraped0.png",
+    "col": 1,
+    "row": 2
+  },
+  "253": {
+    "tile_id": 253,
+    "desc": "ki-rin,female",
+    "sheet": "Characters/Quadraped0.png",
+    "col": 1,
+    "row": 2
+  },
+  "254": {
+    "tile_id": 254,
+    "desc": "Archon,male",
+    "sheet": "Characters/Humanoid0.png",
+    "col": 2,
+    "row": 4
+  },
+  "255": {
+    "tile_id": 255,
+    "desc": "Archon,female",
+    "sheet": "Characters/Humanoid0.png",
+    "col": 2,
+    "row": 4
+  },
+  "256": {
+    "tile_id": 256,
+    "desc": "bat,male",
+    "sheet": "Characters/Avian0.png",
+    "col": 0,
+    "row": 1
+  },
+  "257": {
+    "tile_id": 257,
+    "desc": "bat,female",
+    "sheet": "Characters/Avian0.png",
+    "col": 0,
+    "row": 1
+  },
+  "258": {
+    "tile_id": 258,
+    "desc": "giant bat,male",
+    "sheet": "Characters/Avian0.png",
+    "col": 1,
+    "row": 1
+  },
+  "259": {
+    "tile_id": 259,
+    "desc": "giant bat,female",
+    "sheet": "Characters/Avian0.png",
+    "col": 1,
+    "row": 1
+  },
+  "260": {
+    "tile_id": 260,
+    "desc": "raven,male",
+    "sheet": "Characters/Avian0.png",
+    "col": 2,
+    "row": 1
+  },
+  "261": {
+    "tile_id": 261,
+    "desc": "raven,female",
+    "sheet": "Characters/Avian0.png",
+    "col": 2,
+    "row": 1
+  },
+  "262": {
+    "tile_id": 262,
+    "desc": "vampire bat,male",
+    "sheet": "Characters/Avian0.png",
+    "col": 3,
+    "row": 1
+  },
+  "263": {
+    "tile_id": 263,
+    "desc": "vampire bat,female",
+    "sheet": "Characters/Avian0.png",
+    "col": 3,
+    "row": 1
+  },
+  "264": {
+    "tile_id": 264,
+    "desc": "plains centaur,male",
+    "sheet": "Characters/Quadraped0.png",
+    "col": 0,
+    "row": 3
+  },
+  "265": {
+    "tile_id": 265,
+    "desc": "plains centaur,female",
+    "sheet": "Characters/Quadraped0.png",
+    "col": 0,
+    "row": 3
+  },
+  "266": {
+    "tile_id": 266,
+    "desc": "forest centaur,male",
+    "sheet": "Characters/Quadraped0.png",
+    "col": 1,
+    "row": 3
+  },
+  "267": {
+    "tile_id": 267,
+    "desc": "forest centaur,female",
+    "sheet": "Characters/Quadraped0.png",
+    "col": 1,
+    "row": 3
+  },
+  "268": {
+    "tile_id": 268,
+    "desc": "mountain centaur,male",
+    "sheet": "Characters/Quadraped0.png",
+    "col": 2,
+    "row": 3
+  },
+  "269": {
+    "tile_id": 269,
+    "desc": "mountain centaur,female",
+    "sheet": "Characters/Quadraped0.png",
+    "col": 2,
+    "row": 3
+  },
+  "270": {
+    "tile_id": 270,
+    "desc": "baby gray dragon,male",
+    "sheet": "Characters/Reptile0.png",
+    "col": 0,
+    "row": 1
+  },
+  "271": {
+    "tile_id": 271,
+    "desc": "baby gray dragon,female",
+    "sheet": "Characters/Reptile0.png",
+    "col": 0,
+    "row": 1
+  },
+  "278": {
+    "tile_id": 278,
+    "desc": "baby red dragon,male",
+    "sheet": "Characters/Reptile0.png",
+    "col": 1,
+    "row": 1
+  },
+  "279": {
+    "tile_id": 279,
+    "desc": "baby red dragon,female",
+    "sheet": "Characters/Reptile0.png",
+    "col": 1,
+    "row": 1
+  },
+  "280": {
+    "tile_id": 280,
+    "desc": "baby white dragon,male",
+    "sheet": "Characters/Reptile0.png",
+    "col": 2,
+    "row": 1
+  },
+  "281": {
+    "tile_id": 281,
+    "desc": "baby white dragon,female",
+    "sheet": "Characters/Reptile0.png",
+    "col": 2,
+    "row": 1
+  },
+  "284": {
+    "tile_id": 284,
+    "desc": "baby black dragon,male",
+    "sheet": "Characters/Reptile0.png",
+    "col": 5,
+    "row": 1
+  },
+  "285": {
+    "tile_id": 285,
+    "desc": "baby black dragon,female",
+    "sheet": "Characters/Reptile0.png",
+    "col": 5,
+    "row": 1
+  },
+  "286": {
+    "tile_id": 286,
+    "desc": "baby blue dragon,male",
+    "sheet": "Characters/Reptile0.png",
+    "col": 3,
+    "row": 1
+  },
+  "287": {
+    "tile_id": 287,
+    "desc": "baby blue dragon,female",
+    "sheet": "Characters/Reptile0.png",
+    "col": 3,
+    "row": 1
+  },
+  "288": {
+    "tile_id": 288,
+    "desc": "baby green dragon,male",
+    "sheet": "Characters/Reptile0.png",
+    "col": 4,
+    "row": 1
+  },
+  "289": {
+    "tile_id": 289,
+    "desc": "baby green dragon,female",
+    "sheet": "Characters/Reptile0.png",
+    "col": 4,
+    "row": 1
+  },
+  "290": {
+    "tile_id": 290,
+    "desc": "baby yellow dragon,male",
+    "sheet": "Characters/Reptile0.png",
+    "col": 6,
+    "row": 1
+  },
+  "291": {
+    "tile_id": 291,
+    "desc": "baby yellow dragon,female",
+    "sheet": "Characters/Reptile0.png",
+    "col": 6,
+    "row": 1
+  },
+  "292": {
+    "tile_id": 292,
+    "desc": "gray dragon,male",
+    "sheet": "Characters/Reptile0.png",
+    "col": 0,
+    "row": 2
+  },
+  "293": {
+    "tile_id": 293,
+    "desc": "gray dragon,female",
+    "sheet": "Characters/Reptile0.png",
+    "col": 0,
+    "row": 2
+  },
+  "300": {
+    "tile_id": 300,
+    "desc": "red dragon,male",
+    "sheet": "Characters/Reptile0.png",
+    "col": 1,
+    "row": 2
+  },
+  "301": {
+    "tile_id": 301,
+    "desc": "red dragon,female",
+    "sheet": "Characters/Reptile0.png",
+    "col": 1,
+    "row": 2
+  },
+  "302": {
+    "tile_id": 302,
+    "desc": "white dragon,male",
+    "sheet": "Characters/Reptile0.png",
+    "col": 2,
+    "row": 2
+  },
+  "303": {
+    "tile_id": 303,
+    "desc": "white dragon,female",
+    "sheet": "Characters/Reptile0.png",
+    "col": 2,
+    "row": 2
+  },
+  "306": {
+    "tile_id": 306,
+    "desc": "black dragon,male",
+    "sheet": "Characters/Reptile0.png",
+    "col": 5,
+    "row": 2
+  },
+  "307": {
+    "tile_id": 307,
+    "desc": "black dragon,female",
+    "sheet": "Characters/Reptile0.png",
+    "col": 5,
+    "row": 2
+  },
+  "308": {
+    "tile_id": 308,
+    "desc": "blue dragon,male",
+    "sheet": "Characters/Reptile0.png",
+    "col": 3,
+    "row": 2
+  },
+  "309": {
+    "tile_id": 309,
+    "desc": "blue dragon,female",
+    "sheet": "Characters/Reptile0.png",
+    "col": 3,
+    "row": 2
+  },
+  "310": {
+    "tile_id": 310,
+    "desc": "green dragon,male",
+    "sheet": "Characters/Reptile0.png",
+    "col": 4,
+    "row": 2
+  },
+  "311": {
+    "tile_id": 311,
+    "desc": "green dragon,female",
+    "sheet": "Characters/Reptile0.png",
+    "col": 4,
+    "row": 2
+  },
+  "312": {
+    "tile_id": 312,
+    "desc": "yellow dragon,male",
+    "sheet": "Characters/Reptile0.png",
+    "col": 6,
+    "row": 2
+  },
+  "313": {
+    "tile_id": 313,
+    "desc": "yellow dragon,female",
+    "sheet": "Characters/Reptile0.png",
+    "col": 6,
+    "row": 2
+  },
+  "314": {
+    "tile_id": 314,
+    "desc": "stalker,male",
+    "sheet": "Characters/Elemental0.png",
+    "col": 0,
+    "row": 2
+  },
+  "315": {
+    "tile_id": 315,
+    "desc": "stalker,female",
+    "sheet": "Characters/Elemental0.png",
+    "col": 0,
+    "row": 2
+  },
+  "316": {
+    "tile_id": 316,
+    "desc": "air elemental,male",
+    "sheet": "Characters/Elemental0.png",
+    "col": 1,
+    "row": 2
+  },
+  "317": {
+    "tile_id": 317,
+    "desc": "air elemental,female",
+    "sheet": "Characters/Elemental0.png",
+    "col": 1,
+    "row": 2
+  },
+  "318": {
+    "tile_id": 318,
+    "desc": "fire elemental,male",
+    "sheet": "Characters/Elemental0.png",
+    "col": 2,
+    "row": 2
+  },
+  "319": {
+    "tile_id": 319,
+    "desc": "fire elemental,female",
+    "sheet": "Characters/Elemental0.png",
+    "col": 2,
+    "row": 2
+  },
+  "320": {
+    "tile_id": 320,
+    "desc": "earth elemental,male",
+    "sheet": "Characters/Elemental0.png",
+    "col": 3,
+    "row": 2
+  },
+  "321": {
+    "tile_id": 321,
+    "desc": "earth elemental,female",
+    "sheet": "Characters/Elemental0.png",
+    "col": 3,
+    "row": 2
+  },
+  "322": {
+    "tile_id": 322,
+    "desc": "water elemental,male",
+    "sheet": "Characters/Elemental0.png",
+    "col": 4,
+    "row": 2
+  },
+  "323": {
+    "tile_id": 323,
+    "desc": "water elemental,female",
+    "sheet": "Characters/Elemental0.png",
+    "col": 4,
+    "row": 2
+  },
+  "324": {
+    "tile_id": 324,
+    "desc": "lichen,male",
+    "sheet": "Characters/Plant0.png",
+    "col": 0,
+    "row": 0
+  },
+  "325": {
+    "tile_id": 325,
+    "desc": "lichen,female",
+    "sheet": "Characters/Plant0.png",
+    "col": 0,
+    "row": 0
+  },
+  "326": {
+    "tile_id": 326,
+    "desc": "brown mold,male",
+    "sheet": "Characters/Plant0.png",
+    "col": 1,
+    "row": 0
+  },
+  "327": {
+    "tile_id": 327,
+    "desc": "brown mold,female",
+    "sheet": "Characters/Plant0.png",
+    "col": 1,
+    "row": 0
+  },
+  "328": {
+    "tile_id": 328,
+    "desc": "yellow mold,male",
+    "sheet": "Characters/Plant0.png",
+    "col": 2,
+    "row": 0
+  },
+  "329": {
+    "tile_id": 329,
+    "desc": "yellow mold,female",
+    "sheet": "Characters/Plant0.png",
+    "col": 2,
+    "row": 0
+  },
+  "330": {
+    "tile_id": 330,
+    "desc": "green mold,male",
+    "sheet": "Characters/Plant0.png",
+    "col": 3,
+    "row": 0
+  },
+  "331": {
+    "tile_id": 331,
+    "desc": "green mold,female",
+    "sheet": "Characters/Plant0.png",
+    "col": 3,
+    "row": 0
+  },
+  "332": {
+    "tile_id": 332,
+    "desc": "red mold,male",
+    "sheet": "Characters/Plant0.png",
+    "col": 4,
+    "row": 0
+  },
+  "333": {
+    "tile_id": 333,
+    "desc": "red mold,female",
+    "sheet": "Characters/Plant0.png",
+    "col": 4,
+    "row": 0
+  },
+  "334": {
+    "tile_id": 334,
+    "desc": "shrieker,male",
+    "sheet": "Characters/Plant0.png",
+    "col": 5,
+    "row": 0
+  },
+  "335": {
+    "tile_id": 335,
+    "desc": "shrieker,female",
+    "sheet": "Characters/Plant0.png",
+    "col": 5,
+    "row": 0
+  },
+  "336": {
+    "tile_id": 336,
+    "desc": "violet fungus,male",
+    "sheet": "Characters/Plant0.png",
+    "col": 6,
+    "row": 0
+  },
+  "337": {
+    "tile_id": 337,
+    "desc": "violet fungus,female",
+    "sheet": "Characters/Plant0.png",
+    "col": 6,
+    "row": 0
+  },
+  "338": {
+    "tile_id": 338,
+    "desc": "gnome,male",
+    "sheet": "Characters/Humanoid0.png",
+    "col": 0,
+    "row": 5
+  },
+  "339": {
+    "tile_id": 339,
+    "desc": "gnome,female",
+    "sheet": "Characters/Humanoid0.png",
+    "col": 0,
+    "row": 5
+  },
+  "340": {
+    "tile_id": 340,
+    "desc": "gnome leader,male",
+    "sheet": "Characters/Humanoid0.png",
+    "col": 0,
+    "row": 5
+  },
+  "341": {
+    "tile_id": 341,
+    "desc": "gnome leader,female",
+    "sheet": "Characters/Humanoid0.png",
+    "col": 0,
+    "row": 5
+  },
+  "342": {
+    "tile_id": 342,
+    "desc": "gnomish wizard,male",
+    "sheet": "Characters/Humanoid0.png",
+    "col": 2,
+    "row": 5
+  },
+  "343": {
+    "tile_id": 343,
+    "desc": "gnomish wizard,female",
+    "sheet": "Characters/Humanoid0.png",
+    "col": 2,
+    "row": 5
+  },
+  "344": {
+    "tile_id": 344,
+    "desc": "gnome ruler,male",
+    "sheet": "Characters/Humanoid0.png",
+    "col": 0,
+    "row": 5
+  },
+  "345": {
+    "tile_id": 345,
+    "desc": "gnome ruler,female",
+    "sheet": "Characters/Humanoid0.png",
+    "col": 0,
+    "row": 5
+  },
+  "346": {
+    "tile_id": 346,
+    "desc": "giant,male",
+    "sheet": "Characters/Humanoid0.png",
+    "col": 0,
+    "row": 6
+  },
+  "347": {
+    "tile_id": 347,
+    "desc": "giant,female",
+    "sheet": "Characters/Humanoid0.png",
+    "col": 0,
+    "row": 6
+  },
+  "348": {
+    "tile_id": 348,
+    "desc": "stone giant,male",
+    "sheet": "Characters/Humanoid0.png",
+    "col": 1,
+    "row": 6
+  },
+  "349": {
+    "tile_id": 349,
+    "desc": "stone giant,female",
+    "sheet": "Characters/Humanoid0.png",
+    "col": 1,
+    "row": 6
+  },
+  "350": {
+    "tile_id": 350,
+    "desc": "hill giant,male",
+    "sheet": "Characters/Humanoid0.png",
+    "col": 2,
+    "row": 6
+  },
+  "351": {
+    "tile_id": 351,
+    "desc": "hill giant,female",
+    "sheet": "Characters/Humanoid0.png",
+    "col": 2,
+    "row": 6
+  },
+  "352": {
+    "tile_id": 352,
+    "desc": "fire giant,male",
+    "sheet": "Characters/Humanoid0.png",
+    "col": 3,
+    "row": 6
+  },
+  "353": {
+    "tile_id": 353,
+    "desc": "fire giant,female",
+    "sheet": "Characters/Humanoid0.png",
+    "col": 3,
+    "row": 6
+  },
+  "354": {
+    "tile_id": 354,
+    "desc": "frost giant,male",
+    "sheet": "Characters/Humanoid0.png",
+    "col": 4,
+    "row": 6
+  },
+  "355": {
+    "tile_id": 355,
+    "desc": "frost giant,female",
+    "sheet": "Characters/Humanoid0.png",
+    "col": 4,
+    "row": 6
+  },
+  "356": {
+    "tile_id": 356,
+    "desc": "ettin,male",
+    "sheet": "Characters/Humanoid0.png",
+    "col": 6,
+    "row": 6
+  },
+  "357": {
+    "tile_id": 357,
+    "desc": "ettin,female",
+    "sheet": "Characters/Humanoid0.png",
+    "col": 6,
+    "row": 6
+  },
+  "358": {
+    "tile_id": 358,
+    "desc": "storm giant,male",
+    "sheet": "Characters/Humanoid0.png",
+    "col": 5,
+    "row": 6
+  },
+  "359": {
+    "tile_id": 359,
+    "desc": "storm giant,female",
+    "sheet": "Characters/Humanoid0.png",
+    "col": 5,
+    "row": 6
+  },
+  "360": {
+    "tile_id": 360,
+    "desc": "titan,male",
+    "sheet": "Characters/Humanoid0.png",
+    "col": 7,
+    "row": 6
+  },
+  "361": {
+    "tile_id": 361,
+    "desc": "titan,female",
+    "sheet": "Characters/Humanoid0.png",
+    "col": 7,
+    "row": 6
+  },
+  "362": {
+    "tile_id": 362,
+    "desc": "minotaur,male",
+    "sheet": "Characters/Humanoid0.png",
+    "col": 0,
+    "row": 7
+  },
+  "363": {
+    "tile_id": 363,
+    "desc": "minotaur,female",
+    "sheet": "Characters/Humanoid0.png",
+    "col": 0,
+    "row": 7
+  },
+  "364": {
+    "tile_id": 364,
+    "desc": "jabberwock,male",
+    "sheet": "Characters/Reptile0.png",
+    "col": 0,
+    "row": 3
+  },
+  "365": {
+    "tile_id": 365,
+    "desc": "jabberwock,female",
+    "sheet": "Characters/Reptile0.png",
+    "col": 0,
+    "row": 3
+  },
+  "366": {
+    "tile_id": 366,
+    "desc": "vorpal jabberwock,male",
+    "sheet": "Characters/Reptile0.png",
+    "col": 1,
+    "row": 3
+  },
+  "367": {
+    "tile_id": 367,
+    "desc": "vorpal jabberwock,female",
+    "sheet": "Characters/Reptile0.png",
+    "col": 1,
+    "row": 3
+  },
+  "368": {
+    "tile_id": 368,
+    "desc": "Keystone Kop,male",
+    "sheet": "Characters/Humanoid0.png",
+    "col": 0,
+    "row": 8
+  },
+  "369": {
+    "tile_id": 369,
+    "desc": "Keystone Kop,female",
+    "sheet": "Characters/Humanoid0.png",
+    "col": 0,
+    "row": 8
+  },
+  "370": {
+    "tile_id": 370,
+    "desc": "Kop Sergeant,male",
+    "sheet": "Characters/Humanoid0.png",
+    "col": 1,
+    "row": 8
+  },
+  "371": {
+    "tile_id": 371,
+    "desc": "Kop Sergeant,female",
+    "sheet": "Characters/Humanoid0.png",
+    "col": 1,
+    "row": 8
+  },
+  "372": {
+    "tile_id": 372,
+    "desc": "Kop Lieutenant,male",
+    "sheet": "Characters/Humanoid0.png",
+    "col": 2,
+    "row": 8
+  },
+  "373": {
+    "tile_id": 373,
+    "desc": "Kop Lieutenant,female",
+    "sheet": "Characters/Humanoid0.png",
+    "col": 2,
+    "row": 8
+  },
+  "374": {
+    "tile_id": 374,
+    "desc": "Kop Kaptain,male",
+    "sheet": "Characters/Humanoid0.png",
+    "col": 3,
+    "row": 8
+  },
+  "375": {
+    "tile_id": 375,
+    "desc": "Kop Kaptain,female",
+    "sheet": "Characters/Humanoid0.png",
+    "col": 3,
+    "row": 8
+  },
+  "376": {
+    "tile_id": 376,
+    "desc": "lich,male",
+    "sheet": "Characters/Undead0.png",
+    "col": 0,
+    "row": 0
+  },
+  "377": {
+    "tile_id": 377,
+    "desc": "lich,female",
+    "sheet": "Characters/Undead0.png",
+    "col": 0,
+    "row": 0
+  },
+  "378": {
+    "tile_id": 378,
+    "desc": "demilich,male",
+    "sheet": "Characters/Undead0.png",
+    "col": 1,
+    "row": 0
+  },
+  "379": {
+    "tile_id": 379,
+    "desc": "demilich,female",
+    "sheet": "Characters/Undead0.png",
+    "col": 1,
+    "row": 0
+  },
+  "380": {
+    "tile_id": 380,
+    "desc": "master lich,male",
+    "sheet": "Characters/Undead0.png",
+    "col": 2,
+    "row": 0
+  },
+  "381": {
+    "tile_id": 381,
+    "desc": "master lich,female",
+    "sheet": "Characters/Undead0.png",
+    "col": 2,
+    "row": 0
+  },
+  "382": {
+    "tile_id": 382,
+    "desc": "arch-lich,male",
+    "sheet": "Characters/Undead0.png",
+    "col": 3,
+    "row": 0
+  },
+  "383": {
+    "tile_id": 383,
+    "desc": "arch-lich,female",
+    "sheet": "Characters/Undead0.png",
+    "col": 3,
+    "row": 0
+  },
+  "384": {
+    "tile_id": 384,
+    "desc": "kobold mummy,male",
+    "sheet": "Characters/Undead0.png",
+    "col": 0,
+    "row": 1
+  },
+  "385": {
+    "tile_id": 385,
+    "desc": "kobold mummy,female",
+    "sheet": "Characters/Undead0.png",
+    "col": 0,
+    "row": 1
+  },
+  "386": {
+    "tile_id": 386,
+    "desc": "gnome mummy,male",
+    "sheet": "Characters/Undead0.png",
+    "col": 1,
+    "row": 1
+  },
+  "387": {
+    "tile_id": 387,
+    "desc": "gnome mummy,female",
+    "sheet": "Characters/Undead0.png",
+    "col": 1,
+    "row": 1
+  },
+  "388": {
+    "tile_id": 388,
+    "desc": "orc mummy,male",
+    "sheet": "Characters/Undead0.png",
+    "col": 2,
+    "row": 1
+  },
+  "389": {
+    "tile_id": 389,
+    "desc": "orc mummy,female",
+    "sheet": "Characters/Undead0.png",
+    "col": 2,
+    "row": 1
+  },
+  "390": {
+    "tile_id": 390,
+    "desc": "dwarf mummy,male",
+    "sheet": "Characters/Undead0.png",
+    "col": 3,
+    "row": 1
+  },
+  "391": {
+    "tile_id": 391,
+    "desc": "dwarf mummy,female",
+    "sheet": "Characters/Undead0.png",
+    "col": 3,
+    "row": 1
+  },
+  "392": {
+    "tile_id": 392,
+    "desc": "elf mummy,male",
+    "sheet": "Characters/Undead0.png",
+    "col": 4,
+    "row": 1
+  },
+  "393": {
+    "tile_id": 393,
+    "desc": "elf mummy,female",
+    "sheet": "Characters/Undead0.png",
+    "col": 4,
+    "row": 1
+  },
+  "394": {
+    "tile_id": 394,
+    "desc": "human mummy,male",
+    "sheet": "Characters/Undead0.png",
+    "col": 5,
+    "row": 1
+  },
+  "395": {
+    "tile_id": 395,
+    "desc": "human mummy,female",
+    "sheet": "Characters/Undead0.png",
+    "col": 5,
+    "row": 1
+  },
+  "396": {
+    "tile_id": 396,
+    "desc": "ettin mummy,male",
+    "sheet": "Characters/Undead0.png",
+    "col": 6,
+    "row": 1
+  },
+  "397": {
+    "tile_id": 397,
+    "desc": "ettin mummy,female",
+    "sheet": "Characters/Undead0.png",
+    "col": 6,
+    "row": 1
+  },
+  "398": {
+    "tile_id": 398,
+    "desc": "giant mummy,male",
+    "sheet": "Characters/Undead0.png",
+    "col": 7,
+    "row": 1
+  },
+  "399": {
+    "tile_id": 399,
+    "desc": "giant mummy,female",
+    "sheet": "Characters/Undead0.png",
+    "col": 7,
+    "row": 1
+  },
+  "400": {
+    "tile_id": 400,
+    "desc": "red naga hatchling,male",
+    "sheet": "Characters/Reptile0.png",
+    "col": 0,
+    "row": 4
+  },
+  "401": {
+    "tile_id": 401,
+    "desc": "red naga hatchling,female",
+    "sheet": "Characters/Reptile0.png",
+    "col": 0,
+    "row": 4
+  },
+  "402": {
+    "tile_id": 402,
+    "desc": "black naga hatchling,male",
+    "sheet": "Characters/Reptile0.png",
+    "col": 1,
+    "row": 4
+  },
+  "403": {
+    "tile_id": 403,
+    "desc": "black naga hatchling,female",
+    "sheet": "Characters/Reptile0.png",
+    "col": 1,
+    "row": 4
+  },
+  "404": {
+    "tile_id": 404,
+    "desc": "golden naga hatchling,male",
+    "sheet": "Characters/Reptile0.png",
+    "col": 2,
+    "row": 4
+  },
+  "405": {
+    "tile_id": 405,
+    "desc": "golden naga hatchling,female",
+    "sheet": "Characters/Reptile0.png",
+    "col": 2,
+    "row": 4
+  },
+  "406": {
+    "tile_id": 406,
+    "desc": "guardian naga hatchling,male",
+    "sheet": "Characters/Reptile0.png",
+    "col": 3,
+    "row": 4
+  },
+  "407": {
+    "tile_id": 407,
+    "desc": "guardian naga hatchling,female",
+    "sheet": "Characters/Reptile0.png",
+    "col": 3,
+    "row": 4
+  },
+  "408": {
+    "tile_id": 408,
+    "desc": "red naga,male",
+    "sheet": "Characters/Reptile0.png",
+    "col": 4,
+    "row": 4
+  },
+  "409": {
+    "tile_id": 409,
+    "desc": "red naga,female",
+    "sheet": "Characters/Reptile0.png",
+    "col": 4,
+    "row": 4
+  },
+  "410": {
+    "tile_id": 410,
+    "desc": "black naga,male",
+    "sheet": "Characters/Reptile0.png",
+    "col": 5,
+    "row": 4
+  },
+  "411": {
+    "tile_id": 411,
+    "desc": "black naga,female",
+    "sheet": "Characters/Reptile0.png",
+    "col": 5,
+    "row": 4
+  },
+  "412": {
+    "tile_id": 412,
+    "desc": "golden naga,male",
+    "sheet": "Characters/Reptile0.png",
+    "col": 6,
+    "row": 4
+  },
+  "413": {
+    "tile_id": 413,
+    "desc": "golden naga,female",
+    "sheet": "Characters/Reptile0.png",
+    "col": 6,
+    "row": 4
+  },
+  "414": {
+    "tile_id": 414,
+    "desc": "guardian naga,male",
+    "sheet": "Characters/Reptile0.png",
+    "col": 7,
+    "row": 4
+  },
+  "415": {
+    "tile_id": 415,
+    "desc": "guardian naga,female",
+    "sheet": "Characters/Reptile0.png",
+    "col": 7,
+    "row": 4
+  },
+  "416": {
+    "tile_id": 416,
+    "desc": "ogre,male",
+    "sheet": "Characters/Humanoid0.png",
+    "col": 0,
+    "row": 9
+  },
+  "417": {
+    "tile_id": 417,
+    "desc": "ogre,female",
+    "sheet": "Characters/Humanoid0.png",
+    "col": 0,
+    "row": 9
+  },
+  "418": {
+    "tile_id": 418,
+    "desc": "ogre leader,male",
+    "sheet": "Characters/Humanoid0.png",
+    "col": 0,
+    "row": 9
+  },
+  "419": {
+    "tile_id": 419,
+    "desc": "ogre leader,female",
+    "sheet": "Characters/Humanoid0.png",
+    "col": 0,
+    "row": 9
+  },
+  "420": {
+    "tile_id": 420,
+    "desc": "ogre tyrant,male",
+    "sheet": "Characters/Humanoid0.png",
+    "col": 0,
+    "row": 9
+  },
+  "421": {
+    "tile_id": 421,
+    "desc": "ogre tyrant,female",
+    "sheet": "Characters/Humanoid0.png",
+    "col": 0,
+    "row": 9
+  },
+  "422": {
+    "tile_id": 422,
+    "desc": "gray ooze,male",
+    "sheet": "Characters/Slime0.png",
+    "col": 0,
+    "row": 2
+  },
+  "423": {
+    "tile_id": 423,
+    "desc": "gray ooze,female",
+    "sheet": "Characters/Slime0.png",
+    "col": 0,
+    "row": 2
+  },
+  "424": {
+    "tile_id": 424,
+    "desc": "brown pudding,male",
+    "sheet": "Characters/Slime0.png",
+    "col": 1,
+    "row": 2
+  },
+  "425": {
+    "tile_id": 425,
+    "desc": "brown pudding,female",
+    "sheet": "Characters/Slime0.png",
+    "col": 1,
+    "row": 2
+  },
+  "426": {
+    "tile_id": 426,
+    "desc": "green slime,male",
+    "sheet": "Characters/Slime0.png",
+    "col": 2,
+    "row": 2
+  },
+  "427": {
+    "tile_id": 427,
+    "desc": "green slime,female",
+    "sheet": "Characters/Slime0.png",
+    "col": 2,
+    "row": 2
+  },
+  "428": {
+    "tile_id": 428,
+    "desc": "black pudding,male",
+    "sheet": "Characters/Slime0.png",
+    "col": 3,
+    "row": 2
+  },
+  "429": {
+    "tile_id": 429,
+    "desc": "black pudding,female",
+    "sheet": "Characters/Slime0.png",
+    "col": 3,
+    "row": 2
+  },
+  "434": {
+    "tile_id": 434,
+    "desc": "rust monster,male",
+    "sheet": "Characters/Quadraped0.png",
+    "col": 0,
+    "row": 4
+  },
+  "435": {
+    "tile_id": 435,
+    "desc": "rust monster,female",
+    "sheet": "Characters/Quadraped0.png",
+    "col": 0,
+    "row": 4
+  },
+  "436": {
+    "tile_id": 436,
+    "desc": "disenchanter,male",
+    "sheet": "Characters/Quadraped0.png",
+    "col": 1,
+    "row": 4
+  },
+  "437": {
+    "tile_id": 437,
+    "desc": "disenchanter,female",
+    "sheet": "Characters/Quadraped0.png",
+    "col": 1,
+    "row": 4
+  },
+  "438": {
+    "tile_id": 438,
+    "desc": "garter snake,male",
+    "sheet": "Characters/Reptile0.png",
+    "col": 0,
+    "row": 5
+  },
+  "439": {
+    "tile_id": 439,
+    "desc": "garter snake,female",
+    "sheet": "Characters/Reptile0.png",
+    "col": 0,
+    "row": 5
+  },
+  "440": {
+    "tile_id": 440,
+    "desc": "snake,male",
+    "sheet": "Characters/Reptile0.png",
+    "col": 1,
+    "row": 5
+  },
+  "441": {
+    "tile_id": 441,
+    "desc": "snake,female",
+    "sheet": "Characters/Reptile0.png",
+    "col": 1,
+    "row": 5
+  },
+  "442": {
+    "tile_id": 442,
+    "desc": "water moccasin,male",
+    "sheet": "Characters/Reptile0.png",
+    "col": 2,
+    "row": 5
+  },
+  "443": {
+    "tile_id": 443,
+    "desc": "water moccasin,female",
+    "sheet": "Characters/Reptile0.png",
+    "col": 2,
+    "row": 5
+  },
+  "444": {
+    "tile_id": 444,
+    "desc": "python,male",
+    "sheet": "Characters/Reptile0.png",
+    "col": 4,
+    "row": 5
+  },
+  "445": {
+    "tile_id": 445,
+    "desc": "python,female",
+    "sheet": "Characters/Reptile0.png",
+    "col": 4,
+    "row": 5
+  },
+  "446": {
+    "tile_id": 446,
+    "desc": "pit viper,male",
+    "sheet": "Characters/Reptile0.png",
+    "col": 3,
+    "row": 5
+  },
+  "447": {
+    "tile_id": 447,
+    "desc": "pit viper,female",
+    "sheet": "Characters/Reptile0.png",
+    "col": 3,
+    "row": 5
+  },
+  "448": {
+    "tile_id": 448,
+    "desc": "cobra,male",
+    "sheet": "Characters/Reptile0.png",
+    "col": 5,
+    "row": 5
+  },
+  "449": {
+    "tile_id": 449,
+    "desc": "cobra,female",
+    "sheet": "Characters/Reptile0.png",
+    "col": 5,
+    "row": 5
+  },
+  "450": {
+    "tile_id": 450,
+    "desc": "troll,male",
+    "sheet": "Characters/Humanoid0.png",
+    "col": 0,
+    "row": 10
+  },
+  "451": {
+    "tile_id": 451,
+    "desc": "troll,female",
+    "sheet": "Characters/Humanoid0.png",
+    "col": 0,
+    "row": 10
+  },
+  "452": {
+    "tile_id": 452,
+    "desc": "ice troll,male",
+    "sheet": "Characters/Humanoid0.png",
+    "col": 1,
+    "row": 10
+  },
+  "453": {
+    "tile_id": 453,
+    "desc": "ice troll,female",
+    "sheet": "Characters/Humanoid0.png",
+    "col": 1,
+    "row": 10
+  },
+  "454": {
+    "tile_id": 454,
+    "desc": "rock troll,male",
+    "sheet": "Characters/Humanoid0.png",
+    "col": 2,
+    "row": 10
+  },
+  "455": {
+    "tile_id": 455,
+    "desc": "rock troll,female",
+    "sheet": "Characters/Humanoid0.png",
+    "col": 2,
+    "row": 10
+  },
+  "456": {
+    "tile_id": 456,
+    "desc": "water troll,male",
+    "sheet": "Characters/Humanoid0.png",
+    "col": 3,
+    "row": 10
+  },
+  "457": {
+    "tile_id": 457,
+    "desc": "water troll,female",
+    "sheet": "Characters/Humanoid0.png",
+    "col": 3,
+    "row": 10
+  },
+  "458": {
+    "tile_id": 458,
+    "desc": "Olog-hai,male",
+    "sheet": "Characters/Humanoid0.png",
+    "col": 4,
+    "row": 10
+  },
+  "459": {
+    "tile_id": 459,
+    "desc": "Olog-hai,female",
+    "sheet": "Characters/Humanoid0.png",
+    "col": 4,
+    "row": 10
+  },
+  "460": {
+    "tile_id": 460,
+    "desc": "umber hulk,male",
+    "sheet": "Characters/Humanoid0.png",
+    "col": 5,
+    "row": 10
+  },
+  "461": {
+    "tile_id": 461,
+    "desc": "umber hulk,female",
+    "sheet": "Characters/Humanoid0.png",
+    "col": 5,
+    "row": 10
+  },
+  "462": {
+    "tile_id": 462,
+    "desc": "vampire,male",
+    "sheet": "Characters/Undead0.png",
+    "col": 0,
+    "row": 2
+  },
+  "463": {
+    "tile_id": 463,
+    "desc": "vampire,female",
+    "sheet": "Characters/Undead0.png",
+    "col": 0,
+    "row": 2
+  },
+  "464": {
+    "tile_id": 464,
+    "desc": "vampire leader,male",
+    "sheet": "Characters/Undead0.png",
+    "col": 0,
+    "row": 2
+  },
+  "465": {
+    "tile_id": 465,
+    "desc": "vampire leader,female",
+    "sheet": "Characters/Undead0.png",
+    "col": 0,
+    "row": 2
+  },
+  "466": {
+    "tile_id": 466,
+    "desc": "vampire mage,male",
+    "sheet": "Characters/Undead0.png",
+    "col": 2,
+    "row": 2
+  },
+  "467": {
+    "tile_id": 467,
+    "desc": "vampire mage,female",
+    "sheet": "Characters/Undead0.png",
+    "col": 2,
+    "row": 2
+  },
+  "468": {
+    "tile_id": 468,
+    "desc": "Vlad the Impaler,male",
+    "sheet": "Characters/Undead0.png",
+    "col": 3,
+    "row": 2
+  },
+  "469": {
+    "tile_id": 469,
+    "desc": "Vlad the Impaler,female",
+    "sheet": "Characters/Undead0.png",
+    "col": 3,
+    "row": 2
+  },
+  "470": {
+    "tile_id": 470,
+    "desc": "barrow wight,male",
+    "sheet": "Characters/Undead0.png",
+    "col": 0,
+    "row": 3
+  },
+  "471": {
+    "tile_id": 471,
+    "desc": "barrow wight,female",
+    "sheet": "Characters/Undead0.png",
+    "col": 0,
+    "row": 3
+  },
+  "472": {
+    "tile_id": 472,
+    "desc": "wraith,male",
+    "sheet": "Characters/Undead0.png",
+    "col": 1,
+    "row": 3
+  },
+  "473": {
+    "tile_id": 473,
+    "desc": "wraith,female",
+    "sheet": "Characters/Undead0.png",
+    "col": 1,
+    "row": 3
+  },
+  "474": {
+    "tile_id": 474,
+    "desc": "Nazgul,male",
+    "sheet": "Characters/Undead0.png",
+    "col": 2,
+    "row": 3
+  },
+  "475": {
+    "tile_id": 475,
+    "desc": "Nazgul,female",
+    "sheet": "Characters/Undead0.png",
+    "col": 2,
+    "row": 3
+  },
+  "476": {
+    "tile_id": 476,
+    "desc": "xorn,male",
+    "sheet": "Characters/Elemental0.png",
+    "col": 0,
+    "row": 3
+  },
+  "477": {
+    "tile_id": 477,
+    "desc": "xorn,female",
+    "sheet": "Characters/Elemental0.png",
+    "col": 0,
+    "row": 3
+  },
+  "478": {
+    "tile_id": 478,
+    "desc": "monkey,male",
+    "sheet": "Characters/Quadraped0.png",
+    "col": 0,
+    "row": 5
+  },
+  "479": {
+    "tile_id": 479,
+    "desc": "monkey,female",
+    "sheet": "Characters/Quadraped0.png",
+    "col": 0,
+    "row": 5
+  },
+  "480": {
+    "tile_id": 480,
+    "desc": "ape,male",
+    "sheet": "Characters/Quadraped0.png",
+    "col": 1,
+    "row": 5
+  },
+  "481": {
+    "tile_id": 481,
+    "desc": "ape,female",
+    "sheet": "Characters/Quadraped0.png",
+    "col": 1,
+    "row": 5
+  },
+  "482": {
+    "tile_id": 482,
+    "desc": "owlbear,male",
+    "sheet": "Characters/Quadraped0.png",
+    "col": 2,
+    "row": 5
+  },
+  "483": {
+    "tile_id": 483,
+    "desc": "owlbear,female",
+    "sheet": "Characters/Quadraped0.png",
+    "col": 2,
+    "row": 5
+  },
+  "484": {
+    "tile_id": 484,
+    "desc": "yeti,male",
+    "sheet": "Characters/Humanoid0.png",
+    "col": 0,
+    "row": 11
+  },
+  "485": {
+    "tile_id": 485,
+    "desc": "yeti,female",
+    "sheet": "Characters/Humanoid0.png",
+    "col": 0,
+    "row": 11
+  },
+  "486": {
+    "tile_id": 486,
+    "desc": "carnivorous ape,male",
+    "sheet": "Characters/Quadraped0.png",
+    "col": 3,
+    "row": 5
+  },
+  "487": {
+    "tile_id": 487,
+    "desc": "carnivorous ape,female",
+    "sheet": "Characters/Quadraped0.png",
+    "col": 3,
+    "row": 5
+  },
+  "488": {
+    "tile_id": 488,
+    "desc": "sasquatch,male",
+    "sheet": "Characters/Humanoid0.png",
+    "col": 1,
+    "row": 11
+  },
+  "489": {
+    "tile_id": 489,
+    "desc": "sasquatch,female",
+    "sheet": "Characters/Humanoid0.png",
+    "col": 1,
+    "row": 11
+  },
+  "490": {
+    "tile_id": 490,
+    "desc": "kobold zombie,male",
+    "sheet": "Characters/Undead0.png",
+    "col": 0,
+    "row": 4
+  },
+  "491": {
+    "tile_id": 491,
+    "desc": "kobold zombie,female",
+    "sheet": "Characters/Undead0.png",
+    "col": 0,
+    "row": 4
+  },
+  "492": {
+    "tile_id": 492,
+    "desc": "gnome zombie,male",
+    "sheet": "Characters/Undead0.png",
+    "col": 1,
+    "row": 4
+  },
+  "493": {
+    "tile_id": 493,
+    "desc": "gnome zombie,female",
+    "sheet": "Characters/Undead0.png",
+    "col": 1,
+    "row": 4
+  },
+  "494": {
+    "tile_id": 494,
+    "desc": "orc zombie,male",
+    "sheet": "Characters/Undead0.png",
+    "col": 2,
+    "row": 4
+  },
+  "495": {
+    "tile_id": 495,
+    "desc": "orc zombie,female",
+    "sheet": "Characters/Undead0.png",
+    "col": 2,
+    "row": 4
+  },
+  "496": {
+    "tile_id": 496,
+    "desc": "dwarf zombie,male",
+    "sheet": "Characters/Undead0.png",
+    "col": 3,
+    "row": 4
+  },
+  "497": {
+    "tile_id": 497,
+    "desc": "dwarf zombie,female",
+    "sheet": "Characters/Undead0.png",
+    "col": 3,
+    "row": 4
+  },
+  "498": {
+    "tile_id": 498,
+    "desc": "elf zombie,male",
+    "sheet": "Characters/Undead0.png",
+    "col": 4,
+    "row": 4
+  },
+  "499": {
+    "tile_id": 499,
+    "desc": "elf zombie,female",
+    "sheet": "Characters/Undead0.png",
+    "col": 4,
+    "row": 4
+  },
+  "500": {
+    "tile_id": 500,
+    "desc": "human zombie,male",
+    "sheet": "Characters/Undead0.png",
+    "col": 5,
+    "row": 4
+  },
+  "501": {
+    "tile_id": 501,
+    "desc": "human zombie,female",
+    "sheet": "Characters/Undead0.png",
+    "col": 5,
+    "row": 4
+  },
+  "502": {
+    "tile_id": 502,
+    "desc": "ettin zombie,male",
+    "sheet": "Characters/Undead0.png",
+    "col": 6,
+    "row": 4
+  },
+  "503": {
+    "tile_id": 503,
+    "desc": "ettin zombie,female",
+    "sheet": "Characters/Undead0.png",
+    "col": 6,
+    "row": 4
+  },
+  "506": {
+    "tile_id": 506,
+    "desc": "giant zombie,male",
+    "sheet": "Characters/Undead0.png",
+    "col": 7,
+    "row": 4
+  },
+  "507": {
+    "tile_id": 507,
+    "desc": "giant zombie,female",
+    "sheet": "Characters/Undead0.png",
+    "col": 7,
+    "row": 4
+  },
+  "510": {
+    "tile_id": 510,
+    "desc": "straw golem,male",
+    "sheet": "Characters/Humanoid0.png",
+    "col": 0,
+    "row": 12
+  },
+  "511": {
+    "tile_id": 511,
+    "desc": "straw golem,female",
+    "sheet": "Characters/Humanoid0.png",
+    "col": 0,
+    "row": 12
+  },
+  "512": {
+    "tile_id": 512,
+    "desc": "paper golem,male",
+    "sheet": "Characters/Humanoid0.png",
+    "col": 1,
+    "row": 12
+  },
+  "513": {
+    "tile_id": 513,
+    "desc": "paper golem,female",
+    "sheet": "Characters/Humanoid0.png",
+    "col": 1,
+    "row": 12
+  },
+  "514": {
+    "tile_id": 514,
+    "desc": "rope golem,male",
+    "sheet": "Characters/Humanoid0.png",
+    "col": 2,
+    "row": 12
+  },
+  "515": {
+    "tile_id": 515,
+    "desc": "rope golem,female",
+    "sheet": "Characters/Humanoid0.png",
+    "col": 2,
+    "row": 12
+  },
+  "516": {
+    "tile_id": 516,
+    "desc": "gold golem,male",
+    "sheet": "Characters/Humanoid0.png",
+    "col": 3,
+    "row": 12
+  },
+  "517": {
+    "tile_id": 517,
+    "desc": "gold golem,female",
+    "sheet": "Characters/Humanoid0.png",
+    "col": 3,
+    "row": 12
+  },
+  "518": {
+    "tile_id": 518,
+    "desc": "leather golem,male",
+    "sheet": "Characters/Humanoid0.png",
+    "col": 4,
+    "row": 12
+  },
+  "519": {
+    "tile_id": 519,
+    "desc": "leather golem,female",
+    "sheet": "Characters/Humanoid0.png",
+    "col": 4,
+    "row": 12
+  },
+  "520": {
+    "tile_id": 520,
+    "desc": "wood golem,male",
+    "sheet": "Characters/Humanoid0.png",
+    "col": 5,
+    "row": 12
+  },
+  "521": {
+    "tile_id": 521,
+    "desc": "wood golem,female",
+    "sheet": "Characters/Humanoid0.png",
+    "col": 5,
+    "row": 12
+  },
+  "522": {
+    "tile_id": 522,
+    "desc": "flesh golem,male",
+    "sheet": "Characters/Humanoid0.png",
+    "col": 6,
+    "row": 12
+  },
+  "523": {
+    "tile_id": 523,
+    "desc": "flesh golem,female",
+    "sheet": "Characters/Humanoid0.png",
+    "col": 6,
+    "row": 12
+  },
+  "524": {
+    "tile_id": 524,
+    "desc": "clay golem,male",
+    "sheet": "Characters/Humanoid0.png",
+    "col": 7,
+    "row": 12
+  },
+  "525": {
+    "tile_id": 525,
+    "desc": "clay golem,female",
+    "sheet": "Characters/Humanoid0.png",
+    "col": 7,
+    "row": 12
+  },
+  "526": {
+    "tile_id": 526,
+    "desc": "stone golem,male",
+    "sheet": "Characters/Humanoid0.png",
+    "col": 0,
+    "row": 13
+  },
+  "527": {
+    "tile_id": 527,
+    "desc": "stone golem,female",
+    "sheet": "Characters/Humanoid0.png",
+    "col": 0,
+    "row": 13
+  },
+  "528": {
+    "tile_id": 528,
+    "desc": "glass golem,male",
+    "sheet": "Characters/Humanoid0.png",
+    "col": 1,
+    "row": 13
+  },
+  "529": {
+    "tile_id": 529,
+    "desc": "glass golem,female",
+    "sheet": "Characters/Humanoid0.png",
+    "col": 1,
+    "row": 13
+  },
+  "530": {
+    "tile_id": 530,
+    "desc": "iron golem,male",
+    "sheet": "Characters/Humanoid0.png",
+    "col": 2,
+    "row": 13
+  },
+  "531": {
+    "tile_id": 531,
+    "desc": "iron golem,female",
+    "sheet": "Characters/Humanoid0.png",
+    "col": 2,
+    "row": 13
+  },
+  "532": {
+    "tile_id": 532,
+    "desc": "human,male",
+    "sheet": "Characters/Humanoid0.png",
+    "col": 0,
+    "row": 14
+  },
+  "533": {
+    "tile_id": 533,
+    "desc": "human,female",
+    "sheet": "Characters/Humanoid0.png",
+    "col": 0,
+    "row": 14
+  },
+  "534": {
+    "tile_id": 534,
+    "desc": "wererat,male",
+    "sheet": "Characters/Rodent0.png",
+    "col": 3,
+    "row": 0
+  },
+  "535": {
+    "tile_id": 535,
+    "desc": "wererat,female",
+    "sheet": "Characters/Rodent0.png",
+    "col": 3,
+    "row": 0
+  },
+  "536": {
+    "tile_id": 536,
+    "desc": "werejackal,male",
+    "sheet": "Characters/Dog0.png",
+    "col": 3,
+    "row": 0
+  },
+  "537": {
+    "tile_id": 537,
+    "desc": "werejackal,female",
+    "sheet": "Characters/Dog0.png",
+    "col": 3,
+    "row": 0
+  },
+  "538": {
+    "tile_id": 538,
+    "desc": "werewolf,male",
+    "sheet": "Characters/Dog0.png",
+    "col": 3,
+    "row": 1
+  },
+  "539": {
+    "tile_id": 539,
+    "desc": "werewolf,female",
+    "sheet": "Characters/Dog0.png",
+    "col": 3,
+    "row": 1
+  },
+  "554": {
+    "tile_id": 554,
+    "desc": "shopkeeper,male",
+    "sheet": "Characters/Humanoid0.png",
+    "col": 1,
+    "row": 14
+  },
+  "555": {
+    "tile_id": 555,
+    "desc": "shopkeeper,female",
+    "sheet": "Characters/Humanoid0.png",
+    "col": 1,
+    "row": 14
+  },
+  "556": {
+    "tile_id": 556,
+    "desc": "guard,male",
+    "sheet": "Characters/Humanoid0.png",
+    "col": 2,
+    "row": 14
+  },
+  "557": {
+    "tile_id": 557,
+    "desc": "guard,female",
+    "sheet": "Characters/Humanoid0.png",
+    "col": 2,
+    "row": 14
+  },
+  "570": {
+    "tile_id": 570,
+    "desc": "nurse,male",
+    "sheet": "Characters/Humanoid0.png",
+    "col": 4,
+    "row": 14
+  },
+  "571": {
+    "tile_id": 571,
+    "desc": "nurse,female",
+    "sheet": "Characters/Humanoid0.png",
+    "col": 4,
+    "row": 14
+  },
+  "588": {
+    "tile_id": 588,
+    "desc": "ghost,male",
+    "sheet": "Characters/Undead0.png",
+    "col": 0,
+    "row": 5
+  },
+  "589": {
+    "tile_id": 589,
+    "desc": "ghost,female",
+    "sheet": "Characters/Undead0.png",
+    "col": 0,
+    "row": 5
+  },
+  "590": {
+    "tile_id": 590,
+    "desc": "shade,male",
+    "sheet": "Characters/Undead0.png",
+    "col": 1,
+    "row": 5
+  },
+  "591": {
+    "tile_id": 591,
+    "desc": "shade,female",
+    "sheet": "Characters/Undead0.png",
+    "col": 1,
+    "row": 5
+  },
+  "592": {
+    "tile_id": 592,
+    "desc": "water demon,male",
+    "sheet": "Characters/Demon0.png",
+    "col": 0,
+    "row": 2
+  },
+  "593": {
+    "tile_id": 593,
+    "desc": "water demon,female",
+    "sheet": "Characters/Demon0.png",
+    "col": 0,
+    "row": 2
+  },
+  "596": {
+    "tile_id": 596,
+    "desc": "horned devil,male",
+    "sheet": "Characters/Demon0.png",
+    "col": 3,
+    "row": 2
+  },
+  "597": {
+    "tile_id": 597,
+    "desc": "horned devil,female",
+    "sheet": "Characters/Demon0.png",
+    "col": 3,
+    "row": 2
+  },
+  "600": {
+    "tile_id": 600,
+    "desc": "barbed devil,male",
+    "sheet": "Characters/Demon0.png",
+    "col": 4,
+    "row": 2
+  },
+  "601": {
+    "tile_id": 601,
+    "desc": "barbed devil,female",
+    "sheet": "Characters/Demon0.png",
+    "col": 4,
+    "row": 2
+  },
+  "608": {
+    "tile_id": 608,
+    "desc": "bone devil,male",
+    "sheet": "Characters/Demon0.png",
+    "col": 5,
+    "row": 2
+  },
+  "609": {
+    "tile_id": 609,
+    "desc": "bone devil,female",
+    "sheet": "Characters/Demon0.png",
+    "col": 5,
+    "row": 2
+  },
+  "610": {
+    "tile_id": 610,
+    "desc": "ice devil,male",
+    "sheet": "Characters/Demon0.png",
+    "col": 6,
+    "row": 2
+  },
+  "611": {
+    "tile_id": 611,
+    "desc": "ice devil,female",
+    "sheet": "Characters/Demon0.png",
+    "col": 6,
+    "row": 2
+  },
+  "614": {
+    "tile_id": 614,
+    "desc": "pit fiend,male",
+    "sheet": "Characters/Demon0.png",
+    "col": 7,
+    "row": 2
+  },
+  "615": {
+    "tile_id": 615,
+    "desc": "pit fiend,female",
+    "sheet": "Characters/Demon0.png",
+    "col": 7,
+    "row": 2
+  },
+  "618": {
+    "tile_id": 618,
+    "desc": "balrog,male",
+    "sheet": "Characters/Demon0.png",
+    "col": 0,
+    "row": 3
+  },
+  "619": {
+    "tile_id": 619,
+    "desc": "balrog,female",
+    "sheet": "Characters/Demon0.png",
+    "col": 0,
+    "row": 3
+  },
+  "620": {
+    "tile_id": 620,
+    "desc": "Juiblex,male",
+    "sheet": "Characters/Slime0.png",
+    "col": 0,
+    "row": 3
+  },
+  "621": {
+    "tile_id": 621,
+    "desc": "Juiblex,female",
+    "sheet": "Characters/Slime0.png",
+    "col": 0,
+    "row": 3
+  },
+  "622": {
+    "tile_id": 622,
+    "desc": "Yeenoghu,male",
+    "sheet": "Characters/Demon0.png",
+    "col": 1,
+    "row": 3
+  },
+  "623": {
+    "tile_id": 623,
+    "desc": "Yeenoghu,female",
+    "sheet": "Characters/Demon0.png",
+    "col": 1,
+    "row": 3
+  },
+  "624": {
+    "tile_id": 624,
+    "desc": "Orcus,male",
+    "sheet": "Characters/Demon0.png",
+    "col": 2,
+    "row": 3
+  },
+  "625": {
+    "tile_id": 625,
+    "desc": "Orcus,female",
+    "sheet": "Characters/Demon0.png",
+    "col": 2,
+    "row": 3
+  },
+  "626": {
+    "tile_id": 626,
+    "desc": "Geryon,male",
+    "sheet": "Characters/Demon0.png",
+    "col": 3,
+    "row": 3
+  },
+  "627": {
+    "tile_id": 627,
+    "desc": "Geryon,female",
+    "sheet": "Characters/Demon0.png",
+    "col": 3,
+    "row": 3
+  },
+  "628": {
+    "tile_id": 628,
+    "desc": "Dispater,male",
+    "sheet": "Characters/Demon0.png",
+    "col": 4,
+    "row": 3
+  },
+  "629": {
+    "tile_id": 629,
+    "desc": "Dispater,female",
+    "sheet": "Characters/Demon0.png",
+    "col": 4,
+    "row": 3
+  },
+  "630": {
+    "tile_id": 630,
+    "desc": "Baalzebub,male",
+    "sheet": "Characters/Demon0.png",
+    "col": 5,
+    "row": 3
+  },
+  "631": {
+    "tile_id": 631,
+    "desc": "Baalzebub,female",
+    "sheet": "Characters/Demon0.png",
+    "col": 5,
+    "row": 3
+  },
+  "632": {
+    "tile_id": 632,
+    "desc": "Asmodeus,male",
+    "sheet": "Characters/Demon0.png",
+    "col": 6,
+    "row": 3
+  },
+  "633": {
+    "tile_id": 633,
+    "desc": "Asmodeus,female",
+    "sheet": "Characters/Demon0.png",
+    "col": 6,
+    "row": 3
+  },
+  "634": {
+    "tile_id": 634,
+    "desc": "Demogorgon,male",
+    "sheet": "Characters/Demon0.png",
+    "col": 7,
+    "row": 3
+  },
+  "635": {
+    "tile_id": 635,
+    "desc": "Demogorgon,female",
+    "sheet": "Characters/Demon0.png",
+    "col": 7,
+    "row": 3
+  },
+  "646": {
+    "tile_id": 646,
+    "desc": "jellyfish,male",
+    "sheet": "Characters/Aquatic0.png",
+    "col": 0,
+    "row": 0
+  },
+  "647": {
+    "tile_id": 647,
+    "desc": "jellyfish,female",
+    "sheet": "Characters/Aquatic0.png",
+    "col": 0,
+    "row": 0
+  },
+  "648": {
+    "tile_id": 648,
+    "desc": "piranha,male",
+    "sheet": "Characters/Aquatic0.png",
+    "col": 1,
+    "row": 0
+  },
+  "649": {
+    "tile_id": 649,
+    "desc": "piranha,female",
+    "sheet": "Characters/Aquatic0.png",
+    "col": 1,
+    "row": 0
+  },
+  "650": {
+    "tile_id": 650,
+    "desc": "shark,male",
+    "sheet": "Characters/Aquatic0.png",
+    "col": 2,
+    "row": 0
+  },
+  "651": {
+    "tile_id": 651,
+    "desc": "shark,female",
+    "sheet": "Characters/Aquatic0.png",
+    "col": 2,
+    "row": 0
+  },
+  "652": {
+    "tile_id": 652,
+    "desc": "giant eel,male",
+    "sheet": "Characters/Aquatic0.png",
+    "col": 3,
+    "row": 0
+  },
+  "653": {
+    "tile_id": 653,
+    "desc": "giant eel,female",
+    "sheet": "Characters/Aquatic0.png",
+    "col": 3,
+    "row": 0
+  },
+  "654": {
+    "tile_id": 654,
+    "desc": "electric eel,male",
+    "sheet": "Characters/Aquatic0.png",
+    "col": 4,
+    "row": 0
+  },
+  "655": {
+    "tile_id": 655,
+    "desc": "electric eel,female",
+    "sheet": "Characters/Aquatic0.png",
+    "col": 4,
+    "row": 0
+  },
+  "656": {
+    "tile_id": 656,
+    "desc": "kraken,male",
+    "sheet": "Characters/Aquatic0.png",
+    "col": 5,
+    "row": 0
+  },
+  "657": {
+    "tile_id": 657,
+    "desc": "kraken,female",
+    "sheet": "Characters/Aquatic0.png",
+    "col": 5,
+    "row": 0
+  },
+  "658": {
+    "tile_id": 658,
+    "desc": "newt,male",
+    "sheet": "Characters/Reptile0.png",
+    "col": 0,
+    "row": 6
+  },
+  "659": {
+    "tile_id": 659,
+    "desc": "newt,female",
+    "sheet": "Characters/Reptile0.png",
+    "col": 0,
+    "row": 6
+  },
+  "660": {
+    "tile_id": 660,
+    "desc": "gecko,male",
+    "sheet": "Characters/Reptile0.png",
+    "col": 1,
+    "row": 6
+  },
+  "661": {
+    "tile_id": 661,
+    "desc": "gecko,female",
+    "sheet": "Characters/Reptile0.png",
+    "col": 1,
+    "row": 6
+  },
+  "662": {
+    "tile_id": 662,
+    "desc": "iguana,male",
+    "sheet": "Characters/Reptile0.png",
+    "col": 2,
+    "row": 6
+  },
+  "663": {
+    "tile_id": 663,
+    "desc": "iguana,female",
+    "sheet": "Characters/Reptile0.png",
+    "col": 2,
+    "row": 6
+  },
+  "664": {
+    "tile_id": 664,
+    "desc": "baby crocodile,male",
+    "sheet": "Characters/Reptile0.png",
+    "col": 3,
+    "row": 6
+  },
+  "665": {
+    "tile_id": 665,
+    "desc": "baby crocodile,female",
+    "sheet": "Characters/Reptile0.png",
+    "col": 3,
+    "row": 6
+  },
+  "668": {
+    "tile_id": 668,
+    "desc": "chameleon,male",
+    "sheet": "Characters/Reptile0.png",
+    "col": 5,
+    "row": 6
+  },
+  "669": {
+    "tile_id": 669,
+    "desc": "chameleon,female",
+    "sheet": "Characters/Reptile0.png",
+    "col": 5,
+    "row": 6
+  },
+  "670": {
+    "tile_id": 670,
+    "desc": "crocodile,male",
+    "sheet": "Characters/Reptile0.png",
+    "col": 4,
+    "row": 6
+  },
+  "671": {
+    "tile_id": 671,
+    "desc": "crocodile,female",
+    "sheet": "Characters/Reptile0.png",
+    "col": 4,
+    "row": 6
+  },
+  "672": {
+    "tile_id": 672,
+    "desc": "salamander,male",
+    "sheet": "Characters/Reptile0.png",
+    "col": 6,
+    "row": 6
+  },
+  "673": {
+    "tile_id": 673,
+    "desc": "salamander,female",
+    "sheet": "Characters/Reptile0.png",
+    "col": 6,
+    "row": 6
+  },
+  "674": {
+    "tile_id": 674,
+    "desc": "long worm tail,male",
+    "sheet": "Characters/Reptile0.png",
+    "col": 2,
+    "row": 0
+  },
+  "675": {
+    "tile_id": 675,
+    "desc": "long worm tail,female",
+    "sheet": "Characters/Reptile0.png",
+    "col": 2,
+    "row": 0
+  },
+  "676": {
+    "tile_id": 676,
+    "desc": "archeologist,male",
+    "sheet": "Characters/Player0.png",
+    "col": 0,
+    "row": 0
+  },
+  "677": {
+    "tile_id": 677,
+    "desc": "archeologist,female",
+    "sheet": "Characters/Player0.png",
+    "col": 0,
+    "row": 0
+  },
+  "678": {
+    "tile_id": 678,
+    "desc": "barbarian,male",
+    "sheet": "Characters/Player0.png",
+    "col": 1,
+    "row": 0
+  },
+  "679": {
+    "tile_id": 679,
+    "desc": "barbarian,female",
+    "sheet": "Characters/Player0.png",
+    "col": 1,
+    "row": 0
+  },
+  "682": {
+    "tile_id": 682,
+    "desc": "healer,male",
+    "sheet": "Characters/Player0.png",
+    "col": 3,
+    "row": 0
+  },
+  "683": {
+    "tile_id": 683,
+    "desc": "healer,female",
+    "sheet": "Characters/Player0.png",
+    "col": 3,
+    "row": 0
+  },
+  "684": {
+    "tile_id": 684,
+    "desc": "knight,male",
+    "sheet": "Characters/Player0.png",
+    "col": 4,
+    "row": 0
+  },
+  "685": {
+    "tile_id": 685,
+    "desc": "knight,female",
+    "sheet": "Characters/Player0.png",
+    "col": 4,
+    "row": 0
+  },
+  "686": {
+    "tile_id": 686,
+    "desc": "monk,male",
+    "sheet": "Characters/Player0.png",
+    "col": 5,
+    "row": 0
+  },
+  "687": {
+    "tile_id": 687,
+    "desc": "monk,female",
+    "sheet": "Characters/Player0.png",
+    "col": 5,
+    "row": 0
+  },
+  "690": {
+    "tile_id": 690,
+    "desc": "ranger,male",
+    "sheet": "Characters/Player0.png",
+    "col": 7,
+    "row": 0
+  },
+  "691": {
+    "tile_id": 691,
+    "desc": "ranger,female",
+    "sheet": "Characters/Player0.png",
+    "col": 7,
+    "row": 0
+  },
+  "692": {
+    "tile_id": 692,
+    "desc": "rogue,male",
+    "sheet": "Characters/Player0.png",
+    "col": 0,
+    "row": 1
+  },
+  "693": {
+    "tile_id": 693,
+    "desc": "rogue,female",
+    "sheet": "Characters/Player0.png",
+    "col": 0,
+    "row": 1
+  },
+  "694": {
+    "tile_id": 694,
+    "desc": "samurai,male",
+    "sheet": "Characters/Player0.png",
+    "col": 1,
+    "row": 1
+  },
+  "695": {
+    "tile_id": 695,
+    "desc": "samurai,female",
+    "sheet": "Characters/Player0.png",
+    "col": 1,
+    "row": 1
+  },
+  "696": {
+    "tile_id": 696,
+    "desc": "tourist,male",
+    "sheet": "Characters/Player0.png",
+    "col": 2,
+    "row": 1
+  },
+  "697": {
+    "tile_id": 697,
+    "desc": "tourist,female",
+    "sheet": "Characters/Player0.png",
+    "col": 2,
+    "row": 1
+  },
+  "698": {
+    "tile_id": 698,
+    "desc": "valkyrie,male",
+    "sheet": "Characters/Player0.png",
+    "col": 3,
+    "row": 1
+  },
+  "699": {
+    "tile_id": 699,
+    "desc": "valkyrie,female",
+    "sheet": "Characters/Player0.png",
+    "col": 3,
+    "row": 1
+  },
+  "700": {
+    "tile_id": 700,
+    "desc": "wizard,male",
+    "sheet": "Characters/Player0.png",
+    "col": 4,
+    "row": 1
+  },
+  "701": {
+    "tile_id": 701,
+    "desc": "wizard,female",
+    "sheet": "Characters/Player0.png",
+    "col": 4,
+    "row": 1
+  },
+  "791": {
+    "tile_id": 791,
+    "desc": "weapon / generic weapon",
+    "sheet": "Items/LongWep.png",
+    "col": 0,
+    "row": 0
+  },
+  "792": {
+    "tile_id": 792,
+    "desc": "armor / generic armor",
+    "sheet": "Items/Armor.png",
+    "col": 0,
+    "row": 0
+  },
+  "793": {
+    "tile_id": 793,
+    "desc": "ring / generic ring",
+    "sheet": "Items/Ring.png",
+    "col": 0,
+    "row": 0
+  },
+  "794": {
+    "tile_id": 794,
+    "desc": "amulet / generic amulet",
+    "sheet": "Items/Amulet.png",
+    "col": 0,
+    "row": 0
+  },
+  "795": {
+    "tile_id": 795,
+    "desc": "tool / generic tool",
+    "sheet": "Items/Tool.png",
+    "col": 0,
+    "row": 0
+  },
+  "796": {
+    "tile_id": 796,
+    "desc": "food / generic food",
+    "sheet": "Items/Food.png",
+    "col": 0,
+    "row": 0
+  },
+  "797": {
+    "tile_id": 797,
+    "desc": "potion / generic potion",
+    "sheet": "Items/Potion.png",
+    "col": 0,
+    "row": 0
+  },
+  "798": {
+    "tile_id": 798,
+    "desc": "scroll / generic scroll",
+    "sheet": "Items/Scroll.png",
+    "col": 0,
+    "row": 0
+  },
+  "799": {
+    "tile_id": 799,
+    "desc": "spellbook / generic spellbook",
+    "sheet": "Items/Book.png",
+    "col": 0,
+    "row": 0
+  },
+  "800": {
+    "tile_id": 800,
+    "desc": "wand / generic wand",
+    "sheet": "Items/Wand.png",
+    "col": 0,
+    "row": 0
+  },
+  "801": {
+    "tile_id": 801,
+    "desc": "coin / generic coin",
+    "sheet": "Items/Money.png",
+    "col": 0,
+    "row": 0
+  },
+  "802": {
+    "tile_id": 802,
+    "desc": "gem / generic gem",
+    "sheet": "Items/Rock.png",
+    "col": 0,
+    "row": 0
+  },
+  "803": {
+    "tile_id": 803,
+    "desc": "large rock / generic large rock",
+    "sheet": "Items/Rock.png",
+    "col": 1,
+    "row": 0
+  },
+  "804": {
+    "tile_id": 804,
+    "desc": "iron ball / generic iron ball",
+    "sheet": "Items/Rock.png",
+    "col": 2,
+    "row": 0
+  },
+  "807": {
+    "tile_id": 807,
+    "desc": "arrow",
+    "sheet": "Items/Ammo.png",
+    "col": 0,
+    "row": 0
+  },
+  "808": {
+    "tile_id": 808,
+    "desc": "runed arrow / elven arrow",
+    "sheet": "Items/Ammo.png",
+    "col": 1,
+    "row": 0
+  },
+  "809": {
+    "tile_id": 809,
+    "desc": "crude arrow / orcish arrow",
+    "sheet": "Items/Ammo.png",
+    "col": 2,
+    "row": 0
+  },
+  "810": {
+    "tile_id": 810,
+    "desc": "silver arrow",
+    "sheet": "Items/Ammo.png",
+    "col": 3,
+    "row": 0
+  },
+  "812": {
+    "tile_id": 812,
+    "desc": "crossbow bolt",
+    "sheet": "Items/Ammo.png",
+    "col": 5,
+    "row": 0
+  },
+  "813": {
+    "tile_id": 813,
+    "desc": "dart",
+    "sheet": "Items/Ammo.png",
+    "col": 0,
+    "row": 1
+  },
+  "815": {
+    "tile_id": 815,
+    "desc": "boomerang",
+    "sheet": "Items/Ammo.png",
+    "col": 2,
+    "row": 1
+  },
+  "816": {
+    "tile_id": 816,
+    "desc": "spear",
+    "sheet": "Items/LongWep.png",
+    "col": 0,
+    "row": 0
+  },
+  "820": {
+    "tile_id": 820,
+    "desc": "silver spear",
+    "sheet": "Items/LongWep.png",
+    "col": 4,
+    "row": 0
+  },
+  "822": {
+    "tile_id": 822,
+    "desc": "trident",
+    "sheet": "Items/LongWep.png",
+    "col": 6,
+    "row": 0
+  },
+  "823": {
+    "tile_id": 823,
+    "desc": "dagger",
+    "sheet": "Items/ShortWep.png",
+    "col": 0,
+    "row": 0
+  },
+  "826": {
+    "tile_id": 826,
+    "desc": "silver dagger",
+    "sheet": "Items/ShortWep.png",
+    "col": 3,
+    "row": 0
+  },
+  "827": {
+    "tile_id": 827,
+    "desc": "athame",
+    "sheet": "Items/ShortWep.png",
+    "col": 4,
+    "row": 0
+  },
+  "828": {
+    "tile_id": 828,
+    "desc": "scalpel",
+    "sheet": "Items/ShortWep.png",
+    "col": 5,
+    "row": 0
+  },
+  "829": {
+    "tile_id": 829,
+    "desc": "knife",
+    "sheet": "Items/ShortWep.png",
+    "col": 6,
+    "row": 0
+  },
+  "833": {
+    "tile_id": 833,
+    "desc": "axe",
+    "sheet": "Items/MedWep.png",
+    "col": 0,
+    "row": 0
+  },
+  "835": {
+    "tile_id": 835,
+    "desc": "short sword",
+    "sheet": "Items/ShortWep.png",
+    "col": 0,
+    "row": 1
+  },
+  "836": {
+    "tile_id": 836,
+    "desc": "runed short sword / elven short sword",
+    "sheet": "Items/LongWep.png",
+    "col": 0,
+    "row": 1
+  },
+  "837": {
+    "tile_id": 837,
+    "desc": "crude short sword / orcish short sword",
+    "sheet": "Items/LongWep.png",
+    "col": 0,
+    "row": 1
+  },
+  "838": {
+    "tile_id": 838,
+    "desc": "broad short sword / dwarvish short sword",
+    "sheet": "Items/LongWep.png",
+    "col": 0,
+    "row": 1
+  },
+  "839": {
+    "tile_id": 839,
+    "desc": "curved sword / scimitar",
+    "sheet": "Items/LongWep.png",
+    "col": 0,
+    "row": 1
+  },
+  "840": {
+    "tile_id": 840,
+    "desc": "silver saber",
+    "sheet": "Items/LongWep.png",
+    "col": 7,
+    "row": 1
+  },
+  "841": {
+    "tile_id": 841,
+    "desc": "broadsword",
+    "sheet": "Items/LongWep.png",
+    "col": 0,
+    "row": 1
+  },
+  "842": {
+    "tile_id": 842,
+    "desc": "runed broadsword / elven broadsword",
+    "sheet": "Items/LongWep.png",
+    "col": 0,
+    "row": 1
+  },
+  "843": {
+    "tile_id": 843,
+    "desc": "long sword",
+    "sheet": "Items/LongWep.png",
+    "col": 2,
+    "row": 1
+  },
+  "844": {
+    "tile_id": 844,
+    "desc": "two-handed sword",
+    "sheet": "Items/LongWep.png",
+    "col": 3,
+    "row": 1
+  },
+  "845": {
+    "tile_id": 845,
+    "desc": "samurai sword / katana",
+    "sheet": "Items/LongWep.png",
+    "col": 0,
+    "row": 1
+  },
+  "846": {
+    "tile_id": 846,
+    "desc": "long samurai sword / tsurugi",
+    "sheet": "Items/LongWep.png",
+    "col": 0,
+    "row": 1
+  },
+  "847": {
+    "tile_id": 847,
+    "desc": "runed broadsword / runesword",
+    "sheet": "Items/LongWep.png",
+    "col": 0,
+    "row": 1
+  },
+  "862": {
+    "tile_id": 862,
+    "desc": "mace",
+    "sheet": "Items/MedWep.png",
+    "col": 1,
+    "row": 1
+  },
+  "864": {
+    "tile_id": 864,
+    "desc": "morning star",
+    "sheet": "Items/MedWep.png",
+    "col": 2,
+    "row": 1
+  },
+  "865": {
+    "tile_id": 865,
+    "desc": "war hammer",
+    "sheet": "Items/MedWep.png",
+    "col": 4,
+    "row": 1
+  },
+  "866": {
+    "tile_id": 866,
+    "desc": "club",
+    "sheet": "Items/MedWep.png",
+    "col": 0,
+    "row": 1
+  },
+  "870": {
+    "tile_id": 870,
+    "desc": "flail",
+    "sheet": "Items/MedWep.png",
+    "col": 3,
+    "row": 1
+  },
+  "872": {
+    "tile_id": 872,
+    "desc": "bow",
+    "sheet": "Items/Ammo.png",
+    "col": 0,
+    "row": 2
+  },
+  "876": {
+    "tile_id": 876,
+    "desc": "sling",
+    "sheet": "Items/Ammo.png",
+    "col": 4,
+    "row": 2
+  },
+  "877": {
+    "tile_id": 877,
+    "desc": "crossbow",
+    "sheet": "Items/Ammo.png",
+    "col": 5,
+    "row": 2
+  },
+  "878": {
+    "tile_id": 878,
+    "desc": "leather hat / elven leather helm",
+    "sheet": "Items/Hat.png",
+    "col": 0,
+    "row": 0
+  },
+  "879": {
+    "tile_id": 879,
+    "desc": "iron skull cap / orcish helm",
+    "sheet": "Items/Hat.png",
+    "col": 0,
+    "row": 0
+  },
+  "880": {
+    "tile_id": 880,
+    "desc": "hard hat / dwarvish iron helm",
+    "sheet": "Items/Hat.png",
+    "col": 0,
+    "row": 0
+  },
+  "881": {
+    "tile_id": 881,
+    "desc": "fedora",
+    "sheet": "Items/Hat.png",
+    "col": 0,
+    "row": 0
+  },
+  "882": {
+    "tile_id": 882,
+    "desc": "conical hat / cornuthaum",
+    "sheet": "Items/Hat.png",
+    "col": 0,
+    "row": 0
+  },
+  "883": {
+    "tile_id": 883,
+    "desc": "conical hat / dunce cap",
+    "sheet": "Items/Hat.png",
+    "col": 0,
+    "row": 0
+  },
+  "885": {
+    "tile_id": 885,
+    "desc": "crystal helmet / helm of brilliance",
+    "sheet": "Items/Hat.png",
+    "col": 0,
+    "row": 0
+  },
+  "886": {
+    "tile_id": 886,
+    "desc": "plumed helmet / helmet",
+    "sheet": "Items/Hat.png",
+    "col": 0,
+    "row": 0
+  },
+  "887": {
+    "tile_id": 887,
+    "desc": "etched helmet / helm of caution",
+    "sheet": "Items/Hat.png",
+    "col": 0,
+    "row": 0
+  },
+  "888": {
+    "tile_id": 888,
+    "desc": "crested helmet / helm of opposite alignment",
+    "sheet": "Items/Hat.png",
+    "col": 0,
+    "row": 0
+  },
+  "889": {
+    "tile_id": 889,
+    "desc": "visored helmet / helm of telepathy",
+    "sheet": "Items/Hat.png",
+    "col": 0,
+    "row": 0
+  },
+  "890": {
+    "tile_id": 890,
+    "desc": "gray dragon scale mail",
+    "sheet": "Items/Armor.png",
+    "col": 0,
+    "row": 0
+  },
+  "891": {
+    "tile_id": 891,
+    "desc": "gold dragon scale mail",
+    "sheet": "Items/Armor.png",
+    "col": 0,
+    "row": 0
+  },
+  "892": {
+    "tile_id": 892,
+    "desc": "silver dragon scale mail",
+    "sheet": "Items/Armor.png",
+    "col": 0,
+    "row": 0
+  },
+  "893": {
+    "tile_id": 893,
+    "desc": "shimmering dragon scale mail",
+    "sheet": "Items/Ring.png",
+    "col": 0,
+    "row": 1
+  },
+  "894": {
+    "tile_id": 894,
+    "desc": "red dragon scale mail",
+    "sheet": "Items/Armor.png",
+    "col": 0,
+    "row": 0
+  },
+  "895": {
+    "tile_id": 895,
+    "desc": "white dragon scale mail",
+    "sheet": "Items/Armor.png",
+    "col": 0,
+    "row": 0
+  },
+  "896": {
+    "tile_id": 896,
+    "desc": "orange dragon scale mail",
+    "sheet": "Items/Armor.png",
+    "col": 0,
+    "row": 0
+  },
+  "897": {
+    "tile_id": 897,
+    "desc": "black dragon scale mail",
+    "sheet": "Items/Armor.png",
+    "col": 0,
+    "row": 0
+  },
+  "898": {
+    "tile_id": 898,
+    "desc": "blue dragon scale mail",
+    "sheet": "Items/Armor.png",
+    "col": 0,
+    "row": 0
+  },
+  "899": {
+    "tile_id": 899,
+    "desc": "green dragon scale mail",
+    "sheet": "Items/Armor.png",
+    "col": 0,
+    "row": 0
+  },
+  "900": {
+    "tile_id": 900,
+    "desc": "yellow dragon scale mail",
+    "sheet": "Items/Armor.png",
+    "col": 0,
+    "row": 0
+  },
+  "904": {
+    "tile_id": 904,
+    "desc": "shimmering dragon scales",
+    "sheet": "Items/Ring.png",
+    "col": 3,
+    "row": 2
+  },
+  "912": {
+    "tile_id": 912,
+    "desc": "plate mail",
+    "sheet": "Items/Armor.png",
+    "col": 6,
+    "row": 0
+  },
+  "913": {
+    "tile_id": 913,
+    "desc": "crystal plate mail",
+    "sheet": "Items/Armor.png",
+    "col": 7,
+    "row": 0
+  },
+  "914": {
+    "tile_id": 914,
+    "desc": "bronze plate mail",
+    "sheet": "Items/Armor.png",
+    "col": 2,
+    "row": 1
+  },
+  "915": {
+    "tile_id": 915,
+    "desc": "splint mail",
+    "sheet": "Items/Armor.png",
+    "col": 3,
+    "row": 1
+  },
+  "916": {
+    "tile_id": 916,
+    "desc": "banded mail",
+    "sheet": "Items/Armor.png",
+    "col": 4,
+    "row": 1
+  },
+  "917": {
+    "tile_id": 917,
+    "desc": "dwarvish mithril-coat",
+    "sheet": "Items/Armor.png",
+    "col": 1,
+    "row": 1
+  },
+  "918": {
+    "tile_id": 918,
+    "desc": "elven mithril-coat",
+    "sheet": "Items/Armor.png",
+    "col": 0,
+    "row": 1
+  },
+  "919": {
+    "tile_id": 919,
+    "desc": "chain mail",
+    "sheet": "Items/Armor.png",
+    "col": 5,
+    "row": 0
+  },
+  "920": {
+    "tile_id": 920,
+    "desc": "crude chain mail / orcish chain mail",
+    "sheet": "Items/Armor.png",
+    "col": 0,
+    "row": 0
+  },
+  "921": {
+    "tile_id": 921,
+    "desc": "scale mail",
+    "sheet": "Items/Armor.png",
+    "col": 4,
+    "row": 0
+  },
+  "922": {
+    "tile_id": 922,
+    "desc": "studded leather armor",
+    "sheet": "Items/Armor.png",
+    "col": 0,
+    "row": 0
+  },
+  "923": {
+    "tile_id": 923,
+    "desc": "ring mail",
+    "sheet": "Items/Armor.png",
+    "col": 3,
+    "row": 0
+  },
+  "924": {
+    "tile_id": 924,
+    "desc": "crude ring mail / orcish ring mail",
+    "sheet": "Items/Ring.png",
+    "col": 7,
+    "row": 4
+  },
+  "925": {
+    "tile_id": 925,
+    "desc": "leather armor",
+    "sheet": "Items/Armor.png",
+    "col": 1,
+    "row": 0
+  },
+  "926": {
+    "tile_id": 926,
+    "desc": "leather jacket",
+    "sheet": "Items/Armor.png",
+    "col": 0,
+    "row": 0
+  },
+  "930": {
+    "tile_id": 930,
+    "desc": "faded pall / elven cloak",
+    "sheet": "Items/Armor.png",
+    "col": 0,
+    "row": 0
+  },
+  "931": {
+    "tile_id": 931,
+    "desc": "coarse mantelet / orcish cloak",
+    "sheet": "Items/Armor.png",
+    "col": 0,
+    "row": 0
+  },
+  "932": {
+    "tile_id": 932,
+    "desc": "hooded cloak / dwarvish cloak",
+    "sheet": "Items/Armor.png",
+    "col": 0,
+    "row": 0
+  },
+  "933": {
+    "tile_id": 933,
+    "desc": "slippery cloak / oilskin cloak",
+    "sheet": "Items/Armor.png",
+    "col": 0,
+    "row": 0
+  },
+  "936": {
+    "tile_id": 936,
+    "desc": "leather cloak",
+    "sheet": "Items/Armor.png",
+    "col": 0,
+    "row": 0
+  },
+  "937": {
+    "tile_id": 937,
+    "desc": "tattered cape / cloak of protection",
+    "sheet": "Items/Armor.png",
+    "col": 0,
+    "row": 0
+  },
+  "938": {
+    "tile_id": 938,
+    "desc": "opera cloak / cloak of invisibility",
+    "sheet": "Items/Armor.png",
+    "col": 0,
+    "row": 0
+  },
+  "939": {
+    "tile_id": 939,
+    "desc": "ornamental cope / cloak of magic resistance",
+    "sheet": "Items/Armor.png",
+    "col": 0,
+    "row": 0
+  },
+  "940": {
+    "tile_id": 940,
+    "desc": "piece of cloth / cloak of displacement",
+    "sheet": "Items/Armor.png",
+    "col": 0,
+    "row": 0
+  },
+  "941": {
+    "tile_id": 941,
+    "desc": "wooden shield / small shield",
+    "sheet": "Items/Shield.png",
+    "col": 0,
+    "row": 0
+  },
+  "942": {
+    "tile_id": 942,
+    "desc": "wooden shield / shield of drain resistance",
+    "sheet": "Items/Shield.png",
+    "col": 0,
+    "row": 0
+  },
+  "943": {
+    "tile_id": 943,
+    "desc": "wooden shield / shield of shock resistance",
+    "sheet": "Items/Shield.png",
+    "col": 0,
+    "row": 0
+  },
+  "944": {
+    "tile_id": 944,
+    "desc": "blue and green shield / elven shield",
+    "sheet": "Items/Shield.png",
+    "col": 0,
+    "row": 0
+  },
+  "945": {
+    "tile_id": 945,
+    "desc": "white-handed shield / Uruk-hai shield",
+    "sheet": "Items/Shield.png",
+    "col": 0,
+    "row": 0
+  },
+  "946": {
+    "tile_id": 946,
+    "desc": "red-eyed shield / orcish shield",
+    "sheet": "Items/Shield.png",
+    "col": 0,
+    "row": 0
+  },
+  "947": {
+    "tile_id": 947,
+    "desc": "large shield",
+    "sheet": "Items/Shield.png",
+    "col": 1,
+    "row": 0
+  },
+  "948": {
+    "tile_id": 948,
+    "desc": "large round shield / dwarvish roundshield",
+    "sheet": "Items/Shield.png",
+    "col": 0,
+    "row": 0
+  },
+  "949": {
+    "tile_id": 949,
+    "desc": "polished silver shield / shield of reflection",
+    "sheet": "Items/Shield.png",
+    "col": 0,
+    "row": 0
+  },
+  "950": {
+    "tile_id": 950,
+    "desc": "old gloves / leather gloves",
+    "sheet": "Items/Glove.png",
+    "col": 0,
+    "row": 0
+  },
+  "951": {
+    "tile_id": 951,
+    "desc": "padded gloves / gauntlets of fumbling",
+    "sheet": "Items/Glove.png",
+    "col": 0,
+    "row": 0
+  },
+  "952": {
+    "tile_id": 952,
+    "desc": "riding gloves / gauntlets of power",
+    "sheet": "Items/Glove.png",
+    "col": 0,
+    "row": 0
+  },
+  "953": {
+    "tile_id": 953,
+    "desc": "fencing gloves / gauntlets of dexterity",
+    "sheet": "Items/Glove.png",
+    "col": 0,
+    "row": 0
+  },
+  "954": {
+    "tile_id": 954,
+    "desc": "walking shoes / low boots",
+    "sheet": "Items/Boot.png",
+    "col": 0,
+    "row": 0
+  },
+  "955": {
+    "tile_id": 955,
+    "desc": "hard shoes / iron shoes",
+    "sheet": "Items/Boot.png",
+    "col": 0,
+    "row": 0
+  },
+  "956": {
+    "tile_id": 956,
+    "desc": "jackboots / high boots",
+    "sheet": "Items/Boot.png",
+    "col": 0,
+    "row": 0
+  },
+  "957": {
+    "tile_id": 957,
+    "desc": "combat boots / speed boots",
+    "sheet": "Items/Boot.png",
+    "col": 0,
+    "row": 0
+  },
+  "958": {
+    "tile_id": 958,
+    "desc": "jungle boots / water walking boots",
+    "sheet": "Items/Boot.png",
+    "col": 0,
+    "row": 0
+  },
+  "959": {
+    "tile_id": 959,
+    "desc": "hiking boots / jumping boots",
+    "sheet": "Items/Boot.png",
+    "col": 0,
+    "row": 0
+  },
+  "960": {
+    "tile_id": 960,
+    "desc": "mud boots / elven boots",
+    "sheet": "Items/Boot.png",
+    "col": 0,
+    "row": 0
+  },
+  "961": {
+    "tile_id": 961,
+    "desc": "buckled boots / kicking boots",
+    "sheet": "Items/Boot.png",
+    "col": 0,
+    "row": 0
+  },
+  "962": {
+    "tile_id": 962,
+    "desc": "riding boots / fumble boots",
+    "sheet": "Items/Boot.png",
+    "col": 0,
+    "row": 0
+  },
+  "963": {
+    "tile_id": 963,
+    "desc": "snow boots / levitation boots",
+    "sheet": "Items/Boot.png",
+    "col": 0,
+    "row": 0
+  },
+  "970": {
+    "tile_id": 970,
+    "desc": "moonstone / regeneration",
+    "sheet": "Items/Rock.png",
+    "col": 0,
+    "row": 0
+  },
+  "990": {
+    "tile_id": 990,
+    "desc": "engagement / see invisible",
+    "sheet": "Items/Rock.png",
+    "col": 0,
+    "row": 0
+  },
+  "992": {
+    "tile_id": 992,
+    "desc": "circular / amulet of ESP",
+    "sheet": "Items/Amulet.png",
+    "col": 3,
+    "row": 1
+  },
+  "993": {
+    "tile_id": 993,
+    "desc": "spherical / amulet of life saving",
+    "sheet": "Items/Amulet.png",
+    "col": 4,
+    "row": 1
+  },
+  "994": {
+    "tile_id": 994,
+    "desc": "oval / amulet of strangulation",
+    "sheet": "Items/Amulet.png",
+    "col": 5,
+    "row": 1
+  },
+  "995": {
+    "tile_id": 995,
+    "desc": "triangular / amulet of restful sleep",
+    "sheet": "Items/Amulet.png",
+    "col": 6,
+    "row": 1
+  },
+  "996": {
+    "tile_id": 996,
+    "desc": "pyramidal / amulet versus poison",
+    "sheet": "Items/Amulet.png",
+    "col": 7,
+    "row": 1
+  },
+  "997": {
+    "tile_id": 997,
+    "desc": "square / amulet of change",
+    "sheet": "Items/Amulet.png",
+    "col": 0,
+    "row": 2
+  },
+  "998": {
+    "tile_id": 998,
+    "desc": "concave / amulet of unchanging",
+    "sheet": "Items/Amulet.png",
+    "col": 1,
+    "row": 2
+  },
+  "999": {
+    "tile_id": 999,
+    "desc": "hexagonal / amulet of reflection",
+    "sheet": "Items/Amulet.png",
+    "col": 2,
+    "row": 2
+  },
+  "1000": {
+    "tile_id": 1000,
+    "desc": "octagonal / amulet of magical breathing",
+    "sheet": "Items/Amulet.png",
+    "col": 3,
+    "row": 2
+  },
+  "1001": {
+    "tile_id": 1001,
+    "desc": "perforated / amulet of guarding",
+    "sheet": "Items/Amulet.png",
+    "col": 4,
+    "row": 2
+  },
+  "1002": {
+    "tile_id": 1002,
+    "desc": "cubical / amulet of flying",
+    "sheet": "Items/Amulet.png",
+    "col": 5,
+    "row": 2
+  },
+  "1005": {
+    "tile_id": 1005,
+    "desc": "large box",
+    "sheet": "Items/Chest0.png",
+    "col": 0,
+    "row": 0
+  },
+  "1006": {
+    "tile_id": 1006,
+    "desc": "chest",
+    "sheet": "Items/Chest0.png",
+    "col": 1,
+    "row": 0
+  },
+  "1007": {
+    "tile_id": 1007,
+    "desc": "ice box",
+    "sheet": "Items/Chest0.png",
+    "col": 2,
+    "row": 0
+  },
+  "1013": {
+    "tile_id": 1013,
+    "desc": "lock pick",
+    "sheet": "Items/Tool.png",
+    "col": 4,
+    "row": 0
+  },
+  "1024": {
+    "tile_id": 1024,
+    "desc": "blindfold",
+    "sheet": "Items/Tool.png",
+    "col": 7,
+    "row": 0
+  },
+  "1025": {
+    "tile_id": 1025,
+    "desc": "towel",
+    "sheet": "Items/Tool.png",
+    "col": 0,
+    "row": 1
+  },
+  "1026": {
+    "tile_id": 1026,
+    "desc": "saddle",
+    "sheet": "Items/Tool.png",
+    "col": 1,
+    "row": 1
+  },
+  "1027": {
+    "tile_id": 1027,
+    "desc": "leash",
+    "sheet": "Items/Tool.png",
+    "col": 2,
+    "row": 1
+  },
+  "1046": {
+    "tile_id": 1046,
+    "desc": "bell",
+    "sheet": "Items/Music.png",
+    "col": 5,
+    "row": 0
+  },
+  "1050": {
+    "tile_id": 1050,
+    "desc": "pick-axe",
+    "sheet": "Items/Tool.png",
+    "col": 3,
+    "row": 1
+  },
+  "1055": {
+    "tile_id": 1055,
+    "desc": "tripe ration",
+    "sheet": "Items/Food.png",
+    "col": 1,
+    "row": 0
+  },
+  "1056": {
+    "tile_id": 1056,
+    "desc": "corpse",
+    "sheet": "Items/Flesh.png",
+    "col": 0,
+    "row": 0
+  },
+  "1057": {
+    "tile_id": 1057,
+    "desc": "egg",
+    "sheet": "Items/Food.png",
+    "col": 2,
+    "row": 0
+  },
+  "1058": {
+    "tile_id": 1058,
+    "desc": "meatball",
+    "sheet": "Items/Food.png",
+    "col": 0,
+    "row": 0
+  },
+  "1061": {
+    "tile_id": 1061,
+    "desc": "meat ring",
+    "sheet": "Items/Ring.png",
+    "col": 0,
+    "row": 4
+  },
+  "1068": {
+    "tile_id": 1068,
+    "desc": "apple",
+    "sheet": "Items/Food.png",
+    "col": 4,
+    "row": 0
+  },
+  "1069": {
+    "tile_id": 1069,
+    "desc": "orange",
+    "sheet": "Items/Food.png",
+    "col": 0,
+    "row": 1
+  },
+  "1070": {
+    "tile_id": 1070,
+    "desc": "pear",
+    "sheet": "Items/Food.png",
+    "col": 6,
+    "row": 0
+  },
+  "1071": {
+    "tile_id": 1071,
+    "desc": "melon",
+    "sheet": "Items/Food.png",
+    "col": 1,
+    "row": 1
+  },
+  "1072": {
+    "tile_id": 1072,
+    "desc": "banana",
+    "sheet": "Items/Food.png",
+    "col": 7,
+    "row": 0
+  },
+  "1073": {
+    "tile_id": 1073,
+    "desc": "carrot",
+    "sheet": "Items/Food.png",
+    "col": 5,
+    "row": 0
+  },
+  "1075": {
+    "tile_id": 1075,
+    "desc": "clove of garlic",
+    "sheet": "Items/Food.png",
+    "col": 3,
+    "row": 0
+  },
+  "1078": {
+    "tile_id": 1078,
+    "desc": "cream pie",
+    "sheet": "Items/Food.png",
+    "col": 4,
+    "row": 1
+  },
+  "1079": {
+    "tile_id": 1079,
+    "desc": "candy bar",
+    "sheet": "Items/Food.png",
+    "col": 3,
+    "row": 1
+  },
+  "1080": {
+    "tile_id": 1080,
+    "desc": "fortune cookie",
+    "sheet": "Items/Food.png",
+    "col": 2,
+    "row": 1
+  },
+  "1081": {
+    "tile_id": 1081,
+    "desc": "pancake",
+    "sheet": "Items/Food.png",
+    "col": 5,
+    "row": 1
+  },
+  "1082": {
+    "tile_id": 1082,
+    "desc": "lembas wafer",
+    "sheet": "Items/Food.png",
+    "col": 6,
+    "row": 1
+  },
+  "1083": {
+    "tile_id": 1083,
+    "desc": "cram ration",
+    "sheet": "Items/Food.png",
+    "col": 7,
+    "row": 1
+  },
+  "1084": {
+    "tile_id": 1084,
+    "desc": "food ration",
+    "sheet": "Items/Food.png",
+    "col": 0,
+    "row": 2
+  },
+  "1085": {
+    "tile_id": 1085,
+    "desc": "K-ration",
+    "sheet": "Items/Food.png",
+    "col": 1,
+    "row": 2
+  },
+  "1086": {
+    "tile_id": 1086,
+    "desc": "C-ration",
+    "sheet": "Items/Food.png",
+    "col": 2,
+    "row": 2
+  },
+  "1087": {
+    "tile_id": 1087,
+    "desc": "tin",
+    "sheet": "Items/Food.png",
+    "col": 3,
+    "row": 2
+  },
+  "1114": {
+    "tile_id": 1114,
+    "desc": "ZELGO MER / enchant armor",
+    "sheet": "Items/Armor.png",
+    "col": 0,
+    "row": 0
+  },
+  "1115": {
+    "tile_id": 1115,
+    "desc": "JUYED AWK YACC / destroy armor",
+    "sheet": "Items/Armor.png",
+    "col": 0,
+    "row": 0
+  },
+  "1155": {
+    "tile_id": 1155,
+    "desc": "stamped / mail",
+    "sheet": "Items/Armor.png",
+    "col": 0,
+    "row": 0
+  },
+  "1192": {
+    "tile_id": 1192,
+    "desc": "glittering / create familiar",
+    "sheet": "Items/Ring.png",
+    "col": 3,
+    "row": 2
+  },
+  "1196": {
+    "tile_id": 1196,
+    "desc": "thick / stone to flesh",
+    "sheet": "Items/Rock.png",
+    "col": 0,
+    "row": 0
+  },
+  "1229": {
+    "tile_id": 1229,
+    "desc": "gold piece",
+    "sheet": "Items/Money.png",
+    "col": 0,
+    "row": 0
+  },
+  "1261": {
+    "tile_id": 1261,
+    "desc": "gray / luckstone",
+    "sheet": "Items/Rock.png",
+    "col": 0,
+    "row": 0
+  },
+  "1262": {
+    "tile_id": 1262,
+    "desc": "gray / loadstone",
+    "sheet": "Items/Rock.png",
+    "col": 0,
+    "row": 0
+  },
+  "1263": {
+    "tile_id": 1263,
+    "desc": "gray / touchstone",
+    "sheet": "Items/Rock.png",
+    "col": 0,
+    "row": 0
+  },
+  "1273": {
+    "tile_id": 1273,
+    "desc": "main walls vertical",
+    "sheet": "Objects/Wall.png",
+    "col": 0,
+    "row": 0
+  },
+  "1274": {
+    "tile_id": 1274,
+    "desc": "main walls horizontal",
+    "sheet": "Objects/Wall.png",
+    "col": 1,
+    "row": 0
+  },
+  "1275": {
+    "tile_id": 1275,
+    "desc": "main walls tlcorn",
+    "sheet": "Objects/Wall.png",
+    "col": 2,
+    "row": 0
+  },
+  "1276": {
+    "tile_id": 1276,
+    "desc": "main walls trcorn",
+    "sheet": "Objects/Wall.png",
+    "col": 3,
+    "row": 0
+  },
+  "1277": {
+    "tile_id": 1277,
+    "desc": "main walls blcorn",
+    "sheet": "Objects/Wall.png",
+    "col": 4,
+    "row": 0
+  },
+  "1278": {
+    "tile_id": 1278,
+    "desc": "main walls brcorn",
+    "sheet": "Objects/Wall.png",
+    "col": 5,
+    "row": 0
+  },
+  "1279": {
+    "tile_id": 1279,
+    "desc": "main walls cross wall",
+    "sheet": "Objects/Wall.png",
+    "col": 6,
+    "row": 0
+  },
+  "1280": {
+    "tile_id": 1280,
+    "desc": "main walls tuwall",
+    "sheet": "Objects/Wall.png",
+    "col": 7,
+    "row": 0
+  },
+  "1281": {
+    "tile_id": 1281,
+    "desc": "main walls tdwall",
+    "sheet": "Objects/Wall.png",
+    "col": 8,
+    "row": 0
+  },
+  "1282": {
+    "tile_id": 1282,
+    "desc": "main walls tlwall",
+    "sheet": "Objects/Wall.png",
+    "col": 9,
+    "row": 0
+  },
+  "1283": {
+    "tile_id": 1283,
+    "desc": "main walls trwall",
+    "sheet": "Objects/Wall.png",
+    "col": 10,
+    "row": 0
+  },
+  "1285": {
+    "tile_id": 1285,
+    "desc": "vertical open door",
+    "sheet": "Objects/Door0.png",
+    "col": 0,
+    "row": 0
+  },
+  "1286": {
+    "tile_id": 1286,
+    "desc": "horizontal open door",
+    "sheet": "Objects/Door0.png",
+    "col": 1,
+    "row": 0
+  },
+  "1287": {
+    "tile_id": 1287,
+    "desc": "vertical closed door",
+    "sheet": "Objects/Door0.png",
+    "col": 2,
+    "row": 0
+  },
+  "1288": {
+    "tile_id": 1288,
+    "desc": "horizontal closed door",
+    "sheet": "Objects/Door0.png",
+    "col": 3,
+    "row": 0
+  },
+  "1289": {
+    "tile_id": 1289,
+    "desc": "iron bars",
+    "sheet": "Objects/Wall.png",
+    "col": 0,
+    "row": 1
+  },
+  "1290": {
+    "tile_id": 1290,
+    "desc": "tree",
+    "sheet": "Objects/Tree0.png",
+    "col": 0,
+    "row": 0
+  },
+  "1291": {
+    "tile_id": 1291,
+    "desc": "floor of a room",
+    "sheet": "Objects/Floor.png",
+    "col": 0,
+    "row": 0
+  },
+  "1292": {
+    "tile_id": 1292,
+    "desc": "dark part of a room",
+    "sheet": "Objects/Floor.png",
+    "col": 1,
+    "row": 0
+  },
+  "1294": {
+    "tile_id": 1294,
+    "desc": "corridor",
+    "sheet": "Objects/Floor.png",
+    "col": 2,
+    "row": 0
+  },
+  "1295": {
+    "tile_id": 1295,
+    "desc": "lit corridor",
+    "sheet": "Objects/Floor.png",
+    "col": 2,
+    "row": 0
+  },
+  "1296": {
+    "tile_id": 1296,
+    "desc": "engraving in a corridor",
+    "sheet": "Objects/Floor.png",
+    "col": 2,
+    "row": 0
+  },
+  "1299": {
+    "tile_id": 1299,
+    "desc": "ladder up",
+    "sheet": "Objects/Decor0.png",
+    "col": 2,
+    "row": 0
+  },
+  "1300": {
+    "tile_id": 1300,
+    "desc": "ladder down",
+    "sheet": "Objects/Decor0.png",
+    "col": 3,
+    "row": 0
+  },
+  "1303": {
+    "tile_id": 1303,
+    "desc": "branch ladder up",
+    "sheet": "Objects/Decor0.png",
+    "col": 2,
+    "row": 0
+  },
+  "1304": {
+    "tile_id": 1304,
+    "desc": "branch ladder down",
+    "sheet": "Objects/Decor0.png",
+    "col": 3,
+    "row": 0
+  },
+  "1305": {
+    "tile_id": 1305,
+    "desc": "unaligned altar",
+    "sheet": "Objects/Decor0.png",
+    "col": 0,
+    "row": 1
+  },
+  "1306": {
+    "tile_id": 1306,
+    "desc": "chaotic altar",
+    "sheet": "Objects/Decor0.png",
+    "col": 0,
+    "row": 1
+  },
+  "1307": {
+    "tile_id": 1307,
+    "desc": "neutral altar",
+    "sheet": "Objects/Decor0.png",
+    "col": 0,
+    "row": 1
+  },
+  "1308": {
+    "tile_id": 1308,
+    "desc": "lawful altar",
+    "sheet": "Objects/Decor0.png",
+    "col": 0,
+    "row": 1
+  },
+  "1309": {
+    "tile_id": 1309,
+    "desc": "other altar",
+    "sheet": "Objects/Decor0.png",
+    "col": 0,
+    "row": 1
+  },
+  "1310": {
+    "tile_id": 1310,
+    "desc": "grave",
+    "sheet": "Objects/Decor0.png",
+    "col": 1,
+    "row": 1
+  },
+  "1311": {
+    "tile_id": 1311,
+    "desc": "throne",
+    "sheet": "Objects/Decor0.png",
+    "col": 2,
+    "row": 1
+  },
+  "1312": {
+    "tile_id": 1312,
+    "desc": "sink",
+    "sheet": "Objects/Decor0.png",
+    "col": 3,
+    "row": 1
+  },
+  "1313": {
+    "tile_id": 1313,
+    "desc": "fountain",
+    "sheet": "Objects/Decor0.png",
+    "col": 4,
+    "row": 1
+  },
+  "1315": {
+    "tile_id": 1315,
+    "desc": "ice",
+    "sheet": "Objects/Floor.png",
+    "col": 1,
+    "row": 1
+  },
+  "1316": {
+    "tile_id": 1316,
+    "desc": "molten lava",
+    "sheet": "Objects/Floor.png",
+    "col": 2,
+    "row": 1
+  },
+  "1317": {
+    "tile_id": 1317,
+    "desc": "wall of lava",
+    "sheet": "Objects/Floor.png",
+    "col": 2,
+    "row": 1
+  },
+  "1325": {
+    "tile_id": 1325,
+    "desc": "arrow trap",
+    "sheet": "Objects/Trap0.png",
+    "col": 0,
+    "row": 0
+  },
+  "1326": {
+    "tile_id": 1326,
+    "desc": "dart trap",
+    "sheet": "Objects/Trap0.png",
+    "col": 1,
+    "row": 0
+  },
+  "1327": {
+    "tile_id": 1327,
+    "desc": "falling rock trap",
+    "sheet": "Objects/Trap0.png",
+    "col": 2,
+    "row": 0
+  },
+  "1328": {
+    "tile_id": 1328,
+    "desc": "squeaky board",
+    "sheet": "Objects/Trap0.png",
+    "col": 3,
+    "row": 0
+  },
+  "1329": {
+    "tile_id": 1329,
+    "desc": "bear trap",
+    "sheet": "Objects/Trap0.png",
+    "col": 4,
+    "row": 0
+  },
+  "1330": {
+    "tile_id": 1330,
+    "desc": "land mine",
+    "sheet": "Objects/Trap0.png",
+    "col": 5,
+    "row": 0
+  },
+  "1331": {
+    "tile_id": 1331,
+    "desc": "rolling boulder trap",
+    "sheet": "Objects/Trap0.png",
+    "col": 6,
+    "row": 0
+  },
+  "1332": {
+    "tile_id": 1332,
+    "desc": "sleeping gas trap",
+    "sheet": "Objects/Trap0.png",
+    "col": 7,
+    "row": 0
+  },
+  "1333": {
+    "tile_id": 1333,
+    "desc": "rust trap",
+    "sheet": "Objects/Trap0.png",
+    "col": 0,
+    "row": 1
+  },
+  "1334": {
+    "tile_id": 1334,
+    "desc": "fire trap",
+    "sheet": "Objects/Trap0.png",
+    "col": 1,
+    "row": 1
+  },
+  "1335": {
+    "tile_id": 1335,
+    "desc": "pit",
+    "sheet": "Objects/Trap0.png",
+    "col": 2,
+    "row": 1
+  },
+  "1336": {
+    "tile_id": 1336,
+    "desc": "spiked pit",
+    "sheet": "Objects/Trap0.png",
+    "col": 3,
+    "row": 1
+  },
+  "1337": {
+    "tile_id": 1337,
+    "desc": "hole",
+    "sheet": "Objects/Trap0.png",
+    "col": 4,
+    "row": 1
+  },
+  "1338": {
+    "tile_id": 1338,
+    "desc": "trap door",
+    "sheet": "Objects/Trap0.png",
+    "col": 5,
+    "row": 1
+  },
+  "1339": {
+    "tile_id": 1339,
+    "desc": "teleportation trap",
+    "sheet": "Objects/Trap0.png",
+    "col": 6,
+    "row": 1
+  },
+  "1340": {
+    "tile_id": 1340,
+    "desc": "level teleporter",
+    "sheet": "Objects/Trap0.png",
+    "col": 7,
+    "row": 1
+  },
+  "1341": {
+    "tile_id": 1341,
+    "desc": "magic portal",
+    "sheet": "Objects/Trap0.png",
+    "col": 0,
+    "row": 2
+  },
+  "1342": {
+    "tile_id": 1342,
+    "desc": "web",
+    "sheet": "Objects/Trap0.png",
+    "col": 1,
+    "row": 2
+  },
+  "1343": {
+    "tile_id": 1343,
+    "desc": "statue trap",
+    "sheet": "Objects/Trap0.png",
+    "col": 2,
+    "row": 2
+  },
+  "1344": {
+    "tile_id": 1344,
+    "desc": "magic trap",
+    "sheet": "Objects/Trap0.png",
+    "col": 3,
+    "row": 2
+  },
+  "1345": {
+    "tile_id": 1345,
+    "desc": "anti-magic field",
+    "sheet": "Objects/Trap0.png",
+    "col": 4,
+    "row": 2
+  },
+  "1346": {
+    "tile_id": 1346,
+    "desc": "polymorph trap",
+    "sheet": "Objects/Trap0.png",
+    "col": 5,
+    "row": 2
+  },
+  "272": {
+    "tile_id": 272,
+    "desc": "baby gold dragon,male",
+    "sheet": "Characters/Reptile0.png",
+    "col": 0,
+    "row": 2
+  },
+  "273": {
+    "tile_id": 273,
+    "desc": "baby gold dragon,female",
+    "sheet": "Characters/Reptile0.png",
+    "col": 1,
+    "row": 2
+  },
+  "274": {
+    "tile_id": 274,
+    "desc": "baby silver dragon,male",
+    "sheet": "Characters/Reptile0.png",
+    "col": 2,
+    "row": 2
+  },
+  "275": {
+    "tile_id": 275,
+    "desc": "baby silver dragon,female",
+    "sheet": "Characters/Reptile0.png",
+    "col": 3,
+    "row": 2
+  },
+  "276": {
+    "tile_id": 276,
+    "desc": "baby shimmering dragon,male",
+    "sheet": "Characters/Reptile0.png",
+    "col": 4,
+    "row": 2
+  },
+  "277": {
+    "tile_id": 277,
+    "desc": "baby shimmering dragon,female",
+    "sheet": "Characters/Reptile0.png",
+    "col": 5,
+    "row": 2
+  },
+  "282": {
+    "tile_id": 282,
+    "desc": "baby orange dragon,male",
+    "sheet": "Characters/Reptile0.png",
+    "col": 2,
+    "row": 2
+  },
+  "283": {
+    "tile_id": 283,
+    "desc": "baby orange dragon,female",
+    "sheet": "Characters/Reptile0.png",
+    "col": 3,
+    "row": 2
+  },
+  "294": {
+    "tile_id": 294,
+    "desc": "gold dragon,male",
+    "sheet": "Characters/Reptile0.png",
+    "col": 6,
+    "row": 2
+  },
+  "295": {
+    "tile_id": 295,
+    "desc": "gold dragon,female",
+    "sheet": "Characters/Reptile0.png",
+    "col": 7,
+    "row": 2
+  },
+  "296": {
+    "tile_id": 296,
+    "desc": "silver dragon,male",
+    "sheet": "Characters/Reptile0.png",
+    "col": 0,
+    "row": 2
+  },
+  "297": {
+    "tile_id": 297,
+    "desc": "silver dragon,female",
+    "sheet": "Characters/Reptile0.png",
+    "col": 1,
+    "row": 2
+  },
+  "298": {
+    "tile_id": 298,
+    "desc": "shimmering dragon,male",
+    "sheet": "Characters/Reptile0.png",
+    "col": 2,
+    "row": 2
+  },
+  "299": {
+    "tile_id": 299,
+    "desc": "shimmering dragon,female",
+    "sheet": "Characters/Reptile0.png",
+    "col": 3,
+    "row": 2
+  },
+  "304": {
+    "tile_id": 304,
+    "desc": "orange dragon,male",
+    "sheet": "Characters/Reptile0.png",
+    "col": 0,
+    "row": 2
+  },
+  "305": {
+    "tile_id": 305,
+    "desc": "orange dragon,female",
+    "sheet": "Characters/Reptile0.png",
+    "col": 1,
+    "row": 2
+  },
+  "540": {
+    "tile_id": 540,
+    "desc": "elf,male",
+    "sheet": "Characters/Humanoid0.png",
+    "col": 4,
+    "row": 0
+  },
+  "541": {
+    "tile_id": 541,
+    "desc": "elf,female",
+    "sheet": "Characters/Humanoid0.png",
+    "col": 5,
+    "row": 0
+  },
+  "542": {
+    "tile_id": 542,
+    "desc": "Woodland-elf,male",
+    "sheet": "Characters/Humanoid0.png",
+    "col": 6,
+    "row": 0
+  },
+  "543": {
+    "tile_id": 543,
+    "desc": "Woodland-elf,female",
+    "sheet": "Characters/Humanoid0.png",
+    "col": 7,
+    "row": 0
+  },
+  "544": {
+    "tile_id": 544,
+    "desc": "Green-elf,male",
+    "sheet": "Characters/Humanoid0.png",
+    "col": 0,
+    "row": 0
+  },
+  "545": {
+    "tile_id": 545,
+    "desc": "Green-elf,female",
+    "sheet": "Characters/Humanoid0.png",
+    "col": 1,
+    "row": 0
+  },
+  "546": {
+    "tile_id": 546,
+    "desc": "Grey-elf,male",
+    "sheet": "Characters/Humanoid0.png",
+    "col": 2,
+    "row": 0
+  },
+  "547": {
+    "tile_id": 547,
+    "desc": "Grey-elf,female",
+    "sheet": "Characters/Humanoid0.png",
+    "col": 3,
+    "row": 0
+  },
+  "548": {
+    "tile_id": 548,
+    "desc": "elf-noble,male",
+    "sheet": "Characters/Humanoid0.png",
+    "col": 4,
+    "row": 0
+  },
+  "549": {
+    "tile_id": 549,
+    "desc": "elf-noble,female",
+    "sheet": "Characters/Humanoid0.png",
+    "col": 5,
+    "row": 0
+  },
+  "550": {
+    "tile_id": 550,
+    "desc": "elven monarch,male",
+    "sheet": "Characters/Humanoid0.png",
+    "col": 6,
+    "row": 0
+  },
+  "551": {
+    "tile_id": 551,
+    "desc": "elven monarch,female",
+    "sheet": "Characters/Humanoid0.png",
+    "col": 7,
+    "row": 0
+  },
+  "566": {
+    "tile_id": 566,
+    "desc": "soldier,male",
+    "sheet": "Characters/Humanoid0.png",
+    "col": 2,
+    "row": 14
+  },
+  "567": {
+    "tile_id": 567,
+    "desc": "soldier,female",
+    "sheet": "Characters/Humanoid0.png",
+    "col": 2,
+    "row": 14
+  },
+  "582": {
+    "tile_id": 582,
+    "desc": "Wizard of Yendor,male",
+    "sheet": "Characters/Player0.png",
+    "col": 4,
+    "row": 1
+  },
+  "583": {
+    "tile_id": 583,
+    "desc": "Wizard of Yendor,female",
+    "sheet": "Characters/Player0.png",
+    "col": 4,
+    "row": 1
+  },
+  "594": {
+    "tile_id": 594,
+    "desc": "amorous demon,male",
+    "sheet": "Characters/Demon0.png",
+    "col": 2,
+    "row": 2
+  },
+  "595": {
+    "tile_id": 595,
+    "desc": "amorous demon,female",
+    "sheet": "Characters/Demon0.png",
+    "col": 3,
+    "row": 2
+  },
+  "718": {
+    "tile_id": 718,
+    "desc": "Arch Priest,male",
+    "sheet": "Characters/Player0.png",
+    "col": 6,
+    "row": 0
+  },
+  "719": {
+    "tile_id": 719,
+    "desc": "Arch Priest,female",
+    "sheet": "Characters/Player0.png",
+    "col": 6,
+    "row": 0
+  },
+  "736": {
+    "tile_id": 736,
+    "desc": "Chromatic Dragon,male",
+    "sheet": "Characters/Reptile0.png",
+    "col": 0,
+    "row": 2
+  },
+  "737": {
+    "tile_id": 737,
+    "desc": "Chromatic Dragon,female",
+    "sheet": "Characters/Reptile0.png",
+    "col": 1,
+    "row": 2
+  },
+  "764": {
+    "tile_id": 764,
+    "desc": "High-elf,male",
+    "sheet": "Characters/Humanoid0.png",
+    "col": 4,
+    "row": 0
+  },
+  "765": {
+    "tile_id": 765,
+    "desc": "High-elf,female",
+    "sheet": "Characters/Humanoid0.png",
+    "col": 5,
+    "row": 0
+  },
+  "811": {
+    "tile_id": 811,
+    "desc": "bamboo arrow / ya",
+    "sheet": "Items/Ammo.png",
+    "col": 0,
+    "row": 0
+  },
+  "814": {
+    "tile_id": 814,
+    "desc": "throwing star / shuriken",
+    "sheet": "Items/Ammo.png",
+    "col": 1,
+    "row": 1
+  },
+  "824": {
+    "tile_id": 824,
+    "desc": "runed dagger / elven dagger",
+    "sheet": "Items/ShortWep.png",
+    "col": 0,
+    "row": 0
+  },
+  "825": {
+    "tile_id": 825,
+    "desc": "crude dagger / orcish dagger",
+    "sheet": "Items/ShortWep.png",
+    "col": 0,
+    "row": 0
+  },
+  "832": {
+    "tile_id": 832,
+    "desc": "crysknife",
+    "sheet": "Items/ShortWep.png",
+    "col": 6,
+    "row": 0
+  },
+  "834": {
+    "tile_id": 834,
+    "desc": "double-headed axe / battle-axe",
+    "sheet": "Items/MedWep.png",
+    "col": 0,
+    "row": 0
+  },
+  "848": {
+    "tile_id": 848,
+    "desc": "vulgar polearm / partisan",
+    "sheet": "Items/LongWep.png",
+    "col": 0,
+    "row": 3
+  },
+  "849": {
+    "tile_id": 849,
+    "desc": "hilted polearm / ranseur",
+    "sheet": "Items/LongWep.png",
+    "col": 0,
+    "row": 3
+  },
+  "850": {
+    "tile_id": 850,
+    "desc": "forked polearm / spetum",
+    "sheet": "Items/LongWep.png",
+    "col": 0,
+    "row": 3
+  },
+  "851": {
+    "tile_id": 851,
+    "desc": "single-edged polearm / glaive",
+    "sheet": "Items/LongWep.png",
+    "col": 0,
+    "row": 3
+  },
+  "852": {
+    "tile_id": 852,
+    "desc": "angled poleaxe / halberd",
+    "sheet": "Items/LongWep.png",
+    "col": 1,
+    "row": 3
+  },
+  "853": {
+    "tile_id": 853,
+    "desc": "long poleaxe / bardiche",
+    "sheet": "Items/LongWep.png",
+    "col": 2,
+    "row": 3
+  },
+  "854": {
+    "tile_id": 854,
+    "desc": "pole cleaver / voulge",
+    "sheet": "Items/LongWep.png",
+    "col": 3,
+    "row": 3
+  },
+  "855": {
+    "tile_id": 855,
+    "desc": "pole sickle / fauchard",
+    "sheet": "Items/LongWep.png",
+    "col": 1,
+    "row": 4
+  },
+  "856": {
+    "tile_id": 856,
+    "desc": "pruning hook / guisarme",
+    "sheet": "Items/LongWep.png",
+    "col": 5,
+    "row": 3
+  },
+  "857": {
+    "tile_id": 857,
+    "desc": "hooked polearm / bill-guisarme",
+    "sheet": "Items/LongWep.png",
+    "col": 0,
+    "row": 3
+  },
+  "858": {
+    "tile_id": 858,
+    "desc": "pronged polearm / lucern hammer",
+    "sheet": "Items/LongWep.png",
+    "col": 0,
+    "row": 3
+  },
+  "859": {
+    "tile_id": 859,
+    "desc": "beaked polearm / bec de corbin",
+    "sheet": "Items/LongWep.png",
+    "col": 0,
+    "row": 3
+  },
+  "861": {
+    "tile_id": 861,
+    "desc": "lance",
+    "sheet": "Items/LongWep.png",
+    "col": 5,
+    "row": 4
+  },
+  "863": {
+    "tile_id": 863,
+    "desc": "silver mace",
+    "sheet": "Items/MedWep.png",
+    "col": 1,
+    "row": 1
+  },
+  "868": {
+    "tile_id": 868,
+    "desc": "staff / quarterstaff",
+    "sheet": "Items/LongWep.png",
+    "col": 0,
+    "row": 2
+  },
+  "869": {
+    "tile_id": 869,
+    "desc": "thonged club / aklys",
+    "sheet": "Items/MedWep.png",
+    "col": 0,
+    "row": 1
+  },
+  "871": {
+    "tile_id": 871,
+    "desc": "bullwhip",
+    "sheet": "Items/LongWep.png",
+    "col": 7,
+    "row": 4
+  },
+  "873": {
+    "tile_id": 873,
+    "desc": "runed bow / elven bow",
+    "sheet": "Items/Ammo.png",
+    "col": 0,
+    "row": 2
+  },
+  "874": {
+    "tile_id": 874,
+    "desc": "crude bow / orcish bow",
+    "sheet": "Items/Ammo.png",
+    "col": 0,
+    "row": 2
+  },
+  "875": {
+    "tile_id": 875,
+    "desc": "long bow / yumi",
+    "sheet": "Items/Ammo.png",
+    "col": 0,
+    "row": 2
+  },
+  "901": {
+    "tile_id": 901,
+    "desc": "gray dragon scales",
+    "sheet": "Items/Armor.png",
+    "col": 5,
+    "row": 1
+  },
+  "902": {
+    "tile_id": 902,
+    "desc": "gold dragon scales",
+    "sheet": "Items/Armor.png",
+    "col": 5,
+    "row": 1
+  },
+  "903": {
+    "tile_id": 903,
+    "desc": "silver dragon scales",
+    "sheet": "Items/Armor.png",
+    "col": 5,
+    "row": 1
+  },
+  "905": {
+    "tile_id": 905,
+    "desc": "red dragon scales",
+    "sheet": "Items/Armor.png",
+    "col": 5,
+    "row": 1
+  },
+  "906": {
+    "tile_id": 906,
+    "desc": "white dragon scales",
+    "sheet": "Items/Armor.png",
+    "col": 5,
+    "row": 1
+  },
+  "907": {
+    "tile_id": 907,
+    "desc": "orange dragon scales",
+    "sheet": "Items/Armor.png",
+    "col": 5,
+    "row": 1
+  },
+  "908": {
+    "tile_id": 908,
+    "desc": "black dragon scales",
+    "sheet": "Items/Armor.png",
+    "col": 5,
+    "row": 1
+  },
+  "909": {
+    "tile_id": 909,
+    "desc": "blue dragon scales",
+    "sheet": "Items/Armor.png",
+    "col": 5,
+    "row": 1
+  },
+  "910": {
+    "tile_id": 910,
+    "desc": "green dragon scales",
+    "sheet": "Items/Armor.png",
+    "col": 5,
+    "row": 1
+  },
+  "911": {
+    "tile_id": 911,
+    "desc": "yellow dragon scales",
+    "sheet": "Items/Armor.png",
+    "col": 5,
+    "row": 1
+  },
+  "927": {
+    "tile_id": 927,
+    "desc": "Hawaiian shirt",
+    "sheet": "Items/Armor.png",
+    "col": 3,
+    "row": 2
+  },
+  "928": {
+    "tile_id": 928,
+    "desc": "T-shirt",
+    "sheet": "Items/Armor.png",
+    "col": 3,
+    "row": 2
+  },
+  "934": {
+    "tile_id": 934,
+    "desc": "robe",
+    "sheet": "Items/Armor.png",
+    "col": 1,
+    "row": 2
+  },
+  "935": {
+    "tile_id": 935,
+    "desc": "apron / alchemy smock",
+    "sheet": "Items/Armor.png",
+    "col": 2,
+    "row": 2
+  },
+  "1062": {
+    "tile_id": 1062,
+    "desc": "glob of gray ooze",
+    "sheet": "Items/Flesh.png",
+    "col": 6,
+    "row": 6
+  },
+  "1063": {
+    "tile_id": 1063,
+    "desc": "glob of brown pudding",
+    "sheet": "Items/Flesh.png",
+    "col": 7,
+    "row": 6
+  },
+  "1064": {
+    "tile_id": 1064,
+    "desc": "glob of green slime",
+    "sheet": "Items/Flesh.png",
+    "col": 0,
+    "row": 7
+  },
+  "1065": {
+    "tile_id": 1065,
+    "desc": "glob of black pudding",
+    "sheet": "Items/Flesh.png",
+    "col": 1,
+    "row": 7
+  },
+  "1128": {
+    "tile_id": 1128,
+    "desc": "ELAM EBOW / magic mapping",
+    "sheet": "Items/Ammo.png",
+    "col": 0,
+    "row": 2
+  },
+  "1167": {
+    "tile_id": 1167,
+    "desc": "red / force bolt",
+    "sheet": "Items/Ammo.png",
+    "col": 5,
+    "row": 0
+  },
+  "1200": {
+    "tile_id": 1200,
+    "desc": "papyrus / Book of the Dead",
+    "sheet": "Items/Book.png",
+    "col": 0,
+    "row": 6
+  },
+  "1265": {
+    "tile_id": 1265,
+    "desc": "rock",
+    "sheet": "Items/Rock.png",
+    "col": 1,
+    "row": 0
+  },
+  "1348": {
+    "tile_id": 1348,
+    "desc": "trapped door",
+    "sheet": "Objects/Trap0.png",
+    "col": 4,
+    "row": 0
+  },
+  "1349": {
+    "tile_id": 1349,
+    "desc": "trapped chest",
+    "sheet": "Objects/Trap0.png",
+    "col": 5,
+    "row": 0
+  },
+  "1350": {
+    "tile_id": 1350,
+    "desc": "missile zap 1 0",
+    "sheet": "Objects/Effect0.png",
+    "col": 6,
+    "row": 8
+  },
+  "1351": {
+    "tile_id": 1351,
+    "desc": "missile zap 1 1",
+    "sheet": "Objects/Effect0.png",
+    "col": 7,
+    "row": 8
+  },
+  "1352": {
+    "tile_id": 1352,
+    "desc": "missile zap 1 2",
+    "sheet": "Objects/Effect0.png",
+    "col": 0,
+    "row": 9
+  },
+  "1353": {
+    "tile_id": 1353,
+    "desc": "missile zap 1 3",
+    "sheet": "Objects/Effect0.png",
+    "col": 1,
+    "row": 9
+  },
+  "1354": {
+    "tile_id": 1354,
+    "desc": "fire zap 2 0",
+    "sheet": "Objects/Effect0.png",
+    "col": 2,
+    "row": 9
+  },
+  "1355": {
+    "tile_id": 1355,
+    "desc": "fire zap 2 1",
+    "sheet": "Objects/Effect0.png",
+    "col": 3,
+    "row": 9
+  },
+  "1356": {
+    "tile_id": 1356,
+    "desc": "fire zap 2 2",
+    "sheet": "Objects/Effect0.png",
+    "col": 4,
+    "row": 9
+  },
+  "1357": {
+    "tile_id": 1357,
+    "desc": "fire zap 2 3",
+    "sheet": "Objects/Effect0.png",
+    "col": 5,
+    "row": 9
+  },
+  "1358": {
+    "tile_id": 1358,
+    "desc": "frost zap 3 0",
+    "sheet": "Objects/Effect0.png",
+    "col": 6,
+    "row": 9
+  },
+  "1359": {
+    "tile_id": 1359,
+    "desc": "frost zap 3 1",
+    "sheet": "Objects/Effect0.png",
+    "col": 7,
+    "row": 9
+  },
+  "1360": {
+    "tile_id": 1360,
+    "desc": "frost zap 3 2",
+    "sheet": "Objects/Effect0.png",
+    "col": 0,
+    "row": 10
+  },
+  "1361": {
+    "tile_id": 1361,
+    "desc": "frost zap 3 3",
+    "sheet": "Objects/Effect0.png",
+    "col": 1,
+    "row": 10
+  },
+  "1362": {
+    "tile_id": 1362,
+    "desc": "sleep zap 4 0",
+    "sheet": "Objects/Effect0.png",
+    "col": 2,
+    "row": 10
+  },
+  "1363": {
+    "tile_id": 1363,
+    "desc": "sleep zap 4 1",
+    "sheet": "Objects/Effect0.png",
+    "col": 3,
+    "row": 10
+  },
+  "1364": {
+    "tile_id": 1364,
+    "desc": "sleep zap 4 2",
+    "sheet": "Objects/Effect0.png",
+    "col": 4,
+    "row": 10
+  },
+  "1365": {
+    "tile_id": 1365,
+    "desc": "sleep zap 4 3",
+    "sheet": "Objects/Effect0.png",
+    "col": 5,
+    "row": 10
+  },
+  "1366": {
+    "tile_id": 1366,
+    "desc": "death zap 5 0",
+    "sheet": "Objects/Effect0.png",
+    "col": 6,
+    "row": 10
+  },
+  "1367": {
+    "tile_id": 1367,
+    "desc": "death zap 5 1",
+    "sheet": "Objects/Effect0.png",
+    "col": 7,
+    "row": 10
+  },
+  "1368": {
+    "tile_id": 1368,
+    "desc": "death zap 5 2",
+    "sheet": "Objects/Effect0.png",
+    "col": 0,
+    "row": 11
+  },
+  "1369": {
+    "tile_id": 1369,
+    "desc": "death zap 5 3",
+    "sheet": "Objects/Effect0.png",
+    "col": 1,
+    "row": 11
+  },
+  "1370": {
+    "tile_id": 1370,
+    "desc": "lightning zap 6 0",
+    "sheet": "Objects/Effect0.png",
+    "col": 2,
+    "row": 11
+  },
+  "1371": {
+    "tile_id": 1371,
+    "desc": "lightning zap 6 1",
+    "sheet": "Objects/Effect0.png",
+    "col": 3,
+    "row": 11
+  },
+  "1372": {
+    "tile_id": 1372,
+    "desc": "lightning zap 6 2",
+    "sheet": "Objects/Effect0.png",
+    "col": 4,
+    "row": 11
+  },
+  "1373": {
+    "tile_id": 1373,
+    "desc": "lightning zap 6 3",
+    "sheet": "Objects/Effect0.png",
+    "col": 5,
+    "row": 11
+  },
+  "1374": {
+    "tile_id": 1374,
+    "desc": "poison gas zap 7 0",
+    "sheet": "Objects/Effect0.png",
+    "col": 6,
+    "row": 11
+  },
+  "1375": {
+    "tile_id": 1375,
+    "desc": "poison gas zap 7 1",
+    "sheet": "Objects/Effect0.png",
+    "col": 7,
+    "row": 11
+  },
+  "1376": {
+    "tile_id": 1376,
+    "desc": "poison gas zap 7 2",
+    "sheet": "Objects/Effect0.png",
+    "col": 0,
+    "row": 12
+  },
+  "1377": {
+    "tile_id": 1377,
+    "desc": "poison gas zap 7 3",
+    "sheet": "Objects/Effect0.png",
+    "col": 1,
+    "row": 12
+  },
+  "1378": {
+    "tile_id": 1378,
+    "desc": "acid zap 8 0",
+    "sheet": "Objects/Effect0.png",
+    "col": 2,
+    "row": 12
+  },
+  "1379": {
+    "tile_id": 1379,
+    "desc": "acid zap 8 1",
+    "sheet": "Objects/Effect0.png",
+    "col": 3,
+    "row": 12
+  },
+  "1380": {
+    "tile_id": 1380,
+    "desc": "acid zap 8 2",
+    "sheet": "Objects/Effect0.png",
+    "col": 4,
+    "row": 12
+  },
+  "1381": {
+    "tile_id": 1381,
+    "desc": "acid zap 8 3",
+    "sheet": "Objects/Effect0.png",
+    "col": 5,
+    "row": 12
+  },
+  "1382": {
+    "tile_id": 1382,
+    "desc": "dig beam",
+    "sheet": "Objects/Effect0.png",
+    "col": 6,
+    "row": 12
+  },
+  "1383": {
+    "tile_id": 1383,
+    "desc": "flash beam",
+    "sheet": "Objects/Effect0.png",
+    "col": 7,
+    "row": 12
+  },
+  "1400": {
+    "tile_id": 1400,
+    "desc": "explosion dark top left",
+    "sheet": "Objects/Effect0.png",
+    "col": 0,
+    "row": 15
+  },
+  "1401": {
+    "tile_id": 1401,
+    "desc": "explosion dark top center",
+    "sheet": "Objects/Effect0.png",
+    "col": 1,
+    "row": 15
+  },
+  "1402": {
+    "tile_id": 1402,
+    "desc": "explosion dark top right",
+    "sheet": "Objects/Effect0.png",
+    "col": 2,
+    "row": 15
+  },
+  "1403": {
+    "tile_id": 1403,
+    "desc": "explosion dark middle left",
+    "sheet": "Objects/Effect0.png",
+    "col": 3,
+    "row": 15
+  },
+  "1404": {
+    "tile_id": 1404,
+    "desc": "explosion dark middle center",
+    "sheet": "Objects/Effect0.png",
+    "col": 4,
+    "row": 15
+  },
+  "1405": {
+    "tile_id": 1405,
+    "desc": "explosion dark middle right",
+    "sheet": "Objects/Effect0.png",
+    "col": 5,
+    "row": 15
+  },
+  "1406": {
+    "tile_id": 1406,
+    "desc": "explosion dark bottom left",
+    "sheet": "Objects/Effect0.png",
+    "col": 6,
+    "row": 15
+  },
+  "1407": {
+    "tile_id": 1407,
+    "desc": "explosion dark bottom center",
+    "sheet": "Objects/Effect0.png",
+    "col": 7,
+    "row": 15
+  },
+  "1408": {
+    "tile_id": 1408,
+    "desc": "explosion dark bottom right",
+    "sheet": "Objects/Effect0.png",
+    "col": 0,
+    "row": 16
+  },
+  "1409": {
+    "tile_id": 1409,
+    "desc": "explosion noxious top left",
+    "sheet": "Objects/Effect0.png",
+    "col": 1,
+    "row": 16
+  },
+  "1410": {
+    "tile_id": 1410,
+    "desc": "explosion noxious top center",
+    "sheet": "Objects/Effect0.png",
+    "col": 2,
+    "row": 16
+  },
+  "1411": {
+    "tile_id": 1411,
+    "desc": "explosion noxious top right",
+    "sheet": "Objects/Effect0.png",
+    "col": 3,
+    "row": 16
+  },
+  "1412": {
+    "tile_id": 1412,
+    "desc": "explosion noxious middle left",
+    "sheet": "Objects/Effect0.png",
+    "col": 4,
+    "row": 16
+  },
+  "1413": {
+    "tile_id": 1413,
+    "desc": "explosion noxious middle center",
+    "sheet": "Objects/Effect0.png",
+    "col": 5,
+    "row": 16
+  },
+  "1414": {
+    "tile_id": 1414,
+    "desc": "explosion noxious middle right",
+    "sheet": "Objects/Effect0.png",
+    "col": 6,
+    "row": 16
+  },
+  "1415": {
+    "tile_id": 1415,
+    "desc": "explosion noxious bottom left",
+    "sheet": "Objects/Effect0.png",
+    "col": 7,
+    "row": 16
+  },
+  "1416": {
+    "tile_id": 1416,
+    "desc": "explosion noxious bottom center",
+    "sheet": "Objects/Effect0.png",
+    "col": 0,
+    "row": 17
+  },
+  "1417": {
+    "tile_id": 1417,
+    "desc": "explosion noxious bottom right",
+    "sheet": "Objects/Effect0.png",
+    "col": 1,
+    "row": 17
+  },
+  "1418": {
+    "tile_id": 1418,
+    "desc": "explosion muddy top left",
+    "sheet": "Objects/Effect0.png",
+    "col": 2,
+    "row": 17
+  },
+  "1419": {
+    "tile_id": 1419,
+    "desc": "explosion muddy top center",
+    "sheet": "Objects/Effect0.png",
+    "col": 3,
+    "row": 17
+  },
+  "1420": {
+    "tile_id": 1420,
+    "desc": "explosion muddy top right",
+    "sheet": "Objects/Effect0.png",
+    "col": 4,
+    "row": 17
+  },
+  "1421": {
+    "tile_id": 1421,
+    "desc": "explosion muddy middle left",
+    "sheet": "Objects/Effect0.png",
+    "col": 5,
+    "row": 17
+  },
+  "1422": {
+    "tile_id": 1422,
+    "desc": "explosion muddy middle center",
+    "sheet": "Objects/Effect0.png",
+    "col": 6,
+    "row": 17
+  },
+  "1423": {
+    "tile_id": 1423,
+    "desc": "explosion muddy middle right",
+    "sheet": "Objects/Effect0.png",
+    "col": 7,
+    "row": 17
+  },
+  "1424": {
+    "tile_id": 1424,
+    "desc": "explosion muddy bottom left",
+    "sheet": "Objects/Effect0.png",
+    "col": 0,
+    "row": 18
+  },
+  "1425": {
+    "tile_id": 1425,
+    "desc": "explosion muddy bottom center",
+    "sheet": "Objects/Effect0.png",
+    "col": 1,
+    "row": 18
+  },
+  "1426": {
+    "tile_id": 1426,
+    "desc": "explosion muddy bottom right",
+    "sheet": "Objects/Effect0.png",
+    "col": 2,
+    "row": 18
+  },
+  "1427": {
+    "tile_id": 1427,
+    "desc": "explosion wet top left",
+    "sheet": "Objects/Effect0.png",
+    "col": 3,
+    "row": 18
+  },
+  "1428": {
+    "tile_id": 1428,
+    "desc": "explosion wet top center",
+    "sheet": "Objects/Effect0.png",
+    "col": 4,
+    "row": 18
+  },
+  "1429": {
+    "tile_id": 1429,
+    "desc": "explosion wet top right",
+    "sheet": "Objects/Effect0.png",
+    "col": 5,
+    "row": 18
+  },
+  "1430": {
+    "tile_id": 1430,
+    "desc": "explosion wet middle left",
+    "sheet": "Objects/Effect0.png",
+    "col": 6,
+    "row": 18
+  },
+  "1431": {
+    "tile_id": 1431,
+    "desc": "explosion wet middle center",
+    "sheet": "Objects/Effect0.png",
+    "col": 7,
+    "row": 18
+  },
+  "1432": {
+    "tile_id": 1432,
+    "desc": "explosion wet middle right",
+    "sheet": "Objects/Effect0.png",
+    "col": 0,
+    "row": 19
+  },
+  "1433": {
+    "tile_id": 1433,
+    "desc": "explosion wet bottom left",
+    "sheet": "Objects/Effect0.png",
+    "col": 1,
+    "row": 19
+  },
+  "1434": {
+    "tile_id": 1434,
+    "desc": "explosion wet bottom center",
+    "sheet": "Objects/Effect0.png",
+    "col": 2,
+    "row": 19
+  },
+  "1435": {
+    "tile_id": 1435,
+    "desc": "explosion wet bottom right",
+    "sheet": "Objects/Effect0.png",
+    "col": 3,
+    "row": 19
+  },
+  "1436": {
+    "tile_id": 1436,
+    "desc": "explosion magical top left",
+    "sheet": "Objects/Effect0.png",
+    "col": 4,
+    "row": 19
+  },
+  "1437": {
+    "tile_id": 1437,
+    "desc": "explosion magical top center",
+    "sheet": "Objects/Effect0.png",
+    "col": 5,
+    "row": 19
+  },
+  "1438": {
+    "tile_id": 1438,
+    "desc": "explosion magical top right",
+    "sheet": "Objects/Effect0.png",
+    "col": 6,
+    "row": 19
+  },
+  "1439": {
+    "tile_id": 1439,
+    "desc": "explosion magical middle left",
+    "sheet": "Objects/Effect0.png",
+    "col": 7,
+    "row": 19
+  },
+  "1440": {
+    "tile_id": 1440,
+    "desc": "explosion magical middle center",
+    "sheet": "Objects/Effect0.png",
+    "col": 0,
+    "row": 0
+  },
+  "1441": {
+    "tile_id": 1441,
+    "desc": "explosion magical middle right",
+    "sheet": "Objects/Effect0.png",
+    "col": 1,
+    "row": 0
+  },
+  "1442": {
+    "tile_id": 1442,
+    "desc": "explosion magical bottom left",
+    "sheet": "Objects/Effect0.png",
+    "col": 2,
+    "row": 0
+  },
+  "1443": {
+    "tile_id": 1443,
+    "desc": "explosion magical bottom center",
+    "sheet": "Objects/Effect0.png",
+    "col": 3,
+    "row": 0
+  },
+  "1444": {
+    "tile_id": 1444,
+    "desc": "explosion magical bottom right",
+    "sheet": "Objects/Effect0.png",
+    "col": 4,
+    "row": 0
+  },
+  "1445": {
+    "tile_id": 1445,
+    "desc": "explosion fiery top left",
+    "sheet": "Objects/Effect0.png",
+    "col": 5,
+    "row": 0
+  },
+  "1446": {
+    "tile_id": 1446,
+    "desc": "explosion fiery top center",
+    "sheet": "Objects/Effect0.png",
+    "col": 6,
+    "row": 0
+  },
+  "1447": {
+    "tile_id": 1447,
+    "desc": "explosion fiery top right",
+    "sheet": "Objects/Effect0.png",
+    "col": 7,
+    "row": 0
+  },
+  "1448": {
+    "tile_id": 1448,
+    "desc": "explosion fiery middle left",
+    "sheet": "Objects/Effect0.png",
+    "col": 0,
+    "row": 1
+  },
+  "1449": {
+    "tile_id": 1449,
+    "desc": "explosion fiery middle center",
+    "sheet": "Objects/Effect0.png",
+    "col": 1,
+    "row": 1
+  },
+  "1450": {
+    "tile_id": 1450,
+    "desc": "explosion fiery middle right",
+    "sheet": "Objects/Effect0.png",
+    "col": 2,
+    "row": 1
+  },
+  "1451": {
+    "tile_id": 1451,
+    "desc": "explosion fiery bottom left",
+    "sheet": "Objects/Effect0.png",
+    "col": 3,
+    "row": 1
+  },
+  "1452": {
+    "tile_id": 1452,
+    "desc": "explosion fiery bottom center",
+    "sheet": "Objects/Effect0.png",
+    "col": 4,
+    "row": 1
+  },
+  "1453": {
+    "tile_id": 1453,
+    "desc": "explosion fiery bottom right",
+    "sheet": "Objects/Effect0.png",
+    "col": 5,
+    "row": 1
+  },
+  "1454": {
+    "tile_id": 1454,
+    "desc": "explosion frosty top left",
+    "sheet": "Objects/Effect0.png",
+    "col": 6,
+    "row": 1
+  },
+  "1455": {
+    "tile_id": 1455,
+    "desc": "explosion frosty top center",
+    "sheet": "Objects/Effect0.png",
+    "col": 7,
+    "row": 1
+  },
+  "1456": {
+    "tile_id": 1456,
+    "desc": "explosion frosty top right",
+    "sheet": "Objects/Effect0.png",
+    "col": 0,
+    "row": 2
+  },
+  "1457": {
+    "tile_id": 1457,
+    "desc": "explosion frosty middle left",
+    "sheet": "Objects/Effect0.png",
+    "col": 1,
+    "row": 2
+  },
+  "1458": {
+    "tile_id": 1458,
+    "desc": "explosion frosty middle center",
+    "sheet": "Objects/Effect0.png",
+    "col": 2,
+    "row": 2
+  },
+  "1459": {
+    "tile_id": 1459,
+    "desc": "explosion frosty middle right",
+    "sheet": "Objects/Effect0.png",
+    "col": 3,
+    "row": 2
+  },
+  "1460": {
+    "tile_id": 1460,
+    "desc": "explosion frosty bottom left",
+    "sheet": "Objects/Effect0.png",
+    "col": 4,
+    "row": 2
+  },
+  "1461": {
+    "tile_id": 1461,
+    "desc": "explosion frosty bottom center",
+    "sheet": "Objects/Effect0.png",
+    "col": 5,
+    "row": 2
+  },
+  "1462": {
+    "tile_id": 1462,
+    "desc": "explosion frosty bottom right",
+    "sheet": "Objects/Effect0.png",
+    "col": 6,
+    "row": 2
+  },
+  "1471": {
+    "tile_id": 1471,
+    "desc": "mines walls vertical",
+    "sheet": "Objects/Wall.png",
+    "col": 0,
+    "row": 4
+  },
+  "1472": {
+    "tile_id": 1472,
+    "desc": "mines walls horizontal",
+    "sheet": "Objects/Wall.png",
+    "col": 1,
+    "row": 4
+  },
+  "1473": {
+    "tile_id": 1473,
+    "desc": "mines walls tlcorn",
+    "sheet": "Objects/Wall.png",
+    "col": 2,
+    "row": 4
+  },
+  "1474": {
+    "tile_id": 1474,
+    "desc": "mines walls trcorn",
+    "sheet": "Objects/Wall.png",
+    "col": 3,
+    "row": 4
+  },
+  "1475": {
+    "tile_id": 1475,
+    "desc": "mines walls blcorn",
+    "sheet": "Objects/Wall.png",
+    "col": 4,
+    "row": 4
+  },
+  "1476": {
+    "tile_id": 1476,
+    "desc": "mines walls brcorn",
+    "sheet": "Objects/Wall.png",
+    "col": 5,
+    "row": 4
+  },
+  "1477": {
+    "tile_id": 1477,
+    "desc": "mines walls cross wall",
+    "sheet": "Objects/Wall.png",
+    "col": 6,
+    "row": 4
+  },
+  "1478": {
+    "tile_id": 1478,
+    "desc": "mines walls tuwall",
+    "sheet": "Objects/Wall.png",
+    "col": 7,
+    "row": 4
+  },
+  "1479": {
+    "tile_id": 1479,
+    "desc": "mines walls tdwall",
+    "sheet": "Objects/Wall.png",
+    "col": 8,
+    "row": 4
+  },
+  "1480": {
+    "tile_id": 1480,
+    "desc": "mines walls tlwall",
+    "sheet": "Objects/Wall.png",
+    "col": 9,
+    "row": 4
+  },
+  "1481": {
+    "tile_id": 1481,
+    "desc": "mines walls trwall",
+    "sheet": "Objects/Wall.png",
+    "col": 10,
+    "row": 4
+  },
+  "1482": {
+    "tile_id": 1482,
+    "desc": "gehennom walls vertical",
+    "sheet": "Objects/Wall.png",
+    "col": 0,
+    "row": 8
+  },
+  "1483": {
+    "tile_id": 1483,
+    "desc": "gehennom walls horizontal",
+    "sheet": "Objects/Wall.png",
+    "col": 1,
+    "row": 8
+  },
+  "1484": {
+    "tile_id": 1484,
+    "desc": "gehennom walls tlcorn",
+    "sheet": "Objects/Wall.png",
+    "col": 2,
+    "row": 8
+  },
+  "1485": {
+    "tile_id": 1485,
+    "desc": "gehennom walls trcorn",
+    "sheet": "Objects/Wall.png",
+    "col": 3,
+    "row": 8
+  },
+  "1486": {
+    "tile_id": 1486,
+    "desc": "gehennom walls blcorn",
+    "sheet": "Objects/Wall.png",
+    "col": 4,
+    "row": 8
+  },
+  "1487": {
+    "tile_id": 1487,
+    "desc": "gehennom walls brcorn",
+    "sheet": "Objects/Wall.png",
+    "col": 5,
+    "row": 8
+  },
+  "1488": {
+    "tile_id": 1488,
+    "desc": "gehennom walls cross wall",
+    "sheet": "Objects/Wall.png",
+    "col": 6,
+    "row": 8
+  },
+  "1489": {
+    "tile_id": 1489,
+    "desc": "gehennom walls tuwall",
+    "sheet": "Objects/Wall.png",
+    "col": 7,
+    "row": 8
+  },
+  "1490": {
+    "tile_id": 1490,
+    "desc": "gehennom walls tdwall",
+    "sheet": "Objects/Wall.png",
+    "col": 8,
+    "row": 8
+  },
+  "1491": {
+    "tile_id": 1491,
+    "desc": "gehennom walls tlwall",
+    "sheet": "Objects/Wall.png",
+    "col": 9,
+    "row": 8
+  },
+  "1492": {
+    "tile_id": 1492,
+    "desc": "gehennom walls trwall",
+    "sheet": "Objects/Wall.png",
+    "col": 10,
+    "row": 8
+  },
+  "1493": {
+    "tile_id": 1493,
+    "desc": "knox walls vertical",
+    "sheet": "Objects/Wall.png",
+    "col": 0,
+    "row": 12
+  },
+  "1494": {
+    "tile_id": 1494,
+    "desc": "knox walls horizontal",
+    "sheet": "Objects/Wall.png",
+    "col": 1,
+    "row": 12
+  },
+  "1495": {
+    "tile_id": 1495,
+    "desc": "knox walls tlcorn",
+    "sheet": "Objects/Wall.png",
+    "col": 2,
+    "row": 12
+  },
+  "1496": {
+    "tile_id": 1496,
+    "desc": "knox walls trcorn",
+    "sheet": "Objects/Wall.png",
+    "col": 3,
+    "row": 12
+  },
+  "1497": {
+    "tile_id": 1497,
+    "desc": "knox walls blcorn",
+    "sheet": "Objects/Wall.png",
+    "col": 4,
+    "row": 12
+  },
+  "1498": {
+    "tile_id": 1498,
+    "desc": "knox walls brcorn",
+    "sheet": "Objects/Wall.png",
+    "col": 5,
+    "row": 12
+  },
+  "1499": {
+    "tile_id": 1499,
+    "desc": "knox walls cross wall",
+    "sheet": "Objects/Wall.png",
+    "col": 6,
+    "row": 12
+  },
+  "1500": {
+    "tile_id": 1500,
+    "desc": "knox walls tuwall",
+    "sheet": "Objects/Wall.png",
+    "col": 7,
+    "row": 12
+  },
+  "1501": {
+    "tile_id": 1501,
+    "desc": "knox walls tdwall",
+    "sheet": "Objects/Wall.png",
+    "col": 8,
+    "row": 12
+  },
+  "1502": {
+    "tile_id": 1502,
+    "desc": "knox walls tlwall",
+    "sheet": "Objects/Wall.png",
+    "col": 9,
+    "row": 12
+  },
+  "1503": {
+    "tile_id": 1503,
+    "desc": "knox walls trwall",
+    "sheet": "Objects/Wall.png",
+    "col": 10,
+    "row": 12
+  },
+  "1504": {
+    "tile_id": 1504,
+    "desc": "sokoban walls vertical",
+    "sheet": "Objects/Wall.png",
+    "col": 0,
+    "row": 16
+  },
+  "1505": {
+    "tile_id": 1505,
+    "desc": "sokoban walls horizontal",
+    "sheet": "Objects/Wall.png",
+    "col": 1,
+    "row": 16
+  },
+  "1506": {
+    "tile_id": 1506,
+    "desc": "sokoban walls tlcorn",
+    "sheet": "Objects/Wall.png",
+    "col": 2,
+    "row": 16
+  },
+  "1507": {
+    "tile_id": 1507,
+    "desc": "sokoban walls trcorn",
+    "sheet": "Objects/Wall.png",
+    "col": 3,
+    "row": 16
+  },
+  "1508": {
+    "tile_id": 1508,
+    "desc": "sokoban walls blcorn",
+    "sheet": "Objects/Wall.png",
+    "col": 4,
+    "row": 16
+  },
+  "1509": {
+    "tile_id": 1509,
+    "desc": "sokoban walls brcorn",
+    "sheet": "Objects/Wall.png",
+    "col": 5,
+    "row": 16
+  },
+  "1510": {
+    "tile_id": 1510,
+    "desc": "sokoban walls cross wall",
+    "sheet": "Objects/Wall.png",
+    "col": 6,
+    "row": 16
+  },
+  "1511": {
+    "tile_id": 1511,
+    "desc": "sokoban walls tuwall",
+    "sheet": "Objects/Wall.png",
+    "col": 7,
+    "row": 16
+  },
+  "1512": {
+    "tile_id": 1512,
+    "desc": "sokoban walls tdwall",
+    "sheet": "Objects/Wall.png",
+    "col": 8,
+    "row": 16
+  },
+  "1513": {
+    "tile_id": 1513,
+    "desc": "sokoban walls tlwall",
+    "sheet": "Objects/Wall.png",
+    "col": 9,
+    "row": 16
+  },
+  "1514": {
+    "tile_id": 1514,
+    "desc": "sokoban walls trwall",
+    "sheet": "Objects/Wall.png",
+    "col": 10,
+    "row": 16
+  }
+}

@@ -1,0 +1,2760 @@
+[
+  {
+    "name": "giant ant",
+    "m": "giant ant",
+    "f": "giant ant",
+    "n": "giant ant",
+    "s_class": "S_ANT"
+  },
+  {
+    "name": "killer bee",
+    "m": "killer bee",
+    "f": "killer bee",
+    "n": "killer bee",
+    "s_class": "S_ANT"
+  },
+  {
+    "name": "soldier ant",
+    "m": "soldier ant",
+    "f": "soldier ant",
+    "n": "soldier ant",
+    "s_class": "S_ANT"
+  },
+  {
+    "name": "fire ant",
+    "m": "fire ant",
+    "f": "fire ant",
+    "n": "fire ant",
+    "s_class": "S_ANT"
+  },
+  {
+    "name": "giant beetle",
+    "m": "giant beetle",
+    "f": "giant beetle",
+    "n": "giant beetle",
+    "s_class": "S_ANT"
+  },
+  {
+    "name": "queen bee",
+    "m": "queen bee",
+    "f": "queen bee",
+    "n": "queen bee",
+    "s_class": "S_ANT"
+  },
+  {
+    "name": "acid blob",
+    "m": "acid blob",
+    "f": "acid blob",
+    "n": "acid blob",
+    "s_class": "S_BLOB"
+  },
+  {
+    "name": "quivering blob",
+    "m": "quivering blob",
+    "f": "quivering blob",
+    "n": "quivering blob",
+    "s_class": "S_BLOB"
+  },
+  {
+    "name": "gelatinous cube",
+    "m": "gelatinous cube",
+    "f": "gelatinous cube",
+    "n": "gelatinous cube",
+    "s_class": "S_BLOB"
+  },
+  {
+    "name": "chickatrice",
+    "m": "chickatrice",
+    "f": "chickatrice",
+    "n": "chickatrice",
+    "s_class": "S_COCKATRICE"
+  },
+  {
+    "name": "cockatrice",
+    "m": "cockatrice",
+    "f": "cockatrice",
+    "n": "cockatrice",
+    "s_class": "S_COCKATRICE"
+  },
+  {
+    "name": "pyrolisk",
+    "m": "pyrolisk",
+    "f": "pyrolisk",
+    "n": "pyrolisk",
+    "s_class": "S_COCKATRICE"
+  },
+  {
+    "name": "jackal",
+    "m": "jackal",
+    "f": "jackal",
+    "n": "jackal",
+    "s_class": "S_DOG"
+  },
+  {
+    "name": "fox",
+    "m": "fox",
+    "f": "fox",
+    "n": "fox",
+    "s_class": "S_DOG"
+  },
+  {
+    "name": "coyote",
+    "m": "coyote",
+    "f": "coyote",
+    "n": "coyote",
+    "s_class": "S_DOG"
+  },
+  {
+    "name": "werejackal",
+    "m": "werejackal",
+    "f": "werejackal",
+    "n": "werejackal",
+    "s_class": "S_DOG"
+  },
+  {
+    "name": "little dog",
+    "m": "little dog",
+    "f": "little dog",
+    "n": "little dog",
+    "s_class": "S_DOG"
+  },
+  {
+    "name": "dingo",
+    "m": "dingo",
+    "f": "dingo",
+    "n": "dingo",
+    "s_class": "S_DOG"
+  },
+  {
+    "name": "dog",
+    "m": "dog",
+    "f": "dog",
+    "n": "dog",
+    "s_class": "S_DOG"
+  },
+  {
+    "name": "large dog",
+    "m": "large dog",
+    "f": "large dog",
+    "n": "large dog",
+    "s_class": "S_DOG"
+  },
+  {
+    "name": "wolf",
+    "m": "wolf",
+    "f": "wolf",
+    "n": "wolf",
+    "s_class": "S_DOG"
+  },
+  {
+    "name": "werewolf",
+    "m": "werewolf",
+    "f": "werewolf",
+    "n": "werewolf",
+    "s_class": "S_DOG"
+  },
+  {
+    "name": "winter wolf cub",
+    "m": "winter wolf cub",
+    "f": "winter wolf cub",
+    "n": "winter wolf cub",
+    "s_class": "S_DOG"
+  },
+  {
+    "name": "warg",
+    "m": "warg",
+    "f": "warg",
+    "n": "warg",
+    "s_class": "S_DOG"
+  },
+  {
+    "name": "winter wolf",
+    "m": "winter wolf",
+    "f": "winter wolf",
+    "n": "winter wolf",
+    "s_class": "S_DOG"
+  },
+  {
+    "name": "hell hound pup",
+    "m": "hell hound pup",
+    "f": "hell hound pup",
+    "n": "hell hound pup",
+    "s_class": "S_DOG"
+  },
+  {
+    "name": "hell hound",
+    "m": "hell hound",
+    "f": "hell hound",
+    "n": "hell hound",
+    "s_class": "S_DOG"
+  },
+  {
+    "name": "Cerberus",
+    "m": "Cerberus",
+    "f": "Cerberus",
+    "n": "Cerberus",
+    "s_class": "S_DOG"
+  },
+  {
+    "name": "gas spore",
+    "m": "gas spore",
+    "f": "gas spore",
+    "n": "gas spore",
+    "s_class": "S_EYE"
+  },
+  {
+    "name": "floating eye",
+    "m": "floating eye",
+    "f": "floating eye",
+    "n": "floating eye",
+    "s_class": "S_EYE"
+  },
+  {
+    "name": "freezing sphere",
+    "m": "freezing sphere",
+    "f": "freezing sphere",
+    "n": "freezing sphere",
+    "s_class": "S_EYE"
+  },
+  {
+    "name": "flaming sphere",
+    "m": "flaming sphere",
+    "f": "flaming sphere",
+    "n": "flaming sphere",
+    "s_class": "S_EYE"
+  },
+  {
+    "name": "shocking sphere",
+    "m": "shocking sphere",
+    "f": "shocking sphere",
+    "n": "shocking sphere",
+    "s_class": "S_EYE"
+  },
+  {
+    "name": "beholder",
+    "m": "beholder",
+    "f": "beholder",
+    "n": "beholder",
+    "s_class": "S_EYE"
+  },
+  {
+    "name": "kitten",
+    "m": "kitten",
+    "f": "kitten",
+    "n": "kitten",
+    "s_class": "S_FELINE"
+  },
+  {
+    "name": "housecat",
+    "m": "housecat",
+    "f": "housecat",
+    "n": "housecat",
+    "s_class": "S_FELINE"
+  },
+  {
+    "name": "jaguar",
+    "m": "jaguar",
+    "f": "jaguar",
+    "n": "jaguar",
+    "s_class": "S_FELINE"
+  },
+  {
+    "name": "lynx",
+    "m": "lynx",
+    "f": "lynx",
+    "n": "lynx",
+    "s_class": "S_FELINE"
+  },
+  {
+    "name": "panther",
+    "m": "panther",
+    "f": "panther",
+    "n": "panther",
+    "s_class": "S_FELINE"
+  },
+  {
+    "name": "large cat",
+    "m": "large cat",
+    "f": "large cat",
+    "n": "large cat",
+    "s_class": "S_FELINE"
+  },
+  {
+    "name": "tiger",
+    "m": "tiger",
+    "f": "tiger",
+    "n": "tiger",
+    "s_class": "S_FELINE"
+  },
+  {
+    "name": "displacer beast",
+    "m": "displacer beast",
+    "f": "displacer beast",
+    "n": "displacer beast",
+    "s_class": "S_FELINE"
+  },
+  {
+    "name": "gremlin",
+    "m": "gremlin",
+    "f": "gremlin",
+    "n": "gremlin",
+    "s_class": "S_GREMLIN"
+  },
+  {
+    "name": "gargoyle",
+    "m": "gargoyle",
+    "f": "gargoyle",
+    "n": "gargoyle",
+    "s_class": "S_GREMLIN"
+  },
+  {
+    "name": "winged gargoyle",
+    "m": "winged gargoyle",
+    "f": "winged gargoyle",
+    "n": "winged gargoyle",
+    "s_class": "S_GREMLIN"
+  },
+  {
+    "name": "hobbit",
+    "m": "hobbit",
+    "f": "hobbit",
+    "n": "hobbit",
+    "s_class": "S_HUMANOID"
+  },
+  {
+    "name": "dwarf",
+    "m": "dwarf",
+    "f": "dwarf",
+    "n": "dwarf",
+    "s_class": "S_HUMANOID"
+  },
+  {
+    "name": "bugbear",
+    "m": "bugbear",
+    "f": "bugbear",
+    "n": "bugbear",
+    "s_class": "S_HUMANOID"
+  },
+  {
+    "name": "dwarf lord",
+    "m": "dwarf lord",
+    "f": "dwarf lady",
+    "n": "dwarf leader",
+    "s_class": "S_HUMANOID"
+  },
+  {
+    "name": "dwarf king",
+    "m": "dwarf king",
+    "f": "dwarf queen",
+    "n": "dwarf ruler",
+    "s_class": "S_HUMANOID"
+  },
+  {
+    "name": "mind flayer",
+    "m": "mind flayer",
+    "f": "mind flayer",
+    "n": "mind flayer",
+    "s_class": "S_HUMANOID"
+  },
+  {
+    "name": "master mind flayer",
+    "m": "master mind flayer",
+    "f": "master mind flayer",
+    "n": "master mind flayer",
+    "s_class": "S_HUMANOID"
+  },
+  {
+    "name": "manes",
+    "m": "manes",
+    "f": "manes",
+    "n": "manes",
+    "s_class": "S_IMP"
+  },
+  {
+    "name": "homunculus",
+    "m": "homunculus",
+    "f": "homunculus",
+    "n": "homunculus",
+    "s_class": "S_IMP"
+  },
+  {
+    "name": "imp",
+    "m": "imp",
+    "f": "imp",
+    "n": "imp",
+    "s_class": "S_IMP"
+  },
+  {
+    "name": "lemure",
+    "m": "lemure",
+    "f": "lemure",
+    "n": "lemure",
+    "s_class": "S_IMP"
+  },
+  {
+    "name": "quasit",
+    "m": "quasit",
+    "f": "quasit",
+    "n": "quasit",
+    "s_class": "S_IMP"
+  },
+  {
+    "name": "tengu",
+    "m": "tengu",
+    "f": "tengu",
+    "n": "tengu",
+    "s_class": "S_IMP"
+  },
+  {
+    "name": "blue jelly",
+    "m": "blue jelly",
+    "f": "blue jelly",
+    "n": "blue jelly",
+    "s_class": "S_JELLY"
+  },
+  {
+    "name": "spotted jelly",
+    "m": "spotted jelly",
+    "f": "spotted jelly",
+    "n": "spotted jelly",
+    "s_class": "S_JELLY"
+  },
+  {
+    "name": "ochre jelly",
+    "m": "ochre jelly",
+    "f": "ochre jelly",
+    "n": "ochre jelly",
+    "s_class": "S_JELLY"
+  },
+  {
+    "name": "kobold",
+    "m": "kobold",
+    "f": "kobold",
+    "n": "kobold",
+    "s_class": "S_KOBOLD"
+  },
+  {
+    "name": "large kobold",
+    "m": "large kobold",
+    "f": "large kobold",
+    "n": "large kobold",
+    "s_class": "S_KOBOLD"
+  },
+  {
+    "name": "kobold lord",
+    "m": "kobold lord",
+    "f": "kobold lady",
+    "n": "kobold leader",
+    "s_class": "S_KOBOLD"
+  },
+  {
+    "name": "kobold shaman",
+    "m": "kobold shaman",
+    "f": "kobold shaman",
+    "n": "kobold shaman",
+    "s_class": "S_KOBOLD"
+  },
+  {
+    "name": "leprechaun",
+    "m": "leprechaun",
+    "f": "leprechaun",
+    "n": "leprechaun",
+    "s_class": "S_LEPRECHAUN"
+  },
+  {
+    "name": "small mimic",
+    "m": "small mimic",
+    "f": "small mimic",
+    "n": "small mimic",
+    "s_class": "S_MIMIC"
+  },
+  {
+    "name": "large mimic",
+    "m": "large mimic",
+    "f": "large mimic",
+    "n": "large mimic",
+    "s_class": "S_MIMIC"
+  },
+  {
+    "name": "giant mimic",
+    "m": "giant mimic",
+    "f": "giant mimic",
+    "n": "giant mimic",
+    "s_class": "S_MIMIC"
+  },
+  {
+    "name": "wood nymph",
+    "m": "wood nymph",
+    "f": "wood nymph",
+    "n": "wood nymph",
+    "s_class": "S_NYMPH"
+  },
+  {
+    "name": "water nymph",
+    "m": "water nymph",
+    "f": "water nymph",
+    "n": "water nymph",
+    "s_class": "S_NYMPH"
+  },
+  {
+    "name": "mountain nymph",
+    "m": "mountain nymph",
+    "f": "mountain nymph",
+    "n": "mountain nymph",
+    "s_class": "S_NYMPH"
+  },
+  {
+    "name": "goblin",
+    "m": "goblin",
+    "f": "goblin",
+    "n": "goblin",
+    "s_class": "S_ORC"
+  },
+  {
+    "name": "hobgoblin",
+    "m": "hobgoblin",
+    "f": "hobgoblin",
+    "n": "hobgoblin",
+    "s_class": "S_ORC"
+  },
+  {
+    "name": "orc",
+    "m": "orc",
+    "f": "orc",
+    "n": "orc",
+    "s_class": "S_ORC"
+  },
+  {
+    "name": "hill orc",
+    "m": "hill orc",
+    "f": "hill orc",
+    "n": "hill orc",
+    "s_class": "S_ORC"
+  },
+  {
+    "name": "Mordor orc",
+    "m": "Mordor orc",
+    "f": "Mordor orc",
+    "n": "Mordor orc",
+    "s_class": "S_ORC"
+  },
+  {
+    "name": "Uruk-hai",
+    "m": "Uruk-hai",
+    "f": "Uruk-hai",
+    "n": "Uruk-hai",
+    "s_class": "S_ORC"
+  },
+  {
+    "name": "orc shaman",
+    "m": "orc shaman",
+    "f": "orc shaman",
+    "n": "orc shaman",
+    "s_class": "S_ORC"
+  },
+  {
+    "name": "orc-captain",
+    "m": "orc-captain",
+    "f": "orc-captain",
+    "n": "orc-captain",
+    "s_class": "S_ORC"
+  },
+  {
+    "name": "rock piercer",
+    "m": "rock piercer",
+    "f": "rock piercer",
+    "n": "rock piercer",
+    "s_class": "S_PIERCER"
+  },
+  {
+    "name": "iron piercer",
+    "m": "iron piercer",
+    "f": "iron piercer",
+    "n": "iron piercer",
+    "s_class": "S_PIERCER"
+  },
+  {
+    "name": "glass piercer",
+    "m": "glass piercer",
+    "f": "glass piercer",
+    "n": "glass piercer",
+    "s_class": "S_PIERCER"
+  },
+  {
+    "name": "rothe",
+    "m": "rothe",
+    "f": "rothe",
+    "n": "rothe",
+    "s_class": "S_QUADRUPED"
+  },
+  {
+    "name": "mumak",
+    "m": "mumak",
+    "f": "mumak",
+    "n": "mumak",
+    "s_class": "S_QUADRUPED"
+  },
+  {
+    "name": "leocrotta",
+    "m": "leocrotta",
+    "f": "leocrotta",
+    "n": "leocrotta",
+    "s_class": "S_QUADRUPED"
+  },
+  {
+    "name": "wumpus",
+    "m": "wumpus",
+    "f": "wumpus",
+    "n": "wumpus",
+    "s_class": "S_QUADRUPED"
+  },
+  {
+    "name": "titanothere",
+    "m": "titanothere",
+    "f": "titanothere",
+    "n": "titanothere",
+    "s_class": "S_QUADRUPED"
+  },
+  {
+    "name": "baluchitherium",
+    "m": "baluchitherium",
+    "f": "baluchitherium",
+    "n": "baluchitherium",
+    "s_class": "S_QUADRUPED"
+  },
+  {
+    "name": "mastodon",
+    "m": "mastodon",
+    "f": "mastodon",
+    "n": "mastodon",
+    "s_class": "S_QUADRUPED"
+  },
+  {
+    "name": "sewer rat",
+    "m": "sewer rat",
+    "f": "sewer rat",
+    "n": "sewer rat",
+    "s_class": "S_RODENT"
+  },
+  {
+    "name": "giant rat",
+    "m": "giant rat",
+    "f": "giant rat",
+    "n": "giant rat",
+    "s_class": "S_RODENT"
+  },
+  {
+    "name": "rabid rat",
+    "m": "rabid rat",
+    "f": "rabid rat",
+    "n": "rabid rat",
+    "s_class": "S_RODENT"
+  },
+  {
+    "name": "wererat",
+    "m": "wererat",
+    "f": "wererat",
+    "n": "wererat",
+    "s_class": "S_RODENT"
+  },
+  {
+    "name": "rock mole",
+    "m": "rock mole",
+    "f": "rock mole",
+    "n": "rock mole",
+    "s_class": "S_RODENT"
+  },
+  {
+    "name": "woodchuck",
+    "m": "woodchuck",
+    "f": "woodchuck",
+    "n": "woodchuck",
+    "s_class": "S_RODENT"
+  },
+  {
+    "name": "cave spider",
+    "m": "cave spider",
+    "f": "cave spider",
+    "n": "cave spider",
+    "s_class": "S_SPIDER"
+  },
+  {
+    "name": "centipede",
+    "m": "centipede",
+    "f": "centipede",
+    "n": "centipede",
+    "s_class": "S_SPIDER"
+  },
+  {
+    "name": "giant spider",
+    "m": "giant spider",
+    "f": "giant spider",
+    "n": "giant spider",
+    "s_class": "S_SPIDER"
+  },
+  {
+    "name": "scorpion",
+    "m": "scorpion",
+    "f": "scorpion",
+    "n": "scorpion",
+    "s_class": "S_SPIDER"
+  },
+  {
+    "name": "lurker above",
+    "m": "lurker above",
+    "f": "lurker above",
+    "n": "lurker above",
+    "s_class": "S_TRAPPER"
+  },
+  {
+    "name": "trapper",
+    "m": "trapper",
+    "f": "trapper",
+    "n": "trapper",
+    "s_class": "S_TRAPPER"
+  },
+  {
+    "name": "pony",
+    "m": "pony",
+    "f": "pony",
+    "n": "pony",
+    "s_class": "S_UNICORN"
+  },
+  {
+    "name": "white unicorn",
+    "m": "white unicorn",
+    "f": "white unicorn",
+    "n": "white unicorn",
+    "s_class": "S_UNICORN"
+  },
+  {
+    "name": "gray unicorn",
+    "m": "gray unicorn",
+    "f": "gray unicorn",
+    "n": "gray unicorn",
+    "s_class": "S_UNICORN"
+  },
+  {
+    "name": "black unicorn",
+    "m": "black unicorn",
+    "f": "black unicorn",
+    "n": "black unicorn",
+    "s_class": "S_UNICORN"
+  },
+  {
+    "name": "horse",
+    "m": "horse",
+    "f": "horse",
+    "n": "horse",
+    "s_class": "S_UNICORN"
+  },
+  {
+    "name": "warhorse",
+    "m": "warhorse",
+    "f": "warhorse",
+    "n": "warhorse",
+    "s_class": "S_UNICORN"
+  },
+  {
+    "name": "fog cloud",
+    "m": "fog cloud",
+    "f": "fog cloud",
+    "n": "fog cloud",
+    "s_class": "S_VORTEX"
+  },
+  {
+    "name": "dust vortex",
+    "m": "dust vortex",
+    "f": "dust vortex",
+    "n": "dust vortex",
+    "s_class": "S_VORTEX"
+  },
+  {
+    "name": "ice vortex",
+    "m": "ice vortex",
+    "f": "ice vortex",
+    "n": "ice vortex",
+    "s_class": "S_VORTEX"
+  },
+  {
+    "name": "energy vortex",
+    "m": "energy vortex",
+    "f": "energy vortex",
+    "n": "energy vortex",
+    "s_class": "S_VORTEX"
+  },
+  {
+    "name": "steam vortex",
+    "m": "steam vortex",
+    "f": "steam vortex",
+    "n": "steam vortex",
+    "s_class": "S_VORTEX"
+  },
+  {
+    "name": "fire vortex",
+    "m": "fire vortex",
+    "f": "fire vortex",
+    "n": "fire vortex",
+    "s_class": "S_VORTEX"
+  },
+  {
+    "name": "baby long worm",
+    "m": "baby long worm",
+    "f": "baby long worm",
+    "n": "baby long worm",
+    "s_class": "S_WORM"
+  },
+  {
+    "name": "baby purple worm",
+    "m": "baby purple worm",
+    "f": "baby purple worm",
+    "n": "baby purple worm",
+    "s_class": "S_WORM"
+  },
+  {
+    "name": "long worm",
+    "m": "long worm",
+    "f": "long worm",
+    "n": "long worm",
+    "s_class": "S_WORM"
+  },
+  {
+    "name": "purple worm",
+    "m": "purple worm",
+    "f": "purple worm",
+    "n": "purple worm",
+    "s_class": "S_WORM"
+  },
+  {
+    "name": "grid bug",
+    "m": "grid bug",
+    "f": "grid bug",
+    "n": "grid bug",
+    "s_class": "S_XAN"
+  },
+  {
+    "name": "xan",
+    "m": "xan",
+    "f": "xan",
+    "n": "xan",
+    "s_class": "S_XAN"
+  },
+  {
+    "name": "yellow light",
+    "m": "yellow light",
+    "f": "yellow light",
+    "n": "yellow light",
+    "s_class": "S_LIGHT"
+  },
+  {
+    "name": "black light",
+    "m": "black light",
+    "f": "black light",
+    "n": "black light",
+    "s_class": "S_LIGHT"
+  },
+  {
+    "name": "zruty",
+    "m": "zruty",
+    "f": "zruty",
+    "n": "zruty",
+    "s_class": "S_ZRUTY"
+  },
+  {
+    "name": "couatl",
+    "m": "couatl",
+    "f": "couatl",
+    "n": "couatl",
+    "s_class": "S_ANGEL"
+  },
+  {
+    "name": "Aleax",
+    "m": "Aleax",
+    "f": "Aleax",
+    "n": "Aleax",
+    "s_class": "S_ANGEL"
+  },
+  {
+    "name": "Angel",
+    "m": "Angel",
+    "f": "Angel",
+    "n": "Angel",
+    "s_class": "S_ANGEL"
+  },
+  {
+    "name": "ki-rin",
+    "m": "ki-rin",
+    "f": "ki-rin",
+    "n": "ki-rin",
+    "s_class": "S_ANGEL"
+  },
+  {
+    "name": "Archon",
+    "m": "Archon",
+    "f": "Archon",
+    "n": "Archon",
+    "s_class": "S_ANGEL"
+  },
+  {
+    "name": "bat",
+    "m": "bat",
+    "f": "bat",
+    "n": "bat",
+    "s_class": "S_BAT"
+  },
+  {
+    "name": "giant bat",
+    "m": "giant bat",
+    "f": "giant bat",
+    "n": "giant bat",
+    "s_class": "S_BAT"
+  },
+  {
+    "name": "raven",
+    "m": "raven",
+    "f": "raven",
+    "n": "raven",
+    "s_class": "S_BAT"
+  },
+  {
+    "name": "vampire bat",
+    "m": "vampire bat",
+    "f": "vampire bat",
+    "n": "vampire bat",
+    "s_class": "S_BAT"
+  },
+  {
+    "name": "plains centaur",
+    "m": "plains centaur",
+    "f": "plains centaur",
+    "n": "plains centaur",
+    "s_class": "S_CENTAUR"
+  },
+  {
+    "name": "forest centaur",
+    "m": "forest centaur",
+    "f": "forest centaur",
+    "n": "forest centaur",
+    "s_class": "S_CENTAUR"
+  },
+  {
+    "name": "mountain centaur",
+    "m": "mountain centaur",
+    "f": "mountain centaur",
+    "n": "mountain centaur",
+    "s_class": "S_CENTAUR"
+  },
+  {
+    "name": "baby gray dragon",
+    "m": "baby gray dragon",
+    "f": "baby gray dragon",
+    "n": "baby gray dragon",
+    "s_class": "S_DRAGON"
+  },
+  {
+    "name": "baby gold dragon",
+    "m": "baby gold dragon",
+    "f": "baby gold dragon",
+    "n": "baby gold dragon",
+    "s_class": "S_DRAGON"
+  },
+  {
+    "name": "baby silver dragon",
+    "m": "baby silver dragon",
+    "f": "baby silver dragon",
+    "n": "baby silver dragon",
+    "s_class": "S_DRAGON"
+  },
+  {
+    "name": "baby shimmering dragon",
+    "m": "baby shimmering dragon",
+    "f": "baby shimmering dragon",
+    "n": "baby shimmering dragon",
+    "s_class": "S_DRAGON"
+  },
+  {
+    "name": "baby red dragon",
+    "m": "baby red dragon",
+    "f": "baby red dragon",
+    "n": "baby red dragon",
+    "s_class": "S_DRAGON"
+  },
+  {
+    "name": "baby white dragon",
+    "m": "baby white dragon",
+    "f": "baby white dragon",
+    "n": "baby white dragon",
+    "s_class": "S_DRAGON"
+  },
+  {
+    "name": "baby orange dragon",
+    "m": "baby orange dragon",
+    "f": "baby orange dragon",
+    "n": "baby orange dragon",
+    "s_class": "S_DRAGON"
+  },
+  {
+    "name": "baby black dragon",
+    "m": "baby black dragon",
+    "f": "baby black dragon",
+    "n": "baby black dragon",
+    "s_class": "S_DRAGON"
+  },
+  {
+    "name": "baby blue dragon",
+    "m": "baby blue dragon",
+    "f": "baby blue dragon",
+    "n": "baby blue dragon",
+    "s_class": "S_DRAGON"
+  },
+  {
+    "name": "baby green dragon",
+    "m": "baby green dragon",
+    "f": "baby green dragon",
+    "n": "baby green dragon",
+    "s_class": "S_DRAGON"
+  },
+  {
+    "name": "baby yellow dragon",
+    "m": "baby yellow dragon",
+    "f": "baby yellow dragon",
+    "n": "baby yellow dragon",
+    "s_class": "S_DRAGON"
+  },
+  {
+    "name": "gray dragon",
+    "m": "gray dragon",
+    "f": "gray dragon",
+    "n": "gray dragon",
+    "s_class": "S_DRAGON"
+  },
+  {
+    "name": "gold dragon",
+    "m": "gold dragon",
+    "f": "gold dragon",
+    "n": "gold dragon",
+    "s_class": "S_DRAGON"
+  },
+  {
+    "name": "silver dragon",
+    "m": "silver dragon",
+    "f": "silver dragon",
+    "n": "silver dragon",
+    "s_class": "S_DRAGON"
+  },
+  {
+    "name": "shimmering dragon",
+    "m": "shimmering dragon",
+    "f": "shimmering dragon",
+    "n": "shimmering dragon",
+    "s_class": "S_DRAGON"
+  },
+  {
+    "name": "red dragon",
+    "m": "red dragon",
+    "f": "red dragon",
+    "n": "red dragon",
+    "s_class": "S_DRAGON"
+  },
+  {
+    "name": "white dragon",
+    "m": "white dragon",
+    "f": "white dragon",
+    "n": "white dragon",
+    "s_class": "S_DRAGON"
+  },
+  {
+    "name": "orange dragon",
+    "m": "orange dragon",
+    "f": "orange dragon",
+    "n": "orange dragon",
+    "s_class": "S_DRAGON"
+  },
+  {
+    "name": "black dragon",
+    "m": "black dragon",
+    "f": "black dragon",
+    "n": "black dragon",
+    "s_class": "S_DRAGON"
+  },
+  {
+    "name": "blue dragon",
+    "m": "blue dragon",
+    "f": "blue dragon",
+    "n": "blue dragon",
+    "s_class": "S_DRAGON"
+  },
+  {
+    "name": "green dragon",
+    "m": "green dragon",
+    "f": "green dragon",
+    "n": "green dragon",
+    "s_class": "S_DRAGON"
+  },
+  {
+    "name": "yellow dragon",
+    "m": "yellow dragon",
+    "f": "yellow dragon",
+    "n": "yellow dragon",
+    "s_class": "S_DRAGON"
+  },
+  {
+    "name": "stalker",
+    "m": "stalker",
+    "f": "stalker",
+    "n": "stalker",
+    "s_class": "S_ELEMENTAL"
+  },
+  {
+    "name": "air elemental",
+    "m": "air elemental",
+    "f": "air elemental",
+    "n": "air elemental",
+    "s_class": "S_ELEMENTAL"
+  },
+  {
+    "name": "fire elemental",
+    "m": "fire elemental",
+    "f": "fire elemental",
+    "n": "fire elemental",
+    "s_class": "S_ELEMENTAL"
+  },
+  {
+    "name": "earth elemental",
+    "m": "earth elemental",
+    "f": "earth elemental",
+    "n": "earth elemental",
+    "s_class": "S_ELEMENTAL"
+  },
+  {
+    "name": "water elemental",
+    "m": "water elemental",
+    "f": "water elemental",
+    "n": "water elemental",
+    "s_class": "S_ELEMENTAL"
+  },
+  {
+    "name": "lichen",
+    "m": "lichen",
+    "f": "lichen",
+    "n": "lichen",
+    "s_class": "S_FUNGUS"
+  },
+  {
+    "name": "brown mold",
+    "m": "brown mold",
+    "f": "brown mold",
+    "n": "brown mold",
+    "s_class": "S_FUNGUS"
+  },
+  {
+    "name": "yellow mold",
+    "m": "yellow mold",
+    "f": "yellow mold",
+    "n": "yellow mold",
+    "s_class": "S_FUNGUS"
+  },
+  {
+    "name": "green mold",
+    "m": "green mold",
+    "f": "green mold",
+    "n": "green mold",
+    "s_class": "S_FUNGUS"
+  },
+  {
+    "name": "red mold",
+    "m": "red mold",
+    "f": "red mold",
+    "n": "red mold",
+    "s_class": "S_FUNGUS"
+  },
+  {
+    "name": "shrieker",
+    "m": "shrieker",
+    "f": "shrieker",
+    "n": "shrieker",
+    "s_class": "S_FUNGUS"
+  },
+  {
+    "name": "violet fungus",
+    "m": "violet fungus",
+    "f": "violet fungus",
+    "n": "violet fungus",
+    "s_class": "S_FUNGUS"
+  },
+  {
+    "name": "gnome",
+    "m": "gnome",
+    "f": "gnome",
+    "n": "gnome",
+    "s_class": "S_GNOME"
+  },
+  {
+    "name": "gnome lord",
+    "m": "gnome lord",
+    "f": "gnome lady",
+    "n": "gnome leader",
+    "s_class": "S_GNOME"
+  },
+  {
+    "name": "gnomish wizard",
+    "m": "gnomish wizard",
+    "f": "gnomish wizard",
+    "n": "gnomish wizard",
+    "s_class": "S_GNOME"
+  },
+  {
+    "name": "gnome king",
+    "m": "gnome king",
+    "f": "gnome queen",
+    "n": "gnome ruler",
+    "s_class": "S_GNOME"
+  },
+  {
+    "name": "giant",
+    "m": "giant",
+    "f": "giant",
+    "n": "giant",
+    "s_class": "S_GIANT"
+  },
+  {
+    "name": "stone giant",
+    "m": "stone giant",
+    "f": "stone giant",
+    "n": "stone giant",
+    "s_class": "S_GIANT"
+  },
+  {
+    "name": "hill giant",
+    "m": "hill giant",
+    "f": "hill giant",
+    "n": "hill giant",
+    "s_class": "S_GIANT"
+  },
+  {
+    "name": "fire giant",
+    "m": "fire giant",
+    "f": "fire giant",
+    "n": "fire giant",
+    "s_class": "S_GIANT"
+  },
+  {
+    "name": "frost giant",
+    "m": "frost giant",
+    "f": "frost giant",
+    "n": "frost giant",
+    "s_class": "S_GIANT"
+  },
+  {
+    "name": "ettin",
+    "m": "ettin",
+    "f": "ettin",
+    "n": "ettin",
+    "s_class": "S_GIANT"
+  },
+  {
+    "name": "storm giant",
+    "m": "storm giant",
+    "f": "storm giant",
+    "n": "storm giant",
+    "s_class": "S_GIANT"
+  },
+  {
+    "name": "titan",
+    "m": "titan",
+    "f": "titan",
+    "n": "titan",
+    "s_class": "S_GIANT"
+  },
+  {
+    "name": "minotaur",
+    "m": "minotaur",
+    "f": "minotaur",
+    "n": "minotaur",
+    "s_class": "S_GIANT"
+  },
+  {
+    "name": "jabberwock",
+    "m": "jabberwock",
+    "f": "jabberwock",
+    "n": "jabberwock",
+    "s_class": "S_JABBERWOCK"
+  },
+  {
+    "name": "vorpal jabberwock",
+    "m": "vorpal jabberwock",
+    "f": "vorpal jabberwock",
+    "n": "vorpal jabberwock",
+    "s_class": "S_JABBERWOCK"
+  },
+  {
+    "name": "Keystone Kop",
+    "m": "Keystone Kop",
+    "f": "Keystone Kop",
+    "n": "Keystone Kop",
+    "s_class": "S_KOP"
+  },
+  {
+    "name": "Kop Sergeant",
+    "m": "Kop Sergeant",
+    "f": "Kop Sergeant",
+    "n": "Kop Sergeant",
+    "s_class": "S_KOP"
+  },
+  {
+    "name": "Kop Lieutenant",
+    "m": "Kop Lieutenant",
+    "f": "Kop Lieutenant",
+    "n": "Kop Lieutenant",
+    "s_class": "S_KOP"
+  },
+  {
+    "name": "Kop Kaptain",
+    "m": "Kop Kaptain",
+    "f": "Kop Kaptain",
+    "n": "Kop Kaptain",
+    "s_class": "S_KOP"
+  },
+  {
+    "name": "lich",
+    "m": "lich",
+    "f": "lich",
+    "n": "lich",
+    "s_class": "S_LICH"
+  },
+  {
+    "name": "demilich",
+    "m": "demilich",
+    "f": "demilich",
+    "n": "demilich",
+    "s_class": "S_LICH"
+  },
+  {
+    "name": "master lich",
+    "m": "master lich",
+    "f": "master lich",
+    "n": "master lich",
+    "s_class": "S_LICH"
+  },
+  {
+    "name": "arch-lich",
+    "m": "arch-lich",
+    "f": "arch-lich",
+    "n": "arch-lich",
+    "s_class": "S_LICH"
+  },
+  {
+    "name": "kobold mummy",
+    "m": "kobold mummy",
+    "f": "kobold mummy",
+    "n": "kobold mummy",
+    "s_class": "S_MUMMY"
+  },
+  {
+    "name": "gnome mummy",
+    "m": "gnome mummy",
+    "f": "gnome mummy",
+    "n": "gnome mummy",
+    "s_class": "S_MUMMY"
+  },
+  {
+    "name": "orc mummy",
+    "m": "orc mummy",
+    "f": "orc mummy",
+    "n": "orc mummy",
+    "s_class": "S_MUMMY"
+  },
+  {
+    "name": "dwarf mummy",
+    "m": "dwarf mummy",
+    "f": "dwarf mummy",
+    "n": "dwarf mummy",
+    "s_class": "S_MUMMY"
+  },
+  {
+    "name": "elf mummy",
+    "m": "elf mummy",
+    "f": "elf mummy",
+    "n": "elf mummy",
+    "s_class": "S_MUMMY"
+  },
+  {
+    "name": "human mummy",
+    "m": "human mummy",
+    "f": "human mummy",
+    "n": "human mummy",
+    "s_class": "S_MUMMY"
+  },
+  {
+    "name": "ettin mummy",
+    "m": "ettin mummy",
+    "f": "ettin mummy",
+    "n": "ettin mummy",
+    "s_class": "S_MUMMY"
+  },
+  {
+    "name": "giant mummy",
+    "m": "giant mummy",
+    "f": "giant mummy",
+    "n": "giant mummy",
+    "s_class": "S_MUMMY"
+  },
+  {
+    "name": "red naga hatchling",
+    "m": "red naga hatchling",
+    "f": "red naga hatchling",
+    "n": "red naga hatchling",
+    "s_class": "S_NAGA"
+  },
+  {
+    "name": "black naga hatchling",
+    "m": "black naga hatchling",
+    "f": "black naga hatchling",
+    "n": "black naga hatchling",
+    "s_class": "S_NAGA"
+  },
+  {
+    "name": "golden naga hatchling",
+    "m": "golden naga hatchling",
+    "f": "golden naga hatchling",
+    "n": "golden naga hatchling",
+    "s_class": "S_NAGA"
+  },
+  {
+    "name": "guardian naga hatchling",
+    "m": "guardian naga hatchling",
+    "f": "guardian naga hatchling",
+    "n": "guardian naga hatchling",
+    "s_class": "S_NAGA"
+  },
+  {
+    "name": "red naga",
+    "m": "red naga",
+    "f": "red naga",
+    "n": "red naga",
+    "s_class": "S_NAGA"
+  },
+  {
+    "name": "black naga",
+    "m": "black naga",
+    "f": "black naga",
+    "n": "black naga",
+    "s_class": "S_NAGA"
+  },
+  {
+    "name": "golden naga",
+    "m": "golden naga",
+    "f": "golden naga",
+    "n": "golden naga",
+    "s_class": "S_NAGA"
+  },
+  {
+    "name": "guardian naga",
+    "m": "guardian naga",
+    "f": "guardian naga",
+    "n": "guardian naga",
+    "s_class": "S_NAGA"
+  },
+  {
+    "name": "ogre",
+    "m": "ogre",
+    "f": "ogre",
+    "n": "ogre",
+    "s_class": "S_OGRE"
+  },
+  {
+    "name": "ogre lord",
+    "m": "ogre lord",
+    "f": "ogre lady",
+    "n": "ogre leader",
+    "s_class": "S_OGRE"
+  },
+  {
+    "name": "ogre king",
+    "m": "ogre king",
+    "f": "ogre queen",
+    "n": "ogre tyrant",
+    "s_class": "S_OGRE"
+  },
+  {
+    "name": "gray ooze",
+    "m": "gray ooze",
+    "f": "gray ooze",
+    "n": "gray ooze",
+    "s_class": "S_PUDDING"
+  },
+  {
+    "name": "brown pudding",
+    "m": "brown pudding",
+    "f": "brown pudding",
+    "n": "brown pudding",
+    "s_class": "S_PUDDING"
+  },
+  {
+    "name": "green slime",
+    "m": "green slime",
+    "f": "green slime",
+    "n": "green slime",
+    "s_class": "S_PUDDING"
+  },
+  {
+    "name": "black pudding",
+    "m": "black pudding",
+    "f": "black pudding",
+    "n": "black pudding",
+    "s_class": "S_PUDDING"
+  },
+  {
+    "name": "quantum mechanic",
+    "m": "quantum mechanic",
+    "f": "quantum mechanic",
+    "n": "quantum mechanic",
+    "s_class": "S_QUANTMECH"
+  },
+  {
+    "name": "genetic engineer",
+    "m": "genetic engineer",
+    "f": "genetic engineer",
+    "n": "genetic engineer",
+    "s_class": "S_QUANTMECH"
+  },
+  {
+    "name": "rust monster",
+    "m": "rust monster",
+    "f": "rust monster",
+    "n": "rust monster",
+    "s_class": "S_RUSTMONST"
+  },
+  {
+    "name": "disenchanter",
+    "m": "disenchanter",
+    "f": "disenchanter",
+    "n": "disenchanter",
+    "s_class": "S_RUSTMONST"
+  },
+  {
+    "name": "garter snake",
+    "m": "garter snake",
+    "f": "garter snake",
+    "n": "garter snake",
+    "s_class": "S_SNAKE"
+  },
+  {
+    "name": "snake",
+    "m": "snake",
+    "f": "snake",
+    "n": "snake",
+    "s_class": "S_SNAKE"
+  },
+  {
+    "name": "water moccasin",
+    "m": "water moccasin",
+    "f": "water moccasin",
+    "n": "water moccasin",
+    "s_class": "S_SNAKE"
+  },
+  {
+    "name": "python",
+    "m": "python",
+    "f": "python",
+    "n": "python",
+    "s_class": "S_SNAKE"
+  },
+  {
+    "name": "pit viper",
+    "m": "pit viper",
+    "f": "pit viper",
+    "n": "pit viper",
+    "s_class": "S_SNAKE"
+  },
+  {
+    "name": "cobra",
+    "m": "cobra",
+    "f": "cobra",
+    "n": "cobra",
+    "s_class": "S_SNAKE"
+  },
+  {
+    "name": "troll",
+    "m": "troll",
+    "f": "troll",
+    "n": "troll",
+    "s_class": "S_TROLL"
+  },
+  {
+    "name": "ice troll",
+    "m": "ice troll",
+    "f": "ice troll",
+    "n": "ice troll",
+    "s_class": "S_TROLL"
+  },
+  {
+    "name": "rock troll",
+    "m": "rock troll",
+    "f": "rock troll",
+    "n": "rock troll",
+    "s_class": "S_TROLL"
+  },
+  {
+    "name": "water troll",
+    "m": "water troll",
+    "f": "water troll",
+    "n": "water troll",
+    "s_class": "S_TROLL"
+  },
+  {
+    "name": "Olog-hai",
+    "m": "Olog-hai",
+    "f": "Olog-hai",
+    "n": "Olog-hai",
+    "s_class": "S_TROLL"
+  },
+  {
+    "name": "umber hulk",
+    "m": "umber hulk",
+    "f": "umber hulk",
+    "n": "umber hulk",
+    "s_class": "S_UMBER"
+  },
+  {
+    "name": "vampire",
+    "m": "vampire",
+    "f": "vampire",
+    "n": "vampire",
+    "s_class": "S_VAMPIRE"
+  },
+  {
+    "name": "vampire lord",
+    "m": "vampire lord",
+    "f": "vampire lady",
+    "n": "vampire leader",
+    "s_class": "S_VAMPIRE"
+  },
+  {
+    "name": "vampire mage",
+    "m": "vampire mage",
+    "f": "vampire mage",
+    "n": "vampire mage",
+    "s_class": "S_VAMPIRE"
+  },
+  {
+    "name": "Vlad the Impaler",
+    "m": "Vlad the Impaler",
+    "f": "Vlad the Impaler",
+    "n": "Vlad the Impaler",
+    "s_class": "S_VAMPIRE"
+  },
+  {
+    "name": "barrow wight",
+    "m": "barrow wight",
+    "f": "barrow wight",
+    "n": "barrow wight",
+    "s_class": "S_WRAITH"
+  },
+  {
+    "name": "wraith",
+    "m": "wraith",
+    "f": "wraith",
+    "n": "wraith",
+    "s_class": "S_WRAITH"
+  },
+  {
+    "name": "Nazgul",
+    "m": "Nazgul",
+    "f": "Nazgul",
+    "n": "Nazgul",
+    "s_class": "S_WRAITH"
+  },
+  {
+    "name": "xorn",
+    "m": "xorn",
+    "f": "xorn",
+    "n": "xorn",
+    "s_class": "S_XORN"
+  },
+  {
+    "name": "monkey",
+    "m": "monkey",
+    "f": "monkey",
+    "n": "monkey",
+    "s_class": "S_YETI"
+  },
+  {
+    "name": "ape",
+    "m": "ape",
+    "f": "ape",
+    "n": "ape",
+    "s_class": "S_YETI"
+  },
+  {
+    "name": "owlbear",
+    "m": "owlbear",
+    "f": "owlbear",
+    "n": "owlbear",
+    "s_class": "S_YETI"
+  },
+  {
+    "name": "yeti",
+    "m": "yeti",
+    "f": "yeti",
+    "n": "yeti",
+    "s_class": "S_YETI"
+  },
+  {
+    "name": "carnivorous ape",
+    "m": "carnivorous ape",
+    "f": "carnivorous ape",
+    "n": "carnivorous ape",
+    "s_class": "S_YETI"
+  },
+  {
+    "name": "sasquatch",
+    "m": "sasquatch",
+    "f": "sasquatch",
+    "n": "sasquatch",
+    "s_class": "S_YETI"
+  },
+  {
+    "name": "kobold zombie",
+    "m": "kobold zombie",
+    "f": "kobold zombie",
+    "n": "kobold zombie",
+    "s_class": "S_ZOMBIE"
+  },
+  {
+    "name": "gnome zombie",
+    "m": "gnome zombie",
+    "f": "gnome zombie",
+    "n": "gnome zombie",
+    "s_class": "S_ZOMBIE"
+  },
+  {
+    "name": "orc zombie",
+    "m": "orc zombie",
+    "f": "orc zombie",
+    "n": "orc zombie",
+    "s_class": "S_ZOMBIE"
+  },
+  {
+    "name": "dwarf zombie",
+    "m": "dwarf zombie",
+    "f": "dwarf zombie",
+    "n": "dwarf zombie",
+    "s_class": "S_ZOMBIE"
+  },
+  {
+    "name": "elf zombie",
+    "m": "elf zombie",
+    "f": "elf zombie",
+    "n": "elf zombie",
+    "s_class": "S_ZOMBIE"
+  },
+  {
+    "name": "human zombie",
+    "m": "human zombie",
+    "f": "human zombie",
+    "n": "human zombie",
+    "s_class": "S_ZOMBIE"
+  },
+  {
+    "name": "ettin zombie",
+    "m": "ettin zombie",
+    "f": "ettin zombie",
+    "n": "ettin zombie",
+    "s_class": "S_ZOMBIE"
+  },
+  {
+    "name": "ghoul",
+    "m": "ghoul",
+    "f": "ghoul",
+    "n": "ghoul",
+    "s_class": "S_ZOMBIE"
+  },
+  {
+    "name": "giant zombie",
+    "m": "giant zombie",
+    "f": "giant zombie",
+    "n": "giant zombie",
+    "s_class": "S_ZOMBIE"
+  },
+  {
+    "name": "skeleton",
+    "m": "skeleton",
+    "f": "skeleton",
+    "n": "skeleton",
+    "s_class": "S_ZOMBIE"
+  },
+  {
+    "name": "straw golem",
+    "m": "straw golem",
+    "f": "straw golem",
+    "n": "straw golem",
+    "s_class": "S_GOLEM"
+  },
+  {
+    "name": "paper golem",
+    "m": "paper golem",
+    "f": "paper golem",
+    "n": "paper golem",
+    "s_class": "S_GOLEM"
+  },
+  {
+    "name": "rope golem",
+    "m": "rope golem",
+    "f": "rope golem",
+    "n": "rope golem",
+    "s_class": "S_GOLEM"
+  },
+  {
+    "name": "gold golem",
+    "m": "gold golem",
+    "f": "gold golem",
+    "n": "gold golem",
+    "s_class": "S_GOLEM"
+  },
+  {
+    "name": "leather golem",
+    "m": "leather golem",
+    "f": "leather golem",
+    "n": "leather golem",
+    "s_class": "S_GOLEM"
+  },
+  {
+    "name": "wood golem",
+    "m": "wood golem",
+    "f": "wood golem",
+    "n": "wood golem",
+    "s_class": "S_GOLEM"
+  },
+  {
+    "name": "flesh golem",
+    "m": "flesh golem",
+    "f": "flesh golem",
+    "n": "flesh golem",
+    "s_class": "S_GOLEM"
+  },
+  {
+    "name": "clay golem",
+    "m": "clay golem",
+    "f": "clay golem",
+    "n": "clay golem",
+    "s_class": "S_GOLEM"
+  },
+  {
+    "name": "stone golem",
+    "m": "stone golem",
+    "f": "stone golem",
+    "n": "stone golem",
+    "s_class": "S_GOLEM"
+  },
+  {
+    "name": "glass golem",
+    "m": "glass golem",
+    "f": "glass golem",
+    "n": "glass golem",
+    "s_class": "S_GOLEM"
+  },
+  {
+    "name": "iron golem",
+    "m": "iron golem",
+    "f": "iron golem",
+    "n": "iron golem",
+    "s_class": "S_GOLEM"
+  },
+  {
+    "name": "human",
+    "m": "human",
+    "f": "human",
+    "n": "human",
+    "s_class": "S_HUMAN"
+  },
+  {
+    "name": "wererat",
+    "m": "wererat",
+    "f": "wererat",
+    "n": "wererat",
+    "s_class": "S_HUMAN"
+  },
+  {
+    "name": "werejackal",
+    "m": "werejackal",
+    "f": "werejackal",
+    "n": "werejackal",
+    "s_class": "S_HUMAN"
+  },
+  {
+    "name": "werewolf",
+    "m": "werewolf",
+    "f": "werewolf",
+    "n": "werewolf",
+    "s_class": "S_HUMAN"
+  },
+  {
+    "name": "elf",
+    "m": "elf",
+    "f": "elf",
+    "n": "elf",
+    "s_class": "S_HUMAN"
+  },
+  {
+    "name": "Woodland-elf",
+    "m": "Woodland-elf",
+    "f": "Woodland-elf",
+    "n": "Woodland-elf",
+    "s_class": "S_HUMAN"
+  },
+  {
+    "name": "Green-elf",
+    "m": "Green-elf",
+    "f": "Green-elf",
+    "n": "Green-elf",
+    "s_class": "S_HUMAN"
+  },
+  {
+    "name": "Grey-elf",
+    "m": "Grey-elf",
+    "f": "Grey-elf",
+    "n": "Grey-elf",
+    "s_class": "S_HUMAN"
+  },
+  {
+    "name": "elf-lord",
+    "m": "elf-lord",
+    "f": "elf-lady",
+    "n": "elf-noble",
+    "s_class": "S_HUMAN"
+  },
+  {
+    "name": "Elvenking",
+    "m": "Elvenking",
+    "f": "Elvenqueen",
+    "n": "elven monarch",
+    "s_class": "S_HUMAN"
+  },
+  {
+    "name": "doppelganger",
+    "m": "doppelganger",
+    "f": "doppelganger",
+    "n": "doppelganger",
+    "s_class": "S_HUMAN"
+  },
+  {
+    "name": "shopkeeper",
+    "m": "shopkeeper",
+    "f": "shopkeeper",
+    "n": "shopkeeper",
+    "s_class": "S_HUMAN"
+  },
+  {
+    "name": "guard",
+    "m": "guard",
+    "f": "guard",
+    "n": "guard",
+    "s_class": "S_HUMAN"
+  },
+  {
+    "name": "prisoner",
+    "m": "prisoner",
+    "f": "prisoner",
+    "n": "prisoner",
+    "s_class": "S_HUMAN"
+  },
+  {
+    "name": "Oracle",
+    "m": "Oracle",
+    "f": "Oracle",
+    "n": "Oracle",
+    "s_class": "S_HUMAN"
+  },
+  {
+    "name": "priest",
+    "m": "priest",
+    "f": "priestess",
+    "n": "aligned cleric",
+    "s_class": "S_HUMAN"
+  },
+  {
+    "name": "high priest",
+    "m": "high priest",
+    "f": "high priestess",
+    "n": "high cleric",
+    "s_class": "S_HUMAN"
+  },
+  {
+    "name": "soldier",
+    "m": "soldier",
+    "f": "soldier",
+    "n": "soldier",
+    "s_class": "S_HUMAN"
+  },
+  {
+    "name": "sergeant",
+    "m": "sergeant",
+    "f": "sergeant",
+    "n": "sergeant",
+    "s_class": "S_HUMAN"
+  },
+  {
+    "name": "nurse",
+    "m": "nurse",
+    "f": "nurse",
+    "n": "nurse",
+    "s_class": "S_HUMAN"
+  },
+  {
+    "name": "lieutenant",
+    "m": "lieutenant",
+    "f": "lieutenant",
+    "n": "lieutenant",
+    "s_class": "S_HUMAN"
+  },
+  {
+    "name": "captain",
+    "m": "captain",
+    "f": "captain",
+    "n": "captain",
+    "s_class": "S_HUMAN"
+  },
+  {
+    "name": "watchman",
+    "m": "watchman",
+    "f": "watchman",
+    "n": "watchman",
+    "s_class": "S_HUMAN"
+  },
+  {
+    "name": "watch captain",
+    "m": "watch captain",
+    "f": "watch captain",
+    "n": "watch captain",
+    "s_class": "S_HUMAN"
+  },
+  {
+    "name": "Medusa",
+    "m": "Medusa",
+    "f": "Medusa",
+    "n": "Medusa",
+    "s_class": "S_HUMAN"
+  },
+  {
+    "name": "Wizard of Yendor",
+    "m": "Wizard of Yendor",
+    "f": "Wizard of Yendor",
+    "n": "Wizard of Yendor",
+    "s_class": "S_HUMAN"
+  },
+  {
+    "name": "Croesus",
+    "m": "Croesus",
+    "f": "Croesus",
+    "n": "Croesus",
+    "s_class": "S_HUMAN"
+  },
+  {
+    "name": "Charon",
+    "m": "Charon",
+    "f": "Charon",
+    "n": "Charon",
+    "s_class": "S_HUMAN"
+  },
+  {
+    "name": "ghost",
+    "m": "ghost",
+    "f": "ghost",
+    "n": "ghost",
+    "s_class": "S_GHOST"
+  },
+  {
+    "name": "shade",
+    "m": "shade",
+    "f": "shade",
+    "n": "shade",
+    "s_class": "S_GHOST"
+  },
+  {
+    "name": "water demon",
+    "m": "water demon",
+    "f": "water demon",
+    "n": "water demon",
+    "s_class": "S_DEMON"
+  },
+  {
+    "name": "incubus",
+    "m": "incubus",
+    "f": "succubus",
+    "n": "amorous demon",
+    "s_class": "S_DEMON"
+  },
+  {
+    "name": "horned devil",
+    "m": "horned devil",
+    "f": "horned devil",
+    "n": "horned devil",
+    "s_class": "S_DEMON"
+  },
+  {
+    "name": "erinys",
+    "m": "erinys",
+    "f": "erinys",
+    "n": "erinys",
+    "s_class": "S_DEMON"
+  },
+  {
+    "name": "barbed devil",
+    "m": "barbed devil",
+    "f": "barbed devil",
+    "n": "barbed devil",
+    "s_class": "S_DEMON"
+  },
+  {
+    "name": "marilith",
+    "m": "marilith",
+    "f": "marilith",
+    "n": "marilith",
+    "s_class": "S_DEMON"
+  },
+  {
+    "name": "vrock",
+    "m": "vrock",
+    "f": "vrock",
+    "n": "vrock",
+    "s_class": "S_DEMON"
+  },
+  {
+    "name": "hezrou",
+    "m": "hezrou",
+    "f": "hezrou",
+    "n": "hezrou",
+    "s_class": "S_DEMON"
+  },
+  {
+    "name": "bone devil",
+    "m": "bone devil",
+    "f": "bone devil",
+    "n": "bone devil",
+    "s_class": "S_DEMON"
+  },
+  {
+    "name": "ice devil",
+    "m": "ice devil",
+    "f": "ice devil",
+    "n": "ice devil",
+    "s_class": "S_DEMON"
+  },
+  {
+    "name": "nalfeshnee",
+    "m": "nalfeshnee",
+    "f": "nalfeshnee",
+    "n": "nalfeshnee",
+    "s_class": "S_DEMON"
+  },
+  {
+    "name": "pit fiend",
+    "m": "pit fiend",
+    "f": "pit fiend",
+    "n": "pit fiend",
+    "s_class": "S_DEMON"
+  },
+  {
+    "name": "sandestin",
+    "m": "sandestin",
+    "f": "sandestin",
+    "n": "sandestin",
+    "s_class": "S_DEMON"
+  },
+  {
+    "name": "balrog",
+    "m": "balrog",
+    "f": "balrog",
+    "n": "balrog",
+    "s_class": "S_DEMON"
+  },
+  {
+    "name": "Juiblex",
+    "m": "Juiblex",
+    "f": "Juiblex",
+    "n": "Juiblex",
+    "s_class": "S_DEMON"
+  },
+  {
+    "name": "Yeenoghu",
+    "m": "Yeenoghu",
+    "f": "Yeenoghu",
+    "n": "Yeenoghu",
+    "s_class": "S_DEMON"
+  },
+  {
+    "name": "Orcus",
+    "m": "Orcus",
+    "f": "Orcus",
+    "n": "Orcus",
+    "s_class": "S_DEMON"
+  },
+  {
+    "name": "Geryon",
+    "m": "Geryon",
+    "f": "Geryon",
+    "n": "Geryon",
+    "s_class": "S_DEMON"
+  },
+  {
+    "name": "Dispater",
+    "m": "Dispater",
+    "f": "Dispater",
+    "n": "Dispater",
+    "s_class": "S_DEMON"
+  },
+  {
+    "name": "Baalzebub",
+    "m": "Baalzebub",
+    "f": "Baalzebub",
+    "n": "Baalzebub",
+    "s_class": "S_DEMON"
+  },
+  {
+    "name": "Asmodeus",
+    "m": "Asmodeus",
+    "f": "Asmodeus",
+    "n": "Asmodeus",
+    "s_class": "S_DEMON"
+  },
+  {
+    "name": "Demogorgon",
+    "m": "Demogorgon",
+    "f": "Demogorgon",
+    "n": "Demogorgon",
+    "s_class": "S_DEMON"
+  },
+  {
+    "name": "Death",
+    "m": "Death",
+    "f": "Death",
+    "n": "Death",
+    "s_class": "S_DEMON"
+  },
+  {
+    "name": "Pestilence",
+    "m": "Pestilence",
+    "f": "Pestilence",
+    "n": "Pestilence",
+    "s_class": "S_DEMON"
+  },
+  {
+    "name": "Famine",
+    "m": "Famine",
+    "f": "Famine",
+    "n": "Famine",
+    "s_class": "S_DEMON"
+  },
+  {
+    "name": "mail daemon",
+    "m": "mail daemon",
+    "f": "mail daemon",
+    "n": "mail daemon",
+    "s_class": "S_DEMON"
+  },
+  {
+    "name": "djinni",
+    "m": "djinni",
+    "f": "djinni",
+    "n": "djinni",
+    "s_class": "S_DEMON"
+  },
+  {
+    "name": "jellyfish",
+    "m": "jellyfish",
+    "f": "jellyfish",
+    "n": "jellyfish",
+    "s_class": "S_EEL"
+  },
+  {
+    "name": "piranha",
+    "m": "piranha",
+    "f": "piranha",
+    "n": "piranha",
+    "s_class": "S_EEL"
+  },
+  {
+    "name": "shark",
+    "m": "shark",
+    "f": "shark",
+    "n": "shark",
+    "s_class": "S_EEL"
+  },
+  {
+    "name": "giant eel",
+    "m": "giant eel",
+    "f": "giant eel",
+    "n": "giant eel",
+    "s_class": "S_EEL"
+  },
+  {
+    "name": "electric eel",
+    "m": "electric eel",
+    "f": "electric eel",
+    "n": "electric eel",
+    "s_class": "S_EEL"
+  },
+  {
+    "name": "kraken",
+    "m": "kraken",
+    "f": "kraken",
+    "n": "kraken",
+    "s_class": "S_EEL"
+  },
+  {
+    "name": "newt",
+    "m": "newt",
+    "f": "newt",
+    "n": "newt",
+    "s_class": "S_LIZARD"
+  },
+  {
+    "name": "gecko",
+    "m": "gecko",
+    "f": "gecko",
+    "n": "gecko",
+    "s_class": "S_LIZARD"
+  },
+  {
+    "name": "iguana",
+    "m": "iguana",
+    "f": "iguana",
+    "n": "iguana",
+    "s_class": "S_LIZARD"
+  },
+  {
+    "name": "baby crocodile",
+    "m": "baby crocodile",
+    "f": "baby crocodile",
+    "n": "baby crocodile",
+    "s_class": "S_LIZARD"
+  },
+  {
+    "name": "lizard",
+    "m": "lizard",
+    "f": "lizard",
+    "n": "lizard",
+    "s_class": "S_LIZARD"
+  },
+  {
+    "name": "chameleon",
+    "m": "chameleon",
+    "f": "chameleon",
+    "n": "chameleon",
+    "s_class": "S_LIZARD"
+  },
+  {
+    "name": "crocodile",
+    "m": "crocodile",
+    "f": "crocodile",
+    "n": "crocodile",
+    "s_class": "S_LIZARD"
+  },
+  {
+    "name": "salamander",
+    "m": "salamander",
+    "f": "salamander",
+    "n": "salamander",
+    "s_class": "S_LIZARD"
+  },
+  {
+    "name": "long worm tail",
+    "m": "long worm tail",
+    "f": "long worm tail",
+    "n": "long worm tail",
+    "s_class": "S_WORM_TAIL"
+  },
+  {
+    "name": "archeologist",
+    "m": "archeologist",
+    "f": "archeologist",
+    "n": "archeologist",
+    "s_class": "S_HUMAN"
+  },
+  {
+    "name": "barbarian",
+    "m": "barbarian",
+    "f": "barbarian",
+    "n": "barbarian",
+    "s_class": "S_HUMAN"
+  },
+  {
+    "name": "caveman",
+    "m": "caveman",
+    "f": "cavewoman",
+    "n": "cave dweller",
+    "s_class": "S_HUMAN"
+  },
+  {
+    "name": "healer",
+    "m": "healer",
+    "f": "healer",
+    "n": "healer",
+    "s_class": "S_HUMAN"
+  },
+  {
+    "name": "knight",
+    "m": "knight",
+    "f": "knight",
+    "n": "knight",
+    "s_class": "S_HUMAN"
+  },
+  {
+    "name": "monk",
+    "m": "monk",
+    "f": "monk",
+    "n": "monk",
+    "s_class": "S_HUMAN"
+  },
+  {
+    "name": "priest",
+    "m": "priest",
+    "f": "priestess",
+    "n": "cleric",
+    "s_class": "S_HUMAN"
+  },
+  {
+    "name": "ranger",
+    "m": "ranger",
+    "f": "ranger",
+    "n": "ranger",
+    "s_class": "S_HUMAN"
+  },
+  {
+    "name": "rogue",
+    "m": "rogue",
+    "f": "rogue",
+    "n": "rogue",
+    "s_class": "S_HUMAN"
+  },
+  {
+    "name": "samurai",
+    "m": "samurai",
+    "f": "samurai",
+    "n": "samurai",
+    "s_class": "S_HUMAN"
+  },
+  {
+    "name": "tourist",
+    "m": "tourist",
+    "f": "tourist",
+    "n": "tourist",
+    "s_class": "S_HUMAN"
+  },
+  {
+    "name": "valkyrie",
+    "m": "valkyrie",
+    "f": "valkyrie",
+    "n": "valkyrie",
+    "s_class": "S_HUMAN"
+  },
+  {
+    "name": "wizard",
+    "m": "wizard",
+    "f": "wizard",
+    "n": "wizard",
+    "s_class": "S_HUMAN"
+  },
+  {
+    "name": "Lord Carnarvon",
+    "m": "Lord Carnarvon",
+    "f": "Lord Carnarvon",
+    "n": "Lord Carnarvon",
+    "s_class": "S_HUMAN"
+  },
+  {
+    "name": "Pelias",
+    "m": "Pelias",
+    "f": "Pelias",
+    "n": "Pelias",
+    "s_class": "S_HUMAN"
+  },
+  {
+    "name": "Shaman Karnov",
+    "m": "Shaman Karnov",
+    "f": "Shaman Karnov",
+    "n": "Shaman Karnov",
+    "s_class": "S_HUMAN"
+  },
+  {
+    "name": "Earendil",
+    "m": "Earendil",
+    "f": "Earendil",
+    "n": "Earendil",
+    "s_class": "S_HUMAN"
+  },
+  {
+    "name": "Elwing",
+    "m": "Elwing",
+    "f": "Elwing",
+    "n": "Elwing",
+    "s_class": "S_HUMAN"
+  },
+  {
+    "name": "Hippocrates",
+    "m": "Hippocrates",
+    "f": "Hippocrates",
+    "n": "Hippocrates",
+    "s_class": "S_HUMAN"
+  },
+  {
+    "name": "King Arthur",
+    "m": "King Arthur",
+    "f": "King Arthur",
+    "n": "King Arthur",
+    "s_class": "S_HUMAN"
+  },
+  {
+    "name": "Grand Master",
+    "m": "Grand Master",
+    "f": "Grand Master",
+    "n": "Grand Master",
+    "s_class": "S_HUMAN"
+  },
+  {
+    "name": "Arch Priest",
+    "m": "Arch Priest",
+    "f": "Arch Priest",
+    "n": "Arch Priest",
+    "s_class": "S_HUMAN"
+  },
+  {
+    "name": "Orion",
+    "m": "Orion",
+    "f": "Orion",
+    "n": "Orion",
+    "s_class": "S_HUMAN"
+  },
+  {
+    "name": "Master of Thieves",
+    "m": "Master of Thieves",
+    "f": "Master of Thieves",
+    "n": "Master of Thieves",
+    "s_class": "S_HUMAN"
+  },
+  {
+    "name": "Lord Sato",
+    "m": "Lord Sato",
+    "f": "Lord Sato",
+    "n": "Lord Sato",
+    "s_class": "S_HUMAN"
+  },
+  {
+    "name": "Twoflower",
+    "m": "Twoflower",
+    "f": "Twoflower",
+    "n": "Twoflower",
+    "s_class": "S_HUMAN"
+  },
+  {
+    "name": "Norn",
+    "m": "Norn",
+    "f": "Norn",
+    "n": "Norn",
+    "s_class": "S_HUMAN"
+  },
+  {
+    "name": "Neferet the Green",
+    "m": "Neferet the Green",
+    "f": "Neferet the Green",
+    "n": "Neferet the Green",
+    "s_class": "S_HUMAN"
+  },
+  {
+    "name": "Minion of Huhetotl",
+    "m": "Minion of Huhetotl",
+    "f": "Minion of Huhetotl",
+    "n": "Minion of Huhetotl",
+    "s_class": "S_DEMON"
+  },
+  {
+    "name": "Thoth Amon",
+    "m": "Thoth Amon",
+    "f": "Thoth Amon",
+    "n": "Thoth Amon",
+    "s_class": "S_HUMAN"
+  },
+  {
+    "name": "Chromatic Dragon",
+    "m": "Chromatic Dragon",
+    "f": "Chromatic Dragon",
+    "n": "Chromatic Dragon",
+    "s_class": "S_DRAGON"
+  },
+  {
+    "name": "Goblin King",
+    "m": "Goblin King",
+    "f": "Goblin King",
+    "n": "Goblin King",
+    "s_class": "S_ORC"
+  },
+  {
+    "name": "Cyclops",
+    "m": "Cyclops",
+    "f": "Cyclops",
+    "n": "Cyclops",
+    "s_class": "S_GIANT"
+  },
+  {
+    "name": "Ixoth",
+    "m": "Ixoth",
+    "f": "Ixoth",
+    "n": "Ixoth",
+    "s_class": "S_DRAGON"
+  },
+  {
+    "name": "Master Kaen",
+    "m": "Master Kaen",
+    "f": "Master Kaen",
+    "n": "Master Kaen",
+    "s_class": "S_HUMAN"
+  },
+  {
+    "name": "Nalzok",
+    "m": "Nalzok",
+    "f": "Nalzok",
+    "n": "Nalzok",
+    "s_class": "S_DEMON"
+  },
+  {
+    "name": "Scorpius",
+    "m": "Scorpius",
+    "f": "Scorpius",
+    "n": "Scorpius",
+    "s_class": "S_SPIDER"
+  },
+  {
+    "name": "Master Assassin",
+    "m": "Master Assassin",
+    "f": "Master Assassin",
+    "n": "Master Assassin",
+    "s_class": "S_HUMAN"
+  },
+  {
+    "name": "Ashikaga Takauji",
+    "m": "Ashikaga Takauji",
+    "f": "Ashikaga Takauji",
+    "n": "Ashikaga Takauji",
+    "s_class": "S_HUMAN"
+  },
+  {
+    "name": "Lord Surtur",
+    "m": "Lord Surtur",
+    "f": "Lord Surtur",
+    "n": "Lord Surtur",
+    "s_class": "S_GIANT"
+  },
+  {
+    "name": "Dark One",
+    "m": "Dark One",
+    "f": "Dark One",
+    "n": "Dark One",
+    "s_class": "S_HUMAN"
+  },
+  {
+    "name": "student",
+    "m": "student",
+    "f": "student",
+    "n": "student",
+    "s_class": "S_HUMAN"
+  },
+  {
+    "name": "chieftain",
+    "m": "chieftain",
+    "f": "chieftain",
+    "n": "chieftain",
+    "s_class": "S_HUMAN"
+  },
+  {
+    "name": "neanderthal",
+    "m": "neanderthal",
+    "f": "neanderthal",
+    "n": "neanderthal",
+    "s_class": "S_HUMAN"
+  },
+  {
+    "name": "High-elf",
+    "m": "High-elf",
+    "f": "High-elf",
+    "n": "High-elf",
+    "s_class": "S_HUMAN"
+  },
+  {
+    "name": "attendant",
+    "m": "attendant",
+    "f": "attendant",
+    "n": "attendant",
+    "s_class": "S_HUMAN"
+  },
+  {
+    "name": "page",
+    "m": "page",
+    "f": "page",
+    "n": "page",
+    "s_class": "S_HUMAN"
+  },
+  {
+    "name": "abbot",
+    "m": "abbot",
+    "f": "abbot",
+    "n": "abbot",
+    "s_class": "S_HUMAN"
+  },
+  {
+    "name": "acolyte",
+    "m": "acolyte",
+    "f": "acolyte",
+    "n": "acolyte",
+    "s_class": "S_HUMAN"
+  },
+  {
+    "name": "hunter",
+    "m": "hunter",
+    "f": "hunter",
+    "n": "hunter",
+    "s_class": "S_HUMAN"
+  },
+  {
+    "name": "thug",
+    "m": "thug",
+    "f": "thug",
+    "n": "thug",
+    "s_class": "S_HUMAN"
+  },
+  {
+    "name": "ninja",
+    "m": "ninja",
+    "f": "ninja",
+    "n": "ninja",
+    "s_class": "S_HUMAN"
+  },
+  {
+    "name": "roshi",
+    "m": "roshi",
+    "f": "roshi",
+    "n": "roshi",
+    "s_class": "S_HUMAN"
+  },
+  {
+    "name": "guide",
+    "m": "guide",
+    "f": "guide",
+    "n": "guide",
+    "s_class": "S_HUMAN"
+  },
+  {
+    "name": "warrior",
+    "m": "warrior",
+    "f": "warrior",
+    "n": "warrior",
+    "s_class": "S_HUMAN"
+  },
+  {
+    "name": "apprentice",
+    "m": "apprentice",
+    "f": "apprentice",
+    "n": "apprentice",
+    "s_class": "S_HUMAN"
+  }
+]
