@@ -82,6 +82,36 @@ void main() {
     dummyImg.dispose();
   });
 
+  test('NetHackMapPainter paints non-square tiles (15x25) with pet and pile overlays without error', () async {
+    final screen = NetHackScreen();
+
+    // ペットかつアイテム山
+    screen.printGlyph(3, 5, 5, 104, 'd'.codeUnitAt(0), 0xFFFFFF, 0x10 | 0x80);
+
+    // 60x100 のダミー tileImage (15x25 のタイル4x4枚相当)
+    final recorderImg = ui.PictureRecorder();
+    final canvasImg = Canvas(recorderImg);
+    canvasImg.drawRect(const Rect.fromLTWH(0, 0, 60, 100), Paint()..color = Colors.blue);
+    final dummyImg = await recorderImg.endRecording().toImage(60, 100);
+
+    final painter = NetHackMapPainter(
+      screen: screen,
+      tileImage: dummyImg,
+      tileWidth: 15,
+      tileHeight: 25,
+      useTiles: true,
+    );
+
+    final recorder = ui.PictureRecorder();
+    final canvas = Canvas(recorder);
+    const size = Size(800, 600);
+
+    expect(() => painter.paint(canvas, size), returnsNormally);
+    final picture = recorder.endRecording();
+    picture.dispose();
+    dummyImg.dispose();
+  });
+
   test('NetHackMapPainter supports 2-layer rendering for transparent tileset with bktile', () async {
     final screen = NetHackScreen();
 

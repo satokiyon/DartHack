@@ -122,11 +122,12 @@ class NetHackMapPainter extends CustomPainter {
             final dotSize = (cellW / 32.0 * 1.3).clamp(1.0, 3.0);
 
             if (isPet) {
-              // ペットはタイルの左上に赤色ハートマーク
+              // ペットはタイルの右上に赤色ハートマーク
+              final heartStartX = cellLeft + cellW - (_heartPattern[0].length * dotSize) - 1.5;
               _drawPixelPattern(
                 canvas,
                 _heartPattern,
-                cellLeft + 1.5,
+                heartStartX,
                 cellTop + 1.5,
                 dotSize,
                 const Color(0xFFFF2222),
@@ -134,14 +135,11 @@ class NetHackMapPainter extends CustomPainter {
             }
 
             if (isPile) {
-              // アイテム山は、ペットがいる場合は右上、いなければ左上に緑色プラスマーク
-              final pileStartX = isPet
-                  ? cellLeft + cellW - (_pilePattern[0].length * dotSize) - 1.5
-                  : cellLeft + 1.5;
+              // アイテム山はタイルの左上に緑色プラスマーク（ペットと重なっても干渉しない）
               _drawPixelPattern(
                 canvas,
                 _pilePattern,
-                pileStartX,
+                cellLeft + 1.5,
                 cellTop + 1.5,
                 dotSize,
                 const Color(0xFF00FF44),
