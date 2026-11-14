@@ -29,7 +29,7 @@
   "quit": "Quit",
   "scoreboard": "Scoreboard",
   "readGuidebook": "Read Guidebook",
-  "showHelp": "Show NetHack Help (?)",
+  "showHelp": "Show Help (?)",
   "dbSearch": "Database Search (/?)",
   "gameOptions": "Game Options (O)",
   "showFullMap": "Show Full Map (M-z)",
@@ -483,11 +483,11 @@
   "readSpoilers": "Read Spoilers",
   "spoilersTitle": "NetHack Spoilers",
   "searchSpoilersHint": "Search Spoilers...",
-  "dartHackHelpTooltip": "DartHack Help",
-  "readDartHackHelp": "Read DartHack Help",
-  "dartHackHelpTitle": "DartHack Help",
-  "searchDartHackHelpHint": "Search DartHack Help...",
-  "failedToLoadDartHackHelp": "Failed to load DartHack Help: {error}",
+  "dartHackHelpTooltip": "Manual",
+  "readDartHackHelp": "Read Manual",
+  "dartHackHelpTitle": "DartHack Manual",
+  "searchDartHackHelpHint": "Search Manual...",
+  "failedToLoadDartHackHelp": "Failed to load manual: {error}",
   "@failedToLoadDartHackHelp": {
     "placeholders": {
       "error": { "type": "String" }

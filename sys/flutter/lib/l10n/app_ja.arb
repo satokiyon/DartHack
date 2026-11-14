@@ -29,7 +29,7 @@
   "quit": "終了",
   "scoreboard": "スコアボード",
   "readGuidebook": "ガイドブックを読む",
-  "showHelp": "NetHackヘルプを表示 (?)",
+  "showHelp": "ヘルプを表示 (?)",
   "dbSearch": "データベース検索(/?)",
   "gameOptions": "オプション設定(O)",
   "showFullMap": "全体地図を表示 (M-z)",
@@ -484,11 +484,11 @@
   "readSpoilers": "スポイラーを読む",
   "spoilersTitle": "NetHack スポイラー",
   "searchSpoilersHint": "スポイラー内を検索...",
-  "dartHackHelpTooltip": "DartHack ヘルプ",
-  "readDartHackHelp": "DartHackヘルプを読む",
-  "dartHackHelpTitle": "DartHack ヘルプ",
-  "searchDartHackHelpHint": "DartHack ヘルプ内を検索...",
-  "failedToLoadDartHackHelp": "DartHack ヘルプの読み込みに失敗しました: {error}",
+  "dartHackHelpTooltip": "マニュアル",
+  "readDartHackHelp": "マニュアルを読む",
+  "dartHackHelpTitle": "DartHack マニュアル",
+  "searchDartHackHelpHint": "マニュアル内を検索...",
+  "failedToLoadDartHackHelp": "マニュアルの読み込みに失敗しました: {error}",
   "@failedToLoadDartHackHelp": {
     "placeholders": {
       "error": { "type": "String" }

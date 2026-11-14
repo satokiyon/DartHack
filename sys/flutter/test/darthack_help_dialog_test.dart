@@ -201,14 +201,14 @@ void main() {
         (
           locale: const Locale('ja'),
           spoilers: 'スポイラーを読む',
-          darthackHelp: 'DartHackヘルプを読む',
-          nethackHelp: 'NetHackヘルプを表示 (?)',
+          darthackHelp: 'マニュアルを読む',
+          nethackHelp: 'ヘルプを表示 (?)',
         ),
         (
           locale: const Locale('en'),
           spoilers: 'Read Spoilers',
-          darthackHelp: 'Read DartHack Help',
-          nethackHelp: 'Show NetHack Help (?)',
+          darthackHelp: 'Read Manual',
+          nethackHelp: 'Show Help (?)',
         ),
       ]) {
         bool helpTapped = false;
