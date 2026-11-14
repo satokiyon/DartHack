@@ -75,6 +75,10 @@ flutter:
     - assets/tiles/
     - assets/images/
     - assets/images/guidebook/
+    - assets/manual/ja/
+    - assets/manual/ja/images/
+    - assets/manual/en/
+    - assets/manual/en/images/
     - assets/icon/
     - assets/sounds/
     - assets/fonts/

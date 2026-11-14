@@ -90,7 +90,7 @@ class AppLocalizationsJa extends AppLocalizations {
   String get readGuidebook => 'ガイドブックを読む';
 
   @override
-  String get showHelp => 'ヘルプを表示 (?)';
+  String get showHelp => 'NetHackヘルプを表示 (?)';
 
   @override
   String get dbSearch => 'データベース検索(/?)';
@@ -1369,6 +1369,23 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get searchSpoilersHint => 'スポイラー内を検索...';
+
+  @override
+  String get dartHackHelpTooltip => 'DartHack ヘルプ';
+
+  @override
+  String get readDartHackHelp => 'DartHackヘルプを読む';
+
+  @override
+  String get dartHackHelpTitle => 'DartHack ヘルプ';
+
+  @override
+  String get searchDartHackHelpHint => 'DartHack ヘルプ内を検索...';
+
+  @override
+  String failedToLoadDartHackHelp(String error) {
+    return 'DartHack ヘルプの読み込みに失敗しました: $error';
+  }
 
   @override
   String get creditsSpoilersTitle =>

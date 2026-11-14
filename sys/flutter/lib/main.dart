@@ -43,6 +43,7 @@ import 'widgets/shortcut_edit_dialog.dart';
 import 'widgets/game_drawer.dart';
 import 'widgets/guidebook_dialog.dart';
 import 'widgets/spoiler_dialog.dart';
+import 'widgets/darthack_help_dialog.dart';
 import 'widgets/keyboard_help_dialog.dart';
 import 'widgets/overlays/menu_overlay.dart';
 import 'widgets/overlays/yn_overlay.dart';
@@ -618,6 +619,7 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
       onShowScoreboard: _showScoreboardDialog,
       onShowGuidebook: () => GuidebookDialog.show(context).then((_) => _ensureGameFocus()),
       onShowSpoilers: () => SpoilerDialog.show(context).then((_) => _ensureGameFocus()),
+      onShowDartHackHelp: () => DartHackHelpDialog.show(context).then((_) => _ensureGameFocus()),
       onShowHelp: () => _sendFfiKey('?'.codeUnitAt(0), "?"),
       onDatabaseSearch: _triggerDatabaseSearch,
       onOpenOptions: () => _sendFfiKey('O'.codeUnitAt(0), "O"),
@@ -1108,6 +1110,7 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
           TitleScreenFocusTarget.settings,
           TitleScreenFocusTarget.guidebook,
           TitleScreenFocusTarget.spoilers,
+          TitleScreenFocusTarget.darthackHelp,
         ];
         setState(() {
           if (_titleFocus == TitleScreenFocusTarget.none) {
@@ -1148,6 +1151,9 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
           case TitleScreenFocusTarget.spoilers:
             SpoilerDialog.show(context).then((_) => _ensureGameFocus());
             break;
+          case TitleScreenFocusTarget.darthackHelp:
+            DartHackHelpDialog.show(context).then((_) => _ensureGameFocus());
+            break;
         }
         return KeyEventResult.handled;
 
@@ -1168,6 +1174,9 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
             break;
           case TitleScreenFocusTarget.spoilers:
             SpoilerDialog.show(context).then((_) => _ensureGameFocus());
+            break;
+          case TitleScreenFocusTarget.darthackHelp:
+            DartHackHelpDialog.show(context).then((_) => _ensureGameFocus());
             break;
           case TitleScreenFocusTarget.none:
             // 未フォーカス時は誤爆防止

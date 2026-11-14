@@ -29,7 +29,7 @@
   "quit": "Quit",
   "scoreboard": "Scoreboard",
   "readGuidebook": "Read Guidebook",
-  "showHelp": "Show Help (?)",
+  "showHelp": "Show NetHack Help (?)",
   "dbSearch": "Database Search (/?)",
   "gameOptions": "Game Options (O)",
   "showFullMap": "Show Full Map (M-z)",
@@ -483,6 +483,16 @@
   "readSpoilers": "Read Spoilers",
   "spoilersTitle": "NetHack Spoilers",
   "searchSpoilersHint": "Search Spoilers...",
+  "dartHackHelpTooltip": "DartHack Help",
+  "readDartHackHelp": "Read DartHack Help",
+  "dartHackHelpTitle": "DartHack Help",
+  "searchDartHackHelpHint": "Search DartHack Help...",
+  "failedToLoadDartHackHelp": "Failed to load DartHack Help: {error}",
+  "@failedToLoadDartHackHelp": {
+    "placeholders": {
+      "error": { "type": "String" }
+    }
+  },
   "creditsSpoilersTitle": "NetHack Spoilers: A Traveler's Companion to the Mazes of Menace",
   "creditsSpoilersDesc": "Compiled by David Bau",
   "creditsSpoilersLicense": "CC BY-SA 4.0",

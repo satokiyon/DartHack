@@ -12,6 +12,7 @@ class GameDrawerContent extends StatefulWidget {
   final VoidCallback onShowScoreboard;
   final VoidCallback onShowGuidebook;
   final VoidCallback onShowSpoilers;
+  final VoidCallback? onShowDartHackHelp;
   final VoidCallback onShowHelp;
   final VoidCallback onDatabaseSearch;
   final VoidCallback onOpenOptions;
@@ -32,6 +33,7 @@ class GameDrawerContent extends StatefulWidget {
     required this.onShowScoreboard,
     required this.onShowGuidebook,
     required this.onShowSpoilers,
+    this.onShowDartHackHelp,
     required this.onShowHelp,
     required this.onDatabaseSearch,
     required this.onOpenOptions,
@@ -49,12 +51,14 @@ class _DrawerItemDef {
   final Color iconColor;
   final String title;
   final VoidCallback onTap;
+  final bool dividerBefore;
 
   _DrawerItemDef({
     required this.icon,
     required this.iconColor,
     required this.title,
     required this.onTap,
+    this.dividerBefore = false,
   });
 }
 
@@ -117,6 +121,7 @@ class _GameDrawerContentState extends State<GameDrawerContent> {
       icon: Icons.emoji_events,
       iconColor: Colors.amber,
       title: l10n.scoreboard,
+      dividerBefore: widget.isGameRunning,
       onTap: () {
         widget.onClose();
         widget.onShowScoreboard();
@@ -140,12 +145,22 @@ class _GameDrawerContentState extends State<GameDrawerContent> {
         widget.onShowSpoilers();
       },
     ));
+    items.add(_DrawerItemDef(
+      icon: Icons.article_outlined,
+      iconColor: Colors.cyanAccent,
+      title: l10n.readDartHackHelp,
+      onTap: () {
+        widget.onClose();
+        widget.onShowDartHackHelp?.call();
+      },
+    ));
 
     if (widget.isGameRunning) {
       items.add(_DrawerItemDef(
         icon: Icons.help_outline,
         iconColor: Colors.tealAccent,
         title: l10n.showHelp,
+        dividerBefore: true,
         onTap: () {
           widget.onClose();
           widget.onShowHelp();
@@ -184,6 +199,7 @@ class _GameDrawerContentState extends State<GameDrawerContent> {
       icon: widget.isKeyboardVisible ? Icons.videogame_asset_off : Icons.videogame_asset,
       iconColor: Colors.blueAccent,
       title: widget.isKeyboardVisible ? l10n.hideKeyboard : l10n.showKeyboard,
+      dividerBefore: true,
       onTap: () {
         widget.onClose();
         widget.onToggleKeyboard();
@@ -390,11 +406,7 @@ class _GameDrawerContentState extends State<GameDrawerContent> {
             final item = entry.value;
             final isFocused = _focusedIndex == index;
 
-            // セーブ項目とスコアボードの間、および設定項目の前に区切り線を表示
-            final showDividerBefore = (widget.isGameRunning && index == 2) ||
-                (widget.isGameRunning && index == 5) ||
-                (widget.isGameRunning && index == 9) ||
-                (!widget.isGameRunning && index == 3);
+            final showDividerBefore = item.dividerBefore;
 
             return Column(
               mainAxisSize: MainAxisSize.min,

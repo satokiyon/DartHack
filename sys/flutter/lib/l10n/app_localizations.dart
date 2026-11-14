@@ -263,7 +263,7 @@ abstract class AppLocalizations {
   /// No description provided for @showHelp.
   ///
   /// In ja, this message translates to:
-  /// **'ヘルプを表示 (?)'**
+  /// **'NetHackヘルプを表示 (?)'**
   String get showHelp;
 
   /// No description provided for @dbSearch.
@@ -2701,6 +2701,36 @@ abstract class AppLocalizations {
   /// In ja, this message translates to:
   /// **'スポイラー内を検索...'**
   String get searchSpoilersHint;
+
+  /// No description provided for @dartHackHelpTooltip.
+  ///
+  /// In ja, this message translates to:
+  /// **'DartHack ヘルプ'**
+  String get dartHackHelpTooltip;
+
+  /// No description provided for @readDartHackHelp.
+  ///
+  /// In ja, this message translates to:
+  /// **'DartHackヘルプを読む'**
+  String get readDartHackHelp;
+
+  /// No description provided for @dartHackHelpTitle.
+  ///
+  /// In ja, this message translates to:
+  /// **'DartHack ヘルプ'**
+  String get dartHackHelpTitle;
+
+  /// No description provided for @searchDartHackHelpHint.
+  ///
+  /// In ja, this message translates to:
+  /// **'DartHack ヘルプ内を検索...'**
+  String get searchDartHackHelpHint;
+
+  /// No description provided for @failedToLoadDartHackHelp.
+  ///
+  /// In ja, this message translates to:
+  /// **'DartHack ヘルプの読み込みに失敗しました: {error}'**
+  String failedToLoadDartHackHelp(String error);
 
   /// No description provided for @creditsSpoilersTitle.
   ///

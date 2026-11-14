@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../l10n/app_localizations.dart';
 import '../widgets/guidebook_dialog.dart';
 import '../widgets/spoiler_dialog.dart';
+import '../widgets/darthack_help_dialog.dart';
 
 /// タイトル画面でのキーボードフォーカス対象
 enum TitleScreenFocusTarget {
@@ -11,6 +12,7 @@ enum TitleScreenFocusTarget {
   settings,
   guidebook,
   spoilers,
+  darthackHelp,
 }
 
 class StartScreen extends StatelessWidget {
@@ -184,6 +186,34 @@ class StartScreen extends StatelessWidget {
     );
   }
 
+  Widget _buildDartHackHelpButton(BuildContext context, AppLocalizations l10n) {
+    final isFocused = currentFocusTarget == TitleScreenFocusTarget.darthackHelp;
+    return Container(
+      decoration: BoxDecoration(
+        shape: BoxShape.circle,
+        border: isFocused ? Border.all(color: Colors.amberAccent, width: 2.5) : null,
+        boxShadow: isFocused
+            ? [
+                BoxShadow(
+                  color: Colors.amberAccent.withValues(alpha: 0.8),
+                  blurRadius: 10,
+                  spreadRadius: 1,
+                )
+              ]
+            : null,
+      ),
+      child: IconButton(
+        icon: const Icon(Icons.article_outlined, color: Colors.cyanAccent, size: 28),
+        onPressed: () => DartHackHelpDialog.show(context),
+        tooltip: l10n.dartHackHelpTooltip,
+        style: IconButton.styleFrom(
+          backgroundColor: isFocused ? Colors.amberAccent.withValues(alpha: 0.2) : Colors.black38,
+          padding: const EdgeInsets.all(8),
+        ),
+      ),
+    );
+  }
+
   Widget _buildSettingsButton(BuildContext context, AppLocalizations l10n) {
     final isFocused = currentFocusTarget == TitleScreenFocusTarget.settings;
     return Container(
@@ -292,6 +322,8 @@ class StartScreen extends StatelessWidget {
                 _buildGuidebookButton(context, l10n),
                 const SizedBox(width: 10),
                 _buildSpoilerButton(context, l10n),
+                const SizedBox(width: 10),
+                _buildDartHackHelpButton(context, l10n),
               ],
             ),
           ),
@@ -361,6 +393,8 @@ class StartScreen extends StatelessWidget {
                 _buildGuidebookButton(context, l10n),
                 const SizedBox(width: 10),
                 _buildSpoilerButton(context, l10n),
+                const SizedBox(width: 10),
+                _buildDartHackHelpButton(context, l10n),
               ],
             ),
           ),

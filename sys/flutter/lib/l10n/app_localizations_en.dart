@@ -91,7 +91,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get readGuidebook => 'Read Guidebook';
 
   @override
-  String get showHelp => 'Show Help (?)';
+  String get showHelp => 'Show NetHack Help (?)';
 
   @override
   String get dbSearch => 'Database Search (/?)';
@@ -1401,6 +1401,23 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get searchSpoilersHint => 'Search Spoilers...';
+
+  @override
+  String get dartHackHelpTooltip => 'DartHack Help';
+
+  @override
+  String get readDartHackHelp => 'Read DartHack Help';
+
+  @override
+  String get dartHackHelpTitle => 'DartHack Help';
+
+  @override
+  String get searchDartHackHelpHint => 'Search DartHack Help...';
+
+  @override
+  String failedToLoadDartHackHelp(String error) {
+    return 'Failed to load DartHack Help: $error';
+  }
 
   @override
   String get creditsSpoilersTitle =>
