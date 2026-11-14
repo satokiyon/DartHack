@@ -836,7 +836,7 @@ class _MarkdownDocViewerDialogState extends State<MarkdownDocViewerDialog> {
         LongPressGestureRecognizer:
             GestureRecognizerFactoryWithHandlers<LongPressGestureRecognizer>(
           () => LongPressGestureRecognizer(
-            duration: const Duration(milliseconds: 220),
+            duration: const Duration(milliseconds: 800),
           ),
           (instance) {
             instance
