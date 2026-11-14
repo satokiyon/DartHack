@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-14. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-15. */
 /* $NHDT-Header: NetHack 5.0 do_name.c 2026/08/16_14:31:31 NetHack-5.0:1.342 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Pasi Kallinen, 2018. */
@@ -2386,17 +2386,17 @@ static const char *const sir_Terry_novels[] = {
 
 /* Display-only Japanese titles (same order as sir_Terry_novels[]). */
 static const char *const jp_sir_Terry_novels[] = {
-    "魔法の色", "光のファンタスティック", "平等の儀式", "モート",
-    "ソーサリー", "ウィアード・シスターズ", "ピラミッド", "衛兵！衛兵！", "エリック",
-    "動く映像", "死神マン", "海外の魔女たち", "小さな神々",
-    "貴族と淑女", "武装した男たち", "ソウル・ミュージック", "面白き時代",
-    "仮面劇", "粘土の足", "ホッグファーザー", "ジンゴ", "最後の大陸",
-    "喉笛を掴め", "第五の象", "真実", "時間泥棒",
-    "最後の英雄", "驚くべきモーリスと教養ある齧歯類たち",
-    "夜警", "小さな自由の男たち", "怪物の連隊",
-    "空いっぱいの帽子", "郵便局へ行こう", "ドカン！", "冬の精",
-    "お金を作ろう", "見えない学者たち", "真夜中の装い", "スナッフ",
-    "蒸気を起こせ", "羊飼いの王冠"
+    "魔法の色彩", "奇天烈な光", "男女平等の儀式", "死神の徒弟",
+    "ソーサリー", "三人の魔女", "ピラミッド", "衛兵！衛兵！", "エリック",
+    "ムービング・ピクチャーズ", "死神と刈り入れ人", "旅する魔女たち", "小さな神々",
+    "妖精王と女王", "男たち、武器を取れ", "ソウル・ミュージック", "面白い時代",
+    "仮面劇", "粘土の足", "ホグファザー", "狂信的愛国主義", "最後の宿命大陸",
+    "喉首を掻き切れ", "第5のゾウ", "真実", "時の盗賊",
+    "最後の英雄", "天才猫モーリスとその仲間たち",
+    "夜警", "ちっちゃな自由人", "怪物連隊",
+    "空いっぱいの帽子", "郵便事業、始めました", "サッド！", "冬の鍛冶屋",
+    "株と金と郵便局", "見えざる大学のフットボール", "真夜中を身にまとって", "スナッフ",
+    "蒸気を上げろ", "羊飼いの王冠"
 };
 
 const char *
@@ -2458,12 +2458,12 @@ lookup_novel(const char *lookname, int *idx)
             || !strcmpi(lookname, jp_sir_Terry_novels[k])) {
             if (idx)
                 *idx = k;
-            return sir_Terry_novels[k];
+            return jp_sir_Terry_novels[k];
         }
     }
     /* name not found; if novelidx is already set, override the name */
-    if (idx && IndexOk(*idx, sir_Terry_novels))
-        return sir_Terry_novels[*idx];
+    if (idx && IndexOk(*idx, jp_sir_Terry_novels))
+        return jp_sir_Terry_novels[*idx];
 
     return (const char *) 0;
 }
