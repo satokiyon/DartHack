@@ -141,9 +141,12 @@ void main() {
         );
         await tester.pumpAndSettle();
 
-        // 生の [!TIP] / [!NOTE] 文字列が残っていないこと
+        // 生の [!TIP] / [!NOTE] / [!IMPORTANT] / <br> / #### が残っていないこと
         expect(find.textContaining('[!TIP]'), findsNothing);
         expect(find.textContaining('[!NOTE]'), findsNothing);
+        expect(find.textContaining('[!IMPORTANT]'), findsNothing);
+        expect(find.textContaining('<br>'), findsNothing);
+        expect(find.textContaining('####'), findsNothing);
 
         // 目次を開き、絞り込みで16章が抽出されていること
         await tester.tap(find.byIcon(Icons.toc));
@@ -161,6 +164,26 @@ void main() {
           ),
           findsOneWidget,
         );
+
+        // 日本語版は付録 A / 付録 B（日英両対応入力ガイド）も目次から抽出できること
+        if (entry.isJp) {
+          await tester.enterText(tocFilterField, '付録');
+          await tester.pumpAndSettle();
+          expect(
+            find.descendant(
+              of: find.byType(BottomSheet),
+              matching: find.textContaining('付録 A. 日英両対応入力ガイド（通常プレイ）'),
+            ),
+            findsOneWidget,
+          );
+          expect(
+            find.descendant(
+              of: find.byType(BottomSheet),
+              matching: find.textContaining('付録 B. 日英両対応入力ガイド（ウィザードモード）'),
+            ),
+            findsOneWidget,
+          );
+        }
 
         // 目次を Esc キーで閉じる
         await tester.sendKeyEvent(LogicalKeyboardKey.escape);
