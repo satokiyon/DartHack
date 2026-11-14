@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-04. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-14. */
 /* $NHDT-Header: NetHack 5.0 ball.c 2026/06/20_22:26:43 NetHack-5.0:1.80 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) David Cohrs, 2006. */
@@ -922,7 +922,7 @@ drop_ball(coordxy x, coordxy y)
                          (side == LEFT_SIDE) ? "左" : "右",
                          jp_body_part(LEG));
                     losehp(Maybe_Half_Phys(2),
-                           "クマ罠から引きずり出されて脚を負傷した",
+                           "leg damage from being pulled out of a bear trap",
                            KILLED_BY);
                 }
                 break;
@@ -1014,7 +1014,7 @@ drag_down(void)
         if (rn2(6)) {
             pline_The("鉄球に引きずられて階下へ落ちた!");
             losehp(Maybe_Half_Phys(rnd(6)),
-                   "鉄球に引きずられて階下へ落ちた", NO_KILLER_PREFIX);
+                   "dragged downstairs by an iron ball", NO_KILLER_PREFIX);
             litter();
         }
     } else {
@@ -1027,9 +1027,9 @@ drag_down(void)
             dragchance -= 2;
         }
         if ((int) dragchance >= rnd(6)) {
-            pline_The("鉄球に引きずられて階下へ落ちた!");
+            pline_The("鉄球があなたを階下へ引きずり落とした!");
             losehp(Maybe_Half_Phys(rnd(3)),
-                   "鉄球に引きずられて階下へ落ちた", NO_KILLER_PREFIX);
+                   "dragged downstairs by an iron ball", NO_KILLER_PREFIX);
             exercise(A_STR, FALSE);
             litter();
         }

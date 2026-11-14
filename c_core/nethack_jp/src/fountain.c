@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-04. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-14. */
 /* $NHDT-Header: NetHack 5.0 fountain.c 2026/06/20_22:26:43 NetHack-5.0:1.123 $ */
 /*      Copyright Scott R. Turner, srt@ucla, 10/27/86 */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -303,7 +303,7 @@ drinkfountain(void)
                 losehp(rnd(4), "unrefrigerated sip of juice", KILLED_BY_AN);
                 break;
             }
-            poison_strdmg(rn1(4, 3), rnd(10), "汚染された水",
+            poison_strdmg(rn1(4, 3), rnd(10), "contaminated water",
                           KILLED_BY);
             exercise(A_CON, FALSE);
             break;

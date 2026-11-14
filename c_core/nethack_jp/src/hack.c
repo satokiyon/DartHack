@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-12. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-14. */
 /* $NHDT-Header: NetHack 5.0 hack.c 2026/06/20_16:30:50 NetHack-5.0:1.512 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Derek S. Ray, 2015. */
@@ -823,7 +823,7 @@ movobj(struct obj *obj, coordxy ox, coordxy oy)
 staticfn void
 dosinkfall(void)
 {
-    static const char fell_on_sink[] = "流し台に落ちた";
+    static const char fell_on_sink[] = "fell onto a sink";
     struct obj *obj;
     int dmg;
     boolean lev_boots = (uarmf && uarmf->otyp == LEVITATION_BOOTS),

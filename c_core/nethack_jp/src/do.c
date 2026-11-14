@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-04. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-14. */
 /* $NHDT-Header: NetHack 5.0 do.c 2026/10/17_14:49:13 NetHack-5.0:1.416 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Derek S. Ray, 2015. */
@@ -137,7 +137,7 @@ boulder_hits_pool(
                 burn_away_slime();
                 dmg = d((Fire_resistance ? 1 : 3), 6);
                 losehp(Maybe_Half_Phys(dmg), /* lava damage */
-                       "溶岩", KILLED_BY);
+                       "molten lava", KILLED_BY);
             } else if (!fills_up && flags.verbose
                        && (pushing ? !Blind : cansee(rx, ry))) {
                 pline("跡形もなく沈んだ!");
@@ -228,7 +228,7 @@ flooreffects(
             } else {
                 if (!Passes_walls && !throws_rocks(gy.youmonst.data)) {
                     losehp(Maybe_Half_Phys(rnd(15)),
-                           "巨大な岩に押し潰されて", NO_KILLER_PREFIX);
+                           "squished under a boulder", NO_KILLER_PREFIX);
                     goto deletedwithboulder;
                 } else
                     reset_utrap(TRUE);
@@ -1274,7 +1274,7 @@ dodown(void)
                 if (!rn2(3)) {
                     squeezed = TRUE;
                     losehp(Maybe_Half_Phys(rnd(4)),
-                           "狭い通路で頭を打ったこと", KILLED_BY);
+                           "contusion from a small passage", KILLED_BY);
                 } else {
                     You("そこへは収まりきらなかった.");
                     return ECMD_OK;
@@ -1813,8 +1813,8 @@ goto_level(
                     dismount_steed(DISMOUNT_FELL);
                 else
                     losehp(Maybe_Half_Phys(rnd(3)),
-                           ga.at_ladder ? "はしごから落ちたこと"
-                                     : "階段を転げ落ちたこと",
+                           ga.at_ladder ? "falling off a ladder"
+                                     : "tumbling down a flight of stairs",
                            KILLED_BY);
                 selftouch("落下しながら、あなたは");
             } else { /* ordinary descent */

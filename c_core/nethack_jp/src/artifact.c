@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-04. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-14. */
 /* $NHDT-Header: NetHack 5.0 artifact.c 2026/06/20_22:26:43 NetHack-5.0:1.266 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2013. */
@@ -967,13 +967,7 @@ touch_artifact(struct obj *obj, struct monst *mon)
         /* add half (maybe quarter) of the usual silver damage bonus */
         if (objects[obj->otyp].oc_material == SILVER && Hate_silver)
             tmp = rnd(10), dmg += Maybe_Half_Phys(tmp);
-        {
-            const char *artname = jp_artiname((int) (oart - artilist));
-
-            if (!artname || !*artname)
-                artname = oart->name;
-            Sprintf(buf, "%sに触れたこと", artname);
-        }
+        Sprintf(buf, "touching %s", oart->name);
         losehp(dmg, buf, KILLED_BY); /* magic damage, not physical */
         exercise(A_WIS, FALSE);
     }
@@ -2565,9 +2559,9 @@ retouch_object(
                    game's silver item without stating that it is silver
                    potentially leads to confusion about cause of death */
                 if (obj->oclass == RING_CLASS)
-                    what = "銀の指輪";
+                    what = "silver ring";
                 else if (obj->oclass == WAND_CLASS)
-                    what = "銀の杖";
+                    what = "silver wand";
                 /* for anything else, stick with killer_xname() */
             }
             /* damage is somewhat arbitrary; half the usual 1d20 physical
@@ -2576,7 +2570,7 @@ retouch_object(
                 tmp = rnd(10), dmg += Maybe_Half_Phys(tmp);
             if (bane)
                 dmg += rnd(10);
-            Sprintf(buf, "%sを扱った", what);
+            Sprintf(buf, "handling %s", what);
             losehp(dmg, buf, KILLED_BY);
             exercise(A_CON, FALSE);
         }

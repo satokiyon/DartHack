@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-04. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-14. */
 /* $NHDT-Header: NetHack 5.0 detect.c 2026/06/20_22:26:43 NetHack-5.0:1.199 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2018. */
@@ -1261,7 +1261,7 @@ use_crystal_ball(struct obj **optr)
 
     if (Hallucination) {
         nomul(-rnd(charged ? 4 : 2));
-        gm.multi_reason = "looking into a magic 8-ball";
+        gm.multi_reason = "gazing into a Magic 8-Ball (tm)";
         gn.nomovemsg = "";
 
         if (!charged) {
@@ -1314,7 +1314,7 @@ use_crystal_ball(struct obj **optr)
 
     You("%sをのぞき込んだ...", xname(obj));
     nomul(-rnd(charged ? 10 : 2));
-    gm.multi_reason = "looking into a crystal ball";
+    gm.multi_reason = "gazing into a crystal ball";
     gn.nomovemsg = "";
 
     if (!charged) {

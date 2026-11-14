@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-04. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-14. */
 /* $NHDT-Header: NetHack 5.0 mthrowu.c 2026/08/07_12:46:53 NetHack-5.0:1.195 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Pasi Kallinen, 2016. */
@@ -99,28 +99,15 @@ thitu(
             || !strncmpi(name, "a ", 2))
             kprefix = KILLED_BY;
     }
-    onm = (obj && obj_is_pname(obj)) ? the(name)
-          : (obj && obj->quan > 1L) ? name
-            : an(name);
-    if (g_language_is_jp) {
-        if (!strcmpi(name, "arrow"))
-            onm = "矢";
-        else if (!strcmpi(name, "little dart") || !strcmpi(name, "dart"))
-            onm = "吹き矢";
-        else if (!strcmpi(name, "poisoned needle") || !strcmpi(name, "needle"))
-            onm = "毒針";
-        else if (!strcmpi(name, "spikes"))
-            onm = "毒の棘";
-        else if (!strcmpi(name, "falling rock"))
-            onm = "落石";
-        else if (!strcmpi(name, "bear trap"))
-            onm = "熊罠";
-        else if (!strcmpi(name, "land mine"))
-            onm = "地雷";
-        else if (!strcmpi(name, "electric shock"))
-            onm = "電撃";
-        else if (!strcmpi(name, "explosion"))
-            onm = "爆発";
+    if (named) {
+        onm = !strcmpi(name, "arrow") ? "矢"
+              : !strcmpi(name, "little dart") ? "小さな吹き矢"
+              : !strcmpi(name, "boomerang") ? "ブーメラン"
+              : name;
+    } else {
+        onm = (obj && obj_is_pname(obj)) ? the(name)
+              : (obj && obj->quan > 1L) ? name
+                : an(name);
     }
     is_acid = (obj && obj->otyp == ACID_VENOM);
 

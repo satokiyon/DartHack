@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-04. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-14. */
 /* $NHDT-Header: NetHack 5.0 end.c 2026/06/20_22:26:43 NetHack-5.0:1.353 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
@@ -224,7 +224,7 @@ done_in_by(struct monst *mtmp, int how)
     if ((mptr->geno & G_UNIQ) != 0 && !(imitator && !mimicker)
         && !(mptr == &mons[PM_HIGH_CLERIC] && !mtmp->ispriest)) {
         if (!type_is_pname(mptr))
-            Strcat(buf, "");
+            Strcat(buf, "the ");
         svk.killer.format = KILLED_BY;
     }
     /* _the_ <invisible> <distorted> ghost of Dudley */
@@ -234,7 +234,7 @@ done_in_by(struct monst *mtmp, int how)
 #else
     if (mptr == &mons[PM_GHOST] && has_mgivenname(mtmp)) {
 #endif
-        Strcat(buf, "");
+        Strcat(buf, "the ");
         svk.killer.format = KILLED_BY;
     }
     (void) monhealthdescr(mtmp, TRUE, eos(buf));
@@ -246,7 +246,7 @@ done_in_by(struct monst *mtmp, int how)
     if (imitator) {
         char shape[BUFSZ];
         const char *realnm = pmname(champtr, Mgender(mtmp)),
-               *fakenm = pmname(mptr, Mgender(mtmp));
+                   *fakenm = pmname(mptr, Mgender(mtmp));
         boolean alt = is_vampshifter(mtmp);
 
         if (mimicker) {
@@ -278,7 +278,7 @@ done_in_by(struct monst *mtmp, int how)
         mptr = mtmp->data; /* reset for mimicker case */
 #if 0  /* hardfought */
     } else if (has_ebones(mtmp)) {
-        Strcpy(buf, m_monnam(mtmp));
+        Strcpy(buf, en_m_monnam(mtmp));
 #endif
     } else if (mptr == &mons[PM_GHOST]) {
         Strcat(buf, "ghost");
@@ -294,7 +294,7 @@ done_in_by(struct monst *mtmp, int how)
     } else if (mtmp->ispriest || mtmp->isminion) {
         /* m_monnam() suppresses "the" prefix plus "invisible", and
            it overrides the effect of Hallucination on priestname() */
-        Strcat(buf, m_monnam(mtmp));
+        Strcat(buf, en_m_monnam(mtmp));
     } else {
         Strcat(buf, pmname(mptr, Mgender(mtmp)));
         if (has_mgivenname(mtmp)) {
@@ -756,8 +756,8 @@ savelife(int how)
        again (perhaps due to zap rebound); this text will be appended to
           "killed by <something>, while "
        in high scores entry, if any, and in logfile (but not on tombstone) */
-    gm.multi_reason = Role_if(PM_TOURIST) ? "toyed with by fate"
-                                          : "cheating death";
+    gm.multi_reason = Role_if(PM_TOURIST) ? "being toyed with by Fate"
+                                          : "attempting to cheat Death";
 
     if (u.utrap && u.utraptype == TT_LAVA)
         reset_utrap(FALSE);

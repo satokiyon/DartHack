@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-04. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-14. */
 /* $NHDT-Header: NetHack 5.0 dig.c 2026/06/20_22:26:43 NetHack-5.0:1.238 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2012. */
@@ -401,7 +401,7 @@ dig(void)
                     dmg = (dmg + 1) / 2;
                 You("自分の%sを叩いてしまった.", jp_body_part(FOOT));
                 Sprintf(kbuf, "chopping off %s own %s", uhis(),
-                        jp_body_part(FOOT));
+                        body_part(FOOT));
                 losehp(Maybe_Half_Phys(dmg), kbuf, KILLED_BY);
             } else {
                 You("%sでトラバサミを破壊した.",

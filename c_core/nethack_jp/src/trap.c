@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-04. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-14. */
 /* $NHDT-Header: NetHack 5.0 trap.c 2026/11/02_21:05:17 NetHack-5.0:1.653 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2013. */
@@ -78,6 +78,7 @@ staticfn void maybe_finish_sokoban(void);
 static const char *const a_your[2] = { "", "" };
 static const char *const A_Your[2] = { "", "" };
 static const char tower_of_flame[] = "火柱";
+static const char tower_of_flame_killer[] = "tower of flame";
 static const char *const A_gush_of_water_hits = "水流が";
 static const char *const blindgas[6] = { "湿った",   "無臭の",
                                          "刺激臭の", "冷たい",
@@ -1334,7 +1335,7 @@ trapeffect_dart_trap(
         } else if (thitu(7, Maybe_Half_Phys(dam), &otmp, "little dart")) {
             if (otmp) {
                 if (otmp->opoisoned)
-                    poisoned("dart", A_CON, "little dart",
+                    poisoned("吹き矢", A_CON, "little dart",
                              /* if damage triggered life-saving,
                                  poison is limited to attrib loss */
                              (u.umortality > oldumort) ? 0 : 10, TRUE);
@@ -1999,18 +2000,18 @@ trapeffect_pit(
                           death reason will be overridden with
                           "killed while stuck in creature form" */
                        plunged
-                                             ? "故意に鉄の棘だらけの落とし穴へ飛び込んだ"
+                                             ? "deliberately plunged into a pit of iron spikes"
                        : (conj_pit || deliberate)
-                                                 ? "鉄の棘だらけの落とし穴へ足を踏み入れた"
+                                                 ? "stepped into a pit of iron spikes"
                          : adj_pit
-                                                     ? "鉄の棘だらけの落とし穴へつまずいて落ちた"
-                                                     : "鉄の棘だらけの落とし穴へ落ちた",
+                                                     ? "stumbled into a pit of iron spikes"
+                                                     : "fell into a pit of iron spikes",
                        NO_KILLER_PREFIX);
                 if (!rn2(6))
-                    poisoned("spikes", A_STR,
-                             (conj_pit || adj_pit || deliberate)
-                             ? "stepping on poison spikes"
-                             : "fall onto poison spikes",
+                          poisoned("棘", A_STR,
+                                      (conj_pit || adj_pit || deliberate)
+                                      ? "stepping on poison spikes"
+                                      : "fall onto poison spikes",
                              /* if damage triggered life-saving,
                                  poison is limited to attrib loss */
                              (u.umortality > oldumort) ? 0 : 8, FALSE);
@@ -2019,8 +2020,8 @@ trapeffect_pit(
                 if (!conj_pit && !deliberate
                     && !(plunged && (Flying || is_clinger(gy.youmonst.data))))
                     losehp(Maybe_Half_Phys(rnd(adj_pit ? 3 : 6)),
-                              plunged ? "故意に落とし穴へ飛び込んだ"
-                              : "落とし穴へ落ちた",
+                              plunged ? "deliberately plunged into a pit"
+                              : "fell into a pit",
                            NO_KILLER_PREFIX);
             }
             if (Punished && !carried(uball)) {
@@ -4392,7 +4393,7 @@ dofiretrap(
     if (!num)
         You("無傷だった.");
     else
-        losehp(num, tower_of_flame, KILLED_BY_AN); /* fire damage */
+        losehp(num, tower_of_flame_killer, KILLED_BY_AN); /* fire damage */
     burn_away_slime();
 
     if (burnarmor(&gy.youmonst) || rn2(3)) {
@@ -6462,7 +6463,7 @@ chest_trap(
                        && *in_rooms(ox, oy, SHOPBASE) == *u.ushops);
 
             pline("%sが爆発した!", xname(obj));
-            Snprintf(buf, sizeof buf, "exploding %s", xname(obj));
+            Snprintf(buf, sizeof buf, "exploding %s", en_xname(obj));
 
             if (costly)
                 loss += stolen_value(obj, ox, oy, (boolean) shkp->mpeaceful,
@@ -6517,7 +6518,7 @@ chest_trap(
         case 17:
             pline("有毒ガスの雲が%sから噴き出した.", xname(obj));
             if (rn2(3))
-                poisoned("gas cloud", A_STR, "cloud of poison gas", 15,
+                poisoned("ガス雲", A_STR, "cloud of poison gas", 15,
                          FALSE);
             else
                 create_gas_cloud(obj->ox, obj->oy, 1, 8);
@@ -6528,7 +6529,7 @@ chest_trap(
         case 14:
         case 13:
             You_feel("針が%sを刺したのを感じた.", jp_body_part(bodypart));
-            poisoned("needle", A_CON, "poisoned needle", 10, FALSE);
+            poisoned("針", A_CON, "poisoned needle", 10, FALSE);
             exercise(A_CON, FALSE);
             break;
         case 12:
@@ -6562,7 +6563,7 @@ chest_trap(
             if (!Free_action) {
                 pline("突然その場で凍りついた!");
                 nomul(-d(5, 6));
-                gm.multi_reason = "罠で凍りついた";
+                gm.multi_reason = "frozen by a trap";
                 exercise(A_DEX, FALSE);
                 gn.nomovemsg = You_can_move_again;
             } else

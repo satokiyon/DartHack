@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-04. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-14. */
 /* $NHDT-Header: NetHack 5.0 uhitm.c 2026/06/20_22:26:43 NetHack-5.0:1.505 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
@@ -107,16 +107,12 @@ dynamic_multi_reason(struct monst *mon, const char *verb, boolean by_gaze)
     /* combination of noname_monnam() and m_monnam(), more or less;
        accurate regardless of visibility or hallucination (only seen
        if game ends) and without personal name (M2_PNAME excepted) */
-    char *who, *p = gm.multireasonbuf;
-    int save_lang = g_language_is_jp;
-
-    g_language_is_jp = 0;
-    who = x_monnam(mon, ARTICLE_A, (char *) 0,
-                   (SUPPRESS_IT | SUPPRESS_INVISIBLE
-                    | SUPPRESS_HALLUCINATION | SUPPRESS_SADDLE
-                    | SUPPRESS_NAME),
-                   FALSE);
-    g_language_is_jp = save_lang;
+    char *who = en_x_monnam(mon, ARTICLE_A, (char *) 0,
+                         (SUPPRESS_IT | SUPPRESS_INVISIBLE
+                          | SUPPRESS_HALLUCINATION | SUPPRESS_SADDLE
+                          | SUPPRESS_NAME),
+                         FALSE),
+         *p = gm.multireasonbuf;
 
     /* prefix info for done_in_by() */
     Sprintf(p, "%u:", mon->m_id);

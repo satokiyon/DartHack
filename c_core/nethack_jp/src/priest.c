@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-04. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-14. */
 /* $NHDT-Header: NetHack 5.0 priest.c 2026/06/20_22:26:43 NetHack-5.0:1.112 $ */
 /* Copyright (c) Izchak Miller, Steve Linhart, 1989.              */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -354,6 +354,68 @@ priestname(
         Strcat(pname, "（");
         Strcat(pname, jp_gname_for_display(halu_gname(mon_aligntyp(mon))));
         Strcat(pname, "の）");
+    }
+    return pname;
+}
+
+/* 死因・英語内部キー生成専用の僧侶名フォーマット（画面表示には使用しない） */
+char *
+en_priestname(
+    struct monst *mon,
+    int article,
+    boolean reveal_high_priest,
+    char *pname) /* caller-supplied output buffer */
+{
+    boolean do_hallu = Hallucination,
+            aligned_priest = mon->data == &mons[PM_ALIGNED_CLERIC],
+            high_priest = mon->data == &mons[PM_HIGH_CLERIC];
+    char whatcode = '\0';
+    const char *what = do_hallu ? rndmonnam(&whatcode)
+                                : pmname(mon->data, Mgender(mon));
+
+    if (!mon->ispriest && !mon->isminion)
+        return strcpy(pname, what);
+
+    if (mon->ispriest || aligned_priest || high_priest)
+        what = do_hallu ? "poohbah" : mon->female ? "priestess" : "priest";
+
+    *pname = '\0';
+    if (article != ARTICLE_NONE && (!do_hallu || !bogon_is_pname(whatcode))) {
+        if (article == ARTICLE_YOUR || (article == ARTICLE_A && high_priest))
+            article = ARTICLE_THE;
+        if (article == ARTICLE_THE) {
+            Strcpy(pname, "the ");
+        } else if (!strcmp(what, "Angel")) {
+            Strcpy(pname, "an ");
+        } else {
+            (void) just_an(pname, what);
+        }
+    }
+    if (mon->minvis) {
+        if (!strcmp(pname, "a "))
+            Strcpy(pname, "an ");
+        Strcat(pname, "invisible ");
+    }
+    if (mon->isminion && EMIN(mon)->renegade) {
+        if (!strcmp(pname, "an ") && !mon->minvis)
+            Strcpy(pname, "a ");
+        Strcat(pname, "renegade ");
+    }
+
+    if (mon->ispriest || aligned_priest) {
+        if (high_priest)
+            Strcat(pname, do_hallu ? "grand " : "high ");
+    } else {
+        if (mon->mtame && !strcmpi(what, "Angel"))
+            Strcat(pname, "guardian ");
+    }
+
+    Strcat(pname, what);
+    if (do_hallu || !high_priest || reveal_high_priest
+        || !Is_astralevel(&u.uz)
+        || m_next2u(mon) || program_state.gameover) {
+        Strcat(pname, " of ");
+        Strcat(pname, halu_gname(mon_aligntyp(mon)));
     }
     return pname;
 }

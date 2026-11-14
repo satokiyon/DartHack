@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-09. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-14. */
 /* $NHDT-Header: NetHack 5.0 music.c 2026/06/20_22:26:43 NetHack-5.0:1.128 $ */
 /*      Copyright (c) 1989 by Jean-Christophe Collet */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -312,7 +312,7 @@ do_pit(coordxy x, coordxy y, unsigned tu_pit)
             You("裂け目に落ちた!");
             set_utrap(rn1(6, 2), TT_PIT);
             losehp(Maybe_Half_Phys(rnd(6)),
-                   "裂け目に落ちた", NO_KILLER_PREFIX);
+                   "fell into a chasm", NO_KILLER_PREFIX);
             selftouch("落下しながら、あなたは");
         } else if (u.utrap && u.utraptype == TT_PIT) {
             boolean keepfooting =
@@ -323,7 +323,7 @@ do_pit(coordxy x, coordxy y, unsigned tu_pit)
             You("激しく揺さぶられた!");
             set_utrap(rn1(6, 2), TT_PIT);
             losehp(Maybe_Half_Phys(rnd(keepfooting ? 2 : 4)),
-                   "裂け目で傷を負った", NO_KILLER_PREFIX);
+                   "hurt in a chasm", NO_KILLER_PREFIX);
             if (keepfooting)
                 exercise(A_DEX, TRUE);
             else
@@ -620,7 +620,7 @@ do_improvisation(struct obj *instr)
             if ((damage = zapyourself(instr, TRUE)) != 0) {
                 char buf[BUFSZ];
 
-                Sprintf(buf, "魔法の角笛の反動");
+                Sprintf(buf, "using a magical horn on %sself", uhim());
                 Hero_playnotes(obj_to_instr(&itmp), improvisation, 50);
                 losehp(damage, buf, KILLED_BY); /* fire or frost damage */
             }
