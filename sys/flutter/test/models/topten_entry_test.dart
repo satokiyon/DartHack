@@ -642,5 +642,138 @@ void main() {
       expect(recEntriesEn[1].details[0], contains('Killed by a gas spore\'s explosion'));
       expect(recEntriesEn[2].details[0], contains('Gas spore\'s explosion'));
     });
+
+    test('性別分化NAMSモンスター・大文字小文字混在モンスター/アーティファクト・巫女パターンの日本語化テスト', () {
+      // 全15組の NAMS 性別表現（gnome lord 等を含む）
+      final namsCases = <String, String>{
+        'killed by a gnome lord': 'ノームの領主に倒された',
+        'killed by a gnome lady': 'ノームの女領主に倒された',
+        'killed by a gnome leader': 'ノームの首領に倒された',
+        'killed by a gnome king': 'ノームの王に倒された',
+        'killed by a gnome queen': 'ノームの女王に倒された',
+        'killed by a gnome ruler': 'ノームの支配者に倒された',
+        'killed by a dwarf lord': 'ドワーフの領主に倒された',
+        'killed by a dwarf lady': 'ドワーフの女領主に倒された',
+        'killed by a dwarf king': 'ドワーフの王に倒された',
+        'killed by a dwarf queen': 'ドワーフの女王に倒された',
+        'killed by a kobold lord': 'コボルドの領主に倒された',
+        'killed by a kobold lady': 'コボルドの女領主に倒された',
+        'killed by a kobold leader': 'コボルドの首領に倒された',
+        'killed by an ogre lord': 'オーガの頭領に倒された',
+        'killed by an ogre lady': 'オーガの女頭領に倒された',
+        'killed by an ogre king': 'オーガの王に倒された',
+        'killed by an ogre queen': 'オーガの女王に倒された',
+        'killed by a vampire lady': 'ヴァンパイアレディに倒された',
+        'killed by a vampire leader': 'ヴァンパイアの長に倒された',
+        'killed by an elf-lord': 'エルフの貴公子に倒された',
+        'killed by an elf-lady': 'エルフの貴婦人に倒された',
+        'killed by an elf-noble': 'エルフの貴族に倒された',
+        'killed by the Elvenking': 'エルフの王に倒された',
+        'killed by the Elvenqueen': 'エルフの女王に倒された',
+        'killed by an elven monarch': 'エルフの君主に倒された',
+        'killed by a priest': '僧侶に倒された',
+        'killed by a priestess': '女僧侶に倒された',
+        'killed by an aligned cleric': '神官に倒された',
+        'killed by a cleric': '司祭に倒された',
+        'killed by a high priest': '高位神官に倒された',
+        'killed by a high priestess': '高位巫女に倒された',
+        'killed by a high cleric': '高位神官に倒された',
+        'killed by an amorous demon': '愛の悪魔に倒された',
+        'killed by a caveman': '原始人に倒された',
+        'killed by a cavewoman': '女の原始人に倒された',
+        'killed by a cave dweller': '洞窟人に倒された',
+      };
+      namsCases.forEach((raw, expected) {
+        expect(translateDeathReason(raw, isJp: true), expected, reason: raw);
+      });
+
+      // 神名付き巫女パターン
+      expect(translateDeathReason('killed by a high priestess of Moloch', isJp: true), 'モロクの高位巫女に倒された');
+      expect(translateDeathReason('killed by a priestess of Anubis', isJp: true), 'アヌビスの巫女に倒された');
+      expect(translateDeathReason('killed by a temple priestess', isJp: true), '寺院の巫女に倒された');
+
+      // 大文字小文字差のあるモンスター・未登録オブジェクト・アーティファクト
+      expect(translateDeathReason('killed by a Mordor orc', isJp: true), 'モルドールのオークに倒された');
+      expect(translateDeathReason('killed by an Uruk-hai', isJp: true), 'ウルク・ハイに倒された');
+      expect(translateDeathReason('killed by a Keystone Kop', isJp: true), '警備員に倒された');
+      expect(translateDeathReason('killed by a Kop Sergeant', isJp: true), '巡査部長に倒された');
+      expect(translateDeathReason('killed by a Kop Lieutenant', isJp: true), '警部補に倒された');
+      expect(translateDeathReason('killed by a Kop Kaptain', isJp: true), '警部に倒された');
+      expect(translateDeathReason('killed by an Olog-hai', isJp: true), 'オログ・ハイに倒された');
+      expect(translateDeathReason('killed by the Oracle', isJp: true), '賢者に倒された');
+      expect(translateDeathReason('killed by a mail daemon', isJp: true), 'メイルデーモンに倒された');
+      expect(
+        translateDeathReason('killed by The Palantir of Westernesse', isJp: true),
+        'ウェスタネスのパランティアに倒された',
+      );
+      expect(translateDeathReason('killed by a silver ring', isJp: true), '銀の指輪に倒された');
+      expect(translateDeathReason('killed by a silver wand', isJp: true), '銀の杖に倒された');
+    });
+
+    test('自爆・他者光線・新規英語正規化死因・while理由の日本語化テスト', () {
+      // 自爆（杖・角笛・呪文・ブレス・幻想）
+      expect(
+        translateDeathReason('killed by zapped herself with a wand of death', isJp: true),
+        '死の杖で自分自身を撃った',
+      );
+      expect(
+        translateDeathReason('killed by blasted himself with a fireball', isJp: true),
+        '火の玉で自分自身を吹き飛ばした',
+      );
+      expect(
+        translateDeathReason('killed by using a magical horn on himself', isJp: true),
+        '魔法の角笛の反動で倒された',
+      );
+      expect(
+        translateDeathReason('killed by magic missile cast by himself', isJp: true),
+        '自分自身で唱えた魔法の矢で倒された',
+      );
+      expect(
+        translateDeathReason('killed by blast of lightning exhaled by itself', isJp: true),
+        '自分自身で吐いた電撃の息で倒された',
+      );
+      expect(
+        translateDeathReason('killed by fireball imagined by herself', isJp: true),
+        '自分自身で想像した火の玉で倒された',
+      );
+
+      // 他モンスターの光線・死の接触
+      expect(
+        translateDeathReason('killed by bolt of fire zapped by a gnome lord', isJp: true),
+        'ノームの領主が放った火炎の光線で倒された',
+      );
+      expect(
+        translateDeathReason('killed by blast of frost exhaled by a white dragon', isJp: true),
+        'ホワイトドラゴンが吐いた氷結の息で倒された',
+      );
+      expect(
+        translateDeathReason('killed by inflicted by the touch of death of a lich', isJp: true),
+        'リッチの死の手によって倒された',
+      );
+
+      // 新規英語正規化死因（罠・薬・乗馬・爆発・操作）
+      expect(translateDeathReason('slipped while mounting a pony', isJp: true), 'ポニーに乗ろうとして滑って倒された');
+      expect(translateDeathReason('killed by chopping off his own foot', isJp: true), '自分の足を切り落として倒された');
+      expect(translateDeathReason('killed by handling a Candelabrum of Invocation', isJp: true), '祈りの燭台を扱ったことで倒された');
+      expect(translateDeathReason('killed by an exploding ring', isJp: true), '指輪の爆発に倒された');
+      expect(translateDeathReason('dissolved in acid', isJp: true), '酸で溶けた');
+      expect(translateDeathReason('stepped into a pit of iron spikes', isJp: true), '鉄の棘だらけの落とし穴へ足を踏み入れて倒された');
+      expect(translateDeathReason('stepping on poison spikes', isJp: true), '毒の棘を踏んで倒された');
+      expect(translateDeathReason('quaffing a burning potion of oil', isJp: true), '燃えている油の薬を飲んで倒された');
+      expect(translateDeathReason('anti-magic implosion', isJp: true), '反魔法の収縮に倒された');
+
+      // 無防備理由 (, while ... / translateMultiReasonText)
+      expect(
+        translateDeathReason('killed by a gnome lord, while frozen by a trap', isJp: true),
+        'ノームの領主に倒された（罠で凍りついていた）',
+      );
+      expect(
+        translateDeathReason('killed by Death, while being toyed with by Fate', isJp: true),
+        'デスに倒された（運命に翻弄されていた）',
+      );
+      expect(translateMultiReasonText('attempting to cheat Death', isJp: true), '死神を欺こうとしていた');
+      expect(translateMultiReasonText('gazing into a Magic 8-Ball (tm)', isJp: true), 'マジック8ボールをのぞき込んでいた');
+      expect(translateMultiReasonText('gazing into a crystal ball', isJp: true), '水晶玉をのぞき込んでいた');
+    });
   });
 }

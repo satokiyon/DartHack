@@ -65,26 +65,28 @@ DartHack では、アップストリーム本来の英語キーを出力する�
 
 ---
 
-## 3. 同期済みの共通レイヤー (`topten.c` / `explode.c`)
+## 3. 同期済みの共通レイヤー (`topten.c` / `explode.c` / 英語キー完全移行)
 
-2026年9月現在、以下のコンポーネントは両リポジトリ間で完全同期（または互換実装）されています。
+2026年11月現在、NetHackJP 本家側も上記 §2 の未移行箇所を含めて**全死因・キラー・無防備理由 (`gm.multi_reason`)・モンスタートークンの英語キー正規化と表示時動的翻訳アーキテクチャへ完全移行・同期**されました。
 
-1. **`src/topten.c`**:
-   - `jp_killer_reason_table`: 上記の全英語キー（落石、トラバサミ、酸の薬、火の巻物、昇天、不正行為等）を網羅した動的翻訳テーブル。
-   - `jp_translate_multi_reason_exact` / `reason_map[]`: 複合死因（気絶、金貨の山、恐怖、運命の翻弄等）の動的翻訳テーブル。
-   - `jp_translate_food_or_corpse`: 毒・酸・死体・卵・石像・部位の詳細名詞解決。
-   - `jp_translate_killer_text_for_display`: 誤射、水場、石化事故等の多層構文解析。
-2. **`src/explode.c`**:
-   - `jp_translate_explosion_noun`: モンスター名（`name_to_mon`）、オブジェクト名（`name_to_otyp`）、爆発名の詳細解決。
-   - `jp_explosion_text_for_display`: 外部公開関数として `topten.c` から安全に参照可能。
-   - `explode()` および `mon_explodes()`: `svk.killer.name` を英語キー（`"caught in a %s"`, `"%s explosion"`）で保持。
+1. **英語キー生成・正規化層 (`src/*.c`)**:
+   - `src/do_name.c` / `src/objnam.c` / `src/priest.c`: プレイヤー向け画面表示 (`pline` 等) は日本語のまま維持しつつ、記録・死因専用の英語生成ヘルパー (`en_x_monnam`, `en_m_monnam`, `en_obj_pmname`, `en_xname`, `en_ansimpleoname`, `en_bare_artifactname`, `en_priestname`) および `en_tin_details` (`src/eat.c`) を導入し、`svk.killer.name` や `gm.multi_reason` への日本語文字列混入を根絶。
+   - `src/zap.c`: `en_flash_types[]` を導入し、光線・魔法・ブレス由来の自爆および敵攻撃死因の内部キーを英語化（`potion.c`, `read.c`, `spell.c`, `trap.c`, `fountain.c`, `music.c`, `pickup.c`, `steed.c`, `pray.c`, `region.c`, `muse.c`, `detect.c`, `monmove.c`, `mhitu.c`, `mon.c`, `uhitm.c`, `mthrowu.c`, `end.c` も同様に統一）。
+   - `src/mon_jp.c`: `NAMS()` による性別対応モンスター（`dwarf lord`/`dwarf lady`, `gnome lord`/`gnome lady`, `priest`/`priestess`, `high priest`/`high priestess` 等 全15組）の `{ male, female, neutral }` 全スロットを定義。
+2. **`src/topten.c` / `src/explode.c` / `src/rip.c` (Cコア表示時翻訳層)**:
+   - `name_to_mon(..., &gend)` で判別した性別インデックスを `jp_pmname_from_idx(mndx, (gend >= 0) ? gend : 0)` へ伝播し、英語キーから日本語の性別別名称へ正確に復元。
+   - `jp_killer_reason_table`: 罠・水場・薬・巻物・乗馬滑落・鉄球等を含む全英語キーを網羅。
+   - `jp_flash_text_to_jp` / `jp_translate_self_inflicted`: `zap`/`cast`/`exhale`/`play`/`imagine`/`inflict` 各構文を自爆・他者攻撃の双方で動的翻訳。
+   - `jp_translate_killer_name_or_monster`: `high priestess of <神>` / `priestess of <神>` / `exploding <X>` / `handling <X>` / `touching <X>` を正確に処理。
+3. **Flutter UI 層 (`topten_entry.dart` / `xlog_entry.dart`)**:
+   - `TopTenEntry` / `translateDeathReason` / `translateMultiReasonText` の辞書・パターンを C コアと二重同期（全モンスター・性別 `NAMS()` ペア・全アイテム・アーティファクト・罠・光線系死因・大文字小文字フォールバック）。
+   - `XLogEntry.translateWhileReason` は独自辞書を廃止し、`translateMultiReasonText` へ一元委譲。
 
 ---
 
-## 4. 今後の移行・Git Subtree 同期ガイドライン
+## 4. 今後の運用・Git Subtree 同期ガイドライン
 
-1. **NetHackJP 側の段階的移行方針**:
-   - NetHackJP 本家でも近年 `invent.c`（素手触診石化）などで英語キーへの正常化が進められています。
-   - 将来的に NetHackJP 側で罠やアイテム死因の英語キー化を進める際は、上記の一覧表を参照して DartHack の実装（アップストリーム同一のキー名）に合わせることで、DartHack との差分を解消し、Git Subtree 同期時のコンフリクトを最小限に抑えることができます。
+1. **内部キー英語原則の維持**:
+   - 新しい死因・罠・イベントを追加する際は、画面表示用メッセージ (`pline`, `You`, `poisoned()` 第1引数 等) のみを日本語にし、`losehp()`, `poisoned()` 第3引数, `poison_strdmg()`, `instapetrify()`, `svk.killer.name`, `gm.multi_reason` に渡す内部識別キーは必ず上流 `NetHack` 同一の英語文字列を維持してください。
 2. **Flutter UI 側との二重同期ルールの徹底**:
-   - Cコア側で死因キーや翻訳文言を変更・追加した際は、必ず Flutter UI 側（`sys/flutter/lib/models/topten_entry.dart`）の辞書およびテストコード（`sys/flutter/test/models/topten_entry_test.dart`）も同時に同期・更新してください（RULE[AGENTS.md] 参照）。
+   - Cコア側で死因キーや翻訳文言を変更・追加した際は、必ず Flutter UI 側（`sys/flutter/lib/models/topten_entry.dart`）の辞書およびテストコード（`sys/flutter/test/models/topten_entry_test.dart`, `sys/flutter/test/xlog_sync_and_detail_test.dart`）も同時に同期・更新してください（RULE[AGENTS.md] 参照）。

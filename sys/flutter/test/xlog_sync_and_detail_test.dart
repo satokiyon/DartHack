@@ -1418,5 +1418,58 @@ void main() {
       final controller = overlayKey.currentState!.scrollController;
       expect(controller.offset, equals(controller.position.maxScrollExtent));
     });
+
+    test('XLogEntry.translateWhileReason が topten_entry.dart の共通辞書へ委譲されていること', () {
+      expect(XLogEntry.translateWhileReason('frozen by a trap', true), '罠で凍りついていた');
+      expect(XLogEntry.translateWhileReason('being toyed with by Fate', true), '運命に翻弄されていた');
+      expect(XLogEntry.translateWhileReason('attempting to cheat Death', true), '死神を欺こうとしていた');
+      expect(XLogEntry.translateWhileReason('paralyzed', true), '麻痺していた');
+      expect(XLogEntry.translateWhileReason('fainted from lack of food', true), '食料不足で気絶していた');
+      expect(XLogEntry.translateWhileReason('frozen by a trap.', false), 'frozen by a trap');
+    });
+
+    testWidgets('ScoreDetailDialog で gnome lord と whileReason が完全日本語で表示されること', (tester) async {
+      final xlog = XLogEntry.parseLine(
+        _buildXLogLine(
+          points: 601,
+          name: 'Player',
+          role: 'Pri',
+          race: 'Elf',
+          gender: 'Fem',
+          align: 'Cha',
+          deathdnum: 2,
+          deathlev: 4,
+          maxlvl: 4,
+          hp: 0,
+          maxhp: 38,
+          death: 'killed by a gnome lord',
+          whileReason: 'frozen by a trap',
+        ),
+      )!;
+      final entry = TopTenEntry(
+        rank: 4,
+        score: '601',
+        nameAndProfile: 'Player 司祭/エルフ/女性/混沌',
+        details: const ['ノームの領主に倒された (罠で凍りついていた間)', 'HP/最大HP: -/38'],
+        isCurrent: true,
+        xlog: xlog,
+      );
+
+      await tester.pumpWidget(
+        MaterialApp(
+          locale: const Locale('ja'),
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
+          home: Scaffold(
+            body: ScoreDetailDialog(entry: entry, isJp: true),
+          ),
+        ),
+      );
+
+      expect(find.textContaining('ノームの領主に倒された'), findsOneWidget);
+      expect(find.textContaining('罠で凍りついていた'), findsOneWidget);
+      expect(find.textContaining('gnome lord'), findsNothing);
+      expect(find.textContaining('frozen by a trap'), findsNothing);
+    });
   });
 }

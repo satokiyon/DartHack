@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'topten_entry.dart';
 
 /// xlogfile の 1 行（タブ区切り key=value 形式）を表すデータモデル
 class XLogEntry {
@@ -413,27 +414,9 @@ class XLogEntry {
     return table[key] ?? _capitalizeWordsIfAscii(key.replaceAll('_', ' '));
   }
 
-  /// 無防備理由 (while=) を日英向けに整形（日本語コア由来の既知文言・英語文言の双方に対応）
+  /// 無防備理由 (while=) を日英向けに整形（topten_entry.dart の翻訳辞書へ委譲）
   static String translateWhileReason(String reason, bool isJp) {
-    final trimmed = reason.trim();
-    if (trimmed.isEmpty) return trimmed;
-    if (!isJp) return trimmed;
-
-    const mapJp = <String, String>{
-      'helpless': '行動不能',
-      'sleeping': '眠っていた',
-      'paralyzed': '麻痺していた',
-      'unconscious': '気絶していた',
-      'stunned': '朦朧としていた',
-      'fainted from lack of food': '空腹で気絶していた',
-      'putting on armor': '防具を着けていた',
-      'taking off armor': '防具を外していた',
-      'reading': '読んでいた',
-      'praying': '祈っていた',
-      'digging': '掘っていた',
-      'eating': '食べていた',
-    };
-    return mapJp[trimmed.toLowerCase()] ?? trimmed;
+    return translateMultiReasonText(reason, isJp: isJp);
   }
 
   /// flags ビットマスクを表示用ラベル群にデコードする

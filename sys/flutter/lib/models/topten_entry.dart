@@ -614,24 +614,28 @@ String _translateMonsterOrItemName(String raw) {
   }
 
   // 神官パターン (e.g., "high priest of Moloch", "priest of Anubis")
-  if (s.startsWith('high priest of ')) {
+  final lowerS = s.toLowerCase();
+  if (lowerS.startsWith('high priest of ')) {
     final god = _translateMonsterOrItemName(s.substring(15));
     return '$godの高位神官';
   }
-  if (s.startsWith('high priestess of ')) {
+  if (lowerS.startsWith('high priestess of ')) {
     final god = _translateMonsterOrItemName(s.substring(18));
-    return '$godの高位神官';
+    return '$godの高位巫女';
   }
-  if (s.startsWith('priest of ')) {
+  if (lowerS.startsWith('priest of ')) {
     final god = _translateMonsterOrItemName(s.substring(10));
     return '$godの神官';
   }
-  if (s.startsWith('priestess of ')) {
+  if (lowerS.startsWith('priestess of ')) {
     final god = _translateMonsterOrItemName(s.substring(13));
-    return '$godの神官';
+    return '$godの巫女';
   }
-  if (s == 'temple priest' || s == 'temple priestess') {
+  if (lowerS == 'temple priest') {
     return '寺院の神官';
+  }
+  if (lowerS == 'temple priestess') {
+    return '寺院の巫女';
   }
 
   // 名前付きペット・モンスター (e.g., "kitten called Tama", "dog named Pochi")
@@ -854,6 +858,15 @@ String _translateMonsterOrItemName(String raw) {
   if (s.startsWith('body of ')) {
     return '${_translateMonsterOrItemName(s.substring(8))}の体';
   }
+  if (lowerS.startsWith('exploding ')) {
+    return '${_translateMonsterOrItemName(s.substring(10))}の爆発';
+  }
+  if (lowerS.startsWith('handling ')) {
+    return '${_translateMonsterOrItemName(s.substring(9))}を扱ったこと';
+  }
+  if (lowerS.startsWith('touching ') && !lowerS.contains(' bare-handed')) {
+    return '${_translateMonsterOrItemName(s.substring(9))}に触れたこと';
+  }
 
   const monsterMap = {
     // A
@@ -862,7 +875,9 @@ String _translateMonsterOrItemName(String raw) {
     'acolyte': '侍者',
     'air elemental': '風のエレメンタル',
     'Aleax': 'アレアックス',
+    'aligned cleric': '神官',
     'aligned priest': '神官',
+    'amorous demon': '愛の悪魔',
     'Angel': '天使',
     'ape': '類人猿',
     'apprentice': '実習生',
@@ -912,9 +927,10 @@ String _translateMonsterOrItemName(String raw) {
     // C
     'captain': '指揮官',
     'carnivorous ape': '人喰い猿',
+    'cave dweller': '洞窟人',
     'cave spider': '洞窟クモ',
-    'caveman': '洞窟人',
-    'cavewoman': '洞窟人',
+    'caveman': '原始人',
+    'cavewoman': '女の原始人',
     'centipede': 'ムカデ',
     'Cerberus': 'ケルベロス',
     'chameleon': 'カメレオン',
@@ -923,6 +939,7 @@ String _translateMonsterOrItemName(String raw) {
     'chieftain': '首領',
     'Chromatic Dragon': 'クロマティック・ドラゴン',
     'clay golem': '土ゴーレム',
+    'cleric': '司祭',
     'cobra': 'コブラ',
     'cockatrice': 'コカトリス',
     'couatl': 'コウアトル',
@@ -945,7 +962,13 @@ String _translateMonsterOrItemName(String raw) {
     'dragon': 'ドラゴン',
     'dust vortex': 'ほこりの渦',
     'dwarf': 'ドワーフ',
+    'dwarf king': 'ドワーフの王',
+    'dwarf lady': 'ドワーフの女領主',
+    'dwarf leader': 'ドワーフの首領',
+    'dwarf lord': 'ドワーフの領主',
     'dwarf mummy': 'ドワーフのミイラ',
+    'dwarf queen': 'ドワーフの女王',
+    'dwarf ruler': 'ドワーフの支配者',
     'dwarf zombie': 'ドワーフのゾンビ',
     // E
     'Earendil': 'エアレンディル',
@@ -954,6 +977,12 @@ String _translateMonsterOrItemName(String raw) {
     'elf': 'エルフ',
     'elf mummy': 'エルフのミイラ',
     'elf zombie': 'エルフのゾンビ',
+    'elf-lady': 'エルフの貴婦人',
+    'elf-lord': 'エルフの貴公子',
+    'elf-noble': 'エルフの貴族',
+    'elven monarch': 'エルフの君主',
+    'Elvenking': 'エルフの王',
+    'Elvenqueen': 'エルフの女王',
     'Elwing': 'エルウィング',
     'energy vortex': 'エネルギーの渦',
     'erinys': 'イリニス',
@@ -998,8 +1027,12 @@ String _translateMonsterOrItemName(String raw) {
     'glass golem': 'ガラスゴーレム',
     'glass piercer': 'ガラスピアサー',
     'gnome': 'ノーム',
+    'gnome king': 'ノームの王',
+    'gnome lady': 'ノームの女領主',
     'gnome leader': 'ノームの首領',
+    'gnome lord': 'ノームの領主',
     'gnome mummy': 'ノームのミイラ',
+    'gnome queen': 'ノームの女王',
     'gnome ruler': 'ノームの支配者',
     'gnome zombie': 'ノームのゾンビ',
     'gnomish wizard': 'ノームの魔法使い',
@@ -1031,7 +1064,9 @@ String _translateMonsterOrItemName(String raw) {
     'hell hound': 'ヘルハウンド',
     'hell hound pup': 'ヘルハウンドの子',
     'hezrou': 'ヘズロウ',
+    'high cleric': '高位神官',
     'high priest': '高位神官',
+    'high priestess': '高位巫女',
     'High-elf': 'ハイエルフ',
     'hill giant': '丘の巨人',
     'hill orc': '丘オーク',
@@ -1066,6 +1101,7 @@ String _translateMonsterOrItemName(String raw) {
     'jellyfish': 'クラゲ',
     'Juiblex': 'ジョウビレックス',
     // K
+    'Keystone Kop': '警備員',
     'keystone kop': '警備員',
     'ki-rin': '麒麟',
     'killer bee': '殺人バチ',
@@ -1073,12 +1109,17 @@ String _translateMonsterOrItemName(String raw) {
     'kitten': '子猫',
     'knight': '騎士',
     'kobold': 'コボルド',
-    'kobold lord': 'コボルドの君主',
+    'kobold lady': 'コボルドの女領主',
+    'kobold leader': 'コボルドの首領',
+    'kobold lord': 'コボルドの領主',
     'kobold mummy': 'コボルドのミイラ',
     'kobold shaman': 'コボルドの呪術師',
     'kobold zombie': 'コボルドのゾンビ',
+    'Kop Kaptain': '警部',
     'kop kaptain': '警部',
+    'Kop Lieutenant': '警部補',
     'kop lieutenant': '警部補',
+    'Kop Sergeant': '巡査部長',
     'kop sergeant': '巡査部長',
     'kraken': 'クラーケン',
     // L
@@ -1104,6 +1145,7 @@ String _translateMonsterOrItemName(String raw) {
     'lynx': 'ヤマネコ',
     // M
     'Mail Daemon': 'メイルデーモン',
+    'mail daemon': 'メイルデーモン',
     'manes': '亡霊',
     'marilith': 'マリリス',
     'Master Assassin': '暗殺者の頭領',
@@ -1120,6 +1162,7 @@ String _translateMonsterOrItemName(String raw) {
     'mirkwood spider': '闇の森のクモ',
     'monk': '修道士',
     'monkey': '猿',
+    'Mordor orc': 'モルドールのオーク',
     'mordor orc': 'モルドールのオーク',
     'mountain centaur': '山のケンタウロス',
     'mountain nymph': '山のニンフ',
@@ -1137,9 +1180,15 @@ String _translateMonsterOrItemName(String raw) {
     // O
     'ochre jelly': '黄土色ゼリー',
     'ogre': 'オーガ',
+    'ogre king': 'オーガの王',
+    'ogre lady': 'オーガの女頭領',
     'ogre leader': 'オーガの首領',
+    'ogre lord': 'オーガの頭領',
+    'ogre queen': 'オーガの女王',
     'ogre tyrant': 'オーガの暴君',
+    'Olog-hai': 'オログ・ハイ',
     'olog-hai': 'オログ・ハイ',
+    'Oracle': '賢者',
     'oracle': '賢者',
     'orange dragon': 'オレンジドラゴン',
     'orc': 'オーク',
@@ -1164,7 +1213,7 @@ String _translateMonsterOrItemName(String raw) {
     'pet': 'ペット',
     'pony': 'ポニー',
     'priest': '僧侶',
-    'priestess': '僧侶',
+    'priestess': '女僧侶',
     'prisoner': '囚人',
     'purple worm': '紫ワーム',
     'pyrolisk': 'パイロリスク',
@@ -1234,11 +1283,14 @@ String _translateMonsterOrItemName(String raw) {
     'Twoflower': 'ツーフラワー',
     // U
     'umber hulk': 'アンバーハルク',
+    'Uruk-hai': 'ウルク・ハイ',
     'uruk-hai': 'ウルク・ハイ',
     // V
     'valkyrie': 'バルキリー',
     'vampire': 'ヴァンパイア',
     'vampire bat': '吸血コウモリ',
+    'vampire lady': 'ヴァンパイアレディ',
+    'vampire leader': 'ヴァンパイアの長',
     'vampire lord': 'ヴァンパイアロード',
     'vampire mage': 'ヴァンパイアメイジ',
     'violet fungus': '紫キノコ',
@@ -1390,6 +1442,7 @@ String _translateMonsterOrItemName(String raw) {
     'cadaver': '腐った死体',
     'Camazotz': 'カマソッソ',
     'can of grease': '脂の缶',
+    'candelabrum': '燭台',
     'cancellation': '無力化の杖',
     'Candelabrum of Invocation': '祈りの燭台',
     'candy bar': 'キャンディバー',
@@ -1675,7 +1728,10 @@ String _translateMonsterOrItemName(String raw) {
     'Orcrist': 'オークリスト',
     'overexertion': '力尽きたこと',
     // P
+    'Palantir of Westernesse': 'ウェスタネスのパランティア',
     'pancake': 'パンケーキ',
+    'paperback': 'ペーパーバック',
+    'papyrus': 'パピルス',
     'paralysis': '麻痺の薬',
     'partisan': 'パルチザン',
     'pear': '梨',
@@ -1826,10 +1882,13 @@ String _translateMonsterOrItemName(String raw) {
     'shuriken': '手裏剣',
     'sickness': '病気の薬',
     'silver arrow': '銀の矢',
+    'silver bell': '銀のベル',
     'silver dagger': '銀の短剣',
     'silver mace': '銀のメイス',
+    'silver ring': '銀の指輪',
     'silver saber': '銀のサーベル',
     'silver spear': '銀の槍',
+    'silver wand': '銀の杖',
     'skeleton key': '万能鍵',
     'sleep': '眠りの杖',
     'sleeping': '睡眠の薬',
@@ -1850,6 +1909,7 @@ String _translateMonsterOrItemName(String raw) {
     'splash of acid': '酸の飛沫',
     'splash of acid venom': '酸の毒液',
     'splash of blinding venom': '目潰しの毒液',
+    'splash of venom': '毒液の飛沫',
     'splint mail': '鉄片の鎧',
     'sprig of wolfsbane': 'トリカブト',
     'Staff of Aesculapius': 'アスクレピオスの杖',
@@ -1885,6 +1945,7 @@ String _translateMonsterOrItemName(String raw) {
     'The Mitre of Holiness': '神聖の僧帽',
     'The Orb of Detection': '探知のオーブ',
     'The Orb of Fate': '運命のオーブ',
+    'The Palantir of Westernesse': 'ウェスタネスのパランティア',
     'The Platinum Yendorian Express Card': 'プラチナイェンダー印エクスプレスカード',
     'The Sceptre of Might': '力の王笏',
     'The Staff of Aesculapius': 'アスクレピオスの杖',
@@ -1967,49 +2028,71 @@ String _translateMonsterOrItemName(String raw) {
     'yumi': '和弓',
   };
 
-  if (monsterMap.containsKey(s)) {
-    return monsterMap[s]!;
-  }
-  final capS = _capitalizeFirst(s);
-  if (monsterMap.containsKey(capS)) {
-    return monsterMap[capS]!;
+  final directMonster = _lookupMapExactOrCaseInsensitive(monsterMap, s);
+  if (directMonster != null) {
+    return directMonster;
   }
 
-  if (itemAndEnvironmentMap.containsKey(s)) {
-    return itemAndEnvironmentMap[s]!;
+  // モンスターの複数形（s / es）に対するフォールバック単数化
+  if (s.endsWith('s')) {
+    var singular = s.substring(0, s.length - 1);
+    final m1 = _lookupMapExactOrCaseInsensitive(monsterMap, singular);
+    if (m1 != null) return m1;
+    if (s.endsWith('es')) {
+      singular = s.substring(0, s.length - 2);
+      final m2 = _lookupMapExactOrCaseInsensitive(monsterMap, singular);
+      if (m2 != null) return m2;
+    }
   }
-  if (itemAndEnvironmentMap.containsKey(capS)) {
-    return itemAndEnvironmentMap[capS]!;
+
+  final directItem = _lookupMapExactOrCaseInsensitive(itemAndEnvironmentMap, s);
+  if (directItem != null) {
+    return directItem;
   }
 
   // アイテムの複数形（s / es）に対するフォールバック単数化
   if (s.endsWith('s')) {
     final singular = s.substring(0, s.length - 1);
-    if (itemAndEnvironmentMap.containsKey(singular)) {
-      return itemAndEnvironmentMap[singular]!;
-    }
-    final capSingular = _capitalizeFirst(singular);
-    if (itemAndEnvironmentMap.containsKey(capSingular)) {
-      return itemAndEnvironmentMap[capSingular]!;
-    }
+    final i1 = _lookupMapExactOrCaseInsensitive(itemAndEnvironmentMap, singular);
+    if (i1 != null) return i1;
     if (s.endsWith('es')) {
       final singularEs = s.substring(0, s.length - 2);
-      if (itemAndEnvironmentMap.containsKey(singularEs)) {
-        return itemAndEnvironmentMap[singularEs]!;
-      }
-      final capSingularEs = _capitalizeFirst(singularEs);
-      if (itemAndEnvironmentMap.containsKey(capSingularEs)) {
-        return itemAndEnvironmentMap[capSingularEs]!;
-      }
+      final i2 = _lookupMapExactOrCaseInsensitive(itemAndEnvironmentMap, singularEs);
+      if (i2 != null) return i2;
     }
   }
 
   return s;
 }
 
+String? _lookupMapExactOrCaseInsensitive(Map<String, String> map, String key) {
+  final exact = map[key];
+  if (exact != null) return exact;
+  final capKey = _capitalizeFirst(key);
+  final capped = map[capKey];
+  if (capped != null) return capped;
+  final lower = key.toLowerCase();
+  for (final entry in map.entries) {
+    if (entry.key.toLowerCase() == lower) {
+      return entry.value;
+    }
+  }
+  return null;
+}
+
 String _capitalizeFirst(String text) {
   if (text.isEmpty) return text;
   return text[0].toUpperCase() + text.substring(1);
+}
+
+/// 無防備理由（while= / ", while ..."）を日英表示向けに翻訳する公開ヘルパー
+String translateMultiReasonText(String rawReason, {bool isJp = true}) {
+  var reason = rawReason.trim();
+  if (reason.endsWith('.')) {
+    reason = reason.substring(0, reason.length - 1).trim();
+  }
+  if (!isJp || reason.isEmpty) return reason;
+  return _translateMultiReason(reason);
 }
 
 String _translateMultiReason(String rawReason) {
@@ -2036,8 +2119,12 @@ String _translateMultiReason(String rawReason) {
     'opening a container': '容器を開けていた',
     'tipping a container': '容器を傾けていた',
     'looking into a magic 8-ball': 'マジック8ボールを覗き込んでいた',
+    'gazing into a magic 8-ball (tm)': 'マジック8ボールをのぞき込んでいた',
     'looking into a crystal ball': '水晶玉を覗き込んでいた',
+    'gazing into a crystal ball': '水晶玉をのぞき込んでいた',
     'toyed with by fate': '運命に翻弄されていた',
+    'being toyed with by fate': '運命に翻弄されていた',
+    'attempting to cheat death': '死神を欺こうとしていた',
     'paralyzed by fear': '恐怖で身動きできなかった',
     'being scared stiff': '恐怖で身動きできなかった',
     'being frightened to death': '恐怖で死にかけていた',
@@ -2050,6 +2137,7 @@ String _translateMultiReason(String rawReason) {
     'being terrified of a ghost': '幽霊におびえていた',
     'scared by rattling': 'ガタガタいう音に驚いていた',
     'frozen by a potion': 'ポーションで凍りついていた',
+    'frozen by a trap': '罠で凍りついていた',
     'getting stoned': '石化していた',
     'fumbling': 'もたついていた',
     'sleeping': '眠っていた',
@@ -2064,6 +2152,14 @@ String _translateMultiReason(String rawReason) {
     'system shock': 'システムショック状態だった',
     'alchemic blast': '錬金術の爆発に巻き込まれていた',
     'helpless': '無力状態',
+    'paralyzed': '麻痺していた',
+    'unconscious': '気絶していた',
+    'stunned': '朦朧としていた',
+    'putting on armor': '防具を着けていた',
+    'taking off armor': '防具を外していた',
+    'reading': '読んでいた',
+    'digging': '掘っていた',
+    'eating': '食べていた',
   };
 
   final lower = reason.toLowerCase();
@@ -2188,48 +2284,181 @@ String _translateDeathText(String death, bool isJp) {
   return result;
 }
 
+String _translateFlashText(String str) {
+  final lower = str.trim().toLowerCase();
+  if (lower.isEmpty) return '光線';
+  if (lower == 'the touch of death') return '死の接触';
+  if (lower.contains('magic missile')) return '魔法の矢';
+  if (lower == 'bolt of fire') return '火炎の光線';
+  if (lower == 'bolt of cold') return '冷気の光線';
+  if (lower == 'sleep ray') return '睡眠光線';
+  if (lower == 'death ray') return '死の光線';
+  if (lower == 'bolt of lightning') return '電撃の光線';
+  if (lower == 'fireball') return '火の玉';
+  if (lower == 'cone of cold') return '冷気の円錐';
+  if (lower == 'finger of death') return '死の指';
+  if (lower == 'blast of missiles') return '魔法の矢の息';
+  if (lower == 'blast of fire') return '火炎の息';
+  if (lower == 'blast of frost') return '氷結の息';
+  if (lower == 'blast of sleep gas') return '睡眠ガスの息';
+  if (lower.contains('disintegration')) return '分解の息';
+  if (lower == 'blast of lightning') return '電撃の息';
+  if (lower.contains('poison gas')) return '毒ガスの息';
+  if (lower.contains('acid')) return '酸の息';
+  if (lower.contains('fire')) return '火炎';
+  if (lower.contains('frost') || lower.contains('cold')) return '冷気';
+  if (lower.contains('sleep')) return '睡眠ガス';
+  if (lower.contains('death')) return '死の光線';
+  if (lower.contains('lightning')) return '稲妻';
+  return '光線';
+}
+
 String? _translateSelfInflicted(String str) {
-  if (!str.contains(' by himself') &&
-      !str.contains(' by herself') &&
-      !str.contains(' by itself')) {
+  final lower = str.toLowerCase();
+  for (final prefix in [
+    'zapped himself with ',
+    'zapped herself with ',
+    'zapped itself with ',
+  ]) {
+    if (lower.startsWith(prefix)) {
+      final what = str.substring(prefix.length).trim();
+      if (what.isNotEmpty) {
+        final tr = _translateMonsterOrItemName(what);
+        final stripped = _stripEnglishArticle(what);
+        final jpWhat = (tr != stripped) ? tr : _translateFlashText(stripped);
+        return '$jpWhatで自分自身を撃った';
+      }
+      return '自分自身を撃った';
+    }
+  }
+  for (final prefix in [
+    'blasted himself with ',
+    'blasted herself with ',
+    'blasted itself with ',
+  ]) {
+    if (lower.startsWith(prefix)) {
+      final what = str.substring(prefix.length).trim();
+      if (what.isNotEmpty) {
+        final tr = _translateMonsterOrItemName(what);
+        final stripped = _stripEnglishArticle(what);
+        final jpWhat = (tr != stripped) ? tr : _translateFlashText(stripped);
+        return '$jpWhatで自分自身を吹き飛ばした';
+      }
+      return '自分自身を吹き飛ばした';
+    }
+  }
+  if (lower == 'using a magical horn on himself' ||
+      lower == 'using a magical horn on herself' ||
+      lower == 'using a magical horn on itself') {
+    return '魔法の角笛の反動で倒された';
+  }
+
+  if (!lower.contains(' by himself') &&
+      !lower.contains(' by herself') &&
+      !lower.contains(' by itself')) {
     return null;
   }
 
   String verb;
-  if (str.contains('zapped')) {
+  if (lower.contains('played')) {
+    verb = '奏でた';
+  } else if (lower.contains('zapped')) {
     verb = '放った';
-  } else if (str.contains('breathed')) {
+  } else if (lower.contains('cast')) {
+    verb = '唱えた';
+  } else if (lower.contains('exhaled') || lower.contains('breathed')) {
     verb = '吐いた';
+  } else if (lower.contains('imagined')) {
+    verb = '想像した';
   } else {
     verb = '引き起こした';
   }
 
-  String fltxt;
-  if (str.contains('disintegration')) {
+  String flashSubject = str;
+  for (final marker in [
+    ' played by ',
+    ' zapped by ',
+    ' cast by ',
+    ' exhaled by ',
+    ' breathed by ',
+    ' imagined by ',
+    ' inflicted by ',
+    ' by ',
+  ]) {
+    final idx = lower.indexOf(marker);
+    if (idx != -1) {
+      flashSubject = str.substring(0, idx).trim();
+      break;
+    }
+  }
+
+  var fltxt = _translateFlashText(flashSubject);
+  if (lower.contains('disintegration')) {
     fltxt = '分解ブレス';
-    verb = '吐いた';
-  } else if (str.contains('magic missile')) {
+    if (!lower.contains('exhaled') && !lower.contains('breathed')) {
+      verb = '吐いた';
+    }
+  } else if (lower.contains('magic missile')) {
     fltxt = '魔法の矢';
-    verb = '放った';
-  } else if (str.contains('fire')) {
-    fltxt = '火炎';
-  } else if (str.contains('frost')) {
-    fltxt = '冷気';
-  } else if (str.contains('sleep')) {
-    fltxt = '睡眠ガス';
-  } else if (str.contains('death')) {
-    fltxt = '死の光線';
-  } else if (str.contains('lightning')) {
-    fltxt = '稲妻';
-  } else if (str.contains('poison gas')) {
-    fltxt = '毒ガス';
-  } else if (str.contains('acid')) {
-    fltxt = '酸';
-  } else {
-    fltxt = '光線';
+    if (!lower.contains('zapped') && !lower.contains('cast')) {
+      verb = '放った';
+    }
   }
 
   return '自分自身で$verb$fltxtで倒された';
+}
+
+String? _translateByFlashPattern(String str) {
+  final lower = str.toLowerCase();
+  if (lower.startsWith('inflicted by ')) {
+    final body = str.substring(13).trim();
+    final bodyLow = body.toLowerCase();
+    String what;
+    String mon = '';
+    if (bodyLow.startsWith('the touch of death of ')) {
+      what = 'the touch of death';
+      mon = _translateMonsterOrItemName(body.substring(22).trim());
+    } else {
+      final ofIdx = bodyLow.indexOf(' of ');
+      if (ofIdx != -1) {
+        what = body.substring(0, ofIdx).trim();
+        mon = _translateMonsterOrItemName(body.substring(ofIdx + 4).trim());
+      } else {
+        what = body;
+      }
+    }
+    final whatLow = what.toLowerCase();
+    final whatJp = (whatLow == 'the touch of death')
+        ? '死の手'
+        : (whatLow == 'strength loss' ? '力不足' : what);
+    if (mon.isNotEmpty) {
+      return '$monの$whatJpによって倒された';
+    }
+    return '$whatJpによって倒された';
+  }
+
+  const markers = <MapEntry<String, String>>[
+    MapEntry(' inflicted by ', ''),
+    MapEntry(' played by ', '奏でた'),
+    MapEntry(' zapped by ', '放った'),
+    MapEntry(' cast by ', '唱えた'),
+    MapEntry(' exhaled by ', '吐いた'),
+    MapEntry(' imagined by ', '想像した'),
+  ];
+  for (final m in markers) {
+    final idx = lower.indexOf(m.key);
+    if (idx != -1) {
+      final what = str.substring(0, idx).trim();
+      final who = str.substring(idx + m.key.length).trim();
+      final whoJp = _translateMonsterOrItemName(who);
+      final fltxtJp = _translateFlashText(what);
+      if (m.value.isNotEmpty) {
+        return '$whoJpが${m.value}$fltxtJpで倒された';
+      }
+      return '$whoJpの$fltxtJpによって倒された';
+    }
+  }
+  return null;
 }
 
 String _translateDeathTextInternal(String death, bool isJp) {
@@ -2356,10 +2585,64 @@ String _translateDeathTextInternal(String death, bool isJp) {
     'its own player': 'プレイヤー自身の手で倒された',
     'sitting on an iron spike': '鉄の刺の上に座ったこと',
     'riding accident': '落馬事故',
+    'gazing into a Magic 8-Ball (tm)': 'マジック8ボールをのぞき込んで倒された',
+    'gazing into a crystal ball': '水晶玉をのぞき込んで倒された',
+    'dragged downstairs by an iron ball': '鉄球に引きずられて階段から落ちて倒された',
+    'leg damage from being pulled out of a bear trap': 'トラバサミから足を引き抜いた傷で倒された',
+    'falling off a ladder': 'はしごから落ちて倒された',
+    'tumbling down a flight of stairs': '階段から転げ落ちて倒された',
+    'fell onto a sink': '流し台に落ちて倒された',
+    'fell into a chasm': '裂け目に落ちて倒された',
+    'hurt in a chasm': '裂け目で傷を負って倒された',
+    'deliberately plunged into a pit of iron spikes': '故意に鉄の棘だらけの落とし穴へ飛び込んで倒された',
+    'stepped into a pit of iron spikes': '鉄の棘だらけの落とし穴へ足を踏み入れて倒された',
+    'stumbled into a pit of iron spikes': '鉄の棘だらけの落とし穴へつまずいて落ちて倒された',
+    'fell into a pit of iron spikes': '鉄の棘だらけの落とし穴へ落ちて倒された',
+    'stepping on poison spikes': '毒の棘を踏んで倒された',
+    'fall onto poison spikes': '毒の棘へ落ちて倒された',
+    'deliberately plunged into a pit': '故意に落とし穴へ飛び込んで倒された',
+    'fell into a pit': '落とし穴へ落ちて倒された',
+    'boiling water': '熱湯に倒された',
+    'contaminated water': '汚染された水に倒された',
+    'contaminated tap water': '汚染された水道水に倒された',
+    'mildly contaminated tap water': '少し汚染された水道水に倒された',
+    'contaminated potion': '汚染された薬に倒された',
+    'quaffing a burning potion of oil': '燃えている油の薬を飲んで倒された',
+    'propelled potion': '飛んできた薬に倒された',
+    'thrown potion': '投げられた薬に倒された',
+    'scroll of earth': '大地の巻物に倒された',
+    'scroll of fire': '火炎の巻物に倒された',
+    'poisoned blast': '毒の爆風に倒された',
+    'anti-magic implosion': '反魔法の収縮に倒された',
+    'boomerang': 'ブーメランに倒された',
+    'silver ring': '銀の指輪に倒された',
+    'silver wand': '銀の杖に倒された',
+    'killer slime mold': '人喰いスライムモールドに倒された',
+    'wand': '魔法の杖に倒された',
+    'potion of acid': '酸の薬に倒された',
+    'potion of holy water': '聖水に倒された',
+    'potion of unholy water': '不浄な水に倒された',
+    'grappling hook': 'グラップリングフックに倒された',
+    'shot himself with a death ray': '死の光線で自分を照射したこと',
+    'shot herself with a death ray': '死の光線で自分を照射したこと',
+    'shot itself with a death ray': '死の光線で自分を照射したこと',
+    'frozen by a trap': '罠で凍りついたことで倒された',
+    'being toyed with by Fate': '運命に翻弄されたことで倒された',
+    'attempting to cheat Death': '死神を欺こうとしたことで倒された',
   };
 
-  if (exactMap.containsKey(death)) {
-    return exactMap[death]!;
+  final exactTr = _lookupMapExactOrCaseInsensitive(exactMap, death);
+  if (exactTr != null) {
+    return exactTr;
+  }
+
+  final lowerDeath = death.toLowerCase();
+  if (lowerDeath.startsWith('slipped while mounting ')) {
+    final tr = _translateMonsterOrItemName(death.substring(23));
+    return '$trに乗ろうとして滑って倒された';
+  }
+  if (lowerDeath.startsWith('chopping off ')) {
+    return '自分の足を切り落として倒された';
   }
 
   if (death.startsWith('teleported out of the dungeon and fell to ')) {
@@ -2441,65 +2724,88 @@ String _translateDeathTextInternal(String death, bool isJp) {
     return '$trTargetの爆発に倒された';
   }
 
-  if (death.startsWith('killed by a ')) {
-    final raw = death.substring(12);
-    if (raw == 'scroll of genocide') return '虐殺の巻物に倒された';
-    if (raw == 'bad experience sitting on a throne') return '玉座に座った悪影響で倒された';
-    if (raw == 'mildly contaminated potion') return '少し古くなった薬で倒された';
-    if (raw == 'contusion from a small passage') return '狭い通路で頭を打ったことで倒された';
-    if (raw == 'system shock') return 'システムショックで倒された';
-    if (raw == 'riding accident') return '落馬事故で倒された';
-    final tr = _translateMonsterOrItemName(raw);
-    return tr.endsWith('倒された') || tr.endsWith('石化した') || tr.endsWith('死んだ') ? tr : '$trに倒された';
-  }
-  if (death.startsWith('killed by an ')) {
-    final raw = death.substring(13);
-    if (raw == 'iron spike' || raw == 'sitting on an iron spike') {
-      return '鉄の刺の上に座ったことで倒された';
+  for (final prefix in ['killed by a ', 'killed by an ', 'killed by ']) {
+    if (death.startsWith(prefix)) {
+      final raw = death.substring(prefix.length);
+      final rawLow = raw.toLowerCase();
+      if (prefix == 'killed by a ' && raw == 'scroll of genocide') return '虐殺の巻物に倒された';
+      if (raw == 'rusting away' || raw == '錆び崩れ') return '錆び崩れて倒された';
+      if (raw == 'system shock' || raw == 'a system shock') return 'システムショックで倒された';
+      if (raw == 'riding accident' || raw == 'a riding accident') return '落馬事故で倒された';
+      if (raw == 'iron spike' || raw == 'sitting on an iron spike') {
+        return '鉄の刺の上に座ったことで倒された';
+      }
+      if (raw == 'overexertion') return '精根尽き果てて倒された';
+      if (raw == 'life drainage') return '生命力吸収で倒された';
+      if (raw == 'a bad experience sitting on a throne' || raw == 'bad experience sitting on a throne') {
+        return '玉座に座った悪影響で倒された';
+      }
+      if (raw == 'sitting on lava' || raw == 'sitting in lava') {
+        return '溶岩に座ったことで倒された';
+      }
+      if (raw == 'mildly contaminated potion' || raw == 'a mildly contaminated potion') {
+        return '少し古くなった薬で倒された';
+      }
+      if (raw == 'contusion from a small passage' || raw == 'a contusion from a small passage') {
+        return '狭い通路で頭を打ったことで倒された';
+      }
+      if (prefix == 'killed by ' && raw == 'falling drawbridge') return '落下した跳ね橋に倒された';
+      if (prefix == 'killed by ' && raw == 'closing drawbridge') return '閉じる跳ね橋に倒された';
+      if (prefix == 'killed by ' && raw == 'exploding drawbridge') return '爆発する跳ね橋に倒された';
+      if (prefix == 'killed by ' && raw == 'collapsing drawbridge') return '崩れ落ちる跳ね橋に倒された';
+      if (raw == 'boiling potion' || raw == 'boiling potions') return '沸騰して爆発した薬で倒された';
+      if (raw == 'exploding potion' || raw == 'exploding potions') return '引火して爆発した薬で倒された';
+      if (raw == 'shattered potion' || raw == 'shattered potions') return '凍結して砕け散った薬で倒された';
+      if (raw == 'burning scroll' || raw == 'burning scrolls') return '燃え上がった巻物で倒された';
+      if (raw == 'burning book') return '燃え上がった魔法書で倒された';
+      if (raw == 'exploding glob of slime' || raw == 'exploding globs of slime') return '爆発したスライムの塊で倒された';
+      if (raw == 'strangulation') return '首を絞められて倒された';
+      if (raw == 'suffocation') return '窒息して倒された';
+      if (raw == 'slimicide') return 'スライム化による死';
+      if (raw == 'potion of poison') return '毒薬に倒された';
+      if (raw == 'potion of polymorph') return 'へんげの薬に倒された';
+      if (rawLow.startsWith('slipped while mounting ')) {
+        return '${_translateMonsterOrItemName(raw.substring(23))}に乗ろうとして滑って倒された';
+      }
+      if (rawLow.startsWith('chopping off ')) {
+        return '自分の足を切り落として倒された';
+      }
+      if (raw.contains('own player')) return 'プレイヤー自身の手で倒された';
+      final self = _translateSelfInflicted(raw);
+      if (self != null) return self;
+      final byFlash = _translateByFlashPattern(raw);
+      if (byFlash != null) return byFlash;
+      final tr = _translateMonsterOrItemName(raw);
+      if (tr == _stripEnglishArticle(raw)) {
+        final exactInner = _lookupMapExactOrCaseInsensitive(exactMap, raw);
+        if (exactInner != null) {
+          if (exactInner.endsWith('倒された') ||
+              exactInner.endsWith('石化した') ||
+              exactInner.endsWith('死んだ') ||
+              exactInner.endsWith('死亡した') ||
+              exactInner.endsWith('失敗') ||
+              exactInner.endsWith('した') ||
+              exactInner.endsWith('こと')) {
+            return exactInner;
+          }
+          return '$exactInnerに倒された';
+        }
+      }
+      if (tr.endsWith('に触れたこと') || tr.endsWith('を扱ったこと')) {
+        return '$trで倒された';
+      }
+      return tr.endsWith('倒された') ||
+              tr.endsWith('石化した') ||
+              tr.endsWith('死んだ') ||
+              tr.endsWith('失敗') ||
+              tr.endsWith('食べたこと') ||
+              tr.endsWith('試食') ||
+              tr.endsWith('挟まれた') ||
+              tr.endsWith('卵') ||
+              tr.endsWith('照射したこと')
+          ? tr
+          : '$trに倒された';
     }
-    final tr = _translateMonsterOrItemName(raw);
-    return tr.endsWith('倒された') || tr.endsWith('石化した') || tr.endsWith('死んだ') ? tr : '$trに倒された';
-  }
-  if (death.startsWith('killed by ')) {
-    final raw = death.substring(10);
-    if (raw == 'rusting away' || raw == '錆び崩れ') return '錆び崩れて倒された';
-    if (raw == 'system shock' || raw == 'a system shock') return 'システムショックで倒された';
-    if (raw == 'riding accident' || raw == 'a riding accident') return '落馬事故で倒された';
-    if (raw == 'sitting on an iron spike') return '鉄の刺の上に座ったことで倒された';
-    if (raw == 'overexertion') return '精根尽き果てて倒された';
-    if (raw == 'life drainage') return '生命力吸収で倒された';
-    if (raw == 'a bad experience sitting on a throne' || raw == 'bad experience sitting on a throne') {
-      return '玉座に座った悪影響で倒された';
-    }
-    if (raw == 'sitting on lava' || raw == 'sitting in lava') {
-      return '溶岩に座ったことで倒された';
-    }
-    if (raw == 'mildly contaminated potion' || raw == 'a mildly contaminated potion') {
-      return '少し古くなった薬で倒された';
-    }
-    if (raw == 'contusion from a small passage' || raw == 'a contusion from a small passage') {
-      return '狭い通路で頭を打ったことで倒された';
-    }
-    if (raw == 'falling drawbridge') return '落下した跳ね橋に倒された';
-    if (raw == 'closing drawbridge') return '閉じる跳ね橋に倒された';
-    if (raw == 'exploding drawbridge') return '爆発する跳ね橋に倒された';
-    if (raw == 'collapsing drawbridge') return '崩れ落ちる跳ね橋に倒された';
-    if (raw == 'boiling potion' || raw == 'boiling potions') return '沸騰して爆発した薬で倒された';
-    if (raw == 'exploding potion' || raw == 'exploding potions') return '引火して爆発した薬で倒された';
-    if (raw == 'shattered potion' || raw == 'shattered potions') return '凍結して砕け散った薬で倒された';
-    if (raw == 'burning scroll' || raw == 'burning scrolls') return '燃え上がった巻物で倒された';
-    if (raw == 'burning book') return '燃え上がった魔法書で倒された';
-    if (raw == 'exploding glob of slime' || raw == 'exploding globs of slime') return '爆発したスライムの塊で倒された';
-    if (raw == 'strangulation') return '首を絞められて倒された';
-    if (raw == 'suffocation') return '窒息して倒された';
-    if (raw == 'slimicide') return 'スライム化による死';
-    if (raw == 'potion of poison') return '毒薬に倒された';
-    if (raw == 'potion of polymorph') return 'へんげの薬に倒された';
-    if (raw.contains('own player')) return 'プレイヤー自身の手で倒された';
-    final self = _translateSelfInflicted(raw);
-    if (self != null) return self;
-    final tr = _translateMonsterOrItemName(raw);
-    return tr.endsWith('倒された') || tr.endsWith('石化した') || tr.endsWith('死んだ') ? tr : '$trに倒された';
   }
   if (death.startsWith('petrified by ')) {
     final raw = death.substring(13);
@@ -2595,6 +2901,14 @@ String _translateDeathTextInternal(String death, bool isJp) {
     final tr = _translateMonsterOrItemName(death.substring(11));
     return '$trで溺死した';
   }
+  if (death.startsWith('dissolved in ')) {
+    final what = _stripEnglishArticle(death.substring(13).trim());
+    final whatLow = what.toLowerCase();
+    if (whatLow == 'lava' || whatLow == 'molten lava') return '溶岩で溶けた';
+    if (whatLow == 'acid') return '酸で溶けた';
+    final tr = _translateMonsterOrItemName(what);
+    return '$trで溶けた';
+  }
   if (death.startsWith('unwisely drank from ')) {
     final tr = _translateMonsterOrItemName(death.substring(20));
     return '$trから飲んだ不心得';
@@ -2661,6 +2975,10 @@ String _translateDeathTextInternal(String death, bool isJp) {
   final selfInflicted = _translateSelfInflicted(death);
   if (selfInflicted != null) {
     return selfInflicted;
+  }
+  final byFlash = _translateByFlashPattern(death);
+  if (byFlash != null) {
+    return byFlash;
   }
 
   if (death == 'committed suicide') {
