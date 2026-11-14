@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-04. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-14. */
 /* $NHDT-Header: NetHack 5.0 fountain.c 2026/06/20_22:26:43 NetHack-5.0:1.123 $ */
 /*      Copyright Scott R. Turner, srt@ucla, 10/27/86 */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -300,10 +300,10 @@ drinkfountain(void)
             if (Poison_resistance) {
                 pline("近くの%s農園から流れ込んだ水なのかもしれない.",
                       fruitname(FALSE));
-                losehp(rnd(4), "冷やされていない果汁をひと口すすった", KILLED_BY_AN);
+                losehp(rnd(4), "unrefrigerated sip of juice", KILLED_BY_AN);
                 break;
             }
-            poison_strdmg(rn1(4, 3), rnd(10), "汚染された水",
+            poison_strdmg(rn1(4, 3), rnd(10), "contaminated water",
                           KILLED_BY);
             exercise(A_CON, FALSE);
             break;
@@ -613,7 +613,7 @@ drinksink(void)
             pline("かなりおいしく感じた.");
             monstseesu(M_SEEN_FIRE);
         } else {
-            losehp(rnd(6), "煮えたぎる湯をひと口すすった", KILLED_BY);
+            losehp(rnd(6), "sipping boiling water", KILLED_BY);
             monstunseesu(M_SEEN_FIRE);
         }
         /* boiling water burns considered fire damage */

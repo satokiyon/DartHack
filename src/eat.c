@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-12. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-14. */
 /* $NHDT-Header: NetHack 5.0 eat.c 2026/07/31_10:25:58 NetHack-5.0:1.358 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
@@ -815,7 +815,7 @@ eat_brains(
         } else if (is_rider(pd)) {
             pline("それを摂取すると致命的だった.");
             Sprintf(svk.killer.name, "unwisely ate the brain of %s",
-                    jp_pmname(pd, Mgender(mdef)));
+                    pmname(pd, Mgender(mdef)));
             svk.killer.format = NO_KILLER_PREFIX;
             done(DIED);
             /* life-saving needed to reach here */
@@ -1613,6 +1613,40 @@ tin_details(struct obj *obj, int mnum, char *buf)
     jp_tin_display_name(tin_variety(obj, TRUE), mnum, buf, BUFSZ);
 }
 
+/* 死因・英語内部キー生成専用の缶詰詳細名追記関数（画面表示には使用しない） */
+void
+en_tin_details(struct obj *obj, int mnum, char *buf)
+{
+    char buf2[BUFSZ];
+    int r;
+
+    if (!obj || !buf)
+        return;
+
+    r = tin_variety(obj, TRUE);
+
+    if (r == SPINACH_TIN)
+        Strcat(buf, " of spinach");
+    else if (mnum == NON_PM)
+        Strcpy(buf, "empty tin");
+    else {
+        if ((obj->cknown || iflags.override_ID) && obj->spe < 0) {
+            if (r == ROTTEN_TIN || r == HOMEMADE_TIN) {
+                Sprintf(buf2, "%s %s of ", tintxts[r].txt, buf);
+                Strcpy(buf, buf2);
+            } else {
+                Sprintf(eos(buf), " of %s ", tintxts[r].txt);
+            }
+        } else {
+            Strcpy(eos(buf), " of ");
+        }
+        if (vegetarian(&mons[mnum]))
+            Sprintf(eos(buf), "%s", mons[mnum].pmnames[NEUTRAL]);
+        else
+            Sprintf(eos(buf), "%s meat", mons[mnum].pmnames[NEUTRAL]);
+    }
+}
+
 void
 set_tin_variety(struct obj *obj, int forcetype)
 {
@@ -1996,7 +2030,7 @@ consume_tin(const char *mesg)
         incr_itimeout(&HDeaf, duration);
         disp.botl = TRUE;
         nomul(-duration);
-        gm.multi_reason = "腐った食べ物で意識を失っている";
+        gm.multi_reason = "unconscious from rotten food";
         gn.nomovemsg = "意識を取り戻した.";
         ga.afternmv = Hear_again;
         return 1;
@@ -2958,7 +2992,7 @@ doeat_nonfood(struct obj *otmp)
     if (otmp->oclass == WEAPON_CLASS && otmp->opoisoned) {
         pline("うげっ - 毒があった!");
         if (!Poison_resistance) {
-            poison_strdmg(rnd(4), rnd(15), xname(otmp), KILLED_BY_AN);
+            poison_strdmg(rnd(4), rnd(15), en_xname(otmp), KILLED_BY_AN);
         } else
             You("毒の影響を受けていないようだ.");
     } else if (!nodelicious) {
@@ -3581,7 +3615,7 @@ newuhs(boolean incr)
                 incr_itimeout(&HDeaf, duration);
                 disp.botl = TRUE;
                 nomul(-duration);
-                gm.multi_reason = "空腹のあまり失神している";
+                gm.multi_reason = "fainted from lack of food";
                 gn.nomovemsg = "意識を取り戻した.";
                 ga.afternmv = unfaint;
                 newhs = FAINTED;
@@ -3926,7 +3960,7 @@ vomit(void) /* A good idea from David Neves */
        be immobilized for some other reason at the time vomit() is called */
     if (gm.multi >= -2) {
         nomul(-2);
-        gm.multi_reason = "吐いている";
+        gm.multi_reason = "vomiting";
         gn.nomovemsg = You_can_move_again;
     }
 

@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-04. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-14. */
 /* $NHDT-Header: NetHack 5.0 mthrowu.c 2026/08/07_12:46:53 NetHack-5.0:1.195 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Pasi Kallinen, 2016. */
@@ -99,9 +99,16 @@ thitu(
             || !strncmpi(name, "a ", 2))
             kprefix = KILLED_BY;
     }
-    onm = (obj && obj_is_pname(obj)) ? the(name)
-          : (obj && obj->quan > 1L) ? name
-            : an(name);
+    if (named) {
+        onm = !strcmpi(name, "arrow") ? "矢"
+              : !strcmpi(name, "little dart") ? "小さな吹き矢"
+              : !strcmpi(name, "boomerang") ? "ブーメラン"
+              : name;
+    } else {
+        onm = (obj && obj_is_pname(obj)) ? the(name)
+              : (obj && obj->quan > 1L) ? name
+                : an(name);
+    }
     is_acid = (obj && obj->otyp == ACID_VENOM);
 
     if (u.uac + tlev <= (dieroll = rnd(20))) {

@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-04. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-14. */
 /* $NHDT-Header: NetHack 5.0 end.c 2026/06/20_22:26:43 NetHack-5.0:1.353 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
@@ -224,7 +224,7 @@ done_in_by(struct monst *mtmp, int how)
     if ((mptr->geno & G_UNIQ) != 0 && !(imitator && !mimicker)
         && !(mptr == &mons[PM_HIGH_CLERIC] && !mtmp->ispriest)) {
         if (!type_is_pname(mptr))
-            Strcat(buf, "");
+            Strcat(buf, "the ");
         svk.killer.format = KILLED_BY;
     }
     /* _the_ <invisible> <distorted> ghost of Dudley */
@@ -234,26 +234,26 @@ done_in_by(struct monst *mtmp, int how)
 #else
     if (mptr == &mons[PM_GHOST] && has_mgivenname(mtmp)) {
 #endif
-        Strcat(buf, "");
+        Strcat(buf, "the ");
         svk.killer.format = KILLED_BY;
     }
     (void) monhealthdescr(mtmp, TRUE, eos(buf));
     if (mtmp->minvis)
-        Strcat(buf, "透明な");
+        Strcat(buf, "invisible ");
     if (distorted)
-        Strcat(buf, "幻覚でゆがんだ");
+        Strcat(buf, "hallucinogen-distorted ");
 
     if (imitator) {
         char shape[BUFSZ];
-        const char *realnm = jp_pmname(champtr, Mgender(mtmp)),
-               *fakenm = jp_pmname(mptr, Mgender(mtmp));
+        const char *realnm = pmname(champtr, Mgender(mtmp)),
+                   *fakenm = pmname(mptr, Mgender(mtmp));
         boolean alt = is_vampshifter(mtmp);
 
         if (mimicker) {
             /* realnm is already correct because champtr==mptr;
                set up fake mptr for type_is_pname/the_unique_pm */
             mptr = &mons[mtmp->mappearance];
-            fakenm = jp_pmname(mptr, Mgender(mtmp));
+            fakenm = pmname(mptr, Mgender(mtmp));
         } else if (alt && strstri(realnm, "vampire")
                    && !strcmp(fakenm, "vampire bat")) {
             /* special case: use "vampire in bat form" in preference
@@ -266,40 +266,41 @@ done_in_by(struct monst *mtmp, int how)
         if (alt || type_is_pname(mptr)) /* no article */
             Strcpy(shape, fakenm);
         else if (the_unique_pm(mptr)) /* "the"; don't use the() here */
-            Sprintf(shape, "%s", fakenm);
+            Sprintf(shape, "the %s", fakenm);
         else /* "a"/"an" */
             Strcpy(shape, an(fakenm));
         /* omit "called" to avoid excessive verbosity */
         Sprintf(eos(buf),
-            alt ? "%s（%sの姿）"
-                : mimicker ? "%s（%sに化けていた）"
-                       : "%s（%sのふりをしていた）",
+                alt ? "%s in %s form"
+                    : mimicker ? "%s disguised as %s"
+                               : "%s imitating %s",
                 realnm, shape);
         mptr = mtmp->data; /* reset for mimicker case */
 #if 0  /* hardfought */
     } else if (has_ebones(mtmp)) {
-        Strcpy(buf, m_monnam(mtmp));
+        Strcpy(buf, en_m_monnam(mtmp));
 #endif
     } else if (mptr == &mons[PM_GHOST]) {
-        Strcat(buf, "幽霊");
+        Strcat(buf, "ghost");
         if (has_mgivenname(mtmp))
-            Sprintf(eos(buf), "の%s", jp_mgivenname_for_display(mtmp));
+            Sprintf(eos(buf), " of %s", MGIVENNAME(mtmp));
     } else if (mtmp->isshk) {
-        const char *shknm = jp_shkname_for_display(mtmp),
-                   *honorific = "";
+        const char *shknm = shkname(mtmp),
+                   *honorific = shkname_is_pname(mtmp) ? ""
+                                   : mtmp->female ? "Ms. " : "Mr. ";
 
-        Sprintf(eos(buf), "%s%s（店主）", honorific, shknm);
+        Sprintf(eos(buf), "%s%s, the shopkeeper", honorific, shknm);
         svk.killer.format = KILLED_BY;
     } else if (mtmp->ispriest || mtmp->isminion) {
         /* m_monnam() suppresses "the" prefix plus "invisible", and
            it overrides the effect of Hallucination on priestname() */
-        Strcat(buf, m_monnam(mtmp));
+        Strcat(buf, en_m_monnam(mtmp));
     } else {
-        Strcat(buf, jp_pmname(mptr, Mgender(mtmp)));
+        Strcat(buf, pmname(mptr, Mgender(mtmp)));
         if (has_mgivenname(mtmp)) {
-            Sprintf(eos(buf), "（%s%s）",
-                    has_ebones(mtmp) ? "" : "名は",
-                    jp_mgivenname_for_display(mtmp));
+            Sprintf(eos(buf), " %s %s",
+                    has_ebones(mtmp) ? "of" : "called",
+                    MGIVENNAME(mtmp));
         }
     }
 
@@ -755,8 +756,8 @@ savelife(int how)
        again (perhaps due to zap rebound); this text will be appended to
           "killed by <something>, while "
        in high scores entry, if any, and in logfile (but not on tombstone) */
-    gm.multi_reason = Role_if(PM_TOURIST) ? "運命にもてあそばれていた"
-                                          : "死をごまかそうとしていた";
+    gm.multi_reason = Role_if(PM_TOURIST) ? "being toyed with by Fate"
+                                          : "attempting to cheat Death";
 
     if (u.utrap && u.utraptype == TT_LAVA)
         reset_utrap(FALSE);
@@ -1429,12 +1430,12 @@ really_done(int how)
     }
 #endif
     if (u.uhave.amulet) {
-        Strcat(svk.killer.name, "（魔除けを所持）");
+        Strcat(svk.killer.name, " (with the Amulet)");
     } else if (how == ESCAPED) {
         if (Is_astralevel(&u.uz)) /* offered Amulet to wrong deity */
-            Strcat(svk.killer.name, "（神の不興を買って）");
+            Strcat(svk.killer.name, " (in celestial disgrace)");
         else if (carrying(FAKE_AMULET_OF_YENDOR))
-            Strcat(svk.killer.name, "（偽の魔除けを所持）");
+            Strcat(svk.killer.name, " (with a fake Amulet)");
         /* don't bother counting to see whether it should be plural */
     }
 

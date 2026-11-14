@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-08. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-14. */
 /* $NHDT-Header: NetHack 5.0 steed.c 2026/06/20_16:31:08 NetHack-5.0:1.138 $ */
 /* Copyright (c) Kevin Hugo, 1998-1999. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -294,9 +294,9 @@ mount_steed(
         You("%sに触れた.", l_monnam(mtmp));
         Sprintf(kbuf, "attempting to ride %s",
                 /* "a saddled mumak" or "a saddled pony called Dobbin" */
-                x_monnam(mtmp, ARTICLE_A, (char *) 0,
-                         SUPPRESS_IT | SUPPRESS_INVISIBLE
-                             | SUPPRESS_SADDLE, FALSE));
+                en_x_monnam(mtmp, ARTICLE_A, (char *) 0,
+                            SUPPRESS_IT | SUPPRESS_INVISIBLE
+                                | SUPPRESS_SADDLE, FALSE));
         instapetrify(kbuf);
     }
     if (!mtmp->mtame || mtmp->isminion) {
@@ -351,12 +351,12 @@ mount_steed(
         }
         You("%sに乗ろうとして滑った.", l_monnam(mtmp));
 
-        Sprintf(buf, "%sに乗ろうとして滑った",
+        Sprintf(buf, "slipped while mounting %s",
                 /* "a saddled mumak" or "a saddled pony called Dobbin" */
-                x_monnam(mtmp, ARTICLE_A, (char *) 0,
-                         SUPPRESS_IT | SUPPRESS_INVISIBLE
-                             | SUPPRESS_HALLUCINATION,
-                         TRUE));
+                en_x_monnam(mtmp, ARTICLE_A, (char *) 0,
+                            SUPPRESS_IT | SUPPRESS_INVISIBLE
+                                | SUPPRESS_HALLUCINATION,
+                            TRUE));
         losehp(Maybe_Half_Phys(rn1(5, 10)), buf, NO_KILLER_PREFIX);
         return (FALSE);
     }

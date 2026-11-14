@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-04. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-14. */
 /* $NHDT-Header: NetHack 5.0 trap.c 2026/11/02_21:05:17 NetHack-5.0:1.653 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2013. */
@@ -78,6 +78,7 @@ staticfn void maybe_finish_sokoban(void);
 static const char *const a_your[2] = { "", "" };
 static const char *const A_Your[2] = { "", "" };
 static const char tower_of_flame[] = "火柱";
+static const char tower_of_flame_killer[] = "tower of flame";
 static const char *const A_gush_of_water_hits = "水流が";
 static const char *const blindgas[6] = { "湿った",   "無臭の",
                                          "刺激臭の", "冷たい",
@@ -1262,7 +1263,7 @@ trapeffect_arrow_trap(
         dam = dmgval(otmp, &gy.youmonst);
         if (u.usteed && !rn2(2) && steedintrap(trap, otmp)) {
             ; /* nothing */
-        } else if (thitu(8, Maybe_Half_Phys(dam), &otmp, "矢")) {
+        } else if (thitu(8, Maybe_Half_Phys(dam), &otmp, "arrow")) {
             if (otmp)
                 obfree(otmp, (struct obj *) 0);
         } else {
@@ -1327,10 +1328,10 @@ trapeffect_dart_trap(
         dam = dmgval(otmp, &gy.youmonst);
         if (u.usteed && !rn2(2) && steedintrap(trap, otmp)) {
             ; /* nothing */
-        } else if (thitu(7, Maybe_Half_Phys(dam), &otmp, "小さな吹き矢")) {
+        } else if (thitu(7, Maybe_Half_Phys(dam), &otmp, "little dart")) {
             if (otmp) {
                 if (otmp->opoisoned)
-                    poisoned("吹き矢", A_CON, "小さな吹き矢",
+                    poisoned("吹き矢", A_CON, "little dart",
                              /* if damage triggered life-saving,
                                 poison is limited to attrib loss */
                              (u.umortality > oldumort) ? 0 : 10, TRUE);
@@ -1420,7 +1421,7 @@ trapeffect_rocktrap(
             newsym(u.ux, u.uy); /* map the rock */
 
             if (!harmless) {
-                losehp(Maybe_Half_Phys(dmg), "落石", KILLED_BY_AN);
+                losehp(Maybe_Half_Phys(dmg), "falling rock", KILLED_BY_AN);
                 exercise(A_STR, FALSE);
             }
         }
@@ -1980,18 +1981,18 @@ trapeffect_pit(
                           death reason will be overridden with
                           "killed while stuck in creature form" */
                        plunged
-                                             ? "故意に鉄の棘だらけの落とし穴へ飛び込んだ"
+                                             ? "deliberately plunged into a pit of iron spikes"
                        : (conj_pit || deliberate)
-                                                 ? "鉄の棘だらけの落とし穴へ足を踏み入れた"
+                                                 ? "stepped into a pit of iron spikes"
                          : adj_pit
-                                                     ? "鉄の棘だらけの落とし穴へつまずいて落ちた"
-                                                     : "鉄の棘だらけの落とし穴へ落ちた",
+                                                     ? "stumbled into a pit of iron spikes"
+                                                     : "fell into a pit of iron spikes",
                        NO_KILLER_PREFIX);
                 if (!rn2(6))
                           poisoned("棘", A_STR,
                                       (conj_pit || adj_pit || deliberate)
-                                      ? "毒の棘を踏んだ"
-                                      : "毒の棘へ落ちた",
+                                      ? "stepping on poison spikes"
+                                      : "fall onto poison spikes",
                              /* if damage triggered life-saving,
                                 poison is limited to attrib loss */
                              (u.umortality > oldumort) ? 0 : 8, FALSE);
@@ -2000,8 +2001,8 @@ trapeffect_pit(
                 if (!conj_pit && !deliberate
                     && !(plunged && (Flying || is_clinger(gy.youmonst.data))))
                     losehp(Maybe_Half_Phys(rnd(adj_pit ? 3 : 6)),
-                              plunged ? "故意に落とし穴へ飛び込んだ"
-                              : "落とし穴へ落ちた",
+                              plunged ? "deliberately plunged into a pit"
+                              : "fell into a pit",
                            NO_KILLER_PREFIX);
             }
             if (Punished && !carried(uball)) {
@@ -2352,7 +2353,7 @@ trapeffect_magic_trap(
             deltrap(trap);
             newsym(u.ux, u.uy); /* update position */
             You("魔法の爆発に巻き込まれた!");
-            losehp(rnd(10), "魔法の爆発", KILLED_BY_AN);
+            losehp(rnd(10), "magical explosion", KILLED_BY_AN);
             Your("体が魔法エネルギーの一部を吸収した!");
             u.uen = (u.uenmax += 2);
             if (u.uenmax > u.uenpeak)
@@ -2434,7 +2435,7 @@ trapeffect_anti_magic(
                      : (dmgval2 >= hp / 4) ? "ひどくだるい."
                        : "動きが鈍い.");
             /* opposite of magical explosion */
-            losehp(dmgval2, "反魔法の収縮", KILLED_BY_AN);
+            losehp(dmgval2, "anti-magic implosion", KILLED_BY_AN);
         }
 
         /* if the drain amount is more than hero's maximum energy then up
@@ -2646,7 +2647,7 @@ trapeffect_landmine(
            blow_up_landmine() will remove pit afterwards if inappropriate */
         trap->ttyp = PIT;
         trap->madeby_u = FALSE;
-        losehp(Maybe_Half_Phys(damage), "地雷", KILLED_BY_AN);
+        losehp(Maybe_Half_Phys(damage), "land mine", KILLED_BY_AN);
         blow_up_landmine(trap);
         if (steed_mid && saddle && !u.usteed)
             (void) keep_saddle_with_steedcorpse(steed_mid, fobj, saddle);
@@ -4185,7 +4186,7 @@ float_down(
                         pline("しまった! 墜落した.");
                     else
                         You("倒れ込んだ.");
-                    losehp(rnd(2), "危険な突風", KILLED_BY);
+                    losehp(rnd(2), "dangerous winds", KILLED_BY);
                     if (u.usteed)
                         dismount_steed(DISMOUNT_FELL);
                     selftouch("倒れ込んだ拍子に、あなたは");
@@ -4304,7 +4305,7 @@ dofiretrap(
         if (Fire_resistance)
             You("無傷だった.");
         else
-            losehp(rnd(3), "熱湯", KILLED_BY);
+            losehp(rnd(3), "boiling water", KILLED_BY);
         return;
     }
     pline("%sから%sが%s!",
@@ -4359,7 +4360,7 @@ dofiretrap(
     if (!num)
         You("無傷だった.");
     else
-        losehp(num, tower_of_flame, KILLED_BY_AN); /* fire damage */
+        losehp(num, tower_of_flame_killer, KILLED_BY_AN); /* fire damage */
     burn_away_slime();
 
     if (burnarmor(&gy.youmonst) || rn2(3)) {
@@ -6429,7 +6430,7 @@ chest_trap(
                        && *in_rooms(ox, oy, SHOPBASE) == *u.ushops);
 
             pline("%sが爆発した!", xname(obj));
-            Snprintf(buf, sizeof buf, "exploding %s", xname(obj));
+            Snprintf(buf, sizeof buf, "exploding %s", en_xname(obj));
 
             if (costly)
                 loss += stolen_value(obj, ox, oy, (boolean) shkp->mpeaceful,
@@ -6484,7 +6485,7 @@ chest_trap(
         case 17:
             pline("有毒ガスの雲が%sから噴き出した.", xname(obj));
             if (rn2(3))
-                poisoned("ガス雲", A_STR, "毒ガスの雲", 15,
+                poisoned("ガス雲", A_STR, "cloud of poison gas", 15,
                          FALSE);
             else
                 create_gas_cloud(obj->ox, obj->oy, 1, 8);
@@ -6495,7 +6496,7 @@ chest_trap(
         case 14:
         case 13:
             You_feel("針が%sを刺したのを感じた.", jp_body_part(bodypart));
-            poisoned("針", A_CON, "毒針", 10, FALSE);
+            poisoned("針", A_CON, "poisoned needle", 10, FALSE);
             exercise(A_CON, FALSE);
             break;
         case 12:
@@ -6520,7 +6521,7 @@ chest_trap(
             }
             (void) destroy_items(&gy.youmonst, AD_ELEC, orig_dmg);
             if (dmg)
-                losehp(dmg, "電撃", KILLED_BY_AN);
+                losehp(dmg, "electric shock", KILLED_BY_AN);
             break;
         } /* case 6 */
         case 5:
@@ -6529,7 +6530,7 @@ chest_trap(
             if (!Free_action) {
                 pline("突然その場で凍りついた!");
                 nomul(-d(5, 6));
-                gm.multi_reason = "罠で凍りついた";
+                gm.multi_reason = "frozen by a trap";
                 exercise(A_DEX, FALSE);
                 gn.nomovemsg = You_can_move_again;
             } else
@@ -6776,7 +6777,7 @@ b_trapped(const char *item, int bodypart)
     Soundeffect(se_kaboom, 80);
     pline("ドカーン!!  %sにはブービートラップが仕掛けられていた!", j_item);
     wake_nearby(FALSE);
-    losehp(Maybe_Half_Phys(dmg), "爆発", KILLED_BY_AN);
+    losehp(Maybe_Half_Phys(dmg), "explosion", KILLED_BY_AN);
     exercise(A_STR, FALSE);
     if (bodypart != NO_PART)
         exercise(A_CON, FALSE);

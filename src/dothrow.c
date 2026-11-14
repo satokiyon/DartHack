@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-08. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-14. */
 /* $NHDT-Header: NetHack 5.0 dothrow.c 2026/06/20_16:30:46 NetHack-5.0:1.321 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2013. */
@@ -1063,8 +1063,9 @@ mhurtle_step(genericptr_t arg, coordxy x, coordxy y)
                      "being hit by %s",
                      /* combine m_monnam() and noname_monnam():
                         "{your,a} hurtling cockatrice" w/o assigned name */
-                     x_monnam(mon, mon->mtame ? ARTICLE_YOUR : ARTICLE_A,
-                              "hurtling", EXACT_NAME | SUPPRESS_NAME, FALSE));
+                     en_x_monnam(mon, mon->mtame ? ARTICLE_YOUR : ARTICLE_A,
+                                 "hurtling", EXACT_NAME | SUPPRESS_NAME,
+                                 FALSE));
             instapetrify(svk.killer.name);
             newsym(u.ux, u.uy);
         }
@@ -1426,7 +1427,7 @@ toss_up(struct obj *obj, boolean hitsroof)
         hitfloor(obj, TRUE);
         gt.thrownobj = 0;
         if (!harmless)
-            losehp(dmg, "落下物", KILLED_BY_AN);
+            losehp(dmg, "falling object", KILLED_BY_AN);
     }
     return TRUE;
 }

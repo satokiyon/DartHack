@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-04. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-14. */
 /* $NHDT-Header: NetHack 5.0 dig.c 2026/06/20_22:26:43 NetHack-5.0:1.238 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2012. */
@@ -401,7 +401,7 @@ dig(void)
                     dmg = (dmg + 1) / 2;
                 You("自分の%sを叩いてしまった.", jp_body_part(FOOT));
                 Sprintf(kbuf, "chopping off %s own %s", uhis(),
-                        jp_body_part(FOOT));
+                        body_part(FOOT));
                 losehp(Maybe_Half_Phys(dmg), kbuf, KILLED_BY);
             } else {
                 You("%sでトラバサミを破壊した.",
@@ -1242,7 +1242,7 @@ use_pick_axe2(struct obj *obj)
                           vibrate ? "  斧の柄が激しく震えた!"
                                   : "");
                     if (vibrate)
-                        losehp(Maybe_Half_Phys(2), "斧で硬いものを叩いたこと",
+                        losehp(Maybe_Half_Phys(2), "axing a hard object",
                                KILLED_BY);
                     wake_nearby(FALSE);
                 } else {
@@ -1593,7 +1593,7 @@ zap_dig(void)
                 You("%sの岩を緩めた.", ceiling(u.ux, u.uy));
                 pline("それが自分の%sに落ちてきた!", jp_body_part(HEAD));
                 dmg = rnd(hard_helmet(uarmh) ? 2 : 6);
-                losehp(Maybe_Half_Phys(dmg), "落石", KILLED_BY_AN);
+                losehp(Maybe_Half_Phys(dmg), "falling rock", KILLED_BY_AN);
                 otmp = mksobj_at(ROCK, u.ux, u.uy, FALSE, FALSE);
                 if (otmp) {
                     (void) xname(otmp); /* set dknown, maybe bknown */

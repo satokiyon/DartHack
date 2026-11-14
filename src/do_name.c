@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-04. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-14. */
 /* $NHDT-Header: NetHack 5.0 do_name.c 2026/08/16_14:31:31 NetHack-5.0:1.342 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Pasi Kallinen, 2018. */
@@ -1073,6 +1073,182 @@ x_monnam(
     return buf;
 }
 
+/* 死因・英語内部キー生成専用のモンスター名フォーマット（画面表示には使用しない） */
+char *
+en_x_monnam(
+    struct monst *mtmp,
+    int article,
+    const char *adjective,
+    int suppress,
+    boolean called)
+{
+    char *buf = nextmbuf();
+    struct permonst *mdat = mtmp->data;
+    const char *pm_name;
+    boolean do_hallu, do_invis, do_it, do_saddle, do_mappear,
+            do_exact, do_name, augment_it;
+    boolean name_at_start, has_adjectives, insertbuf2,
+            mappear_as_mon = (M_AP_TYPE(mtmp) == M_AP_MONSTER);
+    char *bp, buf2[BUFSZ];
+
+    if (mtmp == &gy.youmonst)
+        return strcpy(buf, "you");
+
+    if (program_state.gameover)
+        suppress |= SUPPRESS_HALLUCINATION;
+    if (article == ARTICLE_YOUR && !mtmp->mtame)
+        article = ARTICLE_THE;
+
+    if (u.uswallow && mtmp == u.ustuck) {
+        article = ARTICLE_THE;
+        suppress |= SUPPRESS_INVISIBLE;
+    }
+    do_hallu = Hallucination && !(suppress & SUPPRESS_HALLUCINATION);
+    do_invis = mtmp->minvis && !(suppress & SUPPRESS_INVISIBLE);
+    do_it = !canspotmon(mtmp) && article != ARTICLE_YOUR
+            && !program_state.gameover && mtmp != u.usteed
+            && !engulfing_u(mtmp) && !(suppress & SUPPRESS_IT);
+    do_saddle = !(suppress & SUPPRESS_SADDLE);
+    do_mappear = mappear_as_mon && !(suppress & SUPPRESS_MAPPEARANCE);
+    do_exact = (suppress & EXACT_NAME) == EXACT_NAME;
+    do_name = !(suppress & SUPPRESS_NAME) || type_is_pname(mdat);
+    augment_it = (suppress & AUGMENT_IT) != 0;
+
+    buf[0] = '\0';
+
+    if (do_it) {
+        boolean s_one = humanoid(mdat) && !is_animal(mdat) && !mindless(mdat);
+
+        Strcpy(buf, !augment_it ? "it"
+                    : (!do_hallu ? s_one : !rn2(2)) ? "someone"
+                      : "something");
+        return buf;
+    }
+
+    if ((mtmp->ispriest || mtmp->isminion) && !do_mappear) {
+        char *name;
+        long save_prop = EHalluc_resistance;
+        unsigned save_invis = mtmp->minvis;
+
+        if (!do_hallu)
+            EHalluc_resistance = 1L;
+        if (!do_invis)
+            mtmp->minvis = 0;
+        name = en_priestname(mtmp, article, do_exact, buf2);
+        EHalluc_resistance = save_prop;
+        mtmp->minvis = save_invis;
+        if (article == ARTICLE_NONE && !strncmp(name, "the ", 4))
+            name += 4;
+        return strcpy(buf, name);
+    }
+
+    if (do_mappear) {
+        pm_name = pmname(&mons[mtmp->mappearance], Mgender(mtmp));
+    } else {
+        pm_name = pmname(mtmp->data, Mgender(mtmp));
+    }
+
+    if (mtmp->isshk && !do_hallu && !do_mappear) {
+        if (adjective && article == ARTICLE_THE) {
+            Strcpy(buf, "the ");
+            Strcat(strcat(buf, adjective), " ");
+            Strcat(buf, shkname(mtmp));
+        } else {
+            Strcat(buf, shkname(mtmp));
+            if (mdat != &mons[PM_SHOPKEEPER] || do_invis) {
+                Strcat(buf, " the ");
+                if (do_invis)
+                    Strcat(buf, "invisible ");
+                Strcat(buf, pm_name);
+            }
+        }
+        return buf;
+    }
+
+    if (adjective)
+        Strcat(strcat(buf, adjective), " ");
+    if (do_invis)
+        Strcat(buf, "invisible ");
+    if (do_saddle && (mtmp->misc_worn_check & W_SADDLE) && !Blind
+        && !Hallucination)
+        Strcat(buf, "saddled ");
+    has_adjectives = (buf[0] != '\0');
+
+    if (do_hallu) {
+        char rnamecode;
+        char *rname = rndmonnam(&rnamecode);
+
+        Strcat(buf, rname);
+        name_at_start = bogon_is_pname(rnamecode);
+    } else if (do_name && has_mgivenname(mtmp)) {
+        char *name = MGIVENNAME(mtmp);
+
+        if (mdat == &mons[PM_GHOST]) {
+            Sprintf(eos(buf), "%s ghost", s_suffix(name));
+            name_at_start = TRUE;
+        } else if (called) {
+            Sprintf(eos(buf), "%s called %s", pm_name, name);
+            name_at_start = (boolean) type_is_pname(mdat);
+        } else if (is_mplayer(mdat) && (bp = strstri(name, " the ")) != 0) {
+            char pbuf[BUFSZ];
+
+            Strcpy(pbuf, name);
+            pbuf[bp - name + 5] = '\0';
+            if (has_adjectives)
+                Strcat(pbuf, buf);
+            Strcat(pbuf, bp + 5);
+            Strcpy(buf, pbuf);
+            article = ARTICLE_NONE;
+            name_at_start = TRUE;
+        } else {
+            Strcat(buf, name);
+            name_at_start = TRUE;
+        }
+    } else if (is_mplayer(mdat) && !In_endgame(&u.uz)) {
+        char pbuf[BUFSZ];
+
+        Strcpy(pbuf, rank_of((int) mtmp->m_lev, monsndx(mdat),
+                             (boolean) mtmp->female));
+        Strcat(buf, lcase(pbuf));
+        name_at_start = FALSE;
+    } else {
+        Strcat(buf, pm_name);
+        name_at_start = (boolean) type_is_pname(mdat);
+    }
+
+    if (name_at_start && (article == ARTICLE_YOUR || !has_adjectives)) {
+        if (mdat == &mons[PM_WIZARD_OF_YENDOR])
+            article = ARTICLE_THE;
+        else
+            article = ARTICLE_NONE;
+    } else if ((mdat->geno & G_UNIQ) != 0 && article == ARTICLE_A) {
+        article = ARTICLE_THE;
+    }
+
+    insertbuf2 = TRUE;
+    buf2[0] = '\0';
+    switch (article) {
+    case ARTICLE_YOUR:
+        Strcpy(buf2, "your ");
+        break;
+    case ARTICLE_THE:
+        Strcpy(buf2, "the ");
+        break;
+    case ARTICLE_A:
+        (void) just_an(buf2, buf);
+        break;
+    case ARTICLE_NONE:
+    default:
+        insertbuf2 = FALSE;
+        break;
+    }
+    if (insertbuf2) {
+        Strcat(buf2, buf);
+        Strcpy(buf, buf2);
+    }
+    return buf;
+}
+
 char *
 l_monnam(struct monst *mtmp)
 {
@@ -1170,6 +1346,13 @@ char *
 m_monnam(struct monst *mtmp)
 {
     return x_monnam(mtmp, ARTICLE_NONE, (char *) 0, EXACT_NAME, FALSE);
+}
+
+/* 死因・英語内部キー生成専用のモンスター固有英語名（m_monnamの英語版） */
+char *
+en_m_monnam(struct monst *mtmp)
+{
+    return en_x_monnam(mtmp, ARTICLE_NONE, (char *) 0, EXACT_NAME, FALSE);
 }
 
 /* pet name: "your little dog" */
@@ -1415,6 +1598,27 @@ obj_pmname(struct obj *obj)
         return jp_pmname(&mons[mndx], mgend);
     }
     impossible("obj_pmname otyp:%i,corpsenm:%i", obj->otyp, obj->corpsenm);
+    return "two-legged glorkum-seeker";
+}
+
+/* 死因・英語内部キー生成専用の死体/像/置物モンスター英語名 */
+const char *
+en_obj_pmname(struct obj *obj)
+{
+    if ((obj->otyp == CORPSE || obj->otyp == STATUE || obj->otyp == FIGURINE)
+        && ismnum(obj->corpsenm)) {
+        int cgend = (obj->spe & CORPSTAT_GENDER),
+            mgend = ((cgend == CORPSTAT_MALE) ? MALE
+                     : (cgend == CORPSTAT_FEMALE) ? FEMALE
+                       : NEUTRAL),
+            mndx = obj->corpsenm;
+
+        if (mndx == PM_ALIGNED_CLERIC && cgend == CORPSTAT_RANDOM)
+            mndx = PM_CLERIC;
+
+        return pmname(&mons[mndx], mgend);
+    }
+    impossible("en_obj_pmname otyp:%i,corpsenm:%i", obj->otyp, obj->corpsenm);
     return "two-legged glorkum-seeker";
 }
 

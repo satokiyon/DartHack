@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-04. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-14. */
 /* $NHDT-Header: NetHack 5.0 explode.c 2026/10/17_17:31:03 NetHack-5.0:1.133 $ */
 /*      Copyright (C) 1990 by Ken Arromdee */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -209,7 +209,7 @@ jp_translate_explosion_noun(const char *noun, char *out, size_t outsz)
     /* モンスター名検索 */
     mndx = name_to_mon(mname, &gend);
     if (mndx >= LOW_PM && mndx < NUMMONS) {
-        return jp_pmname_from_idx(mndx, 0);
+        return jp_pmname_from_idx(mndx, (gend >= 0) ? gend : 0);
     }
 
     /* オブジェクト（アイテム）名検索 */

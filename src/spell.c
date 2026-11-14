@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-04. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-14. */
 /* $NHDT-Header: NetHack 5.0 spell.c 2026/06/20_22:26:43 NetHack-5.0:1.191 $ */
 /*      Copyright (c) M. Stephenson 1988                          */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -175,7 +175,7 @@ cursed_book(struct obj *bp)
         } else {
             pline("本を読んでいると、それはあなたの顔の前で爆発した!");
             dmg = 2 * rnd(10) + 5;
-            losehp(Maybe_Half_Phys(dmg), "ルーンの爆発", KILLED_BY_AN);
+            losehp(Maybe_Half_Phys(dmg), "exploding rune", KILLED_BY_AN);
         }
         return TRUE;
     default:

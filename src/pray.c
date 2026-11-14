@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-04. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-14. */
 /* $NHDT-Header: NetHack 5.0 pray.c 2026/06/20_22:26:43 NetHack-5.0:1.255 $ */
 /* Copyright (c) Benson I. Margulies, Mike Stephenson, Steve Linhart, 1989. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1761,7 +1761,7 @@ sacrifice_your_race(
                 dmon->mpeaceful = TRUE;
             You("恐怖で身がすくんで動けなくなった.");
             nomul(-3);
-            gm.multi_reason = "悪魔を恐れている";
+            gm.multi_reason = "being terrified of a demon";
             gn.nomovemsg = 0;
         } else
             pline_The("%s.", demonless_msg);
@@ -2305,7 +2305,7 @@ prayer_done(void) /* M. Stephenson (1.0.3b) */
         /* KMH -- Gods have mastery over unchanging */
         rehumanize();
         /* no Half_physical_damage adjustment here */
-        losehp(rnd(20), "アンデッド退散の残留効果", KILLED_BY_AN);
+        losehp(rnd(20), "residual undead turning effect", KILLED_BY_AN);
         exercise(A_CON, FALSE);
         return 1;
     }

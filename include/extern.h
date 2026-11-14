@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-12. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-14. */
 /* $NHDT-Header: NetHack 5.0 extern.h 2026/10/17_14:49:13 NetHack-5.0:1.1583 $ */
 /* Copyright (c) Steve Creps, 1988.                               */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -715,6 +715,7 @@ extern const char *rndghostname(void);
 extern const char *jp_mgivenname_for_display(struct monst *);
 extern const char *jp_bogusmon_for_display(const char *);
 extern char *x_monnam(struct monst *, int, const char *, int, boolean) NONNULLARG1;
+extern char *en_x_monnam(struct monst *, int, const char *, int, boolean) NONNULLARG1;
 extern char *l_monnam(struct monst *) NONNULLARG1;
 extern char *mon_nam(struct monst *) NONNULLARG1;
 extern char *noit_mon_nam(struct monst *) NONNULLARG1;
@@ -726,6 +727,7 @@ extern char *noit_or_your_Monnam(struct monst *) NONNULLARG1;
 extern char *Some_Monnam(struct monst *) NONNULLARG1;
 extern char *noname_monnam(struct monst *, int) NONNULLARG1;
 extern char *m_monnam(struct monst *) NONNULLARG1;
+extern char *en_m_monnam(struct monst *) NONNULLARG1;
 extern char *y_monnam(struct monst *) NONNULLARG1;
 extern char *YMonnam(struct monst *) NONNULLARG1;
 extern char *Adjmonnam(struct monst *, const char *) NONNULLARG1;
@@ -761,6 +763,7 @@ extern const char *jp_pmname(struct permonst *, int) NONNULLARG1;
 extern const char *jp_pmname_from_idx(int, int);
 extern const char *mon_pmname(struct monst *) NONNULLARG1;
 extern const char *obj_pmname(struct obj *) NONNULLARG1;
+extern const char *en_obj_pmname(struct obj *) NONNULLARG1;
 
 /* ### do_wear.c ### */
 
@@ -1013,6 +1016,7 @@ extern void cant_finish_meal(struct obj *) NONNULLARG1;
 extern void set_tin_variety(struct obj *, int) NONNULLARG1;
 extern int tin_variety_txt(char *, int *);
 extern void tin_details(struct obj *, int, char *);
+extern void en_tin_details(struct obj *, int, char *);
 extern const char *jp_hunger_status_for_display(int, boolean);
 extern boolean Popeye(int);
 extern int Finish_digestion(void);
@@ -2286,6 +2290,7 @@ extern const char *jp_counter_for_obj(struct obj *);
 extern char *cxname(struct obj *) NONNULLARG1;
 extern char *cxname_singular(struct obj *) NONNULLARG1;
 extern char *killer_xname(struct obj *) NONNULLARG1;
+extern char *en_xname(struct obj *) NONNULLARG1;
 extern char *short_oname(struct obj *, char *(*)(struct obj *),
                          char *(*)(struct obj *), unsigned) NONNULLARG12;
 extern const char *singular(struct obj *, char *(*)(struct obj *)) NONNULLPTRS;
@@ -2309,9 +2314,11 @@ extern char *ysimple_name(struct obj *) NONNULL NONNULLARG1;
 extern char *Ysimple_name2(struct obj *) NONNULL NONNULLARG1;
 extern char *simpleonames(struct obj *) NONNULL NONNULLARG1;
 extern char *ansimpleoname(struct obj *) NONNULL NONNULLARG1;
+extern char *en_ansimpleoname(struct obj *) NONNULL NONNULLARG1;
 extern char *thesimpleoname(struct obj *) NONNULL NONNULLARG1;
 extern char *actualoname(struct obj *) NONNULL NONNULLARG1;
 extern char *bare_artifactname(struct obj *) NONNULL NONNULLARG1;
+extern char *en_bare_artifactname(struct obj *) NONNULL NONNULLARG1;
 /* makeplural() and makesingular() never return NULL but have tests for NULL
    arg1, and code path that leads to impossible(), preventing NONNULLARG1 */
 extern char *makeplural(const char *) NONNULL NO_NNARGS;
@@ -2658,6 +2665,7 @@ extern int pri_move(struct monst *) NONNULLARG1;
 extern void priestini(d_level *, struct mkroom *, int, int, boolean) NONNULLARG12;
 extern aligntyp mon_aligntyp(struct monst *) NONNULLARG1;
 extern char *priestname(struct monst *, int, boolean, char *) NONNULLARG1;
+extern char *en_priestname(struct monst *, int, boolean, char *) NONNULLARG1;
 extern boolean p_coaligned(struct monst *) NONNULLARG1;
 extern struct monst *findpriest(char);
 extern void intemple(int);

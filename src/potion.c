@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-04. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-14. */
 /* $NHDT-Header: NetHack 5.0 potion.c 2026/06/20_22:26:43 NetHack-5.0:1.290 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2013. */
@@ -494,7 +494,7 @@ ghost_from_bottle(void)
     if (flags.verbose)
         You("恐怖で動けなくなった.");
     nomul(-3);
-    gm.multi_reason = "恐怖で身がすくんでいる";
+    gm.multi_reason = "being frightened to death";
     gn.nomovemsg = "ようやく落ち着きを取り戻した.";
 }
 
@@ -890,7 +890,7 @@ peffect_paralysis(struct obj *otmp)
             Your("%sは%sに貼りついて凍りついた!", jp_body_part_plural(FOOT),
                  surface(u.ux, u.uy));
         nomul(-(rn1(10, 25 - 12 * bcsign(otmp))));
-        gm.multi_reason = "薬で凍りついた";
+        gm.multi_reason = "frozen by a potion";
         gn.nomovemsg = You_can_move_again;
         exercise(A_DEX, FALSE);
     }
@@ -967,7 +967,7 @@ peffect_sickness(struct obj *otmp)
         pline("(実際は少し古くなった%sだった.)", fruitname(TRUE));
         if (!Role_if(PM_HEALER)) {
             /* NB: blessed otmp->fromsink is not possible */
-            losehp(1, "少し汚染された薬", KILLED_BY);
+            losehp(1, "mildly contaminated potion", KILLED_BY_AN);
         }
     } else {
         if (Poison_resistance)
@@ -979,12 +979,9 @@ peffect_sickness(struct obj *otmp)
             char contaminant[BUFSZ];
             int typ = rn2(A_MAX);
 
-            if (otmp->fromsink)
-                Sprintf(contaminant, "%s汚染された水道水",
-                        (Poison_resistance) ? "少し" : "");
-            else
-                Sprintf(contaminant, "%s汚染された薬",
-                        (Poison_resistance) ? "少し" : "");
+            Sprintf(contaminant, "%s%s", (Poison_resistance) ? "mildly " : "",
+                    (otmp->fromsink) ? "contaminated tap water"
+                                     : "contaminated potion");
 
             if (!Fixed_abil) {
                 poisontell(typ, FALSE);
@@ -1203,7 +1200,7 @@ peffect_levitation(struct obj *otmp)
 
             You("%sを%sにぶつけた.", jp_body_part(HEAD),
                 ceiling(u.ux, u.uy));
-            losehp(Maybe_Half_Phys(dmg), "天井への衝突", KILLED_BY_AN);
+            losehp(Maybe_Half_Phys(dmg), "colliding with the ceiling", KILLED_BY);
             gp.potion_nothing = 0; /* not nothing after all */
         }
     } else if (otmp->blessed) {
@@ -1276,7 +1273,7 @@ peffect_oil(struct obj *otmp)
             /* fire damage */
             vulnerable = !Fire_resistance || Cold_resistance;
             losehp(d(vulnerable ? 4 : 2, 4),
-                   "燃えている油の薬を飲んだこと",
+                   "quaffing a burning potion of oil",
                    KILLED_BY);
         }
         /*
@@ -1307,7 +1304,7 @@ peffect_acid(struct obj *otmp)
               otmp->blessed ? "少し" : otmp->cursed ? "かなり"
                                                     : "焼けるように");
         dmg = d(otmp->cursed ? 2 : 1, otmp->blessed ? 4 : 8);
-        losehp(Maybe_Half_Phys(dmg), "酸の薬", KILLED_BY_AN);
+        losehp(Maybe_Half_Phys(dmg), "potion of acid", KILLED_BY_AN);
         exercise(A_CON, FALSE);
     }
     if (Stoned)
@@ -1637,8 +1634,8 @@ potionhit(struct monst *mon, struct obj *obj, int how)
         pline_The("%sがあなたの%sに当たり、砕け散った.", botlnam,
               jp_body_part(HEAD));
         losehp(Maybe_Half_Phys(rnd(2)),
-               (how == POTHIT_OTHER_THROW) ? "飛んできた薬" /* scatter */
-                                           : "投げられた薬",
+               (how == POTHIT_OTHER_THROW) ? "propelled potion" /* scatter */
+                                           : "thrown potion",
                KILLED_BY_AN);
     } else {
         tx = mon->mx, ty = mon->my;
@@ -1700,7 +1697,7 @@ potionhit(struct monst *mon, struct obj *obj, int how)
                       obj->blessed ? "少し"
                                    : obj->cursed ? "かなり" : "");
                 dmg = d(obj->cursed ? 2 : 1, obj->blessed ? 4 : 8);
-                losehp(Maybe_Half_Phys(dmg), "酸の薬", KILLED_BY_AN);
+                losehp(Maybe_Half_Phys(dmg), "potion of acid", KILLED_BY_AN);
             }
             break;
         }
@@ -2041,7 +2038,7 @@ potionbreathe(struct obj *obj)
         if (!Free_action) {
             pline("%sに押さえつけられているようだ.", Something);
             nomul(-rnd(5));
-            gm.multi_reason = "薬で凍りついた";
+            gm.multi_reason = "frozen by a potion";
             gn.nomovemsg = You_can_move_again;
             exercise(A_DEX, FALSE);
         } else
@@ -2052,7 +2049,7 @@ potionbreathe(struct obj *obj)
         if (!Free_action && !Sleep_resistance) {
             You_feel("かなり眠くなった.");
             nomul(-rnd(5));
-            gm.multi_reason = "魔法の薬で眠っている";
+            gm.multi_reason = "sleeping off a magical draught";
             gn.nomovemsg = You_can_move_again;
             exercise(A_DEX, FALSE);
         } else {
@@ -2427,7 +2424,7 @@ dip_potion_explosion(struct obj *obj, int dmg)
             potionbreathe(obj);
         useupall(obj);
         losehp(dmg, /* not physical damage */
-               "錬金術の爆発", KILLED_BY_AN);
+               "alchemic blast", KILLED_BY_AN);
         return TRUE;
     }
     return FALSE;

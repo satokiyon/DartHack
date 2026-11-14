@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-04. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-14. */
 /* $NHDT-Header: NetHack 5.0 objnam.c 2026/11/02_21:05:17 NetHack-5.0:1.474 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2011. */
@@ -44,6 +44,9 @@ staticfn void jp_scroll_called_name(char *, int, int, const char *);
 staticfn void xcalled(char *, int, const char *, const char *);
 staticfn char *xname_flags(struct obj *, unsigned);
 staticfn char *minimal_xname(struct obj *);
+staticfn char *en_xname_flags(struct obj *, unsigned);
+staticfn char *en_minimal_xname(struct obj *);
+staticfn char *en_simpleonames(struct obj *);
 staticfn void add_erosion_words(struct obj *, char *, size_t);
 staticfn char *doname_base(struct obj *obj, unsigned);
 staticfn boolean singplur_lookup(char *, char *, boolean,
@@ -104,6 +107,14 @@ struct Jitem {
     base ## _eos = eos(base),                                           \
     /* convert signed ptrdiff_t to unsigned size_t */                   \
     base ## spaceleft = (size_t) (base ## _end - base ## _eos)
+
+/* true for gems/rocks that should have " stone" appended to their names */
+#define GemStone(typ)                                                  \
+    (typ == FLINT                                                      \
+     || (objects[typ].oc_material == GEMSTONE                          \
+         && (typ != DILITHIUM_CRYSTAL && typ != RUBY && typ != DIAMOND \
+             && typ != SAPPHIRE && typ != BLACK_OPAL && typ != EMERALD \
+             && typ != OPAL)))
 
 static const struct Jitem Japanese_items[] = {
     { SHORT_SWORD, "脇差し" },
@@ -1994,11 +2005,11 @@ corpse_xname(
     nambuf = gx.xnamep + PREFIX;
 
     if (glob) {
-        mnam = jp_item_name(otmp->otyp); /* "glob of <monster>" */
+        mnam = OBJ_NAME(objects[otmp->otyp]); /* "glob of <monster>" */
     } else if (omndx == NON_PM) { /* paranoia */
         mnam = "thing";
     } else {
-        mnam = obj_pmname(otmp);
+        mnam = en_obj_pmname(otmp);
         if (the_unique_pm(&mons[omndx]) || type_is_pname(&mons[omndx])) {
             mnam = s_suffix(mnam);
             possessive = TRUE;
@@ -2128,6 +2139,377 @@ cxname_singular(struct obj *obj)
     return xname_flags(obj, CXN_SINGULAR);
 }
 
+/* 死因・英語内部キー生成専用の英語オブジェクト名フォーマット */
+staticfn char *
+en_xname_flags(struct obj *obj, unsigned cxn_flags)
+{
+    char *buf;
+    char *obufp, *buf_end, *buf_eos;
+    size_t bufspaceleft;
+    int typ = obj->otyp;
+    struct objclass *ocl = &objects[typ];
+    int nn = ocl->oc_name_known, omndx = obj->corpsenm;
+    const char *actualn = OBJ_NAME(objects[typ]);
+    const char *dn = OBJ_DESCR(objects[typ]);
+    const char *un = ocl->oc_uname;
+    boolean pluralize = (obj->quan != 1L) && !(cxn_flags & CXN_SINGULAR);
+    boolean append_name_parens = FALSE;
+    boolean known, dknown, bknown;
+
+    gx.xnamep = nextobuf();
+    buf = gx.xnamep + PREFIX;
+    buf_end = gx.xnamep + BUFSZ - 1;
+    buf[0] = '\0';
+    ConcUpdate(buf);
+
+    if (!actualn)
+        actualn = (typ > 0 && typ < MAXOCLASSES) ? "generic" : "object?";
+    if (!dn)
+        dn = actualn;
+
+    if (!nn && ocl->oc_uses_known && ocl->oc_unique)
+        obj->known = 0;
+    if (Role_if(PM_CLERIC))
+        obj->bknown = 1;
+
+    if (iflags.override_ID) {
+        known = dknown = bknown = TRUE;
+        nn = 1;
+    } else {
+        known = obj->known;
+        dknown = obj->dknown;
+        bknown = obj->bknown;
+    }
+
+    if (obj_is_pname(obj))
+        goto nameit;
+
+    switch (obj->oclass) {
+    case AMULET_CLASS:
+        if (!dknown)
+            Strcpy(buf, "amulet");
+        else if (typ == AMULET_OF_YENDOR || typ == FAKE_AMULET_OF_YENDOR)
+            Strcpy(buf, known ? actualn : dn);
+        else if (nn)
+            Strcpy(buf, actualn);
+        else if (un)
+            xcalled(buf, BUFSZ - PREFIX, "amulet", un);
+        else
+            Strcpy(buf, dn);
+        break;
+    case WEAPON_CLASS:
+        if (is_poisonable(obj) && obj->opoisoned)
+            Strcpy(buf, "poisoned ");
+        FALLTHROUGH;
+    case VENOM_CLASS:
+    case TOOL_CLASS:
+        if (typ == LENSES)
+            Strcpy(buf, "pair of ");
+        else if (is_wet_towel(obj))
+            Strcpy(buf, (obj->spe < 3) ? "moist " : "wet ");
+
+        if (!dknown)
+            Strcat(buf, dn);
+        else if (nn)
+            Strcat(buf, actualn);
+        else if (un)
+            xcalled(buf, BUFSZ - PREFIX, dn, un);
+        else
+            Strcat(buf, dn);
+        ConcUpdate(buf);
+
+        if (typ == FIGURINE && omndx != NON_PM) {
+            char anbuf[10];
+            const char *fig_pmname = en_obj_pmname(obj);
+
+            ConcatF2(buf, 0, " of %s%s",
+                     type_is_pname(&mons[omndx]) ? ""
+                       : the_unique_pm(&mons[omndx]) ? "the "
+                         : just_an(anbuf, fig_pmname),
+                     fig_pmname);
+        }
+        break;
+    case ARMOR_CLASS:
+        if (typ >= GRAY_DRAGON_SCALES && typ <= YELLOW_DRAGON_SCALES) {
+            Sprintf(buf, "suit of %s", actualn);
+            break;
+        } else if (is_boots(obj) || is_gloves(obj)) {
+            Strcpy(buf, "pair of ");
+        } else if (is_shield(obj) && !dknown) {
+            if (obj->otyp >= ELVEN_SHIELD && obj->otyp <= ORCISH_SHIELD) {
+                Strcpy(buf, "shield");
+                break;
+            } else if (obj->otyp == SHIELD_OF_REFLECTION) {
+                Strcpy(buf, "polished silver shield");
+                break;
+            }
+        }
+        ConcUpdate(buf);
+
+        if (nn)
+            Concat(buf, 0, actualn);
+        else if (un)
+            xcalled(buf, BUFSZ - PREFIX, "armor", un);
+        else
+            Concat(buf, 0, dn);
+        break;
+    case FOOD_CLASS:
+        if (typ == SLIME_MOLD) {
+            struct fruit *f = fruit_from_indx(obj->spe);
+
+            if (!f) {
+                Strcpy(buf, "fruit");
+            } else if (!strcmpi(f->fname, "slime mold")) {
+                Strcpy(buf, "fruit");
+                pluralize = FALSE;
+            } else {
+                Strcpy(buf, f->fname);
+                if (pluralize) {
+                    Strcpy(buf, obufp = makesingular(buf));
+                    releaseobuf(obufp);
+                    Strcpy(buf, obufp = makeplural(buf));
+                    releaseobuf(obufp);
+                    pluralize = FALSE;
+                }
+            }
+            break;
+        }
+        if (iflags.partly_eaten_hack && obj->oeaten)
+            Concat(buf, 0, "partly eaten ");
+        if (obj->globby) {
+            ConcatF2(buf, 0, "%s %s", (obj->owt <= 100) ? "small"
+                                      : (obj->owt <= 300) ? "medium"
+                                        : (obj->owt <= 500) ? "large"
+                                          : "very large",
+                     actualn);
+            break;
+        }
+        Concat(buf, 0, actualn);
+        if (typ == TIN && known)
+            en_tin_details(obj, omndx, buf);
+        break;
+    case COIN_CLASS:
+    case CHAIN_CLASS:
+        Strcpy(buf, actualn);
+        break;
+    case ROCK_CLASS:
+        if (typ == STATUE && omndx != NON_PM) {
+            char anbuf[10];
+            const char *statue_pmname = en_obj_pmname(obj);
+
+            Snprintf(buf, bufspaceleft, "%s%s of %s%s",
+                     (Role_if(PM_ARCHEOLOGIST)
+                      && (obj->spe & CORPSTAT_HISTORIC) != 0) ? "historic "
+                       : "",
+                     actualn,
+                     type_is_pname(&mons[omndx]) ? ""
+                       : the_unique_pm(&mons[omndx]) ? "the "
+                         : just_an(anbuf, statue_pmname),
+                     statue_pmname);
+        } else if (typ == BOULDER && obj->next_boulder == 1) {
+            Strcat(strcpy(buf, "next "), actualn);
+            obj->next_boulder = 0;
+        } else {
+            Strcpy(buf, actualn);
+        }
+        break;
+    case BALL_CLASS:
+        Sprintf(buf, "%sheavy iron ball",
+                (obj->owt > ocl->oc_weight) ? "very " : "");
+        break;
+    case POTION_CLASS:
+        if (dknown && obj->odiluted)
+            Strcpy(buf, "diluted ");
+        if (nn || un || !dknown) {
+            Strcat(buf, "potion");
+            if (!dknown)
+                break;
+            if (nn) {
+                Strcat(buf, " of ");
+                if (typ == POT_WATER && bknown
+                    && (obj->blessed || obj->cursed)) {
+                    Strcat(buf, obj->blessed ? "holy " : "unholy ");
+                }
+                Strcat(buf, actualn);
+            } else {
+                xcalled(buf, BUFSZ - PREFIX, "", un);
+            }
+        } else {
+            Strcat(buf, dn);
+            Strcat(buf, " potion");
+        }
+        break;
+    case SCROLL_CLASS:
+        Strcpy(buf, "scroll");
+        if (!dknown)
+            break;
+        if (nn) {
+            Strcat(buf, " of ");
+            Strcat(buf, actualn);
+        } else if (un) {
+            xcalled(buf, BUFSZ - PREFIX, "", un);
+        } else if (ocl->oc_magic) {
+            Strcat(buf, " labeled ");
+            Strcat(buf, dn);
+        } else {
+            Strcpy(buf, dn);
+            Strcat(buf, " scroll");
+        }
+        break;
+    case WAND_CLASS:
+        if (!dknown)
+            Strcpy(buf, "wand");
+        else if (nn)
+            Sprintf(buf, "wand of %s", actualn);
+        else if (un)
+            xcalled(buf, BUFSZ - PREFIX, "wand", un);
+        else
+            Sprintf(buf, "%s wand", dn);
+        break;
+    case SPBOOK_CLASS:
+        if (typ == SPE_NOVEL) {
+            if (!dknown)
+                Strcpy(buf, "book");
+            else if (nn)
+                Strcpy(buf, actualn);
+            else if (un)
+                xcalled(buf, BUFSZ - PREFIX, "novel", un);
+            else
+                Sprintf(buf, "%s book", dn);
+            break;
+        } else if (!dknown) {
+            Strcpy(buf, "spellbook");
+        } else if (nn) {
+            if (typ != SPE_BOOK_OF_THE_DEAD)
+                Strcpy(buf, "spellbook of ");
+            Strcat(buf, actualn);
+        } else if (un) {
+            xcalled(buf, BUFSZ - PREFIX, "spellbook", un);
+        } else {
+            Sprintf(buf, "%s spellbook", dn);
+        }
+        break;
+    case RING_CLASS:
+        if (!dknown)
+            Strcpy(buf, "ring");
+        else if (nn)
+            Sprintf(buf, "ring of %s", actualn);
+        else if (un)
+            xcalled(buf, BUFSZ - PREFIX, "ring", un);
+        else
+            Sprintf(buf, "%s ring", dn);
+        break;
+    case GEM_CLASS: {
+        const char *rock = (ocl->oc_material == MINERAL) ? "stone" : "gem";
+
+        if (!dknown) {
+            Strcpy(buf, rock);
+        } else if (!nn) {
+            if (un)
+                xcalled(buf, BUFSZ - PREFIX, rock, un);
+            else
+                Sprintf(buf, "%s %s", dn, rock);
+        } else {
+            Strcpy(buf, actualn);
+            if (GemStone(typ))
+                Strcat(buf, " stone");
+        }
+        break;
+    }
+    default:
+        Sprintf(buf, "glorkum %d %d %d", obj->oclass, typ, obj->spe);
+        break;
+    }
+
+    buf_eos = eos(buf);
+    if (buf_eos > buf_end) {
+        paniclog("en_xname", (char *) memcpy(buf - 6, "buf[]=", 6));
+        panic("en_xname: buffer overflow before appending name.");
+    }
+    bufspaceleft = (size_t) (buf_end - buf_eos);
+
+    if (pluralize) {
+        obufp = makeplural(buf);
+        buf[0] = '\0';
+        ConcUpdate(buf);
+        Concat(buf, 0, obufp);
+        releaseobuf(obufp);
+    }
+
+    if (has_oname(obj) && dknown) {
+        append_name_parens = TRUE;
+        Concat(buf, 0, " named ");
+
+ nameit:
+        obufp = eos(buf);
+        Concat(buf, 0, ONAME(obj));
+        if (obj->oartifact && !strncmp(obufp, "The ", 4))
+            *obufp = lowc(*obufp);
+    }
+
+    if (!strncmpi(buf, "the ", 4))
+        buf += 4;
+    (void) append_name_parens;
+    return buf;
+}
+
+/* 死因・英語内部キー生成専用の英語 xname（画面表示には使用しない） */
+char *
+en_xname(struct obj *obj)
+{
+    return en_xname_flags(obj, CXN_NORMAL);
+}
+
+staticfn char *
+en_minimal_xname(struct obj *obj)
+{
+    char *bufp;
+    struct obj bareobj;
+    struct objclass saveobcls;
+    int otyp = obj->otyp;
+
+    saveobcls.oc_uname = objects[otyp].oc_uname;
+    objects[otyp].oc_uname = 0;
+    saveobcls.oc_name_known = objects[otyp].oc_name_known;
+    if (iflags.override_ID)
+        objects[otyp].oc_name_known = 1;
+    else if (!obj->dknown)
+        objects[otyp].oc_name_known = 0;
+
+    bareobj = cg.zeroobj;
+    bareobj.otyp = otyp;
+    bareobj.oclass = obj->oclass;
+    bareobj.dknown = (obj->dknown || iflags.override_ID) ? 1 : 0;
+    bareobj.known = (obj->oclass == AMULET_CLASS)
+                        ? obj->known
+                        : !objects[otyp].oc_uses_known;
+    bareobj.quan = 1L;
+    if (otyp != BOULDER)
+        bareobj.corpsenm = NON_PM;
+    if (obj->otyp == SLIME_MOLD)
+        bareobj.spe = obj->spe;
+
+    bufp = en_xname(&bareobj);
+    if (!strncmp(bufp, "uncursed ", 9))
+        bufp += 9;
+
+    objects[otyp].oc_uname = saveobcls.oc_uname;
+    objects[otyp].oc_name_known = saveobcls.oc_name_known;
+    return bufp;
+}
+
+staticfn char *
+en_simpleonames(struct obj *obj)
+{
+    char *obufp, *simpleoname = en_minimal_xname(obj);
+
+    if (obj->quan != 1L) {
+        Strcpy(simpleoname, obufp = makeplural(simpleoname));
+        releaseobuf(obufp);
+    }
+    return simpleoname;
+}
+
 /* treat an object as fully ID'd when it might be used as reason for death */
 char *
 killer_xname(struct obj *obj)
@@ -2138,7 +2520,7 @@ killer_xname(struct obj *obj)
 
     /* bypass object twiddling for artifacts */
     if (obj->oartifact)
-        return bare_artifactname(obj);
+        return en_bare_artifactname(obj);
 
     /* remember original settings for core of the object;
        oextra structs other than oname don't matter here--since they
@@ -2170,18 +2552,17 @@ killer_xname(struct obj *obj)
     save_ocuname = objects[obj->otyp].oc_uname;
     objects[obj->otyp].oc_uname = 0; /* avoid "foo called bar" */
 
-    /* format the object */
+    /* format the object in English internal killer key form */
     if (obj->otyp == CORPSE) {
-        buf = jp_corpse_xname(obj, (const char *) 0, CXN_NORMAL);
+        buf = corpse_xname(obj, (const char *) 0, CXN_NORMAL);
     } else if (obj->otyp == SLIME_MOLD) {
         /* concession to "most unique deaths competition" in the annual
            devnull tournament, suppress player supplied fruit names because
            those can be used to fake other objects and dungeon features */
         buf = nextobuf();
-        /* NetHackJP: Remove plur(obj->quan) to avoid trailing 's' in Japanese */
-        Sprintf(buf, "危険なスライムモールド");
+        Sprintf(buf, "killer slime mold");
     } else {
-        buf = xname(obj);
+        buf = en_xname(obj);
     }
     /* apply an article if appropriate; caller should always use KILLED_BY */
     if (obj->quan == 1L && !strstri(buf, "'s ") && !strstri(buf, "s' "))
@@ -2706,6 +3087,28 @@ ansimpleoname(struct obj *obj)
     return simpleoname;
 }
 
+/* 死因・英語内部キー生成専用の英語 ansimpleoname（画面表示には使用しない） */
+char *
+en_ansimpleoname(struct obj *obj)
+{
+    char *obufp, *simpleoname = en_simpleonames(obj);
+    int otyp = obj->otyp;
+
+    if (otyp == FAKE_AMULET_OF_YENDOR)
+        otyp = AMULET_OF_YENDOR;
+    if (objects[otyp].oc_unique && OBJ_NAME(objects[otyp])
+        && !strcmp(simpleoname, OBJ_NAME(objects[otyp]))) {
+        obufp = the(simpleoname);
+        Strcpy(simpleoname, obufp);
+        releaseobuf(obufp);
+    } else if (obj->quan == 1L) {
+        obufp = an(simpleoname);
+        Strcpy(simpleoname, obufp);
+        releaseobuf(obufp);
+    }
+    return simpleoname;
+}
+
 /* "the scroll" or "the scrolls" */
 char *
 thesimpleoname(struct obj *obj)
@@ -2751,6 +3154,23 @@ bare_artifactname(struct obj *obj)
         }
     } else {
         outbuf = xname(obj);
+    }
+    return outbuf;
+}
+
+/* 死因・英語内部キー生成専用の英語アーティファクト名（画面表示には使用しない） */
+char *
+en_bare_artifactname(struct obj *obj)
+{
+    char *outbuf;
+
+    if (obj->oartifact) {
+        outbuf = nextobuf();
+        Strcpy(outbuf, artiname(obj->oartifact));
+        if (!strncmp(outbuf, "The ", 4))
+            outbuf[0] = lowc(outbuf[0]);
+    } else {
+        outbuf = en_xname(obj);
     }
     return outbuf;
 }

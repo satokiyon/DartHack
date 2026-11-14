@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-04. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-14. */
 /* $NHDT-Header: NetHack 5.0 ball.c 2026/06/20_22:26:43 NetHack-5.0:1.80 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) David Cohrs, 2006. */
@@ -62,7 +62,7 @@ ballfall(void)
             } else if (flags.verbose)
                     pline("%sでは身を守れなかった.", xname(uarmh));
         }
-        losehp(Maybe_Half_Phys(dmg), "鉄球に頭を打ち砕かれた",
+        losehp(Maybe_Half_Phys(dmg), "crunched in the head by an iron ball",
                NO_KILLER_PREFIX);
     }
 }
@@ -922,7 +922,7 @@ drop_ball(coordxy x, coordxy y)
                          (side == LEFT_SIDE) ? "左" : "右",
                          jp_body_part(LEG));
                     losehp(Maybe_Half_Phys(2),
-                           "クマ罠から引きずり出されて脚を負傷した",
+                           "leg damage from being pulled out of a bear trap",
                            KILLED_BY);
                 }
                 break;
@@ -1014,22 +1014,22 @@ drag_down(void)
         if (rn2(6)) {
             pline_The("鉄球に引きずられて階下へ落ちた!");
             losehp(Maybe_Half_Phys(rnd(6)),
-                   "鉄球に引きずられて階下へ落ちた", NO_KILLER_PREFIX);
+                   "dragged downstairs by an iron ball", NO_KILLER_PREFIX);
             litter();
         }
     } else {
         if (rn2(2)) {
             Soundeffect(se_iron_ball_hits_you, 25);
             pline_The("鉄球があなたに激突した!");
-            losehp(Maybe_Half_Phys(rnd(20)), "鉄球との衝突",
+            losehp(Maybe_Half_Phys(rnd(20)), "iron ball collision",
                    KILLED_BY_AN);
             exercise(A_STR, FALSE);
             dragchance -= 2;
         }
         if ((int) dragchance >= rnd(6)) {
-            pline_The("鉄球に引きずられて階下へ落ちた!");
+            pline_The("鉄球があなたを階下へ引きずり落とした!");
             losehp(Maybe_Half_Phys(rnd(3)),
-                   "鉄球に引きずられて階下へ落ちた", NO_KILLER_PREFIX);
+                   "dragged downstairs by an iron ball", NO_KILLER_PREFIX);
             exercise(A_STR, FALSE);
             litter();
         }

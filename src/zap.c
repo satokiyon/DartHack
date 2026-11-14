@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-09. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-14. */
 /* $NHDT-Header: NetHack 5.0 zap.c 2026/06/20_16:31:15 NetHack-5.0:1.601 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2013. */
@@ -83,6 +83,23 @@ static const char *const flash_types[] = {
     "火炎の息", "氷結の息", "睡眠ガスの息",
     "分解の息", "電撃の息",
     "毒ガスの息", "酸の息", "", ""
+};
+
+/* 死因表示の内部キー用（英語正規化） */
+static const char *const en_flash_types[] = {
+    "magic missile", /* Wands must be 0-9 */
+    "bolt of fire", "bolt of cold", "sleep ray", "death ray",
+    "bolt of lightning", "", "", "", "",
+
+    "magic missile", /* Spell equivalents must be 10-19 */
+    "fireball", "cone of cold", "sleep ray", "finger of death",
+    "bolt of lightning", /* there is no spell, used for retribution */
+    "", "", "", "",
+
+    "blast of missiles", /* Dragon breath equivalents 20-29*/
+    "blast of fire", "blast of frost", "blast of sleep gas",
+    "blast of disintegration", "blast of lightning",
+    "blast of poison gas", "blast of acid", "", ""
 };
 
 /* convert monster zap/spell/breath value to hero zap/spell/breath value */
@@ -2669,7 +2686,7 @@ dozap(void)
         if ((damage = zapyourself(obj, TRUE)) != 0) {
             char buf[BUFSZ];
 
-            Sprintf(buf, "%sで自分を撃った",
+            Sprintf(buf, "zapped %sself with %s", uhim(),
                     killer_xname(obj));
             losehp(Maybe_Half_Phys(damage), buf, NO_KILLER_PREFIX);
         }
@@ -3057,11 +3074,11 @@ lightdamage(
            of death will always be "killed while stuck in creature form"] */
         if (obj->oclass == SCROLL_CLASS || obj->oclass == SPBOOK_CLASS)
             ordinary = FALSE; /* say blasted rather than zapped */
-        how = (obj->oclass == SPBOOK_CLASS) ? "光の呪文"
-              : (!obj->oartifact) ? ansimpleoname(obj)
-                : bare_artifactname(obj);
-        Sprintf(buf, "%sで自分を%s", how,
-                ordinary ? "撃った" : "吹き飛ばした");
+        how = (obj->oclass == SPBOOK_CLASS) ? "spell of light"
+              : (!obj->oartifact) ? en_ansimpleoname(obj)
+                : en_bare_artifactname(obj);
+        Sprintf(buf, "%s %sself with %s",
+                ordinary ? "zapped" : "blasted", uhim(), how);
         /* might rehumanize(); could be fatal, but only for Unchanging */
         losehp(Maybe_Half_Phys(dmg), buf, NO_KILLER_PREFIX);
     }
@@ -4540,7 +4557,7 @@ zhitu(
             (void) destroy_items(&gy.youmonst, AD_ELEC, orig_dam);
         break;
     case ZT_POISON_GAS:
-        poisoned("爆風", A_DEX, "毒の爆風", 15, FALSE);
+        poisoned("blast", A_DEX, "poisoned blast", 15, FALSE);
         break;
     case ZT_ACID:
         if (Acid_resistance) {
@@ -4580,11 +4597,11 @@ zhitu(
         struct obj *otmp = gc.current_wand;
         /* fire horn and frost horn get handled as wands by caller */
         const char *verb = (abstyp < 10) /* wand */
-                           ? ((otmp && otmp->oclass == TOOL_CLASS) ? "奏でた"
-                              : "振った")
-                           : (abstyp < 20) ? "唱えた"
-                             : (abstyp < 30) ? "吐いた"
-                               : "想像した"; /* should never happen */
+                           ? ((otmp && otmp->oclass == TOOL_CLASS) ? "played"
+                              : "zapped")
+                           : (abstyp < 20) ? "cast"
+                             : (abstyp < 30) ? "exhaled"
+                               : "imagined"; /* should never happen */
 
         if (type < 0 || (type == 0 && gb.buzzer != 0)) {
             /* if gb.buzzer is Null, kbuf[] will end up with just <fltxt> */
@@ -4596,7 +4613,7 @@ zhitu(
             /* FIXME: "zapped by herself" is suitable for a rebound;
                "zapped at herself" would be better if player explicitly
                targeted hero */
-            Sprintf(kbuf, "自分自身で%s%s", verb, fltxt);
+            Sprintf(kbuf, "%s %s by %sself", fltxt, verb, uhim());
         }
         /* Half_spell_damage protection yields half-damage for wands & spells,
            including hero's own ricochets; breath attacks do full damage */
@@ -6468,7 +6485,7 @@ flash_str(
            not worth it at this time */
         Sprintf(fltxt, "%sの爆風", rnd_hallublast());
     } else {
-        Strcpy(fltxt, flash_types[typ]);
+        Strcpy(fltxt, nohallu ? en_flash_types[typ] : flash_types[typ]);
     }
     return fltxt;
 }

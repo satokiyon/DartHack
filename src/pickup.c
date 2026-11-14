@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-09. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-14. */
 /* $NHDT-Header: NetHack 5.0 pickup.c 2026/06/27_15:18:44 NetHack-5.0:1.405 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
@@ -2199,7 +2199,7 @@ do_loot_cont(
         You("慎重に%sを開けた...", xname(cobj));
         pline("それは巨大な歯を生やしてあなたを噛んだ!");
         tmp = rnd(10);
-        losehp(Maybe_Half_Phys(tmp), "肉食の袋", KILLED_BY_AN);
+        losehp(Maybe_Half_Phys(tmp), "carnivorous bag", KILLED_BY_AN);
         makeknown(BAG_OF_TRICKS);
         ga.abort_looting = TRUE;
         return ECMD_TIME;
@@ -2734,7 +2734,7 @@ in_container(struct obj *obj)
         else
             panic("in_container:  bag not found.");
 
-        losehp(d(6, 6), "魔法の爆発", KILLED_BY_AN);
+        losehp(d(6, 6), "magical explosion", KILLED_BY_AN);
         gc.current_container = 0; /* baggone = TRUE; */
     }
 
@@ -3051,7 +3051,7 @@ use_container(
         /* even if the trap fails, you've used up this turn */
         if (gm.multi >= 0) { /* in case we didn't become paralyzed */
             nomul(-1);
-            gm.multi_reason = "容器を開けている途中";
+            gm.multi_reason = "opening a container";
             gn.nomovemsg = "";
         }
         ga.abort_looting = TRUE;
@@ -4086,7 +4086,7 @@ tipcontainer_checks(
         /* even if the trap fails, you've used up this turn */
         if (gm.multi >= 0) { /* in case we didn't become paralyzed */
             nomul(-1);
-            gm.multi_reason = "容器を傾けている途中";
+            gm.multi_reason = "tipping a container";
             gn.nomovemsg = "";
         }
         return TIPCHECK_TRAPPED;
