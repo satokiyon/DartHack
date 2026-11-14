@@ -33,6 +33,13 @@ void main() {
       // 下階段へ・上階段へコマンドが含まれていること
       expect(items.contains('_>.'), isTrue);
       expect(items.contains('_<.'), isTrue);
+      // 閉める (c) が「拭く (M-w)」と「下階段へ (_>.)」の間に含まれていること
+      final wipeIdx = items.indexOf('M-w');
+      final closeIdx = items.indexOf('c');
+      final downStairIdx = items.indexOf('_>.');
+      expect(wipeIdx, greaterThanOrEqualTo(0));
+      expect(closeIdx, wipeIdx + 1);
+      expect(downStairIdx, closeIdx + 1);
       // ユーザー指示で追加されたコマンド
       expect(items.contains('t'), isTrue);
       expect(items.contains('f'), isTrue);
@@ -67,6 +74,36 @@ void main() {
         '#therecmdmenu', '#herecmdmenu', '#chat',
         'e', '^a', r'\e',
       ]);
+    });
+
+    test('標準パネルへの c(閉める) 自動マイグレーションが旧デフォルト一致時のみ1回限り動作すること', () async {
+      const legacyDefault =
+          r'[Kbd] # 20s . : ; d q t f x a E ^p ^t D p M-p M-o M-w _>. _<.';
+      final expectedNew = NetHackCmdPanel.defaultPanels[0]['cmds']!;
+
+      // 1. 旧デフォルト値が保存されている場合は新デフォルトへ更新される
+      await AppPrefs.setMockInitialValues({
+        'panel_count': 4,
+        'pCmdString_0': legacyDefault,
+      });
+      var prefs = await AppPrefs.getInstance();
+      await NetHackCmdPanel.migrateDefaultPanelsIfNeeded(prefs);
+      expect(prefs.getString('pCmdString_0'), expectedNew);
+
+      // 2. マイグレーション完了後にユーザーが c を削除して旧デフォルトと同じ文字列に戻しても再復活しない
+      await prefs.setString('pCmdString_0', legacyDefault);
+      await NetHackCmdPanel.migrateDefaultPanelsIfNeeded(prefs);
+      expect(prefs.getString('pCmdString_0'), legacyDefault);
+
+      // 3. 既にカスタマイズ済みの場合は変更されない
+      const customCmds = r'[Kbd] # 20s . i';
+      await AppPrefs.setMockInitialValues({
+        'panel_count': 4,
+        'pCmdString_0': customCmds,
+      });
+      prefs = await AppPrefs.getInstance();
+      await NetHackCmdPanel.migrateDefaultPanelsIfNeeded(prefs);
+      expect(prefs.getString('pCmdString_0'), customCmds);
     });
 
     test('CmdItem.getEffectiveLabel の日本語ラベル辞書引き検証', () {

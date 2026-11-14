@@ -374,6 +374,7 @@ class _SettingsPageState extends State<SettingsPage> {
     await defaultsHelper.syncFromFileToPrefs(widget.defaultsFilePath);
 
     final prefs = await AppPrefs.getInstance();
+    await NetHackCmdPanel.migrateDefaultPanelsIfNeeded(prefs);
     setState(() {
       _useTiles = prefs.getBool('use_tiles') ?? true;
       _selectedLanguage = prefs.getString('selected_language') ?? 'ja';

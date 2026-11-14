@@ -131,11 +131,15 @@ class NetHackCmdPanel extends StatefulWidget {
 
   static const int maxPanelCount = 7;
 
+  static const String _legacyDefaultPanel0Cmds =
+      r'[Kbd] # 20s . : ; d q t f x a E ^p ^t D p M-p M-o M-w _>. _<.';
+  static const String _closeMigrationKey = '__cmd_panel_close_migrated_v1__';
+
   static const List<Map<String, String>> defaultPanels = [
     {
       'nameJp': '標準',
       'nameEn': 'Default',
-      'cmds': r'[Kbd] # 20s . : ; d q t f x a E ^p ^t D p M-p M-o M-w _>. _<.',
+      'cmds': r'[Kbd] # 20s . : ; d q t f x a E ^p ^t D p M-p M-o M-w c _>. _<.',
     },
     {
       'nameJp': '戦闘',
@@ -153,6 +157,19 @@ class NetHackCmdPanel extends StatefulWidget {
       'cmds': r'? & / ; : ^x + \\ v M-e M-C ^p ^o M-A #terrain O M-V M-g',
     },
   ];
+
+  /// 旧標準パネルのデフォルト値がそのまま保存されている既存ユーザーに対してのみ、
+  /// 「c（閉める）」を追加した新デフォルト値へ1回限り自動更新する。
+  static Future<void> migrateDefaultPanelsIfNeeded(AppPrefs prefs) async {
+    if (prefs.getBool(_closeMigrationKey) ?? false) {
+      return;
+    }
+    final savedCmds = prefs.getString('pCmdString_0');
+    if (savedCmds == _legacyDefaultPanel0Cmds) {
+      await prefs.setString('pCmdString_0', defaultPanels[0]['cmds']!);
+    }
+    await prefs.setBool(_closeMigrationKey, true);
+  }
 
   static const Map<String, Map<String, String>> commandLabelDictionary = {
     'i': {'ja': '持ち物', 'en': 'Inv'},
@@ -465,6 +482,7 @@ class _NetHackCmdPanelState extends State<NetHackCmdPanel> {
 
   Future<void> _loadPanels() async {
     final prefs = await AppPrefs.getInstance();
+    await NetHackCmdPanel.migrateDefaultPanelsIfNeeded(prefs);
     _buttonDisplayMode = prefs.getString('button_display_mode') ?? 'label';
     final bool hasSavedPanels = prefs.containsKey('panel_count');
     final int count = prefs.getInt('panel_count') ?? NetHackCmdPanel.defaultPanels.length;
