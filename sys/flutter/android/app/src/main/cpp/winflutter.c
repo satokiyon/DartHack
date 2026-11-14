@@ -479,7 +479,7 @@ typedef void (*DartDestroyWindowCallback)(int winId);
 typedef void (*DartCursCallback)(int winId, int x, int y);
 typedef void (*DartPutStrCallback)(int winId, int attr, const char* str);
 typedef void (*DartPrintGlyphCallback)(int winId, int x, int y, int tile, int ch, int color, int special, int bktile);
-typedef void (*DartNotifyInputCallback)(int requestId);
+typedef void (*DartNotifyInputCallback)(int requestId, int inputState);
 typedef void (*DartStartMenuCallback)(int winId);
 typedef void (*DartAddMenuCallback)(int winId, intptr_t ident, int accelerator, int groupacc, int attr, const char* str, int preselected, int color, int tile);
 typedef void (*DartEndMenuCallback)(int winId, const char* prompt);
@@ -1931,7 +1931,7 @@ static int flutter_nhgetch(void) {
     g_key_available = 0;
 
     if (g_dart_notify_input_cb) {
-        g_dart_notify_input_cb(g_input_request_id);
+        g_dart_notify_input_cb(g_input_request_id, (int)program_state.input_state);
     }
 
     while (!g_key_available) {
@@ -2070,7 +2070,9 @@ static int flutter_nh_poskey(coordxy* x, coordxy* y, int* event) {
         g_poscmd_count--;
         *x = (coordxy) cmd.x;
         *y = (coordxy) cmd.y;
-        if (cmd.mod == FLUTTER_POSCMD_SMART_ADJACENT) {
+        if (program_state.input_state == getposInp) {
+            *event = FLUTTER_POSCMD_MENU;
+        } else if (cmd.mod == FLUTTER_POSCMD_SMART_ADJACENT) {
             *event = resolve_smart_adjacent_mod(*x, *y);
         } else {
             *event = cmd.mod;
@@ -2086,7 +2088,9 @@ static int flutter_nh_poskey(coordxy* x, coordxy* y, int* event) {
         g_pending_poscmd = 0;
         *x = (coordxy) g_pending_poscmd_x;
         *y = (coordxy) g_pending_poscmd_y;
-        if (g_pending_poscmd_mod == FLUTTER_POSCMD_SMART_ADJACENT) {
+        if (program_state.input_state == getposInp) {
+            *event = FLUTTER_POSCMD_MENU;
+        } else if (g_pending_poscmd_mod == FLUTTER_POSCMD_SMART_ADJACENT) {
             *event = resolve_smart_adjacent_mod(*x, *y);
         } else {
             *event = g_pending_poscmd_mod;
@@ -2100,7 +2104,9 @@ static int flutter_nh_poskey(coordxy* x, coordxy* y, int* event) {
         g_pending_poscmd = 0;
         *x = (coordxy) g_pending_poscmd_x;
         *y = (coordxy) g_pending_poscmd_y;
-        if (g_pending_poscmd_mod == FLUTTER_POSCMD_SMART_ADJACENT) {
+        if (program_state.input_state == getposInp) {
+            *event = FLUTTER_POSCMD_MENU;
+        } else if (g_pending_poscmd_mod == FLUTTER_POSCMD_SMART_ADJACENT) {
             *event = resolve_smart_adjacent_mod(*x, *y);
         } else {
             *event = g_pending_poscmd_mod;
@@ -2364,7 +2370,7 @@ static int flutter_select_menu(winid wid, int how, menu_item **selected) {
     // カウンタを上げてキー入力可能にする
     g_input_request_id++;
     if (g_dart_notify_input_cb) {
-        g_dart_notify_input_cb(g_input_request_id);
+        g_dart_notify_input_cb(g_input_request_id, (int)program_state.input_state);
     }
 
     // ユーザーが選択を完了するかキャンセルするまで待機

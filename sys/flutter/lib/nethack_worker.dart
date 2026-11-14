@@ -426,12 +426,13 @@ class NetHackWorker {
       });
     });
 
-    inputCallable = NativeCallable<NotifyInputCallback>.listener((int requestId) {
+    inputCallable = NativeCallable<NotifyInputCallback>.listener((int requestId, int inputState) {
       final gameover = (session?.ffi?.getIsGameOver() ?? 0) != 0;
-      wlog("inputCallable: requestId=$requestId, gameover=$gameover");
+      wlog("inputCallable: requestId=$requestId, inputState=$inputState, gameover=$gameover");
       uiSendPort.send({
         'type': 'request_input',
         'gameover': gameover,
+        'input_state': inputState,
       });
     });
 

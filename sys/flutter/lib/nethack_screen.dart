@@ -198,6 +198,7 @@ class NetHackScreen extends ChangeNotifier {
       _clearMapGrid();
     } else if (type == nhwMessage) {
       _messages.clear();
+      _topline = null;
     } else if (type == nhwStatus) {
       for (int i = 0; i < _statusLines.length; i++) {
         _statusLines[i] = "";

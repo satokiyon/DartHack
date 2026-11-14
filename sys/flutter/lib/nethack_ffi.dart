@@ -11,7 +11,7 @@ typedef DestroyWindowCallback = Void Function(Int32 winId);
 typedef CursCallback = Void Function(Int32 winId, Int32 x, Int32 y);
 typedef PutStrCallback = Void Function(Int32 winId, Int32 attr, Pointer<Utf8> msg);
 typedef PrintGlyphCallback = Void Function(Int32 winId, Int32 x, Int32 y, Int32 tile, Int32 ch, Int32 color, Int32 special, Int32 bktile);
-typedef NotifyInputCallback = Void Function(Int32 requestId);
+typedef NotifyInputCallback = Void Function(Int32 requestId, Int32 inputState);
 
 // メニュー関連コールバック
 typedef StartMenuCallback = Void Function(Int32 winId);

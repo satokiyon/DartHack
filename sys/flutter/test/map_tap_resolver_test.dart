@@ -73,6 +73,24 @@ void main() {
       );
       expect(resAdj.mod, MapTapResolver.modMenu);
       expect(resAdj.targetType, MapTapTargetType.adjacent);
+
+      // disabled / after_scroll(未スクロール) でもターゲット選択中は modMenu を返す
+      for (final mode in ['disabled', 'after_scroll', 'menu']) {
+        final resMode = MapTapResolver.resolve(
+          tileX: px + 5,
+          tileY: py,
+          playerX: px,
+          playerY: py,
+          travelMode: mode,
+          isMapScrolledOrZoomed: false,
+          isTargetingMode: true,
+        );
+        expect(
+          resMode.mod,
+          MapTapResolver.modMenu,
+          reason: 'Targeting mode should force modMenu even when travelMode=$mode',
+        );
+      }
     });
 
     test('always mode: self is menu(1), adjacent is smart(3), far is action(2)', () {

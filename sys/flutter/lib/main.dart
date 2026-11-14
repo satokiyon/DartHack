@@ -320,6 +320,7 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
   bool _isDirectionPromptActive = false;
   String _mapTapTravelMode = 'always';
   bool _isMapScrolledOrZoomed = false;
+  int _currentInputState = 0; // Cコア program_state.input_state (0: otherInp, 1: commandInp, 2: getposInp, 3: getdirInp)
 
   @override
   void initState() {
@@ -2704,6 +2705,7 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
       _isGameRunning = true;
       _isGameFinished = false;
       _waitingForInput = false;
+      _currentInputState = 0;
       _isMainGameStarted = false;
       _mapWinId = null;
       _messageWinId = null;
@@ -2886,8 +2888,10 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
           _cameraFocusY = focusY;
           _triggerCameraUpdate();
         } else if (type == 'request_input') {
+          final inputState = (message['input_state'] as int?) ?? 0;
           setState(() {
             _waitingForInput = true;
+            _currentInputState = inputState;
           });
 
           final isGameOver = message['gameover'] as bool? ?? false;
@@ -2901,6 +2905,7 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
           _ensureGameFocus();
           _triggerCameraUpdate();
         } else if (type == 'yn_function') {
+          _currentInputState = 0;
           final question = (message['question'] as String?) ?? '';
           final choices = (message['choices'] as String?) ?? '';
           final def = (message['def'] as int?) ?? 0;
@@ -2945,6 +2950,7 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
             _extCmdList = [];
           }
           setState(() {
+            _currentInputState = 0;
             _getlinePrompt = prompt;
             _isGetLineVisible = true;
             _mapButtonFocus = MapButtonFocus.none;
@@ -2956,6 +2962,7 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
           final defaultName = saves.isNotEmpty ? saves[0] : "Player";
           _addLog("UI Isolate: askname event received, setting _isAskNameVisible = true (defaultName=$defaultName)");
           setState(() {
+            _currentInputState = 0;
             _askNameSaves = saves;
             _askNameMaxChars = message['maxChars'];
             _isAskNameVisible = true;
@@ -2989,6 +2996,7 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
           final exitMessage = (message['message'] as String?) ?? '';
           setState(() {
             _waitingForInput = false;
+            _currentInputState = 0;
             _isGameRunning = false;
             _isGameFinished = true;
           });
@@ -3011,6 +3019,7 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
           _screen.selectMenu(message['winId'], message['how']);
           setState(() {
             _waitingForInput = true;
+            _currentInputState = 0;
             _extCmdMenuFilter = "";
             _extCmdMenuFilterController.clear();
             _menuSelectedCounts = <int, int>{};
@@ -3724,15 +3733,9 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
     final tile = _mapLocalToTile(details.localPosition);
     if (tile == null) return;
 
-    // farlookモード (/) や ; コマンド、ターゲット選択（getpos等）入力待ち中の判定
-    // toplineプロンプト、またはメッセージ末尾が?で終わる場合はターゲット選択中とみなす
-    final bool isGetposOrTargetingMode = _screen.topline != null ||
-        (_screen.messages.isNotEmpty && _screen.messages.last.trim().endsWith("?"));
-
-    if (isGetposOrTargetingMode) {
-      sendPosCmd(tile.tileX, tile.tileY, 1 /* CLICK_1 */);
-      return;
-    }
+    // farlookモード (/) や ; / #travel コマンド等のターゲット選択（getposInp）入力待ち中の判定。
+    // 文字列推測による誤爆を防ぐため、Cコアの program_state.input_state を直接参照する。
+    final bool isGetposOrTargetingMode = _currentInputState == 2 /* getposInp */;
 
     final resolution = MapTapResolver.resolve(
       tileX: tile.tileX,
@@ -3775,8 +3778,7 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
     final tile = _mapLocalToTile(details.localPosition);
     if (tile == null) return;
 
-    final bool isGetposOrTargetingMode = _screen.topline != null ||
-        (_screen.messages.isNotEmpty && _screen.messages.last.trim().endsWith("?"));
+    final bool isGetposOrTargetingMode = _currentInputState == 2 /* getposInp */;
 
     if (isGetposOrTargetingMode) {
       sendPosCmd(tile.tileX, tile.tileY, 1 /* CLICK_1 */);
