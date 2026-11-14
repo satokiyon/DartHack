@@ -1471,5 +1471,104 @@ void main() {
       expect(find.textContaining('gnome lord'), findsNothing);
       expect(find.textContaining('frozen by a trap'), findsNothing);
     });
+
+    test('XLogEntry.translateAchievement が英語到達ランク名を日英正しく翻訳すること', () {
+      expect(
+        XLogEntry.translateAchievement('attained_the_rank_of_aborigine', true),
+        '到達ランク: 原住民',
+      );
+      expect(
+        XLogEntry.translateAchievement('attained_the_rank_of_aborigine', false),
+        'Attained rank: Aborigine',
+      );
+      expect(
+        XLogEntry.translateAchievement('attained_the_rank_of_student_of_stones', true),
+        '到達ランク: 土の使い手',
+      );
+      expect(
+        XLogEntry.translateAchievement('attained_the_rank_of_medicus_ossium', true),
+        '到達ランク: 整骨医',
+      );
+      expect(
+        XLogEntry.translateAchievement('attained_the_rank_of_medica_ossium', false),
+        'Attained rank: Medica ossium',
+      );
+      expect(
+        XLogEntry.translateAchievement('attained_the_rank_of_woman-at-arms', true),
+        '到達ランク: 武装乙女',
+      );
+      expect(
+        XLogEntry.translateAchievement('attained_the_rank_of_woman-at-arms', false),
+        'Attained rank: Woman-at-arms',
+      );
+      expect(
+        XLogEntry.translateAchievement('attained_the_rank_of_high_priestess', true),
+        '到達ランク: 大僧上',
+      );
+      expect(
+        XLogEntry.translateAchievement('attained_the_rank_of_high_priestess', false),
+        'Attained rank: High Priestess',
+      );
+      expect(
+        XLogEntry.translateAchievement('attained_the_rank_of_kunoichi', true),
+        '到達ランク: くノ一',
+      );
+      expect(
+        XLogEntry.translateAchievement('attained_the_rank_of_caveman', true),
+        '到達ランク: 原始人',
+      );
+      expect(
+        XLogEntry.translateAchievement('attained_the_rank_of_cavewoman', true),
+        '到達ランク: 女の原始人',
+      );
+      // 既存の日本語文字列や未知ランクはそのままフォールバックする
+      expect(
+        XLogEntry.translateAchievement('attained_the_rank_of_見習い魔術師', true),
+        '到達ランク: 見習い魔術師',
+      );
+    });
+
+    testWidgets('ScoreDetailDialog で英語到達ランクキーが日本語ランク名として表示されること', (tester) async {
+      final xlog = XLogEntry.parseLine(
+        _buildXLogLine(
+          points: 777,
+          name: 'Urok',
+          role: 'Cav',
+          race: 'Hum',
+          gender: 'Mal',
+          align: 'Neu',
+          deathdnum: 0,
+          deathlev: 4,
+          maxlvl: 5,
+          hp: 0,
+          maxhp: 32,
+          death: 'killed by a jackal',
+          achieveX: 'attained_the_rank_of_aborigine,entered_the_gnomish_mines',
+        ),
+      )!;
+      final entry = TopTenEntry(
+        rank: 2,
+        score: '777',
+        nameAndProfile: 'Urok 洞窟人/人間/男性/中立',
+        details: const ['ジャッカルに倒された', 'HP/最大HP: -/32'],
+        isCurrent: true,
+        xlog: xlog,
+      );
+
+      await tester.pumpWidget(
+        MaterialApp(
+          locale: const Locale('ja'),
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
+          home: Scaffold(
+            body: ScoreDetailDialog(entry: entry, isJp: true),
+          ),
+        ),
+      );
+
+      expect(find.text('到達ランク: 原住民'), findsOneWidget);
+      expect(find.textContaining('aborigine'), findsNothing);
+      expect(find.textContaining('Aborigine'), findsNothing);
+    });
   });
 }

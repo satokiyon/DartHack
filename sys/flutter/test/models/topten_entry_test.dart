@@ -775,5 +775,65 @@ void main() {
       expect(translateMultiReasonText('gazing into a Magic 8-Ball (tm)', isJp: true), 'マジック8ボールをのぞき込んでいた');
       expect(translateMultiReasonText('gazing into a crystal ball', isJp: true), '水晶玉をのぞき込んでいた');
     });
+
+    test('Magic 8-Ball (tm) および追加死因パターンの日本語化テスト', () {
+      // (tm) を場所括弧と誤認して分割しないこと
+      expect(
+        translateDeathReason('gazing into a Magic 8-Ball (tm)', isJp: true),
+        'マジック8ボールをのぞき込んで倒された',
+      );
+      expect(
+        translateDeathReason('killed by gazing into a Magic 8-Ball (tm)', isJp: true),
+        'マジック8ボールをのぞき込んで倒された',
+      );
+      expect(
+        translateDeathReason('gazing into a Magic 8-Ball (tm) (Doom 1)', isJp: true),
+        'マジック8ボールをのぞき込んで倒された (Doom 1)',
+      );
+
+      // 燃焼・圧死・溺死・無謀な食事・むち・試食・中断
+      expect(translateDeathReason('burned by molten lava', isJp: true), '溶岩で焼死した');
+      expect(translateDeathReason('burned by a fire', isJp: true), '火で焼死した');
+      expect(translateDeathReason('crushed to death by a boulder', isJp: true), '大岩に押しつぶされた');
+      expect(
+        translateDeathReason('drowned in a pool of water by a giant eel', isJp: true),
+        '水たまりで巨大ウナギに溺れさせられた',
+      );
+      expect(
+        translateDeathReason('drowned in a moat by an electric eel', isJp: true),
+        'お堀で電気ウナギに溺れさせられた',
+      );
+      expect(
+        translateDeathReason('unwisely tried to eat a cockatrice egg', isJp: true),
+        '無謀にもコカトリスの卵を食べようとした',
+      );
+      expect(translateDeathReason('whipping himself', isJp: true), 'むちで自分を打って死んだ');
+      expect(translateDeathReason('killed by whipping herself', isJp: true), 'むちで自分を打って死んだ');
+      expect(translateDeathReason('killed by tasting cockatrice meat', isJp: true), 'コカトリスの肉の試食');
+      expect(translateDeathReason('tasting cockatrice meat', isJp: true), 'コカトリスの肉の試食');
+      expect(translateDeathReason('quit while paralyzed', isJp: true), '中断した（麻痺していた）');
+
+      // 騎乗・缶詰・ひったくり・つまずき・while wielding
+      expect(translateDeathReason('killed by riding a cockatrice', isJp: true), 'コカトリスに騎乗中に石化した');
+      expect(translateDeathReason('killed by falling off a pony', isJp: true), 'ポニーから落馬したことで石化した');
+      expect(translateDeathReason('killed by trying to saddle a pony', isJp: true), 'ポニーに鞍を付けようとして石化した');
+      expect(translateDeathReason('killed by trying to mount a white unicorn', isJp: true), '一角獣（白）に乗ろうとして石化した');
+      expect(
+        translateDeathReason('killed by trying to tin a cockatrice corpse without gloves', isJp: true),
+        '手袋なしでコカトリスを缶詰にしようとして石化した',
+      );
+      expect(
+        translateDeathReason('killed by snatching a cockatrice corpse', isJp: true),
+        'コカトリスの死体をひったくろうとして石化した',
+      );
+      expect(
+        translateDeathReason('petrified by tripping over a cockatrice corpse', isJp: true),
+        'コカトリスの死体につまずいたことで石化した',
+      );
+      expect(
+        translateDeathReason('petrified by a cockatrice while wielding Magicbane', isJp: true),
+        'コカトリスによる石化（マジックベインを装備中）',
+      );
+    });
   });
 }

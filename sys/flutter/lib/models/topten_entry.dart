@@ -2246,9 +2246,19 @@ String _translateDeathText(String death, bool isJp) {
   }
 
   int cutIdx = -1;
-  final parenIdx = mainDeath.lastIndexOf(' (');
+  int parenSearchEnd = mainDeath.length;
+  while (parenSearchEnd > 0) {
+    final idx = mainDeath.lastIndexOf(' (', parenSearchEnd - 1);
+    if (idx == -1) break;
+    // "Magic 8-Ball (tm)" の "(tm)" は場所表記ではないため分割しない
+    if (mainDeath.substring(idx).toLowerCase().startsWith(' (tm)')) {
+      parenSearchEnd = idx;
+      continue;
+    }
+    cutIdx = idx;
+    break;
+  }
   final jpParenIdx = mainDeath.lastIndexOf('（');
-  if (parenIdx != -1) cutIdx = parenIdx;
   if (jpParenIdx != -1 && (cutIdx == -1 || jpParenIdx > cutIdx)) cutIdx = jpParenIdx;
 
   if (cutIdx != -1) {
@@ -2261,7 +2271,17 @@ String _translateDeathText(String death, bool isJp) {
     mainDeath = mainDeath.substring(0, mainDeath.length - 1).trim();
   }
 
-  final translatedMain = '${_translateDeathTextInternal(mainDeath, isJp)}$whileSuffix$itemSuffix';
+  String wieldSuffix = '';
+  final wieldIdx = mainDeath.indexOf(' while wielding ');
+  if (wieldIdx != -1) {
+    final rawWield = mainDeath.substring(wieldIdx + 16).trim();
+    mainDeath = mainDeath.substring(0, wieldIdx).trim();
+    if (rawWield.isNotEmpty) {
+      wieldSuffix = '（${_translateMonsterOrItemName(rawWield)}を装備中）';
+    }
+  }
+
+  final translatedMain = '${_translateDeathTextInternal(mainDeath, isJp)}$wieldSuffix$whileSuffix$itemSuffix';
 
   var result = translatedMain;
   if (locSuffix.isNotEmpty) {
@@ -2459,6 +2479,74 @@ String? _translateByFlashPattern(String str) {
     }
   }
   return null;
+}
+
+/// 騎乗・缶詰・ひったくり・つまずき等の石化関連死因を翻訳する共通ヘルパー
+String? _translatePetrificationAction(String raw) {
+  final rawLow = raw.toLowerCase();
+  if (rawLow.startsWith('riding ')) {
+    return '${_translateMonsterOrItemName(raw.substring(7))}に騎乗中に石化した';
+  }
+  if (rawLow.startsWith('falling off ')) {
+    return '${_translateMonsterOrItemName(raw.substring(12))}から落馬したことで石化した';
+  }
+  if (rawLow.startsWith('trying to saddle ')) {
+    return '${_translateMonsterOrItemName(raw.substring(17))}に鞍を付けようとして石化した';
+  }
+  if (rawLow.startsWith('attempting to saddle ')) {
+    return '${_translateMonsterOrItemName(raw.substring(21))}に鞍を付けようとして石化した';
+  }
+  if (rawLow.startsWith('trying to mount ')) {
+    return '${_translateMonsterOrItemName(raw.substring(16))}に乗ろうとして石化した';
+  }
+  if (rawLow.startsWith('attempting to ride ')) {
+    return '${_translateMonsterOrItemName(raw.substring(19))}に乗ろうとして石化した';
+  }
+  if (rawLow.startsWith('trying to tin ') && rawLow.endsWith(' without gloves')) {
+    var target = raw.substring(14, raw.length - 15).trim();
+    if (target.toLowerCase().endsWith(' corpse')) {
+      target = target.substring(0, target.length - 7).trim();
+    }
+    return '手袋なしで${_translateMonsterOrItemName(target)}を缶詰にしようとして石化した';
+  }
+  if (rawLow.startsWith('snatching ')) {
+    return '${_translateMonsterOrItemName(raw.substring(10))}をひったくろうとして石化した';
+  }
+  if (rawLow.startsWith('tripping over ')) {
+    return '${_translateMonsterOrItemName(raw.substring(14))}につまずいたことで石化した';
+  }
+  return null;
+}
+
+/// 溺死地点名称を翻訳するヘルパー
+String _translateWaterPlace(String rawPlace) {
+  final stripped = _stripEnglishArticle(rawPlace.trim());
+  const extraWaterMap = {
+    'lake': '湖',
+    'river': '川',
+    'sea': '海',
+    'ocean': '海',
+    'bog': '沼地',
+    'pool': '水たまり',
+  };
+  final extra = extraWaterMap[stripped.toLowerCase()];
+  if (extra != null) return extra;
+  return _translateMonsterOrItemName(rawPlace);
+}
+
+/// `"drowned in <place>"` および `"drowned in <place> by <mon>"` を翻訳するヘルパー
+String _translateDrownedIn(String rest) {
+  final trimmed = rest.trim();
+  final byIdx = trimmed.toLowerCase().lastIndexOf(' by ');
+  if (byIdx != -1) {
+    final place = trimmed.substring(0, byIdx).trim();
+    final killer = trimmed.substring(byIdx + 4).trim();
+    final placeJp = _translateWaterPlace(place);
+    final killerJp = _translateMonsterOrItemName(killer);
+    return '$placeJpで$killerJpに溺れさせられた';
+  }
+  final placeJp = _translateWaterPlace(trimmed);
+  return '$placeJpで溺死した';
 }
 
 String _translateDeathTextInternal(String death, bool isJp) {
@@ -2666,6 +2754,14 @@ String _translateDeathTextInternal(String death, bool isJp) {
     return '脱出した';
   }
   if (death.startsWith('ascended')) return '昇天した';
+  if (death.startsWith('quit ')) {
+    final reason = death.substring(5).trim();
+    if (reason.isEmpty) return '中断した';
+    if (reason.toLowerCase().startsWith('while ')) {
+      return '中断した（${_translateMultiReason(reason.substring(6).trim())}）';
+    }
+    return '中断した（$reason）';
+  }
 
   // シェイプシフター変身爆発死因 (e.g., "killed by an explosion of a chameleon morphed into a gas spore")
   if (death.contains(' morphed into ') && death.contains('explosion of ')) {
@@ -2770,6 +2866,11 @@ String _translateDeathTextInternal(String death, bool isJp) {
       if (rawLow.startsWith('chopping off ')) {
         return '自分の足を切り落として倒された';
       }
+      if (rawLow == 'whipping' || rawLow.startsWith('whipping ')) {
+        return 'むちで自分を打って死んだ';
+      }
+      final petrifyAction = _translatePetrificationAction(raw);
+      if (petrifyAction != null) return petrifyAction;
       if (raw.contains('own player')) return 'プレイヤー自身の手で倒された';
       final self = _translateSelfInflicted(raw);
       if (self != null) return self;
@@ -2797,6 +2898,9 @@ String _translateDeathTextInternal(String death, bool isJp) {
       return tr.endsWith('倒された') ||
               tr.endsWith('石化した') ||
               tr.endsWith('死んだ') ||
+              tr.endsWith('死亡した') ||
+              tr.endsWith('させられた') ||
+              tr.endsWith('つぶされた') ||
               tr.endsWith('失敗') ||
               tr.endsWith('食べたこと') ||
               tr.endsWith('試食') ||
@@ -2847,15 +2951,9 @@ String _translateDeathTextInternal(String death, bool isJp) {
       final tr = _translateMonsterOrItemName(item);
       return '落とし穴から$trを助け出そうとしたことで石化した';
     }
-    if (raw.startsWith('attempting to saddle ')) {
-      final item = raw.substring(21);
-      final tr = _translateMonsterOrItemName(item);
-      return '$trに鞍を付けようとして石化した';
-    }
-    if (raw.startsWith('attempting to ride ')) {
-      final item = raw.substring(19);
-      final tr = _translateMonsterOrItemName(item);
-      return '$trに乗ろうとして石化した';
+    final petrifyAction = _translatePetrificationAction(raw);
+    if (petrifyAction != null) {
+      return petrifyAction;
     }
     if (raw.startsWith('swallowing ') && raw.endsWith(' whole')) {
       final item = raw.substring(11, raw.length - 6);
@@ -2887,6 +2985,18 @@ String _translateDeathTextInternal(String death, bool isJp) {
     final tr = _translateMonsterOrItemName(death.substring(12));
     return '$trで毒に侵された';
   }
+  if (death.startsWith('burned by ')) {
+    final what = _stripEnglishArticle(death.substring(10).trim());
+    final whatLow = what.toLowerCase();
+    if (whatLow == 'lava' || whatLow == 'molten lava') return '溶岩で焼死した';
+    if (whatLow == 'fire') return '火で焼死した';
+    final tr = _translateMonsterOrItemName(what);
+    return '$trで焼死した';
+  }
+  if (death.startsWith('crushed to death by ')) {
+    final tr = _translateMonsterOrItemName(death.substring(20).trim());
+    return '$trに押しつぶされた';
+  }
   if (death.startsWith('died of ')) {
     final cause = death.substring(8).trim();
     if (cause.toLowerCase() == 'starvation') {
@@ -2898,8 +3008,7 @@ String _translateDeathTextInternal(String death, bool isJp) {
     return '$trで死亡した';
   }
   if (death.startsWith('drowned in ')) {
-    final tr = _translateMonsterOrItemName(death.substring(11));
-    return '$trで溺死した';
+    return _translateDrownedIn(death.substring(11));
   }
   if (death.startsWith('dissolved in ')) {
     final what = _stripEnglishArticle(death.substring(13).trim());
@@ -2920,6 +3029,10 @@ String _translateDeathTextInternal(String death, bool isJp) {
   if (death.startsWith('unwisely ate the brain of ')) {
     final tr = _translateMonsterOrItemName(death.substring(26));
     return '$trの脳を食べたこと';
+  }
+  if (death.startsWith('unwisely tried to eat ')) {
+    final tr = _translateMonsterOrItemName(death.substring(22).trim());
+    return '無謀にも$trを食べようとした';
   }
   if (death.startsWith('unwisely ate ')) {
     final tr = _translateMonsterOrItemName(death.substring(13));
@@ -2970,6 +3083,14 @@ String _translateDeathTextInternal(String death, bool isJp) {
   if (death.startsWith('caught in ')) {
     final tr = _translateMonsterOrItemName(death.substring(10));
     return '$trの爆発に巻き込まれた';
+  }
+
+  if (death == 'whipping' || death.startsWith('whipping ')) {
+    return 'むちで自分を打って死んだ';
+  }
+  final petrifyAction = _translatePetrificationAction(death);
+  if (petrifyAction != null) {
+    return petrifyAction;
   }
 
   final selfInflicted = _translateSelfInflicted(death);

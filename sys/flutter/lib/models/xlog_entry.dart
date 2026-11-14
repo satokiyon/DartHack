@@ -301,11 +301,198 @@ class XLogEntry {
     return result;
   }
 
+  /// 全13職業・ランク0〜8および職業名フォールバックの日英ランク名テーブル
+  /// （c_core/nethack_jp/src/botl.c の jp_role_ranks および role.c に準拠）
+  static const Map<String, _RankTranslation> _rankTranslationTable = {
+    // 考古学者 (Archeologist)
+    'archeologist': _RankTranslation('考古学者', 'Archeologist'),
+    'digger': _RankTranslation('鉱員', 'Digger'),
+    'field worker': _RankTranslation('労働者', 'Field Worker'),
+    'investigator': _RankTranslation('調査者', 'Investigator'),
+    'exhumer': _RankTranslation('発掘者', 'Exhumer'),
+    'excavator': _RankTranslation('掘削者', 'Excavator'),
+    'spelunker': _RankTranslation('探検者', 'Spelunker'),
+    'speleologist': _RankTranslation('洞窟学者', 'Speleologist'),
+    'collector': _RankTranslation('収集家', 'Collector'),
+    'curator': _RankTranslation('館長', 'Curator'),
+
+    // 野蛮人 (Barbarian)
+    'barbarian': _RankTranslation('野蛮人', 'Barbarian'),
+    'plunderer': _RankTranslation('乱暴者', 'Plunderer'),
+    'plunderess': _RankTranslation('乱暴者', 'Plunderess'),
+    'pillager': _RankTranslation('略奪者', 'Pillager'),
+    'bandit': _RankTranslation('悪漢', 'Bandit'),
+    'brigand': _RankTranslation('山賊', 'Brigand'),
+    'raider': _RankTranslation('侵略者', 'Raider'),
+    'reaver': _RankTranslation('強盗', 'Reaver'),
+    'slayer': _RankTranslation('殺戮者', 'Slayer'),
+    'chieftain': _RankTranslation('首領', 'Chieftain'),
+    'chieftainess': _RankTranslation('首領', 'Chieftainess'),
+    'conqueror': _RankTranslation('征服者', 'Conqueror'),
+    'conqueress': _RankTranslation('征服者', 'Conqueress'),
+
+    // 原始人 (Caveman)
+    'caveman': _RankTranslation('原始人', 'Caveman'),
+    'cavewoman': _RankTranslation('女の原始人', 'Cavewoman'),
+    'troglodyte': _RankTranslation('穴居人', 'Troglodyte'),
+    'aborigine': _RankTranslation('原住民', 'Aborigine'),
+    'wanderer': _RankTranslation('放浪者', 'Wanderer'),
+    'vagrant': _RankTranslation('浮浪者', 'Vagrant'),
+    'wayfarer': _RankTranslation('旅行者', 'Wayfarer'),
+    'roamer': _RankTranslation('放遊者', 'Roamer'),
+    'nomad': _RankTranslation('遊牧民', 'Nomad'),
+    'rover': _RankTranslation('漂泊民', 'Rover'),
+    'pioneer': _RankTranslation('先駆者', 'Pioneer'),
+
+    // 治療師 (Healer)
+    'healer': _RankTranslation('治療師', 'Healer'),
+    'rhizotomist': _RankTranslation('根堀人', 'Rhizotomist'),
+    'empiric': _RankTranslation('治療師', 'Empiric'),
+    'embalmer': _RankTranslation('遺体処理師', 'Embalmer'),
+    'dresser': _RankTranslation('創傷処置師', 'Dresser'),
+    'medicus ossium': _RankTranslation('整骨医', 'Medicus ossium'),
+    'medica ossium': _RankTranslation('整骨医', 'Medica ossium'),
+    'herbalist': _RankTranslation('薬草治療師', 'Herbalist'),
+    'magister': _RankTranslation('治療大師', 'Magister'),
+    'magistra': _RankTranslation('治療大師', 'Magistra'),
+    'physician': _RankTranslation('治療医', 'Physician'),
+    'chirurgeon': _RankTranslation('外科医', 'Chirurgeon'),
+
+    // 騎士 (Knight)
+    'gallant': _RankTranslation('騎士見習い', 'Gallant'),
+    'esquire': _RankTranslation('従士', 'Esquire'),
+    'bachelor': _RankTranslation('准騎士', 'Bachelor'),
+    'sergeant': _RankTranslation('下級騎士', 'Sergeant'),
+    'knight': _RankTranslation('騎士', 'Knight'),
+    'banneret': _RankTranslation('旗手騎士', 'Banneret'),
+    'chevalier': _RankTranslation('高位騎士', 'Chevalier'),
+    'chevaliere': _RankTranslation('高位女騎士', 'Chevaliere'),
+    'seignieur': _RankTranslation('騎士長', 'Seignieur'),
+    'dame': _RankTranslation('女騎士長', 'Dame'),
+    'paladin': _RankTranslation('聖騎士', 'Paladin'),
+
+    // 修道士 (Monk)
+    'monk': _RankTranslation('修道士', 'Monk'),
+    'candidate': _RankTranslation('入門希望者', 'Candidate'),
+    'novice': _RankTranslation('初心修行者', 'Novice'),
+    'initiate': _RankTranslation('修行僧', 'Initiate'),
+    'student of stones': _RankTranslation('土の使い手', 'Student of Stones'),
+    'student of waters': _RankTranslation('水の使い手', 'Student of Waters'),
+    'student of metals': _RankTranslation('金の使い手', 'Student of Metals'),
+    'student of winds': _RankTranslation('木の達人', 'Student of Winds'),
+    'student of fire': _RankTranslation('火の達人', 'Student of Fire'),
+    'master': _RankTranslation('免許皆伝', 'Master'),
+
+    // 僧侶 (Priest)
+    'aspirant': _RankTranslation('修道者', 'Aspirant'),
+    'acolyte': _RankTranslation('侍者', 'Acolyte'),
+    'adept': _RankTranslation('侍祭', 'Adept'),
+    'priest': _RankTranslation('僧侶', 'Priest'),
+    'priestess': _RankTranslation('尼僧', 'Priestess'),
+    'curate': _RankTranslation('助任司祭', 'Curate'),
+    'canon': _RankTranslation('聖者', 'Canon'),
+    'canoness': _RankTranslation('聖女', 'Canoness'),
+    'lama': _RankTranslation('司教', 'Lama'),
+    'patriarch': _RankTranslation('大司教', 'Patriarch'),
+    'matriarch': _RankTranslation('大司教', 'Matriarch'),
+    'high priest': _RankTranslation('大僧上', 'High Priest'),
+    'high priestess': _RankTranslation('大僧上', 'High Priestess'),
+
+    // 盗賊 (Rogue)
+    'footpad': _RankTranslation('追いはぎ', 'Footpad'),
+    'cutpurse': _RankTranslation('ひったくり', 'Cutpurse'),
+    'rogue': _RankTranslation('スリ', 'Rogue'),
+    'pilferer': _RankTranslation('ごろつき', 'Pilferer'),
+    'robber': _RankTranslation('こそどろ', 'Robber'),
+    'burglar': _RankTranslation('空巣', 'Burglar'),
+    'filcher': _RankTranslation('泥棒', 'Filcher'),
+    'magsman': _RankTranslation('強盗', 'Magsman'),
+    'magswoman': _RankTranslation('強盗', 'Magswoman'),
+    'thief': _RankTranslation('大泥棒', 'Thief'),
+
+    // 旅人 (Ranger)
+    'ranger': _RankTranslation('旅人', 'Ranger'),
+    'tenderfoot': _RankTranslation('新米', 'Tenderfoot'),
+    'lookout': _RankTranslation('見張り', 'Lookout'),
+    'trailblazer': _RankTranslation('先導', 'Trailblazer'),
+    'reconnoiterer': _RankTranslation('偵察', 'Reconnoiterer'),
+    'reconnoiteress': _RankTranslation('偵察', 'Reconnoiteress'),
+    'scout': _RankTranslation('斥候', 'Scout'),
+    'arbalester': _RankTranslation('弩兵', 'Arbalester'),
+    'archer': _RankTranslation('射撃手', 'Archer'),
+    'sharpshooter': _RankTranslation('熟練射手', 'Sharpshooter'),
+    'marksman': _RankTranslation('名射手', 'Marksman'),
+    'markswoman': _RankTranslation('名射手', 'Markswoman'),
+
+    // 侍 (Samurai)
+    'samurai': _RankTranslation('侍', 'Samurai'),
+    'hatamoto': _RankTranslation('旗本', 'Hatamoto'),
+    'ronin': _RankTranslation('浪人', 'Ronin'),
+    'ninja': _RankTranslation('忍者', 'Ninja'),
+    'kunoichi': _RankTranslation('くノ一', 'Kunoichi'),
+    'joshu': _RankTranslation('城主', 'Joshu'),
+    'ryoshu': _RankTranslation('領主', 'Ryoshu'),
+    'kokushu': _RankTranslation('領主', 'Kokushu'),
+    'daimyo': _RankTranslation('大名', 'Daimyo'),
+    'kuge': _RankTranslation('老中', 'Kuge'),
+    'shogun': _RankTranslation('将軍', 'Shogun'),
+
+    // 観光客 (Tourist)
+    'tourist': _RankTranslation('観光客', 'Tourist'),
+    'rambler': _RankTranslation('プー太郎', 'Rambler'),
+    'sightseer': _RankTranslation('観光客', 'Sightseer'),
+    'excursionist': _RankTranslation('周遊旅行者', 'Excursionist'),
+    'peregrinator': _RankTranslation('遍歴者', 'Peregrinator'),
+    'peregrinatrix': _RankTranslation('遍歴者', 'Peregrinatrix'),
+    'traveler': _RankTranslation('旅行者', 'Traveler'),
+    'journeyer': _RankTranslation('旅人', 'Journeyer'),
+    'voyager': _RankTranslation('航海者', 'Voyager'),
+    'explorer': _RankTranslation('探検家', 'Explorer'),
+    'adventurer': _RankTranslation('冒険者', 'Adventurer'),
+
+    // バルキリー (Valkyrie)
+    'valkyrie': _RankTranslation('バルキリー', 'Valkyrie'),
+    'stripling': _RankTranslation('若き盾乙女', 'Stripling'),
+    'skirmisher': _RankTranslation('散兵乙女', 'Skirmisher'),
+    'fighter': _RankTranslation('闘士乙女', 'Fighter'),
+    'man-at-arms': _RankTranslation('武装乙女', 'Man-at-arms'),
+    'woman-at-arms': _RankTranslation('武装乙女', 'Woman-at-arms'),
+    'warrior': _RankTranslation('戦乙女', 'Warrior'),
+    'swashbuckler': _RankTranslation('剣客乙女', 'Swashbuckler'),
+    'hero': _RankTranslation('英雄', 'Hero'),
+    'heroine': _RankTranslation('女英雄', 'Heroine'),
+    'champion': _RankTranslation('勇者', 'Champion'),
+    'lord': _RankTranslation('盾の勇者', 'Lord'),
+    'lady': _RankTranslation('盾の姫勇者', 'Lady'),
+
+    // 魔法使い (Wizard)
+    'evoker': _RankTranslation('手品師', 'Evoker'),
+    'conjurer': _RankTranslation('奇術師', 'Conjurer'),
+    'thaumaturge': _RankTranslation('占い師', 'Thaumaturge'),
+    'magician': _RankTranslation('霊感師', 'Magician'),
+    'enchanter': _RankTranslation('召喚師', 'Enchanter'),
+    'enchantress': _RankTranslation('召喚師', 'Enchantress'),
+    'sorcerer': _RankTranslation('妖術師', 'Sorcerer'),
+    'sorceress': _RankTranslation('妖術師', 'Sorceress'),
+    'necromancer': _RankTranslation('魔術師', 'Necromancer'),
+    'wizard': _RankTranslation('魔法使い', 'Wizard'),
+    'mage': _RankTranslation('大魔法使い', 'Mage'),
+  };
+
   /// 達成項目キーを日英表示文言へ変換（日英コア混在ランク名対応）
   static String translateAchievement(String key, bool isJp) {
     const rankPrefix = 'attained_the_rank_of_';
     if (key.startsWith(rankPrefix)) {
-      final rawRank = key.substring(rankPrefix.length).replaceAll('_', ' ').trim();
+      final rawRank = key
+          .substring(rankPrefix.length)
+          .replaceAll('_', ' ')
+          .replaceAll(RegExp(r'\s+'), ' ')
+          .trim();
+      final mapped = _rankTranslationTable[rawRank.toLowerCase()];
+      if (mapped != null) {
+        final translatedRank = isJp ? mapped.jp : mapped.en;
+        return isJp ? '到達ランク: $translatedRank' : 'Attained rank: $translatedRank';
+      }
       final formattedRank = _capitalizeWordsIfAscii(rawRank);
       return isJp ? '到達ランク: $formattedRank' : 'Attained rank: $formattedRank';
     }
@@ -488,4 +675,12 @@ class XLogEntry {
       return w;
     }).join(' ');
   }
+}
+
+/// 到達ランクの日英表示ペア
+class _RankTranslation {
+  final String jp;
+  final String en;
+
+  const _RankTranslation(this.jp, this.en);
 }
