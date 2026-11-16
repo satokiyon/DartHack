@@ -12,6 +12,9 @@ DartHack は、ローグライクゲームの金字塔 [NetHack](https://www.net
 日本語版には[NetHackJP](https://github.com/satokiyon/NetHackJP)を、英語版には[NetHack](https://github.com/NetHack/NetHack)を、それぞれ改変して使用しています。
 
 ---
+- [Youtube再生リスト](https://www.youtube.com/playlist?list=PLKBNYid2v3B8)
+
+---
 
 ## 🎮 プレイ方法（ダウンロード）
 
