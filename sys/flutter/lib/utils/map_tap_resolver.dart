@@ -126,4 +126,67 @@ class MapTapResolver {
         }
     }
   }
+
+  /// マウスボタン（右クリック・中ボタン）の設定値に基づいて送信すべき PosCmd の mod 値を算出する
+  static MapTapResolution resolveMouseButton({
+    required int tileX,
+    required int tileY,
+    required int playerX,
+    required int playerY,
+    required String action,
+    required bool isTargetingMode,
+  }) {
+    final targetType = classifyTarget(
+      tileX: tileX,
+      tileY: tileY,
+      playerX: playerX,
+      playerY: playerY,
+    );
+
+    if (action == 'disabled') {
+      return MapTapResolution(
+        targetType: targetType,
+        mod: null,
+      );
+    }
+
+    if (isTargetingMode) {
+      return MapTapResolution(
+        targetType: targetType,
+        mod: modMenu,
+      );
+    }
+
+    switch (action) {
+      case 'action':
+        return MapTapResolution(
+          targetType: targetType,
+          mod: modAction,
+        );
+      case 'smart':
+        switch (targetType) {
+          case MapTapTargetType.self:
+            return const MapTapResolution(
+              targetType: MapTapTargetType.self,
+              mod: modMenu,
+            );
+          case MapTapTargetType.adjacent:
+            return const MapTapResolution(
+              targetType: MapTapTargetType.adjacent,
+              mod: modSmartAdjacent,
+            );
+          case MapTapTargetType.far:
+            return const MapTapResolution(
+              targetType: MapTapTargetType.far,
+              mod: modAction,
+            );
+        }
+      case 'menu':
+      default:
+        return MapTapResolution(
+          targetType: targetType,
+          mod: modMenu,
+        );
+    }
+  }
 }

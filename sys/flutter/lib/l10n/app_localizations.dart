@@ -1274,6 +1274,12 @@ abstract class AppLocalizations {
   /// **'離れたマスのタップ時動作（自動移動）'**
   String get mapTapTravelTitle;
 
+  /// No description provided for @mapTapTravelSub.
+  ///
+  /// In ja, this message translates to:
+  /// **'左クリックも指タップと同じ設定で動作します'**
+  String get mapTapTravelSub;
+
   /// No description provided for @mapTapMenu.
   ///
   /// In ja, this message translates to:
@@ -1297,6 +1303,72 @@ abstract class AppLocalizations {
   /// In ja, this message translates to:
   /// **'無効'**
   String get mapTapDisabled;
+
+  /// No description provided for @mouseSettingsHeader.
+  ///
+  /// In ja, this message translates to:
+  /// **'マウス操作設定（PC・マウス接続時）'**
+  String get mouseSettingsHeader;
+
+  /// No description provided for @mouseRightClickTitle.
+  ///
+  /// In ja, this message translates to:
+  /// **'右クリック時の動作'**
+  String get mouseRightClickTitle;
+
+  /// No description provided for @mouseMiddleClickTitle.
+  ///
+  /// In ja, this message translates to:
+  /// **'中ボタン（ホイールクリック）の動作'**
+  String get mouseMiddleClickTitle;
+
+  /// No description provided for @mouseWheelTitle.
+  ///
+  /// In ja, this message translates to:
+  /// **'マウスホイールの動作'**
+  String get mouseWheelTitle;
+
+  /// No description provided for @mouseBtnMenu.
+  ///
+  /// In ja, this message translates to:
+  /// **'メニュー表示（全地点）'**
+  String get mouseBtnMenu;
+
+  /// No description provided for @mouseBtnSmart.
+  ///
+  /// In ja, this message translates to:
+  /// **'スマート移動（安全確認付き・タップ標準）'**
+  String get mouseBtnSmart;
+
+  /// No description provided for @mouseBtnAction.
+  ///
+  /// In ja, this message translates to:
+  /// **'直接アクション（確認なしで即時実行）'**
+  String get mouseBtnAction;
+
+  /// No description provided for @mouseBtnDisabled.
+  ///
+  /// In ja, this message translates to:
+  /// **'無効'**
+  String get mouseBtnDisabled;
+
+  /// No description provided for @mouseWheelZoom.
+  ///
+  /// In ja, this message translates to:
+  /// **'マップの拡大・縮小（ズーム）'**
+  String get mouseWheelZoom;
+
+  /// No description provided for @mouseWheelScroll.
+  ///
+  /// In ja, this message translates to:
+  /// **'マップのスクロール移動'**
+  String get mouseWheelScroll;
+
+  /// No description provided for @mouseWheelDisabled.
+  ///
+  /// In ja, this message translates to:
+  /// **'無効'**
+  String get mouseWheelDisabled;
 
   /// No description provided for @shortcutPadScaleTitle.
   ///

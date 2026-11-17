@@ -162,6 +162,9 @@ class _SettingsPageState extends State<SettingsPage> {
   bool _swapPadSide = false; // 移動パッドとショートカットパッドの左右反転
   String _dpadLongPressMoveMode = 'G_UPPER';
   String _mapTapTravelMode = 'always';
+  String _mouseRightClickAction = 'menu';
+  String _mouseWheelAction = 'zoom';
+  String _mouseMiddleClickAction = 'disabled';
   String _cameraFollowMode = 'center';
   int _scrollMargin = 3;
   int _scrollAmount = 3;
@@ -443,6 +446,18 @@ class _SettingsPageState extends State<SettingsPage> {
       _mapTapTravelMode = prefs.getString('map_tap_travel_mode') ?? 'always';
       if (!const ['menu', 'always', 'after_scroll', 'disabled'].contains(_mapTapTravelMode)) {
         _mapTapTravelMode = 'always';
+      }
+      _mouseRightClickAction = prefs.getString('mouse_right_click_action') ?? 'menu';
+      if (!const ['menu', 'smart', 'action', 'disabled'].contains(_mouseRightClickAction)) {
+        _mouseRightClickAction = 'menu';
+      }
+      _mouseWheelAction = prefs.getString('mouse_wheel_action') ?? 'zoom';
+      if (!const ['zoom', 'scroll', 'disabled'].contains(_mouseWheelAction)) {
+        _mouseWheelAction = 'zoom';
+      }
+      _mouseMiddleClickAction = prefs.getString('mouse_middle_click_action') ?? 'disabled';
+      if (!const ['menu', 'smart', 'action', 'disabled'].contains(_mouseMiddleClickAction)) {
+        _mouseMiddleClickAction = 'disabled';
       }
       _autosaveEnabled = prefs.getBool('autosave_enabled') ?? true;
       _autosaveInterval = prefs.getInt('autosave_interval') ?? 50;
@@ -2323,6 +2338,7 @@ class _SettingsPageState extends State<SettingsPage> {
           ),
           _buildDropdownSettingTile<String>(
             title: l10n.mapTapTravelTitle,
+            description: l10n.mapTapTravelSub,
             value: _mapTapTravelMode,
             items: [
               DropdownMenuItem(value: 'menu', child: Text(l10n.mapTapMenu)),
@@ -2334,6 +2350,65 @@ class _SettingsPageState extends State<SettingsPage> {
               if (val != null) {
                 setState(() => _mapTapTravelMode = val);
                 _saveSetting('map_tap_travel_mode', val);
+              }
+            },
+          ),
+          ListTile(
+            dense: true,
+            leading: const Icon(Icons.mouse, color: Colors.amber, size: 20),
+            title: Text(
+              l10n.mouseSettingsHeader,
+              style: const TextStyle(
+                color: Colors.amber,
+                fontWeight: FontWeight.bold,
+                fontSize: 13,
+              ),
+            ),
+          ),
+          _buildDropdownSettingTile<String>(
+            title: l10n.mouseRightClickTitle,
+            value: _mouseRightClickAction,
+            items: [
+              DropdownMenuItem(value: 'menu', child: Text(l10n.mouseBtnMenu)),
+              DropdownMenuItem(value: 'smart', child: Text(l10n.mouseBtnSmart)),
+              DropdownMenuItem(value: 'action', child: Text(l10n.mouseBtnAction)),
+              DropdownMenuItem(value: 'disabled', child: Text(l10n.mouseBtnDisabled)),
+            ],
+            onChanged: (val) {
+              if (val != null) {
+                setState(() => _mouseRightClickAction = val);
+                _saveSetting('mouse_right_click_action', val);
+              }
+            },
+          ),
+          _buildDropdownSettingTile<String>(
+            title: l10n.mouseWheelTitle,
+            value: _mouseWheelAction,
+            items: [
+              DropdownMenuItem(value: 'zoom', child: Text(l10n.mouseWheelZoom)),
+              DropdownMenuItem(value: 'scroll', child: Text(l10n.mouseWheelScroll)),
+              DropdownMenuItem(value: 'disabled', child: Text(l10n.mouseWheelDisabled)),
+            ],
+            onChanged: (val) {
+              if (val != null) {
+                setState(() => _mouseWheelAction = val);
+                _saveSetting('mouse_wheel_action', val);
+              }
+            },
+          ),
+          _buildDropdownSettingTile<String>(
+            title: l10n.mouseMiddleClickTitle,
+            value: _mouseMiddleClickAction,
+            items: [
+              DropdownMenuItem(value: 'disabled', child: Text(l10n.mouseBtnDisabled)),
+              DropdownMenuItem(value: 'menu', child: Text(l10n.mouseBtnMenu)),
+              DropdownMenuItem(value: 'smart', child: Text(l10n.mouseBtnSmart)),
+              DropdownMenuItem(value: 'action', child: Text(l10n.mouseBtnAction)),
+            ],
+            onChanged: (val) {
+              if (val != null) {
+                setState(() => _mouseMiddleClickAction = val);
+                _saveSetting('mouse_middle_click_action', val);
               }
             },
           ),

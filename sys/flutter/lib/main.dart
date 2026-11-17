@@ -4,6 +4,7 @@ import 'dart:isolate';
 import 'dart:io';
 import 'dart:math' as math;
 import 'dart:ui' as ui;
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'nethack_assets.dart';
@@ -220,7 +221,7 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
   late TransformationController _transformationController;
   double _currentScale = 1.0; // ピンチズームで設定された現在のズーム率を保持する状態変数
   TapDownDetails? _lastMapTapDownDetails; // マップタップ時の座標一時保持用
-  TapDownDetails? _lastMapSecondaryTapDownDetails; // マップ右クリック時の座標一時保持用
+  final Map<int, ({Offset localPosition, int buttons})> _activeMouseButtonDowns = {}; // 右クリック・中ボタン押下状態管理用
   String _cameraFollowMode = 'center'; // 'center': 常時センタリング, 'fixed': マップ固定・端スクロール
   int _scrollMargin = 3;
   int _scrollAmount = 3;
@@ -328,6 +329,9 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
   ];
   bool _isDirectionPromptActive = false;
   String _mapTapTravelMode = 'always';
+  String _mouseRightClickAction = 'menu';
+  String _mouseWheelAction = 'zoom';
+  String _mouseMiddleClickAction = 'disabled';
   bool _isMapScrolledOrZoomed = false;
   int _currentInputState = 0; // Cコア program_state.input_state (0: otherInp, 1: commandInp, 2: getposInp, 3: getdirInp)
 
@@ -433,6 +437,18 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
       _mapTapTravelMode = prefs.getString('map_tap_travel_mode') ?? 'always';
       if (!const ['menu', 'always', 'after_scroll', 'disabled'].contains(_mapTapTravelMode)) {
         _mapTapTravelMode = 'always';
+      }
+      _mouseRightClickAction = prefs.getString('mouse_right_click_action') ?? 'menu';
+      if (!const ['menu', 'smart', 'action', 'disabled'].contains(_mouseRightClickAction)) {
+        _mouseRightClickAction = 'menu';
+      }
+      _mouseWheelAction = prefs.getString('mouse_wheel_action') ?? 'zoom';
+      if (!const ['zoom', 'scroll', 'disabled'].contains(_mouseWheelAction)) {
+        _mouseWheelAction = 'zoom';
+      }
+      _mouseMiddleClickAction = prefs.getString('mouse_middle_click_action') ?? 'disabled';
+      if (!const ['menu', 'smart', 'action', 'disabled'].contains(_mouseMiddleClickAction)) {
+        _mouseMiddleClickAction = 'disabled';
       }
       _cameraFollowMode = prefs.getString('camera_follow_mode') ?? 'center';
       _scrollMargin = prefs.getInt('scroll_margin') ?? 3;
@@ -3771,30 +3787,76 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
     sendPosCmd(tile.tileX, tile.tileY, resolution.mod!);
   }
 
-  // マップ右クリック処理 (Windows / PC向け)
-  // 右クリック (CLICK_2: mouseaction) を C コアに送信する。
-  // - 離れたマス: その地点までダイレクトに即時自動移動 (dotravel_target)
-  // - 主人公マス: 直接拾う/階段昇降/休息などの直接アクション (メニュー非表示)
-  // - 隣接マス: ドア開閉/直接攻撃/1歩移動
-  // - ターゲット選択中/farlook中: ターゲット座標指定として CLICK_1 を送信
-  void _handleMapSecondaryTap(TapDownDetails details) {
+  // マップ右クリック・中ボタン処理 (PC / マウス接続時向け)
+  // 設定されたアクション ('menu' / 'smart' / 'action' / 'disabled') に応じて PosCmd を送信する。
+  void _handleMapMouseButtonTap(Offset localPosition, String action) {
     if (!_isMainGameStarted) return;
     final px = _screen.playerX;
     final py = _screen.playerY;
     if (px < 0 || py < 0) return;
 
-    final tile = _mapLocalToTile(details.localPosition);
+    final tile = _mapLocalToTile(localPosition);
     if (tile == null) return;
 
     final bool isGetposOrTargetingMode = _currentInputState == 2 /* getposInp */;
+    final resolution = MapTapResolver.resolveMouseButton(
+      tileX: tile.tileX,
+      tileY: tile.tileY,
+      playerX: px,
+      playerY: py,
+      action: action,
+      isTargetingMode: isGetposOrTargetingMode,
+    );
 
-    if (isGetposOrTargetingMode) {
-      sendPosCmd(tile.tileX, tile.tileY, 1 /* CLICK_1 */);
+    if (resolution.mod == null) return;
+    sendPosCmd(tile.tileX, tile.tileY, resolution.mod!);
+  }
+
+  // マップ上のマウスホイール回転処理
+  // 'zoom' の場合は InteractiveViewer 標準のズームに任せ、
+  // 'scroll' または 'disabled' の場合は PointerSignalResolver でイベントを消費する。
+  void _handleMapPointerSignal(PointerSignalEvent event) {
+    if (event is! PointerScrollEvent) return;
+    if (_mouseWheelAction == 'zoom') {
       return;
     }
 
-    // 右クリックは設定値に関わらず常に CLICK_2 (mouseaction) を送信して即時移動/直接アクションを実行
-    sendPosCmd(tile.tileX, tile.tileY, 2 /* CLICK_2: mouseaction */);
+    GestureBinding.instance.pointerSignalResolver.register(event, (PointerSignalEvent resolvedEvent) {
+      if (_mouseWheelAction != 'scroll') return;
+      if (resolvedEvent is! PointerScrollEvent) return;
+
+      final currentMatrix = _transformationController.value;
+      final currentTx = currentMatrix.storage[12];
+      final currentTy = currentMatrix.storage[13];
+
+      final rawTx = currentTx - resolvedEvent.scrollDelta.dx;
+      final rawTy = currentTy - resolvedEvent.scrollDelta.dy;
+
+      // InteractiveViewer の boundaryMargin (2000.0) と整合するクランプ範囲を算出
+      const double canvasW = 4000.0;
+      const double canvasH = 3000.0;
+      const double margin = 2000.0;
+      final double viewW = _lastMapViewportSize.width;
+      final double viewH = _lastMapViewportSize.height;
+
+      final double scaledW = canvasW * _currentScale;
+      final double scaledH = canvasH * _currentScale;
+      final double minTx = viewW - scaledW - margin * _currentScale;
+      final double maxTx = margin * _currentScale;
+      final double minTy = viewH - scaledH - margin * _currentScale;
+      final double maxTy = margin * _currentScale;
+
+      final double newTx = minTx <= maxTx ? rawTx.clamp(minTx, maxTx) : rawTx;
+      final double newTy = minTy <= maxTy ? rawTy.clamp(minTy, maxTy) : rawTy;
+
+      _transformationController.value = Matrix4(
+        _currentScale, 0.0, 0.0, 0.0,
+        0.0, _currentScale, 0.0, 0.0,
+        0.0, 0.0, 1.0, 0.0,
+        newTx, newTy, 0.0, 1.0,
+      );
+      _isMapScrolledOrZoomed = true;
+    });
   }
 
   // マップ座標クリック (PosCmd) を C コアに送信する。
@@ -4124,36 +4186,55 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
                   child: SizedBox(
                     width: 4000.0,
                     height: 3000.0,
-                    child: GestureDetector(
+                    child: Listener(
                       behavior: HitTestBehavior.translucent,
-                      onTapDown: (details) {
-                        _lastMapTapDownDetails = details;
-                      },
-                      onTap: () {
-                        _ensureGameFocus();
-                        if (_lastMapTapDownDetails != null) {
-                          _handleMapTap(_lastMapTapDownDetails!);
+                      onPointerSignal: _handleMapPointerSignal,
+                      onPointerDown: (event) {
+                        if (event.kind == PointerDeviceKind.mouse &&
+                            (event.buttons & (kSecondaryMouseButton | kMiddleMouseButton)) != 0) {
+                          _activeMouseButtonDowns[event.pointer] = (
+                            localPosition: event.localPosition,
+                            buttons: event.buttons,
+                          );
                         }
                       },
-                      onSecondaryTapDown: (details) {
-                        _lastMapSecondaryTapDownDetails = details;
-                      },
-                      onSecondaryTap: () {
-                        _ensureGameFocus();
-                        if (_lastMapSecondaryTapDownDetails != null) {
-                          _handleMapSecondaryTap(_lastMapSecondaryTapDownDetails!);
+                      onPointerUp: (event) {
+                        final down = _activeMouseButtonDowns.remove(event.pointer);
+                        if (down == null) return;
+                        if ((event.localPosition - down.localPosition).distance <= 8.0) {
+                          _ensureGameFocus();
+                          if ((down.buttons & kSecondaryMouseButton) != 0) {
+                            _handleMapMouseButtonTap(event.localPosition, _mouseRightClickAction);
+                          } else if ((down.buttons & kMiddleMouseButton) != 0) {
+                            _handleMapMouseButtonTap(event.localPosition, _mouseMiddleClickAction);
+                          }
                         }
                       },
-                      child: CustomPaint(
-                        painter: NetHackMapPainter(
-                          screen: _screen,
-                          tileImage: _tileImage,
-                          tileWidth: _tileWidth,
-                          tileHeight: _tileHeight,
-                          useTiles: _useTiles,
-                          isTransparentTileset:
-                              TilesetManager.instance.getTilesetById(_selectedTileset).isTransparent,
-                          fontId: FontManager.instance.getSelectedFont(FontTarget.map).id,
+                      onPointerCancel: (event) {
+                        _activeMouseButtonDowns.remove(event.pointer);
+                      },
+                      child: GestureDetector(
+                        behavior: HitTestBehavior.translucent,
+                        onTapDown: (details) {
+                          _lastMapTapDownDetails = details;
+                        },
+                        onTap: () {
+                          _ensureGameFocus();
+                          if (_lastMapTapDownDetails != null) {
+                            _handleMapTap(_lastMapTapDownDetails!);
+                          }
+                        },
+                        child: CustomPaint(
+                          painter: NetHackMapPainter(
+                            screen: _screen,
+                            tileImage: _tileImage,
+                            tileWidth: _tileWidth,
+                            tileHeight: _tileHeight,
+                            useTiles: _useTiles,
+                            isTransparentTileset:
+                                TilesetManager.instance.getTilesetById(_selectedTileset).isTransparent,
+                            fontId: FontManager.instance.getSelectedFont(FontTarget.map).id,
+                          ),
                         ),
                       ),
                     ),

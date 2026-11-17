@@ -608,6 +608,9 @@ class AppLocalizationsJa extends AppLocalizations {
   String get mapTapTravelTitle => '離れたマスのタップ時動作（自動移動）';
 
   @override
+  String get mapTapTravelSub => '左クリックも指タップと同じ設定で動作します';
+
+  @override
   String get mapTapMenu => 'メニュー表示（移動・記号確認）';
 
   @override
@@ -618,6 +621,39 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get mapTapDisabled => '無効';
+
+  @override
+  String get mouseSettingsHeader => 'マウス操作設定（PC・マウス接続時）';
+
+  @override
+  String get mouseRightClickTitle => '右クリック時の動作';
+
+  @override
+  String get mouseMiddleClickTitle => '中ボタン（ホイールクリック）の動作';
+
+  @override
+  String get mouseWheelTitle => 'マウスホイールの動作';
+
+  @override
+  String get mouseBtnMenu => 'メニュー表示（全地点）';
+
+  @override
+  String get mouseBtnSmart => 'スマート移動（安全確認付き・タップ標準）';
+
+  @override
+  String get mouseBtnAction => '直接アクション（確認なしで即時実行）';
+
+  @override
+  String get mouseBtnDisabled => '無効';
+
+  @override
+  String get mouseWheelZoom => 'マップの拡大・縮小（ズーム）';
+
+  @override
+  String get mouseWheelScroll => 'マップのスクロール移動';
+
+  @override
+  String get mouseWheelDisabled => '無効';
 
   @override
   String get shortcutPadScaleTitle => 'ショートカットボタンサイズ倍率';

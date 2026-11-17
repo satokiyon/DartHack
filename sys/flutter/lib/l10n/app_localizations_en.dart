@@ -617,6 +617,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get mapTapTravelTitle => 'Action on Far Tap (Auto-Travel)';
 
   @override
+  String get mapTapTravelSub => 'Left-click also follows this tap setting.';
+
+  @override
   String get mapTapMenu => 'Show Menu (Travel / Look)';
 
   @override
@@ -627,6 +630,39 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get mapTapDisabled => 'Disabled';
+
+  @override
+  String get mouseSettingsHeader => 'Mouse Controls (PC / External Mouse)';
+
+  @override
+  String get mouseRightClickTitle => 'Right-Click Action';
+
+  @override
+  String get mouseMiddleClickTitle => 'Middle-Click Action';
+
+  @override
+  String get mouseWheelTitle => 'Mouse Wheel Action';
+
+  @override
+  String get mouseBtnMenu => 'Show Menu (All Tiles)';
+
+  @override
+  String get mouseBtnSmart => 'Smart Move (Safe / Default Tap)';
+
+  @override
+  String get mouseBtnAction => 'Direct Action (Immediate / No Confirm)';
+
+  @override
+  String get mouseBtnDisabled => 'Disabled';
+
+  @override
+  String get mouseWheelZoom => 'Zoom Map';
+
+  @override
+  String get mouseWheelScroll => 'Scroll Map';
+
+  @override
+  String get mouseWheelDisabled => 'Disabled';
 
   @override
   String get shortcutPadScaleTitle => 'Shortcut Pad Scale Multiplier';

@@ -257,4 +257,111 @@ void main() {
       expect(resFar.mod, isNull);
     });
   });
+
+  group('MapTapResolver.resolveMouseButton Tests', () {
+    const px = 25;
+    const py = 10;
+
+    test('menu action returns modMenu (1) for self, adjacent, and far', () {
+      for (final target in [
+        [px, py],
+        [px + 1, py],
+        [px + 5, py],
+      ]) {
+        final res = MapTapResolver.resolveMouseButton(
+          tileX: target[0],
+          tileY: target[1],
+          playerX: px,
+          playerY: py,
+          action: 'menu',
+          isTargetingMode: false,
+        );
+        expect(res.mod, MapTapResolver.modMenu);
+      }
+    });
+
+    test('action mode returns modAction (2) for self, adjacent, and far', () {
+      for (final target in [
+        [px, py],
+        [px + 1, py],
+        [px + 5, py],
+      ]) {
+        final res = MapTapResolver.resolveMouseButton(
+          tileX: target[0],
+          tileY: target[1],
+          playerX: px,
+          playerY: py,
+          action: 'action',
+          isTargetingMode: false,
+        );
+        expect(res.mod, MapTapResolver.modAction);
+      }
+    });
+
+    test('smart mode returns modMenu for self, modSmartAdjacent for adjacent, modAction for far', () {
+      final resSelf = MapTapResolver.resolveMouseButton(
+        tileX: px,
+        tileY: py,
+        playerX: px,
+        playerY: py,
+        action: 'smart',
+        isTargetingMode: false,
+      );
+      expect(resSelf.mod, MapTapResolver.modMenu);
+
+      final resAdj = MapTapResolver.resolveMouseButton(
+        tileX: px + 1,
+        tileY: py - 1,
+        playerX: px,
+        playerY: py,
+        action: 'smart',
+        isTargetingMode: false,
+      );
+      expect(resAdj.mod, MapTapResolver.modSmartAdjacent);
+
+      final resFar = MapTapResolver.resolveMouseButton(
+        tileX: px + 4,
+        tileY: py,
+        playerX: px,
+        playerY: py,
+        action: 'smart',
+        isTargetingMode: false,
+      );
+      expect(resFar.mod, MapTapResolver.modAction);
+    });
+
+    test('disabled mode always returns null even in targeting mode', () {
+      for (final targeting in [false, true]) {
+        for (final target in [
+          [px, py],
+          [px + 1, py],
+          [px + 5, py],
+        ]) {
+          final res = MapTapResolver.resolveMouseButton(
+            tileX: target[0],
+            tileY: target[1],
+            playerX: px,
+            playerY: py,
+            action: 'disabled',
+            isTargetingMode: targeting,
+          );
+          expect(res.mod, isNull);
+        }
+      }
+    });
+
+    test('targeting mode forces modMenu for enabled actions', () {
+      for (final action in ['menu', 'smart', 'action']) {
+        final res = MapTapResolver.resolveMouseButton(
+          tileX: px + 5,
+          tileY: py,
+          playerX: px,
+          playerY: py,
+          action: action,
+          isTargetingMode: true,
+        );
+        expect(res.mod, MapTapResolver.modMenu);
+      }
+    });
+  });
 }
