@@ -521,14 +521,37 @@
   "symsetLabel": "通常階層シンボルセット (symset)",
   "roguesymsetLabel": "ローグ階層シンボルセット (roguesymset)",
   "secFontTitle": "フォント設定",
-  "secFontSub": "画面各部およびアスキーマップに使用するフォントを設定します",
+  "secFontSub": "画面各部およびアスキーマップのフォント・文字サイズを設定します",
   "fontAllLabel": "一括フォント変更",
+  "fontSizePresetTitle": "サイズ一括プリセット",
+  "fontSizePresetDesc": "画面サイズや好みに合わせて、全系統のサイズ・倍率を一括調整します",
+  "fontSizePresetStandard": "標準",
+  "fontSizePresetLarge": "大きめ",
+  "fontSizePresetExtraLarge": "特大",
   "fontMapLabel": "マップフォント",
-  "fontMapDesc": "タイル表示をOFFにした際のアスキーマップ描画に使用されます（※全角記号混入防止のため日本語フォールバックなし）",
+  "fontMapDesc": "タイル表示をOFFにした際のアスキーマップ描画に使用されます",
   "fontMsgLabel": "メッセージフォント",
+  "msgFontSizeTitle": "メッセージフォントサイズ",
   "fontStatusLabel": "ステータスフォント",
+  "statusFontSizeTitle": "ステータスフォントサイズ",
   "fontMenuLabel": "メニュー＆テキストフォント",
+  "menuFontSizeTitle": "メニュー＆テキストフォントサイズ",
+  "menuFontSizeDesc": "インベントリ、メニュー、ヘルプ、データベース、ガイドブック、終了時ハイライト等に適用されます",
   "fontUiLabel": "UI＆コントローラフォント",
+  "uiFontScaleTitle": "UI全体拡大倍率",
+  "uiFontScaleDesc": "設定画面、メニュー外のUI・確認ダイアログ等の文字倍率を変更します（仮想コントローラ除く）",
+  "fontSizePtLabel": "現在: {size} pt",
+  "@fontSizePtLabel": {
+    "placeholders": {
+      "size": { "type": "String" }
+    }
+  },
+  "uiScaleLabel": "現在: {scale}x",
+  "@uiScaleLabel": {
+    "placeholders": {
+      "scale": { "type": "String" }
+    }
+  },
   "fontAsciiScale": "アスキーマップ表示倍率",
   "fontAddCustom": "外部フォントを追加 (.ttf / .otf / .woff)",
   "fontDeleteCustom": "外部フォントの管理・削除",

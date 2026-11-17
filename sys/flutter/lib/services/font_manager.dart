@@ -1,11 +1,23 @@
 import 'dart:io';
 import 'package:flutter/foundation.dart';
-import 'package:flutter/painting.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter/widgets.dart';
 import 'package:path_provider/path_provider.dart';
 import '../utils/app_prefs.dart';
 import 'font_validator.dart';
 import 'tileset_manager.dart';
+
+/// フォントサイズの一括プリセット
+enum FontSizePreset {
+  /// 標準（スマホ・通常表示向け）
+  standard,
+
+  /// 大きめ（タブレット・PC大画面向け）
+  large,
+
+  /// 特大（高解像度モニター・視認性最優先向け）
+  extraLarge,
+}
 
 /// フォント設定の対象コンポーネント（5系統）
 enum FontTarget {
@@ -84,6 +96,10 @@ class FontManager extends ChangeNotifier {
   static const String prefFontMenu = 'pref_font_menu';
   static const String prefFontUi = 'pref_font_ui';
   static const String prefMapAsciiScale = 'pref_map_ascii_scale';
+  static const String prefMsgFontSize = 'msg_font_size';
+  static const String prefStatusFontSize = 'status_font_size';
+  static const String prefMenuFontSize = 'menu_font_size';
+  static const String prefUiFontScale = 'ui_font_scale';
 
   static bool _licensesRegistered = false;
 
@@ -225,6 +241,18 @@ http://creativecommons.org/publicdomain/zero/1.0/''',
   /// アスキーマップ表示倍率（デフォルト 1.0）
   double _mapAsciiScale = 1.0;
 
+  /// メッセージ領域フォントサイズ (pt: 8.0〜32.0、デフォルト 13.0)
+  double _messageFontSize = 13.0;
+
+  /// ステータス領域フォントサイズ (pt: 8.0〜32.0、デフォルト 13.0)
+  double _statusFontSize = 13.0;
+
+  /// メニュー＆テキスト領域フォントサイズ (pt: 8.0〜32.0、デフォルト 14.0)
+  double _menuFontSize = 14.0;
+
+  /// UI全体拡大倍率 (0.5〜2.5、デフォルト 1.0)
+  double _uiFontScale = 1.0;
+
   /// フォント別のアスペクト比（文字幅 / 高さ）キャッシュ
   final Map<String?, double> _aspectRatioCache = {};
 
@@ -247,6 +275,18 @@ http://creativecommons.org/publicdomain/zero/1.0/''',
   /// アスキーマップの表示倍率（1.0 〜 2.5）
   double get mapAsciiScale => _mapAsciiScale;
 
+  /// メッセージ領域のフォントサイズ（8.0 〜 32.0 pt）
+  double get messageFontSize => _messageFontSize;
+
+  /// ステータス領域のフォントサイズ（8.0 〜 32.0 pt）
+  double get statusFontSize => _statusFontSize;
+
+  /// メニュー＆テキスト領域のフォントサイズ（8.0 〜 32.0 pt）
+  double get menuFontSize => _menuFontSize;
+
+  /// UI全体の拡大倍率（0.5 〜 2.5）
+  double get uiFontScale => _uiFontScale;
+
   /// 初期化処理（Prefs ロード、外部フォント走査・動的登録）
   Future<void> init({AppPrefs? prefs, Directory? customFontsDir}) async {
     registerFontLicenses();
@@ -264,6 +304,29 @@ http://creativecommons.org/publicdomain/zero/1.0/''',
     }
 
     // 保存されている設定値を読み込み
+    _readPrefsValues();
+
+    // 外部フォントディレクトリを走査して動的登録
+    await _loadCustomFontsFromStorage();
+
+    // 削除されたフォント (例: 'Unscii-16') や存在しないフォント ID が保存されていた場合の安全な自動マイグレーション
+    await _validateSelectedFonts();
+
+    _isInitialized = true;
+    notifyListeners();
+  }
+
+  /// AppPrefs からフォント種類およびサイズ設定を再読み込みして即時反映
+  /// （設定インポート・設定初期化時などに使用）
+  Future<void> syncFromPrefs() async {
+    _prefs ??= await AppPrefs.getInstance();
+    _readPrefsValues();
+    await _validateSelectedFonts();
+    notifyListeners();
+  }
+
+  void _readPrefsValues() {
+    if (_prefs == null) return;
     _selectedFontIds[FontTarget.map] =
         _prefs!.getString(prefFontMap) ?? 'Terminus';
     _selectedFontIds[FontTarget.message] =
@@ -274,12 +337,20 @@ http://creativecommons.org/publicdomain/zero/1.0/''',
         _prefs!.getString(prefFontMenu) ?? 'system';
     _selectedFontIds[FontTarget.ui] =
         _prefs!.getString(prefFontUi) ?? 'system';
-    _mapAsciiScale = _prefs!.getDouble(prefMapAsciiScale) ?? 1.0;
+    _mapAsciiScale =
+        (_prefs!.getDouble(prefMapAsciiScale) ?? 1.0).clamp(1.0, 2.5);
+    _messageFontSize =
+        (_prefs!.getDouble(prefMsgFontSize) ?? 13.0).clamp(8.0, 32.0);
+    _statusFontSize =
+        (_prefs!.getDouble(prefStatusFontSize) ?? 13.0).clamp(8.0, 32.0);
+    _menuFontSize =
+        (_prefs!.getDouble(prefMenuFontSize) ?? 14.0).clamp(8.0, 32.0);
+    _uiFontScale =
+        (_prefs!.getDouble(prefUiFontScale) ?? 1.0).clamp(0.5, 2.5);
+  }
 
-    // 外部フォントディレクトリを走査して動的登録
-    await _loadCustomFontsFromStorage();
-
-    // 削除されたフォント (例: 'Unscii-16') や存在しないフォント ID が保存されていた場合の安全な自動マイグレーション
+  Future<void> _validateSelectedFonts() async {
+    if (_prefs == null) return;
     final validIds = availableFonts.map((f) => f.id).toSet();
     for (final target in FontTarget.values) {
       final currentId = _selectedFontIds[target];
@@ -290,9 +361,6 @@ http://creativecommons.org/publicdomain/zero/1.0/''',
         await _prefs!.setString(prefKey, fallbackId);
       }
     }
-
-    _isInitialized = true;
-    notifyListeners();
   }
 
   /// 外部フォントをローカルストレージからスキャンして Flutter に登録
@@ -379,6 +447,78 @@ http://creativecommons.org/publicdomain/zero/1.0/''',
     _mapAsciiScale = scale.clamp(1.0, 2.5);
     if (_prefs != null) {
       await _prefs!.setDouble(prefMapAsciiScale, _mapAsciiScale);
+    }
+    notifyListeners();
+  }
+
+  /// メッセージ領域フォントサイズの設定（8.0 〜 32.0 pt）
+  Future<void> setMessageFontSize(double size) async {
+    _messageFontSize = size.clamp(8.0, 32.0);
+    if (_prefs != null) {
+      await _prefs!.setDouble(prefMsgFontSize, _messageFontSize);
+    }
+    notifyListeners();
+  }
+
+  /// ステータス領域フォントサイズの設定（8.0 〜 32.0 pt）
+  Future<void> setStatusFontSize(double size) async {
+    _statusFontSize = size.clamp(8.0, 32.0);
+    if (_prefs != null) {
+      await _prefs!.setDouble(prefStatusFontSize, _statusFontSize);
+    }
+    notifyListeners();
+  }
+
+  /// メニュー＆テキスト領域フォントサイズの設定（8.0 〜 32.0 pt）
+  Future<void> setMenuFontSize(double size) async {
+    _menuFontSize = size.clamp(8.0, 32.0);
+    if (_prefs != null) {
+      await _prefs!.setDouble(prefMenuFontSize, _menuFontSize);
+    }
+    notifyListeners();
+  }
+
+  /// UI全体拡大倍率の設定（0.5 〜 2.5）
+  Future<void> setUiFontScale(double scale) async {
+    _uiFontScale = scale.clamp(0.5, 2.5);
+    if (_prefs != null) {
+      await _prefs!.setDouble(prefUiFontScale, _uiFontScale);
+    }
+    notifyListeners();
+  }
+
+  /// 全系統のサイズ・倍率を一括プリセット適用
+  Future<void> applySizePreset(FontSizePreset preset) async {
+    switch (preset) {
+      case FontSizePreset.standard:
+        _mapAsciiScale = 1.0;
+        _messageFontSize = 13.0;
+        _statusFontSize = 13.0;
+        _menuFontSize = 14.0;
+        _uiFontScale = 1.0;
+        break;
+      case FontSizePreset.large:
+        _mapAsciiScale = 1.3;
+        _messageFontSize = 17.0;
+        _statusFontSize = 16.0;
+        _menuFontSize = 18.0;
+        _uiFontScale = 1.25;
+        break;
+      case FontSizePreset.extraLarge:
+        _mapAsciiScale = 1.6;
+        _messageFontSize = 21.0;
+        _statusFontSize = 20.0;
+        _menuFontSize = 22.0;
+        _uiFontScale = 1.5;
+        break;
+    }
+
+    if (_prefs != null) {
+      await _prefs!.setDouble(prefMapAsciiScale, _mapAsciiScale);
+      await _prefs!.setDouble(prefMsgFontSize, _messageFontSize);
+      await _prefs!.setDouble(prefStatusFontSize, _statusFontSize);
+      await _prefs!.setDouble(prefMenuFontSize, _menuFontSize);
+      await _prefs!.setDouble(prefUiFontScale, _uiFontScale);
     }
     notifyListeners();
   }
@@ -589,5 +729,25 @@ http://creativecommons.org/publicdomain/zero/1.0/''',
       case FontTarget.ui:
         return prefFontUi;
     }
+  }
+
+  /// メニュー＆テキスト領域用のコンテンツラッパー
+  /// 親の uiFontScale を上書きして menuFontSize 基準の TextScaler を適用し、
+  /// FontTarget.menu のフォントファミリを継承させます。
+  static Widget wrapMenuContent(BuildContext context, {required Widget child}) {
+    final mgr = instance;
+    final menuStyle = mgr.getStyle(FontTarget.menu);
+    return MediaQuery(
+      data: MediaQuery.of(context).copyWith(
+        textScaler: TextScaler.linear(mgr.menuFontSize / 14.0),
+      ),
+      child: DefaultTextStyle.merge(
+        style: TextStyle(
+          fontFamily: menuStyle.fontFamily,
+          fontFamilyFallback: menuStyle.fontFamilyFallback,
+        ),
+        child: child,
+      ),
+    );
   }
 }

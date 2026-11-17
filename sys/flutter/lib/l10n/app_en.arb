@@ -520,14 +520,37 @@
   "symsetLabel": "Dungeon Symbol Set (symset)",
   "roguesymsetLabel": "Rogue Level Symbol Set (roguesymset)",
   "secFontTitle": "Font Settings",
-  "secFontSub": "Configure fonts for UI components and ASCII map",
+  "secFontSub": "Configure fonts and text sizes for UI components and ASCII map",
   "fontAllLabel": "Apply Font to All",
+  "fontSizePresetTitle": "Size Preset (All)",
+  "fontSizePresetDesc": "Adjust all font sizes and scales at once according to your screen size or preference",
+  "fontSizePresetStandard": "Standard",
+  "fontSizePresetLarge": "Large",
+  "fontSizePresetExtraLarge": "Extra Large",
   "fontMapLabel": "Map Font",
-  "fontMapDesc": "Used for ASCII map rendering when tiles are OFF (no Japanese fallback to prevent layout corruption)",
+  "fontMapDesc": "Used for ASCII map rendering when tiles are OFF",
   "fontMsgLabel": "Message Font",
+  "msgFontSizeTitle": "Message Font Size",
   "fontStatusLabel": "Status Font",
+  "statusFontSizeTitle": "Status Font Size",
   "fontMenuLabel": "Menu & Text Font",
+  "menuFontSizeTitle": "Menu & Text Font Size",
+  "menuFontSizeDesc": "Applied to inventory, menus, help, database, guidebook, exit highlights, etc.",
   "fontUiLabel": "UI & Controller Font",
+  "uiFontScaleTitle": "UI Overall Scale",
+  "uiFontScaleDesc": "Adjusts text scale for settings, drawers, and dialogs (excludes virtual controllers)",
+  "fontSizePtLabel": "Current: {size} pt",
+  "@fontSizePtLabel": {
+    "placeholders": {
+      "size": { "type": "String" }
+    }
+  },
+  "uiScaleLabel": "Current: {scale}x",
+  "@uiScaleLabel": {
+    "placeholders": {
+      "scale": { "type": "String" }
+    }
+  },
   "fontAsciiScale": "ASCII Map Scale",
   "fontAddCustom": "Add Custom Font (.ttf / .otf / .woff)",
   "fontDeleteCustom": "Manage Custom Fonts",

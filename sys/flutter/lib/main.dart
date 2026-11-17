@@ -117,8 +117,17 @@ class MyAppState extends State<MyApp> {
       listenable: FontManager.instance,
       builder: (context, _) {
         final uiFont = FontManager.instance.getSelectedFont(FontTarget.ui);
+        final uiScale = FontManager.instance.uiFontScale;
         return MaterialApp(
           title: 'DartHack',
+          builder: (context, child) {
+            return MediaQuery(
+              data: MediaQuery.of(context).copyWith(
+                textScaler: TextScaler.linear(uiScale),
+              ),
+              child: child ?? const SizedBox.shrink(),
+            );
+          },
           localizationsDelegates: AppLocalizations.localizationsDelegates,
           supportedLocales: AppLocalizations.supportedLocales,
           locale: Locale(_localeStr),
@@ -267,7 +276,7 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
   double _shortcutPadEffectiveScale = 1.0;
   double _cmdPanelEffectiveScale = 1.0;
   int _statusDisplayMode = 0; // 0: 領域に合わせて文字サイズ縮小(Fit), 1: 領域の可変高さ(Wrap)
-  double _statusFontSize = 13.0; // ステータス領域フォントサイズ (pt)
+  double get _statusFontSize => FontManager.instance.statusFontSize;
   String _statusLineLayout = 'standard'; // 'standard', 'single_all', 'single_compact'
   int _tombstoneDisplayMode = 0; // 0: 画像+文字オーバーレイ, 1: Cコア出力そのまま(テキスト)
   ScreenMode _screenMode = ScreenMode.normal; // 0: 通常, 1: イマーシブ
@@ -297,7 +306,7 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
   // メッセージ領域設定
   int _msgLineCount = 5;         // 表示行数 (1〜15)
   double _msgOpacity = 0.70;     // 背景透過度 (0.0〜1.0)
-  double _msgFontSize = 13.0;    // フォントサイズ (pt)
+  double get _msgFontSize => FontManager.instance.messageFontSize;
 
   // 物理キー割り当て設定
   int _volupAction = 0;
@@ -389,7 +398,6 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
       _shortcutPadScale = prefs.getDouble('shortcut_pad_scale') ?? 1.0;
       _cmdPanelScale = prefs.getDouble('cmd_panel_scale') ?? 1.0;
       _statusDisplayMode = prefs.getInt('status_display_mode') ?? 0;
-      _statusFontSize = (prefs.getDouble('status_font_size') ?? 13.0).clamp(8.0, 32.0);
       final rawStatusLayout = prefs.getString('status_line_layout') ?? 'standard';
       _statusLineLayout =
           const ['standard', 'single_all', 'single_compact'].contains(rawStatusLayout)
@@ -444,7 +452,6 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
       // メッセージ領域設定のロード
       _msgLineCount = prefs.getInt('msg_line_count') ?? 5;
       _msgOpacity = prefs.getDouble('msg_opacity') ?? 0.70;
-      _msgFontSize = (prefs.getDouble('msg_font_size') ?? 13.0).clamp(8.0, 32.0);
 
       // 言語設定のロード
       _selectedLanguage = prefs.getString('selected_language') ?? 'ja';
@@ -452,6 +459,7 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
       // コントロールのバージョンを更新
       _controlsVersion++;
     });
+    unawaited(FontManager.instance.syncFromPrefs());
     if (tilesetChanged && _assetsReady) {
       unawaited(_loadTileset(newTileset));
     }
@@ -4903,7 +4911,9 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
                       child: Column(
                         children: [
                           Expanded(
-                            child: _buildGameScreen(),
+                            child: MediaQuery.withNoTextScaling(
+                              child: _buildGameScreen(),
+                            ),
                           ),
                         ],
                       ),
@@ -4911,11 +4921,15 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
                   : (_isGameFinished ? _buildEndScreen() : _buildStartScreen()),
               ExcludeFocus(
                 excluding: _hasAnyActiveOverlay,
-                child: _buildControllerOverlay(),
+                child: MediaQuery.withNoTextScaling(
+                  child: _buildControllerOverlay(),
+                ),
               ),
               ExcludeFocus(
                 excluding: _hasAnyActiveOverlay,
-                child: _buildMessageOverlay(),
+                child: MediaQuery.withNoTextScaling(
+                  child: _buildMessageOverlay(),
+                ),
               ),
               if (_isGameRunning && _isMainGameStarted) ...[
                 _buildMenuButton(),

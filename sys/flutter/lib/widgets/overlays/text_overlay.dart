@@ -397,7 +397,11 @@ class TextOverlayState extends State<TextOverlay> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Expanded(
-                  child: () {
+                  child: MediaQuery(
+                    data: MediaQuery.of(context).copyWith(
+                      textScaler: TextScaler.linear(FontManager.instance.menuFontSize / 14.0),
+                    ),
+                    child: () {
                     final isTombstone = widget.textLines.length >= 13 &&
                         ((widget.textLines.any((line) => line.contains('REST')) &&
                             widget.textLines.any((line) => line.contains('PEACE'))) ||
@@ -550,6 +554,7 @@ class TextOverlayState extends State<TextOverlay> {
                       ),
                     );
                   }(),
+                  ),
                 ),
                 const SizedBox(height: 12),
                 Center(

@@ -4,6 +4,7 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import '../l10n/app_localizations.dart';
+import '../services/font_manager.dart';
 import 'exit_ad_banner.dart';
 
 class ExitHighlightDialog extends StatefulWidget {
@@ -156,8 +157,10 @@ class _ExitHighlightDialogState extends State<ExitHighlightDialog>
             l10n.quit,
             style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
           ),
-          content: SingleChildScrollView(
-            child: Column(
+          content: FontManager.wrapMenuContent(
+            context,
+            child: SingleChildScrollView(
+              child: Column(
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -245,6 +248,7 @@ class _ExitHighlightDialogState extends State<ExitHighlightDialog>
                 ),
               ],
             ),
+          ),
           ),
           actions: [
             Container(

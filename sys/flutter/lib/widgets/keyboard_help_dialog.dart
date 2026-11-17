@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import '../services/font_manager.dart';
 
 /// 操作ヘルプを表示するコンテキスト種別
 enum KeyboardHelpContext {
@@ -244,8 +245,10 @@ class _KeyboardHelpDialogState extends State<KeyboardHelpDialog> {
 
                   // 操作一覧リスト
                   Flexible(
-                    child: SingleChildScrollView(
-                      controller: _scrollController,
+                    child: FontManager.wrapMenuContent(
+                      context,
+                      child: SingleChildScrollView(
+                        controller: _scrollController,
                       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                       child: LayoutBuilder(
                         builder: (context, constraints) {
@@ -298,6 +301,7 @@ class _KeyboardHelpDialogState extends State<KeyboardHelpDialog> {
                           );
                         },
                       ),
+                    ),
                     ),
                   ),
 

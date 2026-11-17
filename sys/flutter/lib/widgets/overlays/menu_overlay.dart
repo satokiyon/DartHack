@@ -1054,15 +1054,19 @@ class MenuOverlayState extends State<MenuOverlay> {
                   const SizedBox(height: 8),
                 ],
                 Expanded(
-                  child: Container(
-                    decoration: BoxDecoration(
-                      color: Colors.black.withValues(alpha: 0.18),
-                      borderRadius: BorderRadius.circular(8),
-                      border: Border.all(color: Colors.white.withValues(alpha: 0.08)),
+                  child: MediaQuery(
+                    data: MediaQuery.of(context).copyWith(
+                      textScaler: TextScaler.linear(FontManager.instance.menuFontSize / 14.0),
                     ),
-                    child: LayoutBuilder(
-                      builder: (context, constraints) {
-                        final listView = ListView.builder(
+                    child: Container(
+                      decoration: BoxDecoration(
+                        color: Colors.black.withValues(alpha: 0.18),
+                        borderRadius: BorderRadius.circular(8),
+                        border: Border.all(color: Colors.white.withValues(alpha: 0.08)),
+                      ),
+                      child: LayoutBuilder(
+                        builder: (context, constraints) {
+                          final listView = ListView.builder(
                           controller: _scrollController,
                           padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 6),
                           itemCount: filteredItems.length,
@@ -1419,6 +1423,7 @@ class MenuOverlayState extends State<MenuOverlay> {
                       },
                     ),
                   ),
+                ),
                 ),
                 const SizedBox(height: 10),
                 Center(

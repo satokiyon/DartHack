@@ -1476,29 +1476,75 @@ class AppLocalizationsEn extends AppLocalizations {
   String get secFontTitle => 'Font Settings';
 
   @override
-  String get secFontSub => 'Configure fonts for UI components and ASCII map';
+  String get secFontSub =>
+      'Configure fonts and text sizes for UI components and ASCII map';
 
   @override
   String get fontAllLabel => 'Apply Font to All';
 
   @override
+  String get fontSizePresetTitle => 'Size Preset (All)';
+
+  @override
+  String get fontSizePresetDesc =>
+      'Adjust all font sizes and scales at once according to your screen size or preference';
+
+  @override
+  String get fontSizePresetStandard => 'Standard';
+
+  @override
+  String get fontSizePresetLarge => 'Large';
+
+  @override
+  String get fontSizePresetExtraLarge => 'Extra Large';
+
+  @override
   String get fontMapLabel => 'Map Font';
 
   @override
-  String get fontMapDesc =>
-      'Used for ASCII map rendering when tiles are OFF (no Japanese fallback to prevent layout corruption)';
+  String get fontMapDesc => 'Used for ASCII map rendering when tiles are OFF';
 
   @override
   String get fontMsgLabel => 'Message Font';
 
   @override
+  String get msgFontSizeTitle => 'Message Font Size';
+
+  @override
   String get fontStatusLabel => 'Status Font';
+
+  @override
+  String get statusFontSizeTitle => 'Status Font Size';
 
   @override
   String get fontMenuLabel => 'Menu & Text Font';
 
   @override
+  String get menuFontSizeTitle => 'Menu & Text Font Size';
+
+  @override
+  String get menuFontSizeDesc =>
+      'Applied to inventory, menus, help, database, guidebook, exit highlights, etc.';
+
+  @override
   String get fontUiLabel => 'UI & Controller Font';
+
+  @override
+  String get uiFontScaleTitle => 'UI Overall Scale';
+
+  @override
+  String get uiFontScaleDesc =>
+      'Adjusts text scale for settings, drawers, and dialogs (excludes virtual controllers)';
+
+  @override
+  String fontSizePtLabel(String size) {
+    return 'Current: $size pt';
+  }
+
+  @override
+  String uiScaleLabel(String scale) {
+    return 'Current: ${scale}x';
+  }
 
   @override
   String get fontAsciiScale => 'ASCII Map Scale';

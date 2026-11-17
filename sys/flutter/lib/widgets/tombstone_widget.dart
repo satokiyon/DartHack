@@ -110,8 +110,9 @@ class UniversalTombstoneWidget extends StatelessWidget {
                         fit: BoxFit.cover,
                       ),
                       Positioned.fill(
-                        child: LayoutBuilder(
-                          builder: (context, constraints) {
+                        child: MediaQuery.withNoTextScaling(
+                          child: LayoutBuilder(
+                            builder: (context, constraints) {
                             final width = constraints.maxWidth;
                             final height = constraints.maxHeight;
                             final scale = width / 400;
@@ -218,6 +219,7 @@ class UniversalTombstoneWidget extends StatelessWidget {
                               ),
                             );
                           },
+                        ),
                         ),
                       ),
                     ],

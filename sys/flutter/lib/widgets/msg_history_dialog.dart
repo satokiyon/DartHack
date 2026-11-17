@@ -138,28 +138,30 @@ void showMsgHistoryPanel({
                               style: const TextStyle(color: Colors.white54),
                             ),
                           )
-                        : ListView.builder(
-                            controller: scrollController,
-                            reverse: true,
-                            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                            itemCount: messages.length,
-                            itemBuilder: (_, index) {
-                              final dataIndex = messages.length - 1 - index;
-                              final line = messages[dataIndex];
-                              final ratio = (dataIndex + 1) / messages.length;
-                              final color = Color.lerp(Colors.white38, Colors.white, ratio)!;
-                              return Padding(
-                                padding: const EdgeInsets.symmetric(vertical: 2),
-                                child: Text(
-                                  line,
-                                  style: FontManager.instance.getStyle(
-                                    FontTarget.message,
-                                    color: color,
-                                    fontSize: msgFontSize,
+                        : MediaQuery.withNoTextScaling(
+                            child: ListView.builder(
+                              controller: scrollController,
+                              reverse: true,
+                              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                              itemCount: messages.length,
+                              itemBuilder: (_, index) {
+                                final dataIndex = messages.length - 1 - index;
+                                final line = messages[dataIndex];
+                                final ratio = (dataIndex + 1) / messages.length;
+                                final color = Color.lerp(Colors.white38, Colors.white, ratio)!;
+                                return Padding(
+                                  padding: const EdgeInsets.symmetric(vertical: 2),
+                                  child: Text(
+                                    line,
+                                    style: FontManager.instance.getStyle(
+                                      FontTarget.message,
+                                      color: color,
+                                      fontSize: msgFontSize,
+                                    ),
                                   ),
-                                ),
-                              );
-                            },
+                                );
+                              },
+                            ),
                           ),
                   ),
                   Padding(

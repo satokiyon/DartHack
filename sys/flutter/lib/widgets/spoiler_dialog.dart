@@ -6,6 +6,7 @@ import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 import '../utils/app_prefs.dart';
 
 import '../l10n/app_localizations.dart';
+import '../services/font_manager.dart';
 import 'guidebook_dialog.dart';
 import 'keyboard_help_dialog.dart';
 
@@ -1297,8 +1298,10 @@ class _SpoilerDialogState extends State<SpoilerDialog> {
 
                     // 目次リスト
                     Expanded(
-                      child: ListView.builder(
-                        controller: tocScrollController,
+                      child: FontManager.wrapMenuContent(
+                        context,
+                        child: ListView.builder(
+                          controller: tocScrollController,
                         itemCount: filteredSections.length,
                         itemBuilder: (context, index) {
                           final sec = filteredSections[index];
@@ -1396,6 +1399,7 @@ class _SpoilerDialogState extends State<SpoilerDialog> {
                             ),
                           );
                         },
+                      ),
                       ),
                     ),
                   ],
@@ -2104,28 +2108,31 @@ class _SpoilerDialogState extends State<SpoilerDialog> {
 
                     // 本文表示エリア
                     Expanded(
-                      child: _isLoading
-                          ? const Center(
-                              child: CircularProgressIndicator(
-                                valueColor: AlwaysStoppedAnimation<Color>(
-                                    Colors.amberAccent),
-                              ),
-                            )
-                          : _buildHoldPeekDetector(
-                              behavior: HitTestBehavior.translucent,
-                              child: ScrollablePositionedList.builder(
-                                itemScrollController: _itemScrollController,
-                                itemPositionsListener: _itemPositionsListener,
-                                initialScrollIndex: initialIndex,
-                                initialAlignment: initialAlign,
-                                padding: const EdgeInsets.all(16),
-                                itemCount: _blocks.length,
-                                itemBuilder: (context, index) {
-                                    return _buildBlockWidget(
-                                        index, _blocks[index]);
-                                  },
+                      child: FontManager.wrapMenuContent(
+                        context,
+                        child: _isLoading
+                            ? const Center(
+                                child: CircularProgressIndicator(
+                                  valueColor: AlwaysStoppedAnimation<Color>(
+                                      Colors.amberAccent),
                                 ),
-                              ),
+                              )
+                            : _buildHoldPeekDetector(
+                                behavior: HitTestBehavior.translucent,
+                                child: ScrollablePositionedList.builder(
+                                  itemScrollController: _itemScrollController,
+                                  itemPositionsListener: _itemPositionsListener,
+                                  initialScrollIndex: initialIndex,
+                                  initialAlignment: initialAlign,
+                                  padding: const EdgeInsets.all(16),
+                                  itemCount: _blocks.length,
+                                  itemBuilder: (context, index) {
+                                      return _buildBlockWidget(
+                                          index, _blocks[index]);
+                                    },
+                                  ),
+                                ),
+                      ),
                       ),
                   ],
                 ),

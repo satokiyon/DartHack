@@ -7,6 +7,7 @@ import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 import '../utils/app_prefs.dart';
 
 import '../l10n/app_localizations.dart';
+import '../services/font_manager.dart';
 import 'spoiler_dialog.dart';
 import 'keyboard_help_dialog.dart';
 
@@ -1466,8 +1467,10 @@ class _GuidebookDialogState extends State<GuidebookDialog> {
 
                     // セクション一覧リスト
                     Expanded(
-                      child: ListView.builder(
-                        controller: tocScrollController,
+                      child: FontManager.wrapMenuContent(
+                        context,
+                        child: ListView.builder(
+                          controller: tocScrollController,
                         itemCount: filteredSections.length,
                         itemBuilder: (context, index) {
                           final sec = filteredSections[index];
@@ -1574,6 +1577,7 @@ class _GuidebookDialogState extends State<GuidebookDialog> {
                             ),
                           );
                         },
+                      ),
                       ),
                     ),
                   ],
@@ -2339,32 +2343,35 @@ class _GuidebookDialogState extends State<GuidebookDialog> {
 
                     // ガイドブック本文ブロックリスト
                     Expanded(
-                      child: _isLoading
-                          ? const Center(
-                              child: CircularProgressIndicator(
-                                  color: Colors.amberAccent),
-                            )
-                          : _blocks.isEmpty
-                              ? const Center(
-                                  child: Text('コンテンツがありません',
-                                      style: TextStyle(color: Colors.white54)),
-                                )
-                              : _buildHoldPeekDetector(
-                                  behavior: HitTestBehavior.translucent,
-                                  child: ScrollablePositionedList.builder(
-                                    itemScrollController:
-                                        _itemScrollController,
-                                    itemPositionsListener:
-                                        _itemPositionsListener,
-                                    initialScrollIndex: initialIndex,
-                                    initialAlignment: initialAlign,
-                                    padding: const EdgeInsets.symmetric(
-                                        horizontal: 16, vertical: 12),
-                                    itemCount: _blocks.length,
-                                    itemBuilder: (context, index) =>
-                                        _buildBlockItem(context, index),
+                      child: FontManager.wrapMenuContent(
+                        context,
+                        child: _isLoading
+                            ? const Center(
+                                child: CircularProgressIndicator(
+                                    color: Colors.amberAccent),
+                              )
+                            : _blocks.isEmpty
+                                ? const Center(
+                                    child: Text('コンテンツがありません',
+                                        style: TextStyle(color: Colors.white54)),
+                                  )
+                                : _buildHoldPeekDetector(
+                                    behavior: HitTestBehavior.translucent,
+                                    child: ScrollablePositionedList.builder(
+                                      itemScrollController:
+                                          _itemScrollController,
+                                      itemPositionsListener:
+                                          _itemPositionsListener,
+                                      initialScrollIndex: initialIndex,
+                                      initialAlignment: initialAlign,
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 16, vertical: 12),
+                                      itemCount: _blocks.length,
+                                      itemBuilder: (context, index) =>
+                                          _buildBlockItem(context, index),
+                                    ),
                                   ),
-                                ),
+                      ),
                     ),
                   ],
                 ),

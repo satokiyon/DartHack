@@ -232,4 +232,80 @@ void main() {
       expect(mockPrefs.getString(FontManager.prefFontMessage), equals(customFontId));
     });
   });
+
+  group('FontManager サイズ・倍率・プリセット管理', () {
+    test('各系統の初期サイズ・倍率が正しく設定されている', () async {
+      final manager = FontManager.instance;
+      await manager.init(prefs: mockPrefs, customFontsDir: tempDir);
+
+      expect(manager.mapAsciiScale, 1.0);
+      expect(manager.messageFontSize, 13.0);
+      expect(manager.statusFontSize, 13.0);
+      expect(manager.menuFontSize, 14.0);
+      expect(manager.uiFontScale, 1.0);
+    });
+
+    test('各サイズ・倍率の保存と範囲クランプが機能する', () async {
+      final manager = FontManager.instance;
+      await manager.init(prefs: mockPrefs, customFontsDir: tempDir);
+
+      await manager.setMessageFontSize(40.0);
+      expect(manager.messageFontSize, 32.0);
+      expect(mockPrefs.getDouble(FontManager.prefMsgFontSize), 32.0);
+
+      await manager.setStatusFontSize(4.0);
+      expect(manager.statusFontSize, 8.0);
+      expect(mockPrefs.getDouble(FontManager.prefStatusFontSize), 8.0);
+
+      await manager.setMenuFontSize(20.0);
+      expect(manager.menuFontSize, 20.0);
+      expect(mockPrefs.getDouble(FontManager.prefMenuFontSize), 20.0);
+
+      await manager.setUiFontScale(3.0);
+      expect(manager.uiFontScale, 2.5);
+      expect(mockPrefs.getDouble(FontManager.prefUiFontScale), 2.5);
+
+      await manager.setUiFontScale(0.2);
+      expect(manager.uiFontScale, 0.5);
+      expect(mockPrefs.getDouble(FontManager.prefUiFontScale), 0.5);
+    });
+
+    test('サイズ一括プリセット (standard / large / extraLarge) が機能する', () async {
+      final manager = FontManager.instance;
+      await manager.init(prefs: mockPrefs, customFontsDir: tempDir);
+
+      await manager.applySizePreset(FontSizePreset.large);
+      expect(manager.mapAsciiScale, 1.3);
+      expect(manager.messageFontSize, 17.0);
+      expect(manager.statusFontSize, 16.0);
+      expect(manager.menuFontSize, 18.0);
+      expect(manager.uiFontScale, 1.25);
+
+      await manager.applySizePreset(FontSizePreset.extraLarge);
+      expect(manager.mapAsciiScale, 1.6);
+      expect(manager.messageFontSize, 21.0);
+      expect(manager.statusFontSize, 20.0);
+      expect(manager.menuFontSize, 22.0);
+      expect(manager.uiFontScale, 1.5);
+
+      await manager.applySizePreset(FontSizePreset.standard);
+      expect(manager.mapAsciiScale, 1.0);
+      expect(manager.messageFontSize, 13.0);
+      expect(manager.statusFontSize, 13.0);
+      expect(manager.menuFontSize, 14.0);
+      expect(manager.uiFontScale, 1.0);
+    });
+
+    test('syncFromPrefs により外部で変更された Prefs 値がメモリへ再同期される', () async {
+      final manager = FontManager.instance;
+      await manager.init(prefs: mockPrefs, customFontsDir: tempDir);
+
+      await mockPrefs.setDouble(FontManager.prefMenuFontSize, 24.0);
+      await mockPrefs.setDouble(FontManager.prefUiFontScale, 1.4);
+
+      await manager.syncFromPrefs();
+      expect(manager.menuFontSize, 24.0);
+      expect(manager.uiFontScale, 1.4);
+    });
+  });
 }

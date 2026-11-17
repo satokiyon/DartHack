@@ -2837,7 +2837,7 @@ abstract class AppLocalizations {
   /// No description provided for @secFontSub.
   ///
   /// In ja, this message translates to:
-  /// **'画面各部およびアスキーマップに使用するフォントを設定します'**
+  /// **'画面各部およびアスキーマップのフォント・文字サイズを設定します'**
   String get secFontSub;
 
   /// No description provided for @fontAllLabel.
@@ -2845,6 +2845,36 @@ abstract class AppLocalizations {
   /// In ja, this message translates to:
   /// **'一括フォント変更'**
   String get fontAllLabel;
+
+  /// No description provided for @fontSizePresetTitle.
+  ///
+  /// In ja, this message translates to:
+  /// **'サイズ一括プリセット'**
+  String get fontSizePresetTitle;
+
+  /// No description provided for @fontSizePresetDesc.
+  ///
+  /// In ja, this message translates to:
+  /// **'画面サイズや好みに合わせて、全系統のサイズ・倍率を一括調整します'**
+  String get fontSizePresetDesc;
+
+  /// No description provided for @fontSizePresetStandard.
+  ///
+  /// In ja, this message translates to:
+  /// **'標準'**
+  String get fontSizePresetStandard;
+
+  /// No description provided for @fontSizePresetLarge.
+  ///
+  /// In ja, this message translates to:
+  /// **'大きめ'**
+  String get fontSizePresetLarge;
+
+  /// No description provided for @fontSizePresetExtraLarge.
+  ///
+  /// In ja, this message translates to:
+  /// **'特大'**
+  String get fontSizePresetExtraLarge;
 
   /// No description provided for @fontMapLabel.
   ///
@@ -2855,7 +2885,7 @@ abstract class AppLocalizations {
   /// No description provided for @fontMapDesc.
   ///
   /// In ja, this message translates to:
-  /// **'タイル表示をOFFにした際のアスキーマップ描画に使用されます（※全角記号混入防止のため日本語フォールバックなし）'**
+  /// **'タイル表示をOFFにした際のアスキーマップ描画に使用されます'**
   String get fontMapDesc;
 
   /// No description provided for @fontMsgLabel.
@@ -2864,11 +2894,23 @@ abstract class AppLocalizations {
   /// **'メッセージフォント'**
   String get fontMsgLabel;
 
+  /// No description provided for @msgFontSizeTitle.
+  ///
+  /// In ja, this message translates to:
+  /// **'メッセージフォントサイズ'**
+  String get msgFontSizeTitle;
+
   /// No description provided for @fontStatusLabel.
   ///
   /// In ja, this message translates to:
   /// **'ステータスフォント'**
   String get fontStatusLabel;
+
+  /// No description provided for @statusFontSizeTitle.
+  ///
+  /// In ja, this message translates to:
+  /// **'ステータスフォントサイズ'**
+  String get statusFontSizeTitle;
 
   /// No description provided for @fontMenuLabel.
   ///
@@ -2876,11 +2918,47 @@ abstract class AppLocalizations {
   /// **'メニュー＆テキストフォント'**
   String get fontMenuLabel;
 
+  /// No description provided for @menuFontSizeTitle.
+  ///
+  /// In ja, this message translates to:
+  /// **'メニュー＆テキストフォントサイズ'**
+  String get menuFontSizeTitle;
+
+  /// No description provided for @menuFontSizeDesc.
+  ///
+  /// In ja, this message translates to:
+  /// **'インベントリ、メニュー、ヘルプ、データベース、ガイドブック、終了時ハイライト等に適用されます'**
+  String get menuFontSizeDesc;
+
   /// No description provided for @fontUiLabel.
   ///
   /// In ja, this message translates to:
   /// **'UI＆コントローラフォント'**
   String get fontUiLabel;
+
+  /// No description provided for @uiFontScaleTitle.
+  ///
+  /// In ja, this message translates to:
+  /// **'UI全体拡大倍率'**
+  String get uiFontScaleTitle;
+
+  /// No description provided for @uiFontScaleDesc.
+  ///
+  /// In ja, this message translates to:
+  /// **'設定画面、メニュー外のUI・確認ダイアログ等の文字倍率を変更します（仮想コントローラ除く）'**
+  String get uiFontScaleDesc;
+
+  /// No description provided for @fontSizePtLabel.
+  ///
+  /// In ja, this message translates to:
+  /// **'現在: {size} pt'**
+  String fontSizePtLabel(String size);
+
+  /// No description provided for @uiScaleLabel.
+  ///
+  /// In ja, this message translates to:
+  /// **'現在: {scale}x'**
+  String uiScaleLabel(String scale);
 
   /// No description provided for @fontAsciiScale.
   ///

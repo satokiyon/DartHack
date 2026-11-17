@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import '../models/topten_entry.dart';
 import '../models/xlog_entry.dart';
+import '../services/font_manager.dart';
 import '../utils/app_prefs.dart';
 import 'keyboard_help_dialog.dart';
 
@@ -434,8 +435,10 @@ class _ScoreDetailDialogState extends State<ScoreDetailDialog> {
 
                 // スクロール可能な詳細本体
                 Expanded(
-                  child: Scrollbar(
-                    controller: _scrollController,
+                  child: FontManager.wrapMenuContent(
+                    context,
+                    child: Scrollbar(
+                      controller: _scrollController,
                     thumbVisibility: true,
                     child: SingleChildScrollView(
                       controller: _scrollController,
@@ -640,6 +643,7 @@ class _ScoreDetailDialogState extends State<ScoreDetailDialog> {
                         ],
                       ),
                     ),
+                  ),
                   ),
                 ),
 

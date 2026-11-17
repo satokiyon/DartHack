@@ -132,7 +132,6 @@ class _SettingsPageState extends State<SettingsPage> {
   String _selectedSymset = 'IBMGraphics_2';
   String _selectedRogueSymset = 'Default';
   int _statusDisplayMode = 0;
-  double _statusFontSize = 13.0; // ステータス領域フォントサイズ (pt)
   String _statusLineLayout = 'standard'; // 'standard', 'single_all', 'single_compact'
   int _tombstoneDisplayMode = 0; // 0: 画像+文字オーバーレイ, 1: Cコア出力そのまま(テキスト)
   bool _adFeaturesEnabled = true;
@@ -229,7 +228,6 @@ class _SettingsPageState extends State<SettingsPage> {
   // メッセージ領域設定
   int _msgLineCount = 5;      // 表示行数 (1〜15)
   double _msgOpacity = 0.40;  // 背景透過度 (0.0〜1.0)
-  double _msgFontSize = 13.0; // フォントサイズ (pt)
 
   // 物理キー割り当て (デフォルト: 0 = なし)
   int _volupAction = 0;
@@ -375,6 +373,7 @@ class _SettingsPageState extends State<SettingsPage> {
 
     final prefs = await AppPrefs.getInstance();
     await NetHackCmdPanel.migrateDefaultPanelsIfNeeded(prefs);
+    await FontManager.instance.syncFromPrefs();
     setState(() {
       _useTiles = prefs.getBool('use_tiles') ?? true;
       _selectedLanguage = prefs.getString('selected_language') ?? 'ja';
@@ -388,7 +387,6 @@ class _SettingsPageState extends State<SettingsPage> {
         _selectedRogueSymset = 'Default';
       }
       _statusDisplayMode = prefs.getInt('status_display_mode') ?? 0;
-      _statusFontSize = (prefs.getDouble('status_font_size') ?? 13.0).clamp(8.0, 32.0);
       final rawLayout = prefs.getString('status_line_layout') ?? 'standard';
       _statusLineLayout =
           const ['standard', 'single_all', 'single_compact'].contains(rawLayout)
@@ -456,7 +454,6 @@ class _SettingsPageState extends State<SettingsPage> {
       // メッセージ領域設定のロード
       _msgLineCount = prefs.getInt('msg_line_count') ?? 5;
       _msgOpacity = prefs.getDouble('msg_opacity') ?? 0.40;
-      _msgFontSize = (prefs.getDouble('msg_font_size') ?? 13.0).clamp(8.0, 32.0);
 
       // サウンド設定のロード
       _soundMasterEnabled = !(prefs.getBool('sound_muted') ?? false);
@@ -671,6 +668,9 @@ class _SettingsPageState extends State<SettingsPage> {
         'status_font_size',
         'msg_opacity',
         'msg_font_size',
+        'menu_font_size',
+        'ui_font_scale',
+        FontManager.prefMapAsciiScale,
         'sound_bgm_volume',
         'sound_se_volume',
         'sound_ambience_volume',
@@ -1124,34 +1124,6 @@ class _SettingsPageState extends State<SettingsPage> {
                 style: const TextStyle(fontSize: 12, color: Colors.amberAccent),
               ),
             ),
-          // ステータス領域フォントサイズスライダー（8〜32）
-          _SettingsSliderTile(
-            child: ListTile(
-              title: Text(l10n.statusFontSize),
-              subtitle: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  _SettingsSlider(
-                    child: Slider(
-                      value: _statusFontSize,
-                      min: 8.0,
-                      max: 32.0,
-                      divisions: 24,
-                      label: '${_statusFontSize.round()} pt',
-                      onChanged: (val) {
-                        setState(() => _statusFontSize = val);
-                        _saveSetting('status_font_size', val);
-                      },
-                    ),
-                  ),
-                  Text(
-                    l10n.statusFontSizeLabel(_statusFontSize.round().toString()),
-                    style: const TextStyle(fontSize: 12, color: Colors.white54),
-                  ),
-                ],
-              ),
-            ),
-          ),
           _SettingsSwitchTile(
             title: Text(l10n.optHitpointbar),
             subtitle: Text(l10n.hitpointbarSub),
@@ -1344,10 +1316,13 @@ class _SettingsPageState extends State<SettingsPage> {
             ),
             child: ClipRRect(
               borderRadius: BorderRadius.circular(5),
-              child: StatusBarInteractiveView(
-                statusLines: previewLines,
-                statusDisplayMode: _statusDisplayMode,
-                statusFontSize: _statusFontSize,
+              child: ListenableBuilder(
+                listenable: FontManager.instance,
+                builder: (context, _) => StatusBarInteractiveView(
+                  statusLines: previewLines,
+                  statusDisplayMode: _statusDisplayMode,
+                  statusFontSize: FontManager.instance.statusFontSize,
+                ),
               ),
             ),
           ),
@@ -1410,33 +1385,58 @@ class _SettingsPageState extends State<SettingsPage> {
               }
             },
           ),
-          // 1. マップフォント
+          // サイズ一括プリセット（標準 / 大きめ / 特大）
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  l10n.fontSizePresetTitle,
+                  style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w600),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  l10n.fontSizePresetDesc,
+                  style: const TextStyle(fontSize: 12, color: Colors.white60, height: 1.3),
+                ),
+                const SizedBox(height: 10),
+                Wrap(
+                  spacing: 8,
+                  runSpacing: 8,
+                  children: [
+                    OutlinedButton(
+                      onPressed: () {
+                        fontMgr.applySizePreset(FontSizePreset.standard);
+                        setState(() {});
+                      },
+                      child: Text(l10n.fontSizePresetStandard),
+                    ),
+                    OutlinedButton(
+                      onPressed: () {
+                        fontMgr.applySizePreset(FontSizePreset.large);
+                        setState(() {});
+                      },
+                      child: Text(l10n.fontSizePresetLarge),
+                    ),
+                    OutlinedButton(
+                      onPressed: () {
+                        fontMgr.applySizePreset(FontSizePreset.extraLarge);
+                        setState(() {});
+                      },
+                      child: Text(l10n.fontSizePresetExtraLarge),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+          // 1. マップフォント ＋ アスキーマップ表示倍率
           _buildFontTargetTile(
             target: FontTarget.map,
             title: l10n.fontMapLabel,
             description: l10n.fontMapDesc,
           ),
-          // 2. メッセージフォント
-          _buildFontTargetTile(
-            target: FontTarget.message,
-            title: l10n.fontMsgLabel,
-          ),
-          // 3. ステータスフォント
-          _buildFontTargetTile(
-            target: FontTarget.status,
-            title: l10n.fontStatusLabel,
-          ),
-          // 4. メニュー＆テキストフォント
-          _buildFontTargetTile(
-            target: FontTarget.menu,
-            title: l10n.fontMenuLabel,
-          ),
-          // 5. UIフォント
-          _buildFontTargetTile(
-            target: FontTarget.ui,
-            title: l10n.fontUiLabel,
-          ),
-          // アスキーマップ倍率スライダー
           _SettingsSliderTile(
             child: ListTile(
               title: Text(l10n.fontAsciiScale),
@@ -1459,6 +1459,86 @@ class _SettingsPageState extends State<SettingsPage> {
                         fontMgr.setMapAsciiScale(val);
                       },
                     ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+          // 2. メッセージフォント ＋ メッセージフォントサイズ
+          _buildFontTargetTile(
+            target: FontTarget.message,
+            title: l10n.fontMsgLabel,
+          ),
+          _buildFontSizePtTile(
+            title: l10n.msgFontSizeTitle,
+            value: fontMgr.messageFontSize,
+            labelText: l10n.fontSizePtLabel(fontMgr.messageFontSize.round().toString()),
+            onChanged: (val) {
+              setState(() {});
+              fontMgr.setMessageFontSize(val);
+            },
+          ),
+          // 3. ステータスフォント ＋ ステータスフォントサイズ
+          _buildFontTargetTile(
+            target: FontTarget.status,
+            title: l10n.fontStatusLabel,
+          ),
+          _buildFontSizePtTile(
+            title: l10n.statusFontSizeTitle,
+            value: fontMgr.statusFontSize,
+            labelText: l10n.fontSizePtLabel(fontMgr.statusFontSize.round().toString()),
+            onChanged: (val) {
+              setState(() {});
+              fontMgr.setStatusFontSize(val);
+            },
+          ),
+          // 4. メニュー＆テキストフォント ＋ メニュー＆テキストフォントサイズ
+          _buildFontTargetTile(
+            target: FontTarget.menu,
+            title: l10n.fontMenuLabel,
+          ),
+          _buildFontSizePtTile(
+            title: l10n.menuFontSizeTitle,
+            description: l10n.menuFontSizeDesc,
+            value: fontMgr.menuFontSize,
+            labelText: l10n.fontSizePtLabel(fontMgr.menuFontSize.round().toString()),
+            onChanged: (val) {
+              setState(() {});
+              fontMgr.setMenuFontSize(val);
+            },
+          ),
+          // 5. UIフォント ＋ UI全体拡大倍率
+          _buildFontTargetTile(
+            target: FontTarget.ui,
+            title: l10n.fontUiLabel,
+          ),
+          _SettingsSliderTile(
+            child: ListTile(
+              title: Text(l10n.uiFontScaleTitle),
+              subtitle: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    l10n.uiFontScaleDesc,
+                    style: const TextStyle(fontSize: 12, color: Colors.white60, height: 1.3),
+                  ),
+                  const SizedBox(height: 4),
+                  _SettingsSlider(
+                    child: Slider(
+                      value: fontMgr.uiFontScale,
+                      min: 0.5,
+                      max: 2.5,
+                      divisions: 40,
+                      label: '${fontMgr.uiFontScale.toStringAsFixed(2)}x',
+                      onChanged: (val) {
+                        setState(() {});
+                        fontMgr.setUiFontScale(val);
+                      },
+                    ),
+                  ),
+                  Text(
+                    l10n.uiScaleLabel(fontMgr.uiFontScale.toStringAsFixed(2)),
+                    style: const TextStyle(fontSize: 12, color: Colors.white54),
                   ),
                 ],
               ),
@@ -1490,6 +1570,46 @@ class _SettingsPageState extends State<SettingsPage> {
               ),
             ),
         ]),
+      ),
+    );
+  }
+
+  Widget _buildFontSizePtTile({
+    required String title,
+    String? description,
+    required double value,
+    required String labelText,
+    required ValueChanged<double> onChanged,
+  }) {
+    return _SettingsSliderTile(
+      child: ListTile(
+        title: Text(title),
+        subtitle: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            if (description != null) ...[
+              Text(
+                description,
+                style: const TextStyle(fontSize: 12, color: Colors.white60, height: 1.3),
+              ),
+              const SizedBox(height: 4),
+            ],
+            _SettingsSlider(
+              child: Slider(
+                value: value,
+                min: 8.0,
+                max: 32.0,
+                divisions: 24,
+                label: '${value.round()} pt',
+                onChanged: onChanged,
+              ),
+            ),
+            Text(
+              labelText,
+              style: const TextStyle(fontSize: 12, color: Colors.white54),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -2419,34 +2539,6 @@ class _SettingsPageState extends State<SettingsPage> {
               ),
             ),
           ),
-          // フォントサイズスライダー（8〜32）
-          _SettingsSliderTile(
-            child: ListTile(
-              title: Text(l10n.msgFontSize),
-              subtitle: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  _SettingsSlider(
-                    child: Slider(
-                      value: _msgFontSize,
-                      min: 8.0,
-                      max: 32.0,
-                      divisions: 24,
-                      label: '${_msgFontSize.round()} pt',
-                      onChanged: (val) {
-                        setState(() => _msgFontSize = val);
-                        _saveSetting('msg_font_size', val);
-                      },
-                    ),
-                  ),
-                  Text(
-                    l10n.msgFontSizeLabel(_msgFontSize.round().toString()),
-                    style: const TextStyle(fontSize: 12, color: Colors.white54),
-                  ),
-                ],
-              ),
-            ),
-          ),
           // プレビュー
           Padding(
             padding: const EdgeInsets.fromLTRB(16, 4, 16, 12),
@@ -2493,18 +2585,21 @@ class _SettingsPageState extends State<SettingsPage> {
                         top: 0,
                         left: 0,
                         right: 0,
-                        child: Container(
-                          color: Colors.black.withValues(alpha: _msgOpacity),
-                          padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
-                          child: Text(
-                            l10n.msgSampleText,
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontFamily: 'monospace',
-                              fontSize: _msgFontSize,
+                        child: ListenableBuilder(
+                          listenable: FontManager.instance,
+                          builder: (context, _) => Container(
+                            color: Colors.black.withValues(alpha: _msgOpacity),
+                            padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
+                            child: Text(
+                              l10n.msgSampleText,
+                              style: FontManager.instance.getStyle(
+                                FontTarget.message,
+                                color: Colors.white,
+                                fontSize: FontManager.instance.messageFontSize,
+                              ),
+                              maxLines: _msgLineCount,
+                              overflow: TextOverflow.ellipsis,
                             ),
-                            maxLines: _msgLineCount,
-                            overflow: TextOverflow.ellipsis,
                           ),
                         ),
                       ),

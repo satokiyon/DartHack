@@ -70,7 +70,7 @@ void main() {
     );
   }
 
-  testWidgets('ステップ1: ステータス領域設定にフォントサイズ(8-32pt)と移動4項目が配置され、ゲームルール設定から消えていること', (tester) async {
+  testWidgets('ステップ1: ステータス領域設定に移動4項目が配置され、フォントサイズはフォント設定へ集約されていること', (tester) async {
     tester.view.physicalSize = const Size(900, 1400);
     tester.view.devicePixelRatio = 1.0;
     addTearDown(tester.view.resetPhysicalSize);
@@ -92,23 +92,21 @@ void main() {
     expect(find.text('経過ターン表示 (time)'), findsOneWidget);
     expect(find.text('経験値表示 (showexp)'), findsOneWidget);
 
-    // ステータスフォントサイズスライダーの最大値が 32.0 であること
+    // ステータス領域設定にはフォントサイズスライダーが存在しないこと
     final statusCard = find.ancestor(
       of: statusSectionTitle,
       matching: find.byType(ExpansionTile),
     );
-    final statusSlider = tester.widget<Slider>(
+    expect(
       find.descendant(of: statusCard, matching: find.byType(Slider)),
+      findsNothing,
     );
-    expect(statusSlider.min, equals(8.0));
-    expect(statusSlider.max, equals(32.0));
-    expect(statusSlider.divisions, equals(24));
 
     // ステータス領域設定を閉じる
     await tester.tap(statusSectionTitle);
     await tester.pumpAndSettle();
 
-    // メッセージ領域設定を展開し、フォントサイズスライダーの最大値が 32.0 であることを確認
+    // メッセージ領域設定を展開し、フォントサイズスライダーが存在しないこと（行数・透過度の2つのみ）
     final msgSectionTitle = find.text('メッセージ領域設定');
     await tester.scrollUntilVisible(msgSectionTitle, 200);
     await tester.ensureVisible(msgSectionTitle);
@@ -122,10 +120,24 @@ void main() {
     final msgSliders = tester.widgetList<Slider>(
       find.descendant(of: msgCard, matching: find.byType(Slider)),
     ).toList();
-    expect(msgSliders.last.min, equals(8.0));
-    expect(msgSliders.last.max, equals(32.0));
+    expect(msgSliders.length, equals(2));
 
     await tester.tap(msgSectionTitle);
+    await tester.pumpAndSettle();
+
+    // フォント設定を展開し、メッセージ・ステータス・メニューの各フォントサイズ(8-32pt)が配置されていること
+    final fontSectionTitle = find.text('フォント設定');
+    await tester.scrollUntilVisible(fontSectionTitle, 200);
+    await tester.ensureVisible(fontSectionTitle);
+    await tester.tap(fontSectionTitle);
+    await tester.pumpAndSettle();
+
+    expect(find.text('メッセージフォントサイズ'), findsOneWidget);
+    expect(find.text('ステータスフォントサイズ'), findsOneWidget);
+    expect(find.text('メニュー＆テキストフォントサイズ'), findsOneWidget);
+    expect(find.text('UI全体拡大倍率'), findsOneWidget);
+
+    await tester.tap(fontSectionTitle);
     await tester.pumpAndSettle();
 
     // ゲームルール・プレイ設定セクションを展開し、移動した4項目が存在しないこと

@@ -5,6 +5,7 @@ import 'package:flutter/services.dart';
 import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 
 import '../l10n/app_localizations.dart';
+import '../services/font_manager.dart';
 import '../utils/app_prefs.dart';
 import 'keyboard_help_dialog.dart';
 
@@ -1639,27 +1640,30 @@ class _MarkdownDocViewerDialogState extends State<MarkdownDocViewerDialog> {
                       const Divider(color: Colors.white12, height: 1),
                       // 本文
                       Expanded(
-                        child: _isLoading
-                            ? Center(
-                                child: CircularProgressIndicator(
-                                  valueColor: AlwaysStoppedAnimation<Color>(
-                                      widget.accentColor),
+                        child: FontManager.wrapMenuContent(
+                          context,
+                          child: _isLoading
+                              ? Center(
+                                  child: CircularProgressIndicator(
+                                    valueColor: AlwaysStoppedAnimation<Color>(
+                                        widget.accentColor),
+                                  ),
+                                )
+                              : _buildHoldPeekDetector(
+                                  behavior: HitTestBehavior.translucent,
+                                  child: ScrollablePositionedList.builder(
+                                    itemScrollController: _itemScrollController,
+                                    itemPositionsListener:
+                                        _itemPositionsListener,
+                                    initialScrollIndex: initialIndex,
+                                    initialAlignment: initialAlign,
+                                    padding: const EdgeInsets.all(16),
+                                    itemCount: _blocks.length,
+                                    itemBuilder: (ctx, idx) =>
+                                        _buildBlockWidget(idx, _blocks[idx]),
+                                  ),
                                 ),
-                              )
-                            : _buildHoldPeekDetector(
-                                behavior: HitTestBehavior.translucent,
-                                child: ScrollablePositionedList.builder(
-                                  itemScrollController: _itemScrollController,
-                                  itemPositionsListener:
-                                      _itemPositionsListener,
-                                  initialScrollIndex: initialIndex,
-                                  initialAlignment: initialAlign,
-                                  padding: const EdgeInsets.all(16),
-                                  itemCount: _blocks.length,
-                                  itemBuilder: (ctx, idx) =>
-                                      _buildBlockWidget(idx, _blocks[idx]),
-                                ),
-                              ),
+                        ),
                       ),
                     ],
                   ),
@@ -1850,28 +1854,31 @@ class _TOCBottomSheetState extends State<_TOCBottomSheet> {
           ),
           const SizedBox(height: 8),
           Expanded(
-            child: ListView.builder(
-              itemCount: _filtered.length,
-              itemBuilder: (ctx, idx) {
-                final sec = _filtered[idx];
-                final indent = (sec.level - 1).clamp(0, 3) * 16.0;
-                return ListTile(
-                  dense: true,
-                  contentPadding:
-                      EdgeInsets.only(left: 16 + indent, right: 16),
-                  title: Text(
-                    sec.title,
-                    style: TextStyle(
-                      color: sec.level <= 2 ? Colors.white : Colors.white70,
-                      fontWeight: sec.level <= 2
-                          ? FontWeight.bold
-                          : FontWeight.normal,
-                      fontSize: sec.level <= 2 ? 14 : 13,
+            child: FontManager.wrapMenuContent(
+              context,
+              child: ListView.builder(
+                itemCount: _filtered.length,
+                itemBuilder: (ctx, idx) {
+                  final sec = _filtered[idx];
+                  final indent = (sec.level - 1).clamp(0, 3) * 16.0;
+                  return ListTile(
+                    dense: true,
+                    contentPadding:
+                        EdgeInsets.only(left: 16 + indent, right: 16),
+                    title: Text(
+                      sec.title,
+                      style: TextStyle(
+                        color: sec.level <= 2 ? Colors.white : Colors.white70,
+                        fontWeight: sec.level <= 2
+                            ? FontWeight.bold
+                            : FontWeight.normal,
+                        fontSize: sec.level <= 2 ? 14 : 13,
+                      ),
                     ),
-                  ),
-                  onTap: () => widget.onSelect(sec.blockIndex),
-                );
-              },
+                    onTap: () => widget.onSelect(sec.blockIndex),
+                  );
+                },
+              ),
             ),
           ),
         ],

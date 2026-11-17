@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'l10n/app_localizations.dart';
+import 'services/font_manager.dart';
 
 class DefaultsEditor extends StatefulWidget {
   final String defaultsFilePath;
@@ -242,29 +243,32 @@ class _DefaultsEditorState extends State<DefaultsEditor> {
                         ),
                       ),
                       Expanded(
-                        child: Container(
-                          padding: const EdgeInsets.all(12.0),
-                          color: Colors.grey[950],
-                          child: TextField(
-                            controller: _controller,
-                            maxLines: null,
-                            keyboardType: TextInputType.multiline,
-                            style: const TextStyle(
-                              fontFamily: 'monospace',
-                              fontSize: 14,
-                              color: Colors.white70,
+                        child: FontManager.wrapMenuContent(
+                          context,
+                          child: Container(
+                            padding: const EdgeInsets.all(12.0),
+                            color: Colors.grey[950],
+                            child: TextField(
+                              controller: _controller,
+                              maxLines: null,
+                              keyboardType: TextInputType.multiline,
+                              style: FontManager.instance.getStyle(
+                                FontTarget.menu,
+                                fontSize: 14,
+                                color: Colors.white70,
+                              ),
+                              decoration: InputDecoration(
+                                border: InputBorder.none,
+                                hintText: l10n.enterOptionHint,
+                              ),
+                              onChanged: (val) {
+                                if (!_hasChanges) {
+                                  setState(() {
+                                    _hasChanges = true;
+                                  });
+                                }
+                              },
                             ),
-                            decoration: InputDecoration(
-                              border: InputBorder.none,
-                              hintText: l10n.enterOptionHint,
-                            ),
-                            onChanged: (val) {
-                              if (!_hasChanges) {
-                                setState(() {
-                                  _hasChanges = true;
-                                });
-                              }
-                            },
                           ),
                         ),
                       ),

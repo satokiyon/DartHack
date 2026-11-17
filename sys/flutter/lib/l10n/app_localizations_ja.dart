@@ -1445,29 +1445,72 @@ class AppLocalizationsJa extends AppLocalizations {
   String get secFontTitle => 'フォント設定';
 
   @override
-  String get secFontSub => '画面各部およびアスキーマップに使用するフォントを設定します';
+  String get secFontSub => '画面各部およびアスキーマップのフォント・文字サイズを設定します';
 
   @override
   String get fontAllLabel => '一括フォント変更';
 
   @override
+  String get fontSizePresetTitle => 'サイズ一括プリセット';
+
+  @override
+  String get fontSizePresetDesc => '画面サイズや好みに合わせて、全系統のサイズ・倍率を一括調整します';
+
+  @override
+  String get fontSizePresetStandard => '標準';
+
+  @override
+  String get fontSizePresetLarge => '大きめ';
+
+  @override
+  String get fontSizePresetExtraLarge => '特大';
+
+  @override
   String get fontMapLabel => 'マップフォント';
 
   @override
-  String get fontMapDesc =>
-      'タイル表示をOFFにした際のアスキーマップ描画に使用されます（※全角記号混入防止のため日本語フォールバックなし）';
+  String get fontMapDesc => 'タイル表示をOFFにした際のアスキーマップ描画に使用されます';
 
   @override
   String get fontMsgLabel => 'メッセージフォント';
 
   @override
+  String get msgFontSizeTitle => 'メッセージフォントサイズ';
+
+  @override
   String get fontStatusLabel => 'ステータスフォント';
+
+  @override
+  String get statusFontSizeTitle => 'ステータスフォントサイズ';
 
   @override
   String get fontMenuLabel => 'メニュー＆テキストフォント';
 
   @override
+  String get menuFontSizeTitle => 'メニュー＆テキストフォントサイズ';
+
+  @override
+  String get menuFontSizeDesc =>
+      'インベントリ、メニュー、ヘルプ、データベース、ガイドブック、終了時ハイライト等に適用されます';
+
+  @override
   String get fontUiLabel => 'UI＆コントローラフォント';
+
+  @override
+  String get uiFontScaleTitle => 'UI全体拡大倍率';
+
+  @override
+  String get uiFontScaleDesc => '設定画面、メニュー外のUI・確認ダイアログ等の文字倍率を変更します（仮想コントローラ除く）';
+
+  @override
+  String fontSizePtLabel(String size) {
+    return '現在: $size pt';
+  }
+
+  @override
+  String uiScaleLabel(String scale) {
+    return '現在: ${scale}x';
+  }
 
   @override
   String get fontAsciiScale => 'アスキーマップ表示倍率';
