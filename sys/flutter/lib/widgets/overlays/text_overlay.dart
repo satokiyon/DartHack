@@ -596,8 +596,10 @@ class TextOverlayState extends State<TextOverlay> {
                                 : null,
                           ),
                           child: Text(
-                            (_cachedIsTopTen && widget.usePhysicalKeyboardNotation)
-                                ? (isJp ? "Enter:OK" : "Enter: OK")
+                            _cachedIsTopTen
+                                ? (widget.usePhysicalKeyboardNotation
+                                    ? (isJp ? "Esc:閉じる" : "Esc: Close")
+                                    : (isJp ? "閉じる" : "Close"))
                                 : "OK",
                             style: const TextStyle(
                               fontSize: 16,

@@ -148,8 +148,8 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(overlayKey.currentState?.isTopTen, isTrue);
-      // usePhysicalKeyboardNotation が有効なため Enter:OK と表示されること
-      expect(find.widgetWithText(ElevatedButton, 'Enter:OK'), findsOneWidget);
+      // usePhysicalKeyboardNotation が有効なため Esc:閉じる と表示されること
+      expect(find.widgetWithText(ElevatedButton, 'Esc:閉じる'), findsOneWidget);
 
       // 初期状態ではカード 0 にフォーカス、ボタンターゲットは none
       expect(overlayKey.currentState?.currentFocusTarget, equals(TextOverlayFocusTarget.none));
@@ -216,6 +216,75 @@ void main() {
       // 詳細ダイアログが表示され、onDismiss は呼ばれていないこと
       expect(find.byType(ScoreDetailDialog), findsOneWidget);
       expect(dismissed, isFalse);
+    });
+
+    testWidgets('TopTen 表示時の閉じるボタン表記が言語とヘルプ設定に連動し、通常テキスト時は OK となること', (tester) async {
+      Future<void> pumpTextOverlay({
+        required Locale locale,
+        required List<String> lines,
+        required bool usePhysicalKeyboardNotation,
+      }) async {
+        await tester.pumpWidget(MaterialApp(
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
+          locale: locale,
+          home: Scaffold(
+            body: Stack(
+              children: [
+                TextOverlay(
+                  textLines: lines,
+                  textAttrs: List.filled(lines.length, 0),
+                  textTiles: List.filled(lines.length, -1),
+                  isPlainDialog: false,
+                  plainType: 0,
+                  tombstoneDisplayMode: 0,
+                  useTiles: false,
+                  tileImage: null,
+                  tileWidth: 32,
+                  tileHeight: 32,
+                  onDismiss: () {},
+                  onShowMsgHistory: () {},
+                  bottomInset: 0,
+                  usePhysicalKeyboardNotation: usePhysicalKeyboardNotation,
+                ),
+              ],
+            ),
+          ),
+        ));
+        await tester.pumpAndSettle();
+      }
+
+      // 日本語・ヘルプOFF -> 閉じる
+      await pumpTextOverlay(
+        locale: const Locale('ja'),
+        lines: scoreLines,
+        usePhysicalKeyboardNotation: false,
+      );
+      expect(find.widgetWithText(ElevatedButton, '閉じる'), findsOneWidget);
+
+      // 英語・ヘルプON -> Esc: Close
+      await pumpTextOverlay(
+        locale: const Locale('en'),
+        lines: scoreLines,
+        usePhysicalKeyboardNotation: true,
+      );
+      expect(find.widgetWithText(ElevatedButton, 'Esc: Close'), findsOneWidget);
+
+      // 英語・ヘルプOFF -> Close
+      await pumpTextOverlay(
+        locale: const Locale('en'),
+        lines: scoreLines,
+        usePhysicalKeyboardNotation: false,
+      );
+      expect(find.widgetWithText(ElevatedButton, 'Close'), findsOneWidget);
+
+      // 通常テキスト表示（非 TopTen）時はヘルプONでも OK
+      await pumpTextOverlay(
+        locale: const Locale('ja'),
+        lines: const ['普通のテキスト行1', '普通のテキスト行2'],
+        usePhysicalKeyboardNotation: true,
+      );
+      expect(find.widgetWithText(ElevatedButton, 'OK'), findsOneWidget);
     });
   });
 }
