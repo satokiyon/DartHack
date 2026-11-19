@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-04. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-19. */
 /* $NHDT-Header: NetHack 5.0 wintty.h 2026/06/20_22:26:43 NetHack-5.0:1.87 $ */
 /* Copyright (c) David Cohrs, 1991,1992                           */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -224,7 +224,7 @@ extern void putsyms(const char *);
 #ifdef CLIPPING
 extern void setclipped(void);
 #endif
-extern void docorner(int, int, int);
+extern void docorner(int, int, int, struct WinDesc *);
 extern void end_glyphout(void);
 extern void g_putch(int);
 #ifdef ENHANCED_SYMBOLS
@@ -303,6 +303,7 @@ extern win_request_info *tty_ctrl_nhwindow(winid, int, win_request_info *);
 
 #ifdef TTY_PERM_INVENT
 extern void tty_refresh_inventory(int start, int stop, int y);
+extern boolean perminvent_on_right_side(void);
 #endif
 
 /* termcap is implied if NO_TERMS is not defined */

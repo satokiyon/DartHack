@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-08. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-19. */
 /* $NHDT-Header: NetHack 5.0 files.c 2026/11/03_16:37:53 NetHack-5.0:1.459 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Derek S. Ray, 2015. */
@@ -1763,7 +1763,7 @@ docompress_file(const char *filename, boolean uncomp)
     } else {
         /* (un)compress failed; remove the new, bad file */
         if (uncomp) {
-            raw_printf("Unable to uncompress %s", filename);
+            raw_printf("%s を展開できません", filename);
             (void) unlink(filename);
         } else {
             /* no message needed for compress case; life will go on */
@@ -2291,8 +2291,7 @@ lock_file(const char *filename, int whichprefix,
 #ifdef USE_FCNTL
     lockfd = open(filename, O_RDWR);
     if (lockfd == -1) {
-        HUP raw_printf("Cannot open file %s. "
-                       " Is NetHack installed correctly?",
+        HUP raw_printf("ファイル %s を開けません。NetHack は正しくインストールされていますか?",
                        filename);
         gn.nesting--;
         return FALSE;
@@ -2316,13 +2315,12 @@ lock_file(const char *filename, int whichprefix,
 
 #ifdef USE_FCNTL
         if (retryct--) {
-            HUP raw_printf("Waiting for release of fcntl lock on %s. "
-                           " (%d retries left.)",
+            HUP raw_printf("%s の fcntl ロック解除を待機しています（残りリトライ %d 回）。",
                            filename, retryct);
             sleep(1);
         } else {
-            HUP raw_print("I give up.  Sorry.");
-            HUP raw_printf("Some other process has an unnatural grip on %s.",
+            HUP raw_print("あきらめました。申し訳ありません。");
+            HUP raw_printf("別のプロセスが %s をロックしたまま解放しません。",
                            filename);
             gn.nesting--;
             return FALSE;
@@ -2333,16 +2331,15 @@ lock_file(const char *filename, int whichprefix,
         switch (errnosv) { /* George Barbanis */
         case EEXIST:
             if (retryct--) {
-                HUP raw_printf("Waiting for access to %s. "
-                               " (%d retries left).",
+                HUP raw_printf("%s へのアクセスを待機しています（残りリトライ %d 回）。",
                                filename, retryct);
 #if defined(SYSV) || defined(ULTRIX) || defined(VMS)
                 (void)
 #endif
                     sleep(1);
             } else {
-                HUP raw_print("I give up.  Sorry.");
-                HUP raw_printf("Perhaps there is an old %s around?",
+                HUP raw_print("あきらめました。申し訳ありません。");
+                HUP raw_printf("古い %s が残っていませんか?",
                                lockname);
                 gn.nesting--;
                 return FALSE;
@@ -2350,17 +2347,17 @@ lock_file(const char *filename, int whichprefix,
 
             break;
         case ENOENT:
-            HUP raw_printf("Can't find file %s to lock!", filename);
+            HUP raw_printf("ロック対象のファイル %s が見つかりません!", filename);
             gn.nesting--;
             return FALSE;
         case EACCES:
-            HUP raw_printf("No write permission to lock %s!", filename);
+            HUP raw_printf("%s をロックするための書き込み権限がありません!", filename);
             gn.nesting--;
             return FALSE;
 #ifdef VMS /* c__translate(vmsfiles.c) */
         case EPERM:
             /* could be misleading, but usually right */
-            HUP raw_printf("Can't lock %s due to directory protection.",
+            HUP raw_printf("ディレクトリの保護設定により %s をロックできません。",
                            filename);
             gn.nesting--;
             return FALSE;
@@ -2368,14 +2365,13 @@ lock_file(const char *filename, int whichprefix,
         case EROFS:
             /* take a wild guess at the underlying cause */
             HUP perror(lockname);
-            HUP raw_printf("Cannot lock %s.", filename);
-            HUP raw_printf("(Perhaps you are running NetHack from"
-                           " inside the distribution package?).");
+            HUP raw_printf("%s をロックできません。", filename);
+            HUP raw_printf("（配布パッケージ内から直接 NetHack を実行していませんか?）");
             gn.nesting--;
             return FALSE;
         default:
             HUP perror(lockname);
-            HUP raw_printf("Cannot lock %s for unknown reason (%d).",
+            HUP raw_printf("不明な理由により %s をロックできません (%d)。",
                            filename, errnosv);
             gn.nesting--;
             return FALSE;
@@ -2405,13 +2401,13 @@ lock_file(const char *filename, int whichprefix,
 #endif
 #endif
         if (OPENFAILURE(gl.lockptr)) {
-            raw_printf("Waiting for access to %s.  (%d retries left).",
+            raw_printf("%s へのアクセスを待機しています（残りリトライ %d 回）。",
                        filename, retryct);
             Delay(50);
         }
     }
     if (!retryct) {
-        raw_printf("I give up.  Sorry.");
+        raw_printf("あきらめました。申し訳ありません。");
         gn.nesting--;
         return FALSE;
     }
@@ -2440,7 +2436,7 @@ unlock_file(const char *filename)
         sflock.l_type = F_UNLCK;
         if (lockfd >= 0) {
             if (fcntl(lockfd, F_SETLK, &sflock) == -1)
-                HUP raw_printf("Can't remove fcntl lock on %s.", filename);
+                HUP raw_printf("%s の fcntl ロックを解除できません。", filename);
             (void) close(lockfd), lockfd = -1;
         }
 #else
@@ -2451,7 +2447,7 @@ unlock_file(const char *filename)
 
 #if defined(UNIX) || defined(VMS)
         if (unlink(lockname) < 0)
-            HUP raw_printf("Can't unlink %s.", lockname);
+            HUP raw_printf("%s を削除できません。", lockname);
 #ifdef NO_FILE_LINKS
         (void) nhclose(lockfd), lockfd = -1;
 #endif
@@ -2499,7 +2495,7 @@ fopen_wizkit_file(void)
          * place a file name may be wholly under the player's
          * control
          */
-        raw_printf("Access to %s denied (%d).", gw.wizkit, errno);
+        raw_printf("%s へのアクセスが拒否されました (%d)。", gw.wizkit, errno);
         wait_synch();
         /* fall through to standard names */
     } else
@@ -2509,7 +2505,7 @@ fopen_wizkit_file(void)
 #if defined(UNIX) || defined(VMS)
     } else {
         /* access() above probably caught most problems for UNIX */
-        raw_printf("Couldn't open requested wizkit file %s (%d).", gw.wizkit,
+        raw_printf("指定された wizkit ファイル %s を開けませんでした (%d)。", gw.wizkit,
                    errno);
         wait_synch();
 #endif
@@ -2538,7 +2534,7 @@ fopen_wizkit_file(void)
     else if (errno != ENOENT) {
         /* e.g., problems when setuid NetHack can't search home
          * directory restricted to user */
-        raw_printf("Couldn't open default gw.wizkit file %s (%d).",
+        raw_printf("デフォルトの gw.wizkit ファイル %s を開けませんでした (%d)。",
                    tmp_wizkit, errno);
         wait_synch();
     }
@@ -2589,7 +2585,7 @@ proc_wizkit_line(char *buf)
         }
     } else {
         /* .60 limits output line width to 79 chars */
-        config_error_add("Bad wizkit item: \"%.60s\"", buf);
+        config_error_add("不正な wizkit アイテム: \"%.60s\"", buf);
         return FALSE;
     }
     return TRUE;
@@ -2681,7 +2677,7 @@ read_sym_file(int which_set)
         return 1;
     }
     if (!gc.chosen_symset_end)
-        config_error_add("Missing finish for symset \"%s\"",
+        config_error_add("symset \"%s\" の finish が見つかりません",
                          gs.symset[which_set].name ? gs.symset[which_set].name
                                                 : "unknown");
     config_error_done();
@@ -2712,8 +2708,7 @@ check_recordfile(const char *dir UNUSED_if_not_OS2_CODEVIEW)
     if (fd >= 0) {
 #ifdef VMS /* must be stream-lf to use UPDATE_RECORD_IN_PLACE */
         if (!file_is_stmlf(fd)) {
-            raw_printf("Warning: scoreboard file '%s'"
-                       " is not in stream_lf format",
+            raw_printf("警告: スコアボードファイル '%s' は stream_lf 形式ではありません",
                        fq_record);
             wait_synch();
         }
@@ -2726,7 +2721,7 @@ check_recordfile(const char *dir UNUSED_if_not_OS2_CODEVIEW)
         (void) chmod(fq_record, FCMASK | 007);
 #endif /* VMS && !SECURE */
     } else {
-        raw_printf("Warning: cannot write scoreboard file '%s'", fq_record);
+        raw_printf("警告: スコアボードファイル '%s' に書き込めません", fq_record);
         wait_synch();
     }
 #endif /* !UNIX && !VMS */
@@ -2783,7 +2778,7 @@ check_recordfile(const char *dir UNUSED_if_not_OS2_CODEVIEW)
         fd = open(fq_record, O_CREAT | O_RDWR, S_IREAD | S_IWRITE);
 #endif
         if (fd <= 0) {
-            raw_printf("Warning: cannot write record '%s'", tmp);
+            raw_printf("警告: 記録ファイル '%s' に書き込めません", tmp);
             wait_synch();
         } else {
             (void) nhclose(fd);
@@ -2932,18 +2927,18 @@ recover_savefile(void)
     }
     if (read(gnhfp->fd, (genericptr_t) &hpid, sizeof hpid) != sizeof hpid) {
         raw_printf("\n%s\n%s\n",
-                   "Checkpoint data incompletely written"
-                   " or subsequently clobbered.",
-                   "Recovery impossible.");
+                   "チェックポイントデータの書き込みが不完全であるか"
+                   "その後破損しています。",
+                   "復元できません。");
         close_nhfile(gnhfp);
         return FALSE;
     }
     if (read(gnhfp->fd, (genericptr_t) &savelev, sizeof(savelev))
         != sizeof(savelev)) {
         raw_printf("\n%s %s %s\n",
-                   "Checkpointing was not in effect for",
+                   "チェックポイントが有効になっていませんでした:",
                    gl.lock,
-                   "-- recovery impossible.");
+                   "-- 復元できません。");
         close_nhfile(gnhfp);
         return FALSE;
     }
@@ -2962,7 +2957,7 @@ recover_savefile(void)
             != sizeof pltmpsiz) || (pltmpsiz > PL_NSIZ_PLUS)
         || (read(gnhfp->fd, (genericptr_t) &tmpplbuf, pltmpsiz)
             != pltmpsiz)) {
-        raw_printf("\nError reading %s -- can't recover.\n", gl.lock);
+        raw_printf("\n%s の読み込みエラー -- 復元できません。\n", gl.lock);
         close_nhfile(gnhfp);
         return FALSE;
     }
@@ -2989,7 +2984,7 @@ recover_savefile(void)
     set_savefile_name(TRUE);
     snhfp = create_savefile();
     if (!snhfp) {
-        raw_printf("\nCannot recover savefile %s.\n", gs.SAVEF);
+        raw_printf("\nセーブファイル %s を復元できません。\n", gs.SAVEF);
         close_nhfile(gnhfp);
         return FALSE;
     }
@@ -3081,7 +3076,7 @@ recover_savefile(void)
     }
  cleanup:
     if (savewrite_failure) {
-        raw_printf("\nError writing %s; recovery failed (%s).\n",
+        raw_printf("\n%s の書き込みエラー; 復元に失敗しました (%s)。\n",
                    gs.SAVEF, savewrite_failure);
         close_nhfile(gnhfp);
         close_nhfile(snhfp);
@@ -3241,12 +3236,12 @@ reveal_paths(int code)
     }
     raw_printf("    \"%s\"", filep);
     if (code == 1) {
-        raw_printf("NOTE: The %s above is missing or inaccessible!",
+        raw_printf("注意: 上記の %s は存在しないかアクセスできません!",
                    SYSCONFFILE);
         skip_sysopt = TRUE;
     }
 #else /* !SYSCF */
-    raw_printf("No system configuration file.");
+    raw_printf("システム設定ファイルがありません。");
 #endif /* ?SYSCF */
 
     /* symbols file */
@@ -3263,7 +3258,7 @@ reveal_paths(int code)
     if (cstrp && (int) strlen(cstrp) < maxlen)
         Sprintf(buf, " (in %s)", cstrp);
 #endif /* PREFIXES_IN_USE */
-    raw_printf("The loadable symbols file%s:", buf);
+    raw_printf("読み込み可能な記号ファイル%s:", buf);
 #endif /* UNIX */
 
 #ifdef UNIX
@@ -3296,7 +3291,7 @@ reveal_paths(int code)
         Sprintf(buf, " (in %s)", cstrp);
 #endif
 #ifdef DLB
-    raw_printf("Basic data files%s are collected inside:", buf);
+    raw_printf("基本データファイル%sの格納先:", buf);
     filep = DLBFILE;
 #ifdef VERSION_IN_DLB_FILENAME
     Strcpy(buf, build_dlb_filename((const char *) 0));
@@ -3312,7 +3307,7 @@ reveal_paths(int code)
     raw_printf("    \"%s\"", filep);
 #endif
 #else /* !DLB */
-    raw_printf("Basic data files%s are in many separate files.", buf);
+    raw_printf("基本データファイル%sは複数の個別ファイルに分かれています。", buf);
 #endif /* ?DLB */
 
     /* dumplog */
@@ -3341,7 +3336,7 @@ reveal_paths(int code)
         buf[sizeof buf - sizeof "    \"\""] = '\0';
         raw_printf("    \"%s\"", buf);
     } else {
-        raw_printf("No end-of-game disclosure file (%s).", nodumpreason);
+        raw_printf("ゲーム終了時の詳細情報ファイル (%s) がありません。", nodumpreason);
     }
 #endif /* ?DUMPLOG */
 
@@ -3372,7 +3367,7 @@ reveal_paths(int code)
     if (cstrp && (int) strlen(cstrp) < maxlen)
         Sprintf(buf, " (in %s)", cstrp);
 #endif /* PREFIXES_IN_USE */
-    raw_printf("Your personal configuration file%s:", buf);
+    raw_printf("個人設定ファイル%s:", buf);
 
 #ifdef UNIX
     buf[0] = '\0';

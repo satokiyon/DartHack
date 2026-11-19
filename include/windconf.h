@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-08. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-19. */
 /* $NHDT-Header: NetHack 5.0 windconf.h 2026/10/31_22:59:35 NetHack-5.0:1.138 $ */
 /* Copyright (c) Michael Allison 2026. */
 /* Copyright (c) NetHack PC Development Team 1993, 1994.  */
@@ -61,8 +61,10 @@
                              LEVELDIR, SAVEDIR, BONESDIR, DATADIR, \
                              SCOREDIR, LOCKDIR, CONFIGDIR, TROUBLEDIR へ \
                              パス指定を許可する */
+#ifdef WIN32CON
 #define NO_TERMS
 #define ASCIIGRAPH
+#endif
 
 #ifdef OPTIONS_USED
 #undef OPTIONS_USED

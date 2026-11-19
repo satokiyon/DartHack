@@ -1,4 +1,4 @@
-# Modified by NetHackJP contributor @satokiyon; latest change date: 2026-10-01.
+# Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-19.
 #!/bin/sh
 # NetHackJP build script for WSL (Linux)
 # NetHackJP: --qt option to opt-in the Qt6 window port (2026-09-23).
@@ -135,14 +135,17 @@ fi
 
 echo "Starting main build with sequential make (tty, curses & X11 interfaces)..."
 
-make WANT_WIN_CURSES=1 WANT_WIN_TTY=1 WANT_WIN_X11=1 $QTMAKEARGS WANT_DEFAULT=$WANT_DEFAULT all x11tiles
+BASE_MAKEFLAGS="WANT_WIN_CURSES=1 WANT_WIN_TTY=1 WANT_WIN_X11=1 $QTMAKEARGS WANT_DEFAULT=$WANT_DEFAULT"
+make $BASE_MAKEFLAGS all x11tiles
 
 if [ $WANT_QT -eq 1 ]; then
     # NetHackJP: the Qt port also uses nhtiles.bmp / nhsplash.xpm / rip.xpm
     # (VARDATND0 in the hints); build them from dat/ up front so that
     # 'make install' and the first Qt launch have every asset ready.
+    # Pass the same flags so nhtiles.bmp -> $(GAME) does not recompile/relink
+    # src/nethack with default (non-Qt) flags.
     echo "Building Qt data assets (nhtiles.bmp, nhsplash.xpm, rip.xpm)..."
-    make nhtiles.bmp nhsplash.xpm rip.xpm
+    make $BASE_MAKEFLAGS nhtiles.bmp nhsplash.xpm rip.xpm
 fi
 
 echo "=========================================="

@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-14. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-19. */
 /* $NHDT-Header: NetHack 5.0 mhitu.c 2026/06/20_22:26:43 NetHack-5.0:1.349 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
@@ -192,7 +192,7 @@ mswings(
 {
     if (flags.verbose && !Blind && mon_visible(mtmp)) {
         pline_mon(mtmp, "%sは%s%sで攻撃した.", Monnam(mtmp),
-                  (otemp->quan > 1L) ? "そのうち1つの" : "その",
+                  (otemp->quan > 1L) ? "そのうち1つの" : "",
                   xname(otemp));
     }
 }
@@ -1116,7 +1116,7 @@ u_slip_free(
        protection might fail (33% chance) when the armor is cursed */
     if (obj && (obj->greased || obj->otyp == OILSKIN_CLOAK)
         && (!obj->cursed || rn2(3))) {
-        pline_mon(mtmp, "%sはあなたの%s%sのせいで%s!", Monnam(mtmp),
+        pline_mon(mtmp, "%sは%s%sのせいで%s!", Monnam(mtmp),
               obj->greased ? "油まみれの" : "すべりやすい",
               /* avoid repeating adjective for undiscovered oilskin cloak */
               (obj->greased || objects[obj->otyp].oc_name_known)
@@ -1535,7 +1535,7 @@ gulpmu(struct monst *mtmp, struct attack *mattk)
         break;
     case AD_ELEC:
         if (!mtmp->mcan && rn2(2)) {
-            pline_The("あなたの周囲の空気が電気を帯びてはじけた.");
+            pline_The("周囲の空気が電気を帯びてはじけた.");
             if (Shock_resistance) {
                 shieldeff(u.ux, u.uy);
                 You("平気そうだった.");
@@ -1775,7 +1775,7 @@ gazemu(struct monst *mtmp, struct attack *mattk)
             boolean useeit = canseemon(mtmp);
 
             if (useeit)
-                (void) ureflects("%sの視線はあなたの%sで反射された.",
+                (void) ureflects("%sの視線は%sで反射された.",
                                  l_monnam(mtmp));
             if (mon_reflects(mtmp, !useeit ? (char *) 0
                                   : "視線は%s%sで反射された!"))
@@ -2121,7 +2121,7 @@ doseduce(struct monst *mon)
             } else {
                 pline("%sは%sをあなたに付ければもっと映えると思った.",
                       Who, xname(ring));
-                pline("あなたの指にはめた.");
+                pline("指にはめた.");
             }
             makeknown(RIN_ADORNMENT);
             if (!uright) {
@@ -2593,9 +2593,9 @@ passiveum(
                                      flags.female ? FEMALE : MALE));
                     } else {
                         if (mon_reflects(mtmp,
-                                         "あなたの視線は%s%sで反射された."))
+                                         "視線は%s%sで反射された."))
                             return 1;
-                        pline_mon(mtmp, "%sはあなたの視線で凍りついた!",
+                        pline_mon(mtmp, "%sは視線で凍りついた!",
                                   Monnam(mtmp));
                         paralyze_monst(mtmp, tmp);
                         return M_ATTK_AGR_DONE;
@@ -2647,7 +2647,7 @@ passiveum(
                 tmp = 0;
                 break;
             }
-            pline_mon(mtmp, "%sはあなたの電撃でしびれた!", Monnam(mtmp));
+            pline_mon(mtmp, "%sは電撃でしびれた!", Monnam(mtmp));
             break;
         default:
             tmp = 0;

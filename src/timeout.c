@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-04. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-19. */
 /* $NHDT-Header: NetHack 5.0 timeout.c 2026/06/20_22:26:43 NetHack-5.0:1.214 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2018. */
@@ -325,16 +325,11 @@ sickness_dialogue(void)
     long j = (Sick & TIMEOUT), i = j / 2L;
 
     if (i > 0L && i <= SIZE(sickness_texts) && (j % 2) != 0) {
-        char buf[BUFSZ], pronounbuf[40];
+        char buf[BUFSZ];
 
         Strcpy(buf, sickness_texts[SIZE(sickness_texts) - i]);
         if (Hallucination && i == 1L) {
-            /* youmonst: for Hallucination, mhe()'s mon argument isn't used */
-            Strcpy(pronounbuf, mhe(&gy.youmonst));
-            Sprintf(eos(buf), "  %sがあなたを手招きしている.",
-                    /* upstart() modifies its argument but vtense() doesn't
-                       care whether or not that has already happened */
-                    upstart(pronounbuf));
+            Strcat(buf, " 誰かがあなたを手招きしている.");
         }
         urgent_pline("%s", buf);
     }
@@ -476,13 +471,11 @@ slimed_to_death(struct kinfo *kptr)
      * Despite lack of Unchanging, neither done() nor savelife() calls
      * rehumanize() if hero dies while polymorphed.
      * polymon() undoes the slime countdown's mimick-green-slime hack
-     * but does not perform polyself()'s light source bookkeeping.
+     * and updates the hero's light source to match the new form.
      * No longer need to manually increment uconduct.polyselfs to reflect
      * [formerly implicit] change of form; polymon() takes care of that.
      * Temporarily ungenocide if necessary.
      */
-    if (emits_light(gy.youmonst.data))
-        del_light_source(LS_MONSTER, monst_to_any(&gy.youmonst));
     save_mvflags = svm.mvitals[PM_GREEN_SLIME].mvflags;
     svm.mvitals[PM_GREEN_SLIME].mvflags = save_mvflags & ~G_GENOD;
     /* become a green slime; also resets youmonst.m_ap_type+.mappearance */
@@ -756,8 +749,8 @@ nh_timeout(void)
                 newsym(u.ux, u.uy);
                 if (!Invis && !BInvis && !Blind) {
                     You(!See_invisible
-                            ? "are no longer invisible."
-                            : "can no longer see through yourself.");
+                            ? "もう透明ではない."
+                            : "もう自分の体が透けて見えなくなった.");
                     stop_occupation();
                 }
                 break;
@@ -1095,8 +1088,7 @@ hatch_egg(anything *arg, long timeout)
         if (cansee_hatchspot) {
             /* [bug?  m_monnam() yields accurate monster type
                regardless of hallucination] */
-            Sprintf(monnambuf, "%s%s", siblings ? "some " : "",
-                    siblings ? makeplural(m_monnam(mon)) : an(m_monnam(mon)));
+            Strcpy(monnambuf, m_monnam(mon));
             /* we don't learn the egg type here because learning
                an egg type requires either seeing the egg hatch
                or being familiar with the egg already,
@@ -1619,7 +1611,7 @@ burn_object(anything *arg, long timeout)
                     pline(Hallucination
                               ? (many ? "それらは悲鳴をあげた!" : "それは悲鳴をあげた!")
                               : Blind ? "" : (many ? "それらの炎は消えた."
-                                                   : "その炎は消えた."));
+                                                   : "炎は消えた."));
                 }
             }
             end_burn(obj, FALSE);
@@ -2042,10 +2034,10 @@ wiz_timeout_queue(void)
     if (win == WIN_ERR)
         return ECMD_OK;
 
-    Sprintf(buf, "Current time = %ld.", svm.moves);
+    Sprintf(buf, "現在ターン = %ld.", svm.moves);
     putstr(win, 0, buf);
     putstr(win, 0, "");
-    putstr(win, 0, "Active timeout queue:");
+    putstr(win, 0, "有効なタイムアウトキュー:");
     putstr(win, 0, "");
     print_queue(win, gt.timer_base);
 
@@ -2067,16 +2059,16 @@ wiz_timeout_queue(void)
     }
     putstr(win, 0, "");
     if (!count) {
-        putstr(win, 0, "No timed properties.");
+        putstr(win, 0, "期限付き能力なし.");
     } else {
-        putstr(win, 0, "Timed properties:");
+        putstr(win, 0, "期限付き能力:");
         putstr(win, 0, "");
         for (i = 0; (propname = propertynames[i].prop_name) != 0; ++i) {
             p = propertynames[i].prop_num;
             intrinsic = u.uprops[p].intrinsic;
             if (intrinsic & TIMEOUT) {
                 if (specindx > 0 && i >= specindx) {
-                    putstr(win, 0, " -- settable via #wizintrinsic only --");
+                    putstr(win, 0, " -- #wizintrinsic でのみ設定可能 --");
                     specindx = 0;
                 }
                 /* timeout value can be up to 16777215 (0x00ffffff) but

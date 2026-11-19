@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-04. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-19. */
 /* $NHDT-Header: NetHack 5.0 earlyarg.c 2026/07/20_20:11:01 NetHack-5.0:1.15 $ */
 /* Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -87,15 +87,15 @@ lopt(char *arg,  /* command line token; beginning matches 'optname' */
     if (arg[1] != optname[1]) {
     loptbail:
         if (complain)
-            config_error_add("Unknown option: %.60s", origarg);
+            config_error_add("不明なオプション: %.60s", origarg);
         return (char *) 0;
     loptnotallowed:
         if (complain)
-            config_error_add("Value not allowed: %.60s", origarg);
+            config_error_add("値は指定できません: %.60s", origarg);
         return (char *) 0;
     loptrequired:
         if (complain)
-            config_error_add("Missing required value: %.60s", origarg);
+            config_error_add("必須の値が不足しています: %.60s", origarg);
         return (char *) 0;
     }
 

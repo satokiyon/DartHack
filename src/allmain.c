@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-04. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-19. */
 /* $NHDT-Header: NetHack 5.0 allmain.c 2026/08/23_22:51:13 NetHack-5.0:1.309 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
@@ -174,6 +174,8 @@ void
 moveloop_core(void)
 {
     boolean monscanmove = FALSE;
+
+    gu.uasmon_top_of_moveloop = gu.uasmon_generation;
 
 #ifdef SAFERHANGUP
     if (program_state.done_hup)

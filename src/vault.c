@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-08. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-19. */
 /* $NHDT-Header: NetHack 5.0 vault.c 2026/06/20_16:31:12 NetHack-5.0:1.125 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2011. */
@@ -1222,7 +1222,7 @@ paygd(boolean silently)
 
     if (u.uinvault) {
         if (!silently)
-            Your("%ld %sは魔法の宝物庫へ収められた.",
+            Your("%ld%sは魔法の宝物庫へ収められた.",
                  umoney, currency(umoney));
         gdx = u.ux;
         gdy = u.uy;

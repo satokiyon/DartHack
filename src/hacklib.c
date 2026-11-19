@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-04. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-19. */
 /* $NHDT-Header: NetHack 5.0 hacklib.c 2026/11/02_21:05:17 NetHack-5.0:1.137 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2007. */
@@ -926,7 +926,10 @@ TODO: add set_impossible(), impossible -> func pointer,
                    (n < 0) ? "format error" : "overflow",
                    func, line);
 #endif
-        str[size - 1] = '\0'; /* make sure it is nul terminated */
+        /* make sure it is nul terminated; with a size of 0 nothing was
+           written, and str[-1] would be outside the buffer */
+        if (size > 0)
+            str[size - 1] = '\0';
     }
 }
 

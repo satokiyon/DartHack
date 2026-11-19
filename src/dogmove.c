@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-04. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-19. */
 /* $NHDT-Header: NetHack 5.0 dogmove.c 2026/08/16_14:31:31 NetHack-5.0:1.180 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
@@ -337,7 +337,7 @@ dog_eat(struct monst *mtmp,
             /* edible item owned by shop has been thrown or kicked
                by hero and caught by tame or food-tameable monst */
             oprice = unpaid_cost(obj, COST_CONTENTS);
-                pline("その%sは%ld %sかかった.", objnambuf, oprice,
+            pline("%sは%ld%sかかった.", objnambuf, oprice,
                   currency(oprice));
             /* m_consume_obj() -> delobj() -> obfree() will handle the shop
                billing update */

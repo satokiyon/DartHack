@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-14. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-19. */
 /* $NHDT-Header: NetHack 5.0 eat.c 2026/07/31_10:25:58 NetHack-5.0:1.358 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
@@ -340,7 +340,7 @@ eatmupdate(void)
         /* won't happen; anything which might make immobilized
            hero begin hallucinating (black light attack, theft
            of Grayswandir) will terminate the mimicry first */
-        altmsg = "あなたの外皮は無傷で残った.";
+        altmsg = "外皮は無傷で残った.";
         altapp = ORANGE;
     }
 
@@ -2305,7 +2305,7 @@ fprefx(struct obj *otmp)
         /* 700-1+800 remains below 1500, the choking threshold which
            triggers "you're having a hard time getting it down" feedback */
         else if (u.uhunger < 700)
-            pline("これであなたの%sは満たされた!", jp_body_part(STOMACH));
+            pline("これで%sは満たされた!", jp_body_part(STOMACH));
         /* [satiation message may be inaccurate if eating gets interrupted] */
         break;
     case TRIPE_RATION:
@@ -3075,7 +3075,7 @@ doeat(void)
             else
                 otmp = splitobj(otmp, 1L);
         }
-        pline("うげっ - その%sは防錆加工されていた!", xname(otmp));
+        pline("うげっ - %sは防錆加工されていた!", xname(otmp));
         /* The regurgitated object's rustproofing is gone now */
         otmp->oerodeproof = 0;
         make_stunned((HStun & TIMEOUT) + (long) rn2(10), TRUE);
@@ -3301,8 +3301,8 @@ use_tin_opener(struct obj *obj)
         if (obj->cursed && obj->bknown) {
             char qbuf[QBUFSZ];
 
-            if (ynq(safe_qbuf(qbuf, "Really wield ", "?",
-                              obj, doname, thesimpleoname, "that")) != 'y')
+            if (ynq(safe_qbuf(qbuf, "本当に", "を装備しますか?",
+                              obj, doname, thesimpleoname, "それ")) != 'y')
                 return ECMD_OK;
         }
         if (!wield_tool(obj, "use"))

@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-08. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-19. */
 /* $NHDT-Header: NetHack 5.0 hack.h 2026/10/27_11:20:36 NetHack-5.0:1.309 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Pasi Kallinen, 2017. */
@@ -877,6 +877,13 @@ enum stoning_checks {
     st_petrifies = 0x4,  /* does the corpse petrify on touch? */
     st_resists   = 0x8,  /* do you have stoning resistance? */
     st_all = (st_gloves | st_corpse | st_petrifies | st_resists)
+};
+
+enum toss_types {
+    no_toss,
+    hand_tossed_obj,
+    hand_tossed_ammo,
+    launcher_fired_ammo,
 };
 
 struct throw_and_return_weapon {

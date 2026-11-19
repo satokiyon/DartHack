@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-04. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-19. */
 /* $NHDT-Header: NetHack 5.0 insight.c 2026/06/20_22:26:43 NetHack-5.0:1.141 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* Copyright (c) Michael Allison, 2024.                           */
@@ -1137,7 +1137,7 @@ status_enlightenment(int mode, int final)
         struct obj *saddle = which_armor(u.usteed, W_SADDLE);
 
         if (saddle && saddle->cursed) {
-                Sprintf(buf, "%sの%sに張り付いている", s_suffix(steedname),
+                Sprintf(buf, "%sの%sに張り付いている", steedname,
                     simpleonames(saddle));
             you_are(buf, "");
         }
@@ -1150,9 +1150,7 @@ status_enlightenment(int mode, int final)
         const char *bp = u.usteed ? jp_mbodypart(u.usteed, LEG) : jp_body_part(LEG),
             *leftright = "";
 
-        if (whichleg == BOTH_SIDES)
-            bp = makeplural(bp);
-        else
+        if (whichleg != BOTH_SIDES)
             leftright = (whichleg == LEFT_SIDE) ? "左" : "右";
         Sprintf(buf, "%s%sを負傷している", leftright, bp);
 
@@ -1227,7 +1225,7 @@ status_enlightenment(int mode, int final)
         (void) enlght_combatinc("to hit", -gu.urole.spelarmr, final, buf);
         /* if from_what() ever gets extended from wizard mode to normal
            play, it could be adapted to handle this */
-        Sprintf(eos(buf), "（あなたの%sによる）", suit_simple_name(uarm));
+        Sprintf(eos(buf), "（%sによる）", suit_simple_name(uarm));
         you_have(buf, "");
     }
     /* report 'nudity' */
@@ -3337,11 +3335,8 @@ mstatusline(struct monst *mtmp)
             /* EWounded_legs is used to track left/right/both rather than
                some form of extrinsic impairment; HWounded_legs is used for
                timeout; both apply to steed instead of hero when mounted */
-            long legs = (EWounded_legs & BOTH_SIDES);
             const char *what = jp_mbodypart(mtmp, LEG);
 
-            if (legs == BOTH_SIDES)
-                what = makeplural(what);
             Sprintf(eos(info), ", %sを負傷", what);
         }
     }
@@ -3403,11 +3398,8 @@ ustatusline(void)
         /* EWounded_legs is used to track left/right/both rather than some
            form of extrinsic impairment; HWounded_legs is used for timeout;
            both apply to steed instead of hero when mounted */
-        long legs = (EWounded_legs & BOTH_SIDES);
         const char *what = jp_body_part(LEG);
 
-        if (legs == BOTH_SIDES)
-            what = makeplural(what);
         /* when it's just one leg, ^X reports which, left or right;
            ustatusline() doesn't, in order to keep the output a bit shorter */
         Sprintf(eos(info), ", %sを負傷", what);

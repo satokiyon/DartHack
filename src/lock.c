@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-04. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-19. */
 /* $NHDT-Header: NetHack 5.0 lock.c 2026/11/02_21:05:17 NetHack-5.0:1.155 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2011. */
@@ -194,7 +194,7 @@ breakchestlock(struct obj *box, boolean destroyit)
         if (costly)
             loss += stolen_value(box, u.ux, u.uy, peaceful_shk, TRUE);
         if (loss)
-            You("壊した品物の代金として%ld %sを支払う必要があった.", loss,
+            You("壊した品物の代金として%ld%sを支払う必要があった.", loss,
                 currency(loss));
         delobj(box);
     }
@@ -526,7 +526,7 @@ pick_lock(
         }
         if (c != 'y') {
             if (!count)
-                There("ここには鍵の類はなさそうだった.");
+                pline("ここには鍵の類はなさそうだった.");
             return PICKLOCK_LEARNED_SOMETHING; /* decided against all boxes */
         }
 
@@ -709,7 +709,7 @@ doforce(void)
                    since we're about to set lknown, there's no need to
                    remember and then reset its current value */
                 otmp->lknown = 0;
-                    There("ここに%sがあったが、%s.",
+                    pline("ここに%sがあったが、%s.",
                         doname(otmp), otmp->obroken ? "その鍵は既に壊れていた" : "既に鍵は開いていた");
                 otmp->lknown = 1;
                 continue;
@@ -922,10 +922,12 @@ obstructed(coordxy x, coordxy y, boolean quietly)
             goto objhere;
         if (!quietly) {
             char *Mn = Some_Monnam(mtmp); /* Monnam, Someone or Something */
+            char tailbuf[BUFSZ];
 
-            if ((mtmp->mx != x || mtmp->my != y) && canspotmon(mtmp))
-                /* s_suffix() returns a modifiable buffer */
-                Mn = strcat(s_suffix(Mn), "の尻尾");
+            if ((mtmp->mx != x || mtmp->my != y) && canspotmon(mtmp)) {
+                Sprintf(tailbuf, "%sの尻尾", Mn);
+                Mn = tailbuf;
+            }
 
             pline("%sが道を塞いでいる!", Mn);
         }

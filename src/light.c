@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-04. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-19. */
 /* $NHDT-Header: NetHack 5.0 light.c 2026/06/20_22:26:43 NetHack-5.0:1.90 $ */
 /* Copyright (c) Dean Luick, 1994                                       */
 /* NetHack may be freely redistributed.  See license for details.       */
@@ -943,7 +943,7 @@ wiz_light_sources(void)
     if (win == WIN_ERR)
         return ECMD_OK;
 
-    Sprintf(buf, "Mobile light sources: hero @ (%2d,%2d)", u.ux, u.uy);
+    Sprintf(buf, "移動光源: プレイヤー @ (%2d,%2d)", u.ux, u.uy);
     putstr(win, 0, buf);
     putstr(win, 0, "");
 

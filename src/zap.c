@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-14. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-19. */
 /* $NHDT-Header: NetHack 5.0 zap.c 2026/06/20_16:31:15 NetHack-5.0:1.601 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2013. */
@@ -1054,11 +1054,8 @@ revive(struct obj *corpse, boolean by_hero)
         if (cansee(x, y)) {
             char buf[BUFSZ];
 
-            Strcpy(buf, one_of ? "ひとつの " : "");
-            /* shk_your: "the " or "your " or "<mon>'s " or "<Shk>'s ".
-               If the result is "Shk's " then it will be ambiguous:
-               is Shk the mon carrying it, or does Shk's shop own it?
-               Let's not worry about that... */
+            Strcpy(buf, one_of ? "1つの" : "");
+            /* shk_your: "あなたの" or "<mon>の" or "<Shk>の" */
             (void) shk_your(eos(buf), corpse);
             if (one_of)
                 corpse->quan++; /* force plural */
@@ -1207,9 +1204,9 @@ unturn_dead(struct monst *mon)
         if (youseeit) {
             Strcpy(corpse,
                    jp_corpse_xname(otmp, (const char *) 0, CXN_NORMAL));
-            /* shk_your/Shk_Your produces a value with a trailing space */
+            /* shk_your/Shk_Your produces Japanese ownership prefix */
             if (otmp->quan > 1L) {
-                Strcpy(owner, "ひとつの ");
+                Strcpy(owner, "1つの");
                 (void) shk_your(eos(owner), otmp);
             } else
                 (void) Shk_Your(owner, otmp);
@@ -3339,7 +3336,7 @@ zap_updown(struct obj *obj) /* wand or spell, nonnull */
                    && !Is_qstart(&u.uz)) {
             int dmg;
             /* similar to zap_dig() */
-            pline("岩が%sから崩れ、あなたの%sに落ちた",
+            pline("岩が%sから崩れ、%sに落ちた",
                   ceiling(x, y), jp_body_part(HEAD));
             dmg = rnd(hard_helmet(uarmh) ? 2 : 6);
             losehp(Maybe_Half_Phys(dmg), "falling rock", KILLED_BY_AN);
@@ -3387,7 +3384,7 @@ zap_updown(struct obj *obj) /* wand or spell, nonnull */
             || (Is_qstart(&u.uz) && u.dz < 0)) {
             pline1(nothing_happens);
         } else if (u.dz < 0) { /* we should do more... */
-            pline("血があなたの%sに滴り落ちた.", jp_body_part(FACE));
+            pline("血が%sに滴り落ちた.", jp_body_part(FACE));
         } else if (u.dz > 0 && !OBJ_AT(u.ux, u.uy)) {
             /*
             Print this message only if there wasn't an engraving
@@ -3401,7 +3398,7 @@ zap_updown(struct obj *obj) /* wand or spell, nonnull */
                     pline("%s血があなたの下で渦巻いた.",
                           is_lava(u.ux, u.uy) ? "沸騰した" : "流れた");
                 else
-                    pline("%s血があなたの%sにたまった.",
+                    pline("%s血が%sにたまった.",
                           is_lava(u.ux, u.uy) ? "沸騰した" : "流れた",
                           jp_body_part_plural(FOOT));
             }
@@ -4923,8 +4920,8 @@ dobuzz(
                         if (canseemon(mon)) {
                             hit(flash_str(fltyp, FALSE), mon, ".");
                             pline("%sは分解した.", l_monnam(mon));
-                            pline("%sの体があなたの%sの前で再構成された!",
-                                  s_suffix(Monnam(mon)),
+                            pline("%sの体が%sの前で再構成された!",
+                                  Monnam(mon),
                                   (eyecount(gy.youmonst.data) == 1)
                                       ? jp_body_part(EYE)
                                       : jp_body_part_plural(EYE));
@@ -4972,7 +4969,7 @@ dobuzz(
                             /* some armor was destroyed; no damage done */
                             if (canseemon(mon))
                                 pline("%sの%sは分解された!",
-                                      s_suffix(Monnam(mon)),
+                                      Monnam(mon),
                                       distant_name(otmp, xname));
                             m_useup(mon, otmp);
                         }
@@ -4999,7 +4996,7 @@ dobuzz(
                           The(flash_str(fltyp, FALSE)));
                 if (Reflecting) {
                     if (!Blind) {
-                        (void) ureflects("しかし%sはあなたの%sで跳ね返った!",
+                        (void) ureflects("しかし%sは%sで跳ね返った!",
                                          "それ");
                     } else
                     pline("なぜか影響を受けなかった.");
@@ -5436,7 +5433,7 @@ zap_over_floor(
         newsym(x, y);
         if (see_it)
             pline("%s%sで隠し扉が現れた.",
-                  yourzap ? "あなたの" : "その", zapverb);
+                  "", zapverb);
         else if (Is_rogue_level(&u.uz))
             draft_message(FALSE); /* "You feel a draft." (open doorway) */
     }
@@ -5489,7 +5486,7 @@ zap_over_floor(
                 if (exploding_wand_typ)
                     pline_The("扉は無事だった.");
                 else
-                    pline_The("扉は%s%sを吸収した!", yourzap ? "あなたの" : "その",
+                    pline_The("扉は%s%sを吸収した!", "",
                               zapverb);
             } else
                 You_feel("振動を感じた.");
@@ -5791,7 +5788,7 @@ item_what(int dmgtyp)
         /* format the output to be ready for enl_msg() to append it to
            "Your items {are,were} protected against <damage-type>" */
         if (what)
-            Sprintf(whatbuf, "（あなたの%sによる）", what);
+            Sprintf(whatbuf, "（%sによる）", what);
     }
     return whatbuf;
 }

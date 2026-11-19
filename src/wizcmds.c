@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-08. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-19. */
 /* $NHDT-Header: NetHack 5.0 wizcmds.c 2026/06/20_16:31:14 NetHack-5.0:1.41 $ */
 /*-Copyright (c) Robert Patrick Rankin, 2024. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -240,6 +240,89 @@ wiz_detect(void)
 
 RESTORE_WARNING_FORMAT_NONLITERAL
 
+
+int
+wiz_throwranges(void)
+{
+    winid win;
+    int i;
+    struct obj o, *obj = &o;
+    int range, urange;
+    char buf[BUFSZ], buf2[BUFSZ];
+
+    win = create_nhwindow(NHW_TEXT);
+    Sprintf(buf, "投擲・跳躍の距離計算:");
+    putstr(win, 0, buf);
+    Snprintf(buf2, sizeof buf2, "%-35s %-4s %-1s %-10s %-7s %-6s  %-5s",
+             "名前", "重さ", (Is_airlevel(&u.uz) || Levitation) ? "^" : " ",
+             "装備", "基本値", "urange", "range");
+    putstr(win, 0, buf2);
+    putstr(win, 0, "");
+    for (i = 1; i < SIZE(objects); ++i) {
+        o = cg.zeroobj;
+        o.otyp = i;
+        o.quan = 1L;
+        o.owt = weight(obj);
+        o.oclass = objects[i].oc_class;
+        if (i == SLIME_MOLD)
+            continue;
+        if (obj->oclass == ILLOBJ_CLASS)
+            continue;
+        {
+            int throw_units;
+            long wep_mask = 0L;
+            const struct throw_and_return_weapon *arw =
+                autoreturn_weapon(obj);
+            enum toss_types toss_type =
+                (!is_ammo(obj)                    ? hand_tossed_obj
+                 : (ammo_and_launcher(obj, uwep)) ? launcher_fired_ammo
+                                                  : hand_tossed_ammo);
+            boolean crossbowing = (toss_type == launcher_fired_ammo
+                                   && weapon_type(uwep) == P_CROSSBOW),
+                    tethered_weapon =
+                        (arw && arw->tethered && (wep_mask & W_WEP) != 0);
+
+            /* crossbow range is independent of strength */
+            urange = (crossbowing ? 18 : (int) ACURRSTR) / 2;
+            if (toss_type == launcher_fired_ammo) {
+                if (crossbowing)
+                    urange = BOLT_LIM;
+                else
+                    urange++;
+            } else if (toss_type == hand_tossed_ammo
+                       && obj->oclass != GEM_CLASS) {
+                urange = (urange + (2 / 2)) / 2;
+            }
+            throw_units = (obj->otyp == BOULDER) ? 20 : urange;
+
+            calc_othrow_ranges(obj, toss_type, arw, tethered_weapon,
+                              &range, &urange);
+            Snprintf(
+                buf2, sizeof buf2, "%-35s %4d %-1s %-10s %4d  %4d   %4d %-15s",
+                xname(obj), obj->owt,
+                " ",
+                (toss_type == launcher_fired_ammo && uwep)
+                    ? simpleonames(uwep)
+                    : "",
+                throw_units, urange, range,
+                ((range > throw_units) && (obj->otyp == BOULDER))
+                    ? " ok (大岩特例)"
+                : ((range < throw_units - 1) && (obj->owt >= 100))
+                    ? " ok (重い)"
+                : ((range < throw_units - 1) && (obj->owt >= 60))
+                    ? " ok (やや重い)"
+                : ((range < throw_units - 1) && (obj->owt >= 20))
+                    ? " ok (少し重い)"
+                : ((range < throw_units - 1) && (urange - range) > 1) ? " <-"
+                                                                      : "");
+            putstr(win, 0, buf2);
+        }
+    }
+    display_nhwindow(win, TRUE);
+    destroy_nhwindow(win);
+    return ECMD_OK;
+}
+
 /* the #wizkill command - pick targets and reduce them to 0HP;
    by default, the hero is credited/blamed; use 'm' prefix to avoid that */
 int
@@ -324,8 +407,8 @@ wiz_kill(void)
                    need to have the mon_moving flag be True in order to
                    avoid blaming or crediting hero for their deaths */
                 svc.context.mon_moving = TRUE;
-                pline("%s is %s.", upstart(Mn),
-                      nonliving(mtmp->data) ? "destroyed" : "killed");
+                pline("%sは%sされた.", upstart(Mn),
+                      nonliving(mtmp->data) ? "破壊" : "殺害");
                 /* Null second arg suppresses the usual message */
                 monkilled(mtmp, (char *) 0, AD_PHYS);
                 svc.context.mon_moving = FALSE;
@@ -335,7 +418,7 @@ wiz_kill(void)
             if (u.utotype || !on_level(&u.uz, &uarehere))
                 break;
         } else {
-            There("にはモンスターがいない.");
+            There("はモンスターがいない.");
             break;
         }
     }
@@ -554,7 +637,7 @@ wiz_fuzzer(void)
 {
     if (flags.suppress_alert < FEATURE_NOTICE_VER(3,7,0)) {
         pline("ファズテスターはNetHackにランダムなキー入力を実行させます。");
-        There("にはこのモードから抜け出す通常の方法はない.");
+        pline("このモードから抜け出す通常の方法はない.");
     }
     if (paranoid_query(TRUE, "ファズテストを開始しますか？")) {
         /* Thoth, take the reins */
@@ -1630,7 +1713,7 @@ wiz_show_stats(void)
          total_misc_size, total_misc_count;
 
     win = create_nhwindow(NHW_TEXT);
-    putstr(win, 0, "Current memory statistics:");
+    putstr(win, 0, "現在のメモリ統計:");
 
     total_obj_count = total_obj_size = 0L;
     putstr(win, 0, stats_hdr);
@@ -1778,7 +1861,7 @@ wiz_display_macros(void)
         }
     }
     if (!trouble)
-        putstr(win, 0, "No display macro issues detected.");
+        putstr(win, 0, "表示マクロの問題は検出されなかった.");
     display_nhwindow(win, FALSE);
     destroy_nhwindow(win);
     return ECMD_OK;

@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-12. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-19. */
 /* $NHDT-Header: NetHack 5.0 symbols.c 2026/11/04_00:49:44 NetHack-5.0:1.136 $ */
 /* Copyright (c) Michael Allison 2024. */
 /* Copyright (c) NetHack Development Team 2020.                   */
@@ -482,7 +482,7 @@ parse_sym_line(char *buf, int which_set)
             gc.chosen_symset_start = FALSE;
             return 1;
         }
-        config_error_add("No \"finish\"");
+        config_error_add("\"finish\" が見つかりません");
         return 0;
     }
     /* skip '=' and space which follows, if any */
@@ -504,7 +504,7 @@ parse_sym_line(char *buf, int which_set)
 #endif
     }
     if (!symp && !is_glyph && !enhanced_unavailable) {
-        config_error_add("Unknown sym keyword");
+        config_error_add("不明な記号キーワードです");
         return 0;
     }
     if (symp) {
@@ -1049,7 +1049,7 @@ do_symset(boolean rogueflag)
                 big_desc = thissize;
         }
         if (!setcount) {
-            There("には適切な%sシンボルセットがない.",
+            pline("適切な%sシンボルセットがない.",
                   rogueflag ? "ローグレベルの" : "標準の");
             return TRUE;
         }
@@ -1061,7 +1061,7 @@ do_symset(boolean rogueflag)
         if (!symset_name)
             defindx = any.a_int;
         add_menu(tmpwin, &nul_glyphinfo, &any, 0, 0, ATR_NONE,
-                 clr, "Default Symbols",
+                 clr, "デフォルトの記号",
                  (any.a_int == defindx) ? MENU_ITEMFLAGS_SELECTED
                                         : MENU_ITEMFLAGS_NONE);
 

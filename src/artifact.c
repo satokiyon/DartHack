@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-14. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-19. */
 /* $NHDT-Header: NetHack 5.0 artifact.c 2026/06/20_22:26:43 NetHack-5.0:1.266 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2013. */
@@ -976,7 +976,7 @@ touch_artifact(struct obj *obj, struct monst *mon)
     if (badclass && badalign && self_willed) {
         if (yours) {
             if (!carried(obj))
-                pline("%sはあなたの手をすり抜けた!", Tobjnam(obj, (char *)0));
+                pline("%sは手をすり抜けた!", Tobjnam(obj, (char *)0));
             else
                 pline("%sはもう制御できなかった!", Tobjnam(obj, (char *)0));
         }
@@ -1641,7 +1641,7 @@ artifact_hit(
                 }
                 if (noncorporeal(mdef->data) || amorphous(mdef->data)) {
                     pline("%sは%sの%sを切り裂いた.", wepdesc,
-                          s_suffix(mon_nam(mdef)), jp_mbodypart(mdef, NECK));
+                          mon_nam(mdef), jp_mbodypart(mdef, NECK));
                     return TRUE;
                 }
                 *dmgptr = 2 * mdef->mhp + FATAL_DAMAGE_MODIFIER;
@@ -1724,7 +1724,7 @@ artifact_hit(
             int oldhpmax = u.uhpmax;
 
             if (Blind) {
-                You_feel("%sがあなたの%sを吸い取るのを感じた!",
+                You_feel("%sが%sを吸い取るのを感じた!",
                          is_art(otmp, ART_STORMBRINGER)
                                      ? "邪悪な刃"
                                      : "何か",
@@ -1735,10 +1735,10 @@ artifact_hit(
                 char *otmpname = distant_name(otmp, xname);
 
                 if (is_art(otmp, ART_STORMBRINGER))
-                    pline_The("%sの刃があなたの%sを吸い取った!",
+                    pline_The("%sの刃が%sを吸い取った!",
                               hcolor(NH_BLACK), life);
                 else
-                    pline("%sはあなたの%sを吸い取った!", The(otmpname), life);
+                    pline("%sは%sを吸い取った!", The(otmpname), life);
             }
             losexp("life drainage");
             if (magr && magr->mhp < magr->mhpmax) {

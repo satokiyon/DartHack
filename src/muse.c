@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-14. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-19. */
 /* $NHDT-Header: NetHack 5.0 muse.c 2026/06/20_22:26:43 NetHack-5.0:1.250 $ */
 /*      Copyright (C) 1990 by Ken Arromdee                         */
 /* NetHack may be freely redistributed.  See license for details.  */
@@ -221,7 +221,7 @@ mplayhorn(
         if (strlen(objnamp) >= QBUFSZ)
             objnamp = simpleonames(otmp);
         pline("%sはあなたに向けて%sを吹いた!",
-              Monnam(mtmp), an(objnamp));
+              Monnam(mtmp), objnamp);
         makeknown(otmp->otyp);
         stop_occupation();
     }
@@ -1937,7 +1937,7 @@ use_offensive(struct monst *mtmp)
             verbalize("はいチーズ！");
         } else if (!Blind) {
             pline("%sは%sであなたを撮影した！",
-                  l_monnam(mtmp), an(xname(otmp)));
+                  l_monnam(mtmp), xname(otmp));
         }
         gm.m_using = TRUE;
         if (!Blind && !resists_blnd(&gy.youmonst)) {
@@ -2552,10 +2552,8 @@ use_misc(struct monst *mtmp)
             if (!obj)
                 break; /* shouldn't happen after find_misc() */
 
-            Strcpy(the_weapon, the(xname(obj)));
+            Strcpy(the_weapon, distant_name(obj, xname));
             hand = jp_body_part(HAND);
-            if (bimanual(obj))
-                hand = makeplural(hand);
             (void) strncpy(hand_buf, hand, sizeof hand_buf - 1);
             hand_buf[sizeof hand_buf - 1] = '\0';
 

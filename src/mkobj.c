@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-04. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-19. */
 /* $NHDT-Header: NetHack 5.0 mkobj.c 2026/08/18_14:24:35 NetHack-5.0:1.338 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Derek S. Ray, 2015. */
@@ -983,8 +983,7 @@ mksobj_init(struct obj **obj, boolean artif)
         case TALLOW_CANDLE:
         case WAX_CANDLE:
             otmp->spe = 1;
-            otmp->age = 20L * /* 400 or 200 */
-                        (long) objects[otmp->otyp].oc_cost;
+            otmp->age = candle_max_burn_time(otmp);
             otmp->lamplit = 0;
             otmp->quan = 1L + (long) (rn2(2) ? rn2(7) : 0);
             blessorcurse(otmp, 5);
@@ -3845,7 +3844,7 @@ pudding_merge_message(struct obj *otmp, struct obj *otmp2)
 
             pline("%s%sが%s合わさった。",
                   (onfloor && adj) ? "隣の" : "",
-                  makeplural(obj_typename(otmp->otyp)),
+                  obj_typename(otmp->otyp),
                   inpack ? "荷物の中で" : "");
         }
     } else {

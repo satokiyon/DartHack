@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-14. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-19. */
 /* $NHDT-Header: NetHack 5.0 apply.c 2026/06/20_16:30:40 NetHack-5.0:1.486 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
@@ -252,7 +252,7 @@ its_dead(coordxy rx, coordxy ry, int *resp)
             Strcpy(buf, "彼らは死んでいる");
         }
         /* variations on "He's dead, Jim." (Star Trek's Dr McCoy) */
-        You_hear("声がこう告げるのを聞いた: \"%s、ジム.\"", buf);
+        You_hear("「%s、ジム.」と告げる声が聞こえた.", buf);
         *resp = ECMD_TIME;
         return TRUE;
 
@@ -404,7 +404,7 @@ use_stethoscope(struct obj *obj)
 
         if (mtmp->mundetected) {
             if (!canspotmon(mtmp))
-                There("そこに%sが隠れていた.", mnm);
+                There("%sが隠れていた.", mnm);
             mtmp->mundetected = 0;
             newsym(mtmp->mx, mtmp->my);
         } else if (mtmp->mappearance) {
@@ -443,7 +443,7 @@ use_stethoscope(struct obj *obj)
                 use_plural ? "それらの" : "その", what,
                 mnm, "だった");
         } else if (flags.verbose && !canspotmon(mtmp)) {
-            There("そこに%sがいた.", mnm);
+            There("%sがいた.", mnm);
         }
 
         mstatusline(mtmp);
@@ -808,7 +808,7 @@ use_leash(struct obj *obj)
      */
 
     if (!(mtmp = m_at(cc.x, cc.y))) {
-        There("そこに生き物はいなかった.");
+        There("生き物はいなかった.");
         (void) unmap_invisible(cc.x, cc.y);
         return ECMD_TIME;
     }
@@ -1143,7 +1143,7 @@ use_mirror(struct obj *obj)
         if (vis)
             pline("%sは自分の姿に凍りついた.", l_monnam(mtmp));
         else
-            You_hear("%sが動きを止めたのを聞いた.", something);
+            You_hear("%sが動きを止める音が聞こえた.", something);
         paralyze_monst(mtmp, (int) mtmp->mfrozen + tmp);
     } else if (monable && mtmp->data == &mons[PM_UMBER_HULK]) {
         if (vis)
@@ -1397,14 +1397,14 @@ use_candle(struct obj **optr)
     }
 
     /* first, minimal candelabrum suffix for formatting candles */
-    Sprintf(qsfx, " に\033%s?", thesimpleoname(otmp));
+    Sprintf(qsfx, "を\033%sに取り付けますか?", thesimpleoname(otmp));
     /* next, format the candles as a prefix for the candelabrum */
-    (void) safe_qbuf(qbuf, "取り付ける ", qsfx, obj, yname, thesimpleoname, s);
+    (void) safe_qbuf(qbuf, "", qsfx, obj, yname, thesimpleoname, s);
     /* strip temporary candelabrum suffix */
-    if ((q = strstri(qbuf, " に\033")) != 0)
-        Strcpy(q, " に ");
+    if ((q = strstri(qbuf, "を\033")) != 0)
+        Strcpy(q, "を");
     /* last, format final "attach candles to candelabrum?" query */
-    if (y_n(safe_qbuf(qbuf, qbuf, "?", otmp, yname, thesimpleoname, "それ"))
+    if (y_n(safe_qbuf(qbuf, qbuf, "に取り付けますか?", otmp, yname, thesimpleoname, "それ"))
         == 'n') {
         use_lamp(obj);
         return;
@@ -1780,7 +1780,7 @@ dorub(void)
         } else if (obj->otyp == LUMP_OF_ROYAL_JELLY) {
             return use_royal_jelly(&obj);
         } else {
-            pline("それの使い方は分からなかった.");
+            pline("使い方が分からなかった.");
             return ECMD_OK;
         }
     }
@@ -3153,8 +3153,6 @@ use_whip(struct obj *obj)
             Strcpy(onambuf, cxname(otmp));
             if (gotit) {
                 mon_hand = jp_mbodypart(mtmp, HAND);
-                if (bimanual(otmp))
-                    mon_hand = makeplural(mon_hand);
             } else
                 mon_hand = 0; /* lint suppression */
 
@@ -3931,11 +3929,11 @@ do_break_wand(struct obj *obj)
     }
     if (!paranoid_query(ParanoidBreakwand,
                         safe_qbuf(confirm,
-                                  "Are you really sure you want to break ",
-                                  "?", obj, yname, ysimple_name, "the wand")))
+                                  "本当に",
+                                  "を折りますか?", obj, yname, ysimple_name, "杖")))
         return ECMD_OK;
     pline("%sを%sの上に高く掲げ、真っ二つに%s!", xname(obj),
-          jp_body_part(HEAD), is_fragile ? "snap" : "break");
+          jp_body_part(HEAD), is_fragile ? "へし折った" : "折った");
 
     /* [ALI] Do this first so that wand is removed from bill. Otherwise,
      * the freeinv() below also hides it from setpaid() which causes problems.
@@ -4411,7 +4409,7 @@ doapply(void)
             res = use_pick_axe(obj);
             break;
         }
-        pline("それの使い方は分からなかった.");
+        pline("使い方が分からなかった.");
         return ECMD_FAIL;
     }
     /* This assumes that anything that potentially destroyed obj has kept
@@ -4482,7 +4480,7 @@ flip_through_book(struct obj *obj)
             if (!Hallucination) {
                 Soundeffect(se_rustling_paper, 50);
             }
-            You_hear("ページが不快な%s音を立てた.",
+            pline("ページが不快な%s音を立てた.",
                      Hallucination ? "くすくす笑う"
                                    : "さらさら鳴る");
         } else if (!Blind) {

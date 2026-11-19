@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-08. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-19. */
 /* $NHDT-Header: NetHack 5.0 glyphs.c 2026/09/30_14:47:34 NetHack-5.0:1.77 $ */
 /* Copyright (c) Michael Allison, 2021. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -84,8 +84,7 @@ to_custom_symset_entry_callback(
             static int glyphnag = 0;
 
             if (!glyphnag++)
-                config_error_add("Unimplemented customization feature,"
-                                 " ignoring for now");
+                config_error_add("未実装のカスタマイズ機能のため、現時点では無視します");
         }
     }
 #endif
@@ -97,8 +96,7 @@ to_custom_symset_entry_callback(
             static int colornag = 0;
 
             if (!colornag++)
-                config_error_add("Unimplemented customization feature,"
-                                 " ignoring for now");
+                config_error_add("未実装のカスタマイズ機能のため、現時点では無視します");
         }
     }
 }

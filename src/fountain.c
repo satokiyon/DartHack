@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-14. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-19. */
 /* $NHDT-Header: NetHack 5.0 fountain.c 2026/06/20_22:26:43 NetHack-5.0:1.123 $ */
 /*      Copyright Scott R. Turner, srt@ucla, 10/27/86 */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -810,7 +810,7 @@ sink_backs_up(coordxy x, coordxy y)
     else if (!Deaf)
         Strcpy(buf, "ざぶりという音が聞こえた"); /* Deaf-aware */
     else
-        Sprintf(buf, "何かがあなたの%sに跳ねかかった", jp_body_part(FACE));
+        Sprintf(buf, "何かが%sに跳ねかかった", jp_body_part(FACE));
     pline("%s%s.", !Deaf ? "ぼちゃん!  " : "", buf);
 
     if (!(levl[x][y].looted & S_LRING)) { /* once per sink */

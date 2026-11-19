@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-14. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-19. */
 /* $NHDT-Header: NetHack 5.0 end.c 2026/06/20_22:26:43 NetHack-5.0:1.353 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
@@ -1529,7 +1529,7 @@ really_done(int how)
                     if (has_oname(otmp))
                         free_oname(otmp);
                     otmp->quan = count;
-                    Sprintf(pbuf, "%8ld %s（価値 %ld %s）,", count,
+                    Sprintf(pbuf, "%8ld %s（価値 %ld%s）,", count,
                             xname(otmp), count * (long) objects[typ].oc_cost,
                             currency(2L));
                     obfree(otmp, (struct obj *) 0);
@@ -1645,7 +1645,7 @@ container_contents(
                    reports the box as containing "1 item" */
                 cat = SchroedingersBox(box);
 
-                Sprintf(buf, "%s の中身:", the(xname(box)));
+                Sprintf(buf, "%sの中身:", xname(box));
                 putstr(tmpwin, 0, buf);
                 if (!dumping)
                     putstr(tmpwin, 0, "");

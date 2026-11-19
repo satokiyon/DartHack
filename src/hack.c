@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-14. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-19. */
 /* $NHDT-Header: NetHack 5.0 hack.c 2026/06/20_16:30:50 NetHack-5.0:1.512 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Derek S. Ray, 2015. */
@@ -426,7 +426,7 @@ moverock_core(coordxy sx, coordxy sy)
         if (verysmall(gy.youmonst.data) && !u.usteed) {
             if (Blind)
                 feel_location(sx, sy);
-            pline("小さすぎてその%sを押せなかった.", xname(otmp));
+            pline("小さすぎて%sを押せなかった.", xname(otmp));
             return cannot_push(otmp, sx, sy);
         }
         if (isok(rx, ry) && !IS_OBSTRUCTED(levl[rx][ry].typ)
@@ -509,7 +509,7 @@ moverock_core(coordxy sx, coordxy sy)
                               (!Deaf || !Blind) ? "ドッカーン!!"
                                                 : "グラグラッ",
                               Tobjnam(otmp, (char *) 0),
-                              ttmp->madeby_u ? "あなたの" : "1つの");
+                              ttmp->madeby_u ? "自分で仕掛けた" : "");
                         blow_up_landmine(ttmp);
                         /* if the boulder remains, it should fill the pit */
                         fill_pit(u.ux, u.uy);
@@ -1007,7 +1007,7 @@ test_move(
                so we won't get here, hence don't need to worry about
                "there" being somewhere the player isn't sure of */
             if (mode == DO_MOVE)
-                There("そこに障害物があった.");
+                There("障害物があった.");
             return FALSE;
         } else if (tmpr->typ == IRONBARS) {
             if (mode == DO_MOVE
@@ -1040,7 +1040,7 @@ test_move(
                 } else if (Passes_walls && !may_passwall(x, y)
                            && In_sokoban(&u.uz)) {
                     /* soko restriction stays even after puzzle is solved */
-                    pline_The("Sokobanの壁はあなたの能力に抵抗した.");
+                    pline_The("倉庫番の壁は能力に抵抗した.");
                 } else if (flags.mention_walls) {
                     char buf[BUFSZ];
                     int glyph = back_to_glyph(x, y),

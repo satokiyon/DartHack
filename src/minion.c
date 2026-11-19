@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-09. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-19. */
 /* $NHDT-Header: NetHack 5.0 minion.c 2026/06/20_22:26:43 NetHack-5.0:1.90 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2008. */
@@ -299,7 +299,7 @@ summon_minion(aligntyp alignment, boolean talk)
                 pline_The("%sの声が轟いた:", jp_align_gname_for_display(alignment));
             else
                 You_feel("%sの轟く声を感じた:",
-                         s_suffix(jp_align_gname_for_display(alignment)));
+                         jp_align_gname_for_display(alignment));
             SetVoice(mon, 0, 80, 0);
             verbalize("汝の不謹慎な行動に代価を払わせるぞ！");
             if (canspotmon(mon))
@@ -382,7 +382,7 @@ demon_talk(struct monst *mtmp)
             demand = cash + (long) rn1(1000, 125);
 
         if (!Deaf)
-            pline("%sは安全な通行の対価として%ld %sを要求した.",
+            pline("%sは安全な通行の対価として%ld%sを要求した.",
                   Amonnam(mtmp), demand, currency(demand));
         else if (canseemon(mtmp))
             pline("%sは何かを要求しているようだ.", Amonnam(mtmp));
@@ -405,7 +405,7 @@ demon_talk(struct monst *mtmp)
     /* if 'mtmp' is unrecognizable due to hero's hallucination,
        #chronicle will reveal its true identity -- just live with that;
        also, avoid random hallucinatory currency() units */
-    livelog_printf(LL_UMONST, "安全に通過するため、%sを %ld %sで買収した",
+    livelog_printf(LL_UMONST, "安全に通過するため、%sを%ld%sで買収した",
                    x_monnam(mtmp, ARTICLE_A, (char *) 0, EXACT_NAME, FALSE),
                    offer, currency(offer));
     mongone(mtmp);
@@ -438,7 +438,7 @@ bribe(struct monst *mtmp, const char *prompt)
         You("%sに全ての金を与えた.", l_monnam(mtmp));
         offer = umoney;
     } else {
-        You("%sに%ld %sを与えた.", l_monnam(mtmp), offer, currency(offer));
+        You("%sに%ld%sを与えた.", l_monnam(mtmp), offer, currency(offer));
     }
     (void) money2mon(mtmp, offer);
     disp.botl = TRUE;

@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-14. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-19. */
 /* $NHDT-Header: NetHack 5.0 priest.c 2026/06/20_22:26:43 NetHack-5.0:1.112 $ */
 /* Copyright (c) Izchak Miller, Steve Linhart, 1989.              */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -315,7 +315,8 @@ priestname(
 {
     boolean do_hallu = Hallucination,
             aligned_priest = mon->data == &mons[PM_ALIGNED_CLERIC],
-            high_priest = mon->data == &mons[PM_HIGH_CLERIC];
+            high_priest = mon->data == &mons[PM_HIGH_CLERIC],
+            show_deity;
     char whatcode = '\0';
     const char *what = do_hallu ? rndmonnam(&whatcode) : mon_pmname(mon);
 
@@ -328,8 +329,16 @@ priestname(
         what = jp_priest_role_for_display(do_hallu, mon->female);
 
     *pname = '\0';
-    if (article == ARTICLE_YOUR)
-        Strcat(pname, "あなたの");
+    show_deity = (do_hallu || !high_priest || reveal_high_priest
+                  || !Is_astralevel(&u.uz)
+                  || m_next2u(mon) || program_state.gameover);
+
+    nhUse(article);
+
+    if (show_deity) {
+        Strcat(pname, jp_gname_for_display(halu_gname(mon_aligntyp(mon))));
+        Strcat(pname, "の");
+    }
 
     if (mon->minvis) {
         Strcat(pname, "透明な");
@@ -347,14 +356,6 @@ priestname(
     }
 
     Strcat(pname, what);
-    /* same as distant_monnam(), more or less... */
-    if (do_hallu || !high_priest || reveal_high_priest
-        || !Is_astralevel(&u.uz)
-        || m_next2u(mon) || program_state.gameover) {
-        Strcat(pname, "（");
-        Strcat(pname, jp_gname_for_display(halu_gname(mon_aligntyp(mon))));
-        Strcat(pname, "の）");
-    }
     return pname;
 }
 

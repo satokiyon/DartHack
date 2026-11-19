@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-04. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-19. */
 /* $NHDT-Header: NetHack 5.0 mcastu.c 2026/06/20_22:26:43 NetHack-5.0:1.124 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2011. */
@@ -546,7 +546,7 @@ mcast_fire_pillar(struct monst *mtmp, int dmg)
 {
     int orig_dmg;
 
-    pline("火柱があなたの周囲一帯を襲った!");
+    pline("火柱が周囲一帯を襲った!");
     orig_dmg = dmg = d(8, 6);
     if (Fire_resistance) {
         shieldeff(u.ux, u.uy);
@@ -575,7 +575,7 @@ mcast_lightning(struct monst *mtmp, int dmg)
 
     Soundeffect(se_bolt_of_lightning, 80);
     pline("稲妻が上空からあなためがけて落ちてきた!");
-    reflects = ureflects("しかし%sはあなたの%sで跳ね返った!", "");
+    reflects = ureflects("しかし%sは%sで跳ね返った!", "");
     orig_dmg = dmg = d(8, 6);
     if (reflects || Shock_resistance) {
         shieldeff(u.ux, u.uy);
@@ -724,7 +724,7 @@ mcast_blind_you(void)
     if (!Blinded) {
         int num_eyes = eyecount(gy.youmonst.data);
 
-        pline("鱗があなたの%sを覆った!", (num_eyes == 1)
+        pline("鱗が%sを覆った!", (num_eyes == 1)
                                       ? jp_body_part(EYE)
                                       : jp_body_part_plural(EYE));
         make_blinded(Half_spell_damage ? 100L : 200L, FALSE);

@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-14. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-19. */
 /* $NHDT-Header: NetHack 5.0 dothrow.c 2026/06/20_16:30:46 NetHack-5.0:1.321 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2013. */
@@ -1288,7 +1288,7 @@ toss_up(struct obj *obj, boolean hitsroof)
     } else {
         action = "かすめ";
     }
-    pline("%sは%sを%s、あなたの%sの上に落ちてきた.", Doname2(obj),
+    pline("%sは%sを%s、%sの上に落ちてきた.", Doname2(obj),
           action, ceiling(u.ux, u.uy), jp_body_part(HEAD));
 
     /* object now hits you */
@@ -1513,6 +1513,86 @@ throwit_mon_hit(struct obj *obj, struct monst *mon)
     return FALSE;
 }
 
+void
+calc_othrow_ranges(struct obj *obj, enum toss_types toss_type,
+                  const struct throw_and_return_weapon *arw,
+                  boolean tethered_weapon,
+                  int *range, int *urange)
+{
+    int throw_units;
+    boolean crossbowing =
+        (toss_type == launcher_fired_ammo && weapon_type(uwep) == P_CROSSBOW);
+
+    /* crossbow range is independent of strength */
+    throw_units = (crossbowing ? 18 : (int) ACURRSTR) / 2;
+    if (toss_type == launcher_fired_ammo) {
+        if (crossbowing)
+            throw_units = BOLT_LIM;
+        else
+            throw_units++;
+    } else if (toss_type == hand_tossed_ammo && obj->oclass != GEM_CLASS) {
+        throw_units /= 2;
+    }
+
+    /* balls are easy to throw or at least roll;
+     * also, this insures the maximum range of a ball is greater
+     * than 1, so the effects from throwing attached balls are
+     * actually possible
+     */
+
+    if (obj->otyp == HEAVY_IRON_BALL)
+        *range = throw_units - (int) (obj->owt / 100);
+    else
+        *range = throw_units - (int) (obj->owt / 40);
+    if (obj == uball) {
+        if (u.ustuck)
+            *range = 1;
+        else if (*range >= 5)
+            *range = 5;
+    }
+    if (toss_type == launcher_fired_ammo) {
+        *range = throw_units;
+    }
+    if (*range < 1)
+        *range = 1;
+
+    if (Is_airlevel(&u.uz) || Levitation) {
+        *urange = throw_units;
+        /* action, reaction... */
+        *urange -= *range;
+        if (*urange < 1)
+            *urange = 1;
+        *range -= *urange;
+
+        if (*range < 1)
+            *range = 1;
+    }
+
+    if (obj->otyp == BOULDER) {
+        throw_units = 20;
+        *range = 20;  /* you must be giant */
+        if (Is_airlevel(&u.uz) || Levitation)
+            *range /= 2;
+    } else if (is_art(obj, ART_MJOLLNIR)) {
+        *range = (*range + 1) / 2; /* it's heavy */
+    } else if (tethered_weapon) {  /* primary weapon is aklys */
+        /* range of a tethered_weapon is limited by the
+           length of the attached cord [implicit aspect of item] */
+        *range = min(*range, isqrt(arw->range));
+    } else if (obj == uball && u.utrap && u.utraptype == TT_INFLOOR) {
+        *range = 1;
+    }
+    *urange = throw_units - *range;
+
+    if (Underwater) {
+        *range = 1;
+    }
+    if (*range < 1)
+        *range = 1;
+    if (*urange < 1)
+        *urange = 1;
+}
+
 /* throw an object, NB: obj may be consumed in the process */
 void
 throwit(
@@ -1523,19 +1603,23 @@ throwit(
     struct obj *oldslot) /* for thrown-and-return used with !fixinv */
 {
     struct monst *mon;
-    int range, urange;
+    int range = 0, urange = 0;
     const struct throw_and_return_weapon *arw = autoreturn_weapon(obj);
-    boolean crossbowing,
-            impaired = (Confusion || Stunned || Blind
+    boolean impaired = (Confusion || Stunned || Blind
                         || Hallucination || Fumbling),
             tethered_weapon = (arw && arw->tethered && (wep_mask & W_WEP) != 0),
             tether_released_msg = FALSE;
+    enum toss_types toss_type =
+        (!is_ammo(obj)                    ? hand_tossed_obj
+         : (ammo_and_launcher(obj, uwep)) ? launcher_fired_ammo
+                                          : hand_tossed_ammo);
 
     gn.notonhead = FALSE; /* reset potentially stale value */
+
     if ((obj->cursed || obj->greased) && (u.dx || u.dy) && !rn2(7)) {
         boolean slipok = TRUE;
 
-        if (ammo_and_launcher(obj, uwep)) {
+        if (toss_type == launcher_fired_ammo) {
             pline("%sは不発した!", Doname2(obj));
         } else {
             /* only slip if it's greased or meant to be thrown */
@@ -1619,66 +1703,17 @@ throwit(
             return;
         }
     } else {
-        /* crossbow range is independent of strength */
-        crossbowing = (ammo_and_launcher(obj, uwep)
-                       && weapon_type(uwep) == P_CROSSBOW);
-        urange = (crossbowing ? 18 : (int) ACURRSTR) / 2;
-        /* balls are easy to throw or at least roll;
-         * also, this insures the maximum range of a ball is greater
-         * than 1, so the effects from throwing attached balls are
-         * actually possible
-         */
-        if (obj->otyp == HEAVY_IRON_BALL)
-            range = urange - (int) (obj->owt / 100);
-        else
-            range = urange - (int) (obj->owt / 40);
-        if (obj == uball) {
-            if (u.ustuck)
-                range = 1;
-            else if (range >= 5)
-                range = 5;
-        }
-        if (range < 1)
-            range = 1;
-
-        if (is_ammo(obj)) {
-            if (ammo_and_launcher(obj, uwep)) {
-                if (crossbowing)
-                    range = BOLT_LIM;
-                else
-                    range++;
-            } else if (obj->oclass != GEM_CLASS) {
-                range /= 2;
-                    pline("%sを装備していないため、%sを%sで投げた.",
+        if (toss_type == hand_tossed_ammo) {
+            if (obj->oclass != GEM_CLASS) {
+                pline("%sを装備していないため、%sを%sで投げた.",
                       skill_name_jp(weapon_type(obj)),
                       weapon_descr_jp(obj),
                       jp_body_part(HAND));
             }
         }
-
-        if (Is_airlevel(&u.uz) || Levitation) {
-            /* action, reaction... */
-            urange -= range;
-            if (urange < 1)
-                urange = 1;
-            range -= urange;
-            if (range < 1)
-                range = 1;
-        }
-
-        if (obj->otyp == BOULDER)
-            range = 20; /* you must be giant */
-        else if (is_art(obj, ART_MJOLLNIR))
-            range = (range + 1) / 2; /* it's heavy */
-        else if (tethered_weapon) /* primary weapon is aklys */
-            /* range of a tethered_weapon is limited by the
-               length of the attached cord [implicit aspect of item] */
-            range = min(range, isqrt(arw->range));
-        else if (obj == uball && u.utrap && u.utraptype == TT_INFLOOR)
-            range = 1;
-
-        if (Underwater)
-            range = 1;
+        calc_othrow_ranges(obj, toss_type,
+                          arw, tethered_weapon,
+                          &range, &urange);
 
         mon = bhit(u.dx, u.dy, range,
                    tethered_weapon ? THROWN_TETHERED_WEAPON : THROWN_WEAPON,
@@ -1696,7 +1731,7 @@ throwit(
                we're about to return */
             if (tethered_weapon) {
                 if (!tether_released_msg) {
-                    pline("紐があなたの%sからはずれた.",
+                    pline("紐が%sから外れた.",
                            jp_body_part(ARM));
                     tether_released_msg = TRUE;
                 }
@@ -1716,7 +1751,7 @@ throwit(
         /* missile has already been handled */
         if (tethered_weapon) {
             if (!tether_released_msg) {
-                pline("紐があなたの%sからはずれた.",
+                pline("紐が%sから外れた.",
                        jp_body_part(ARM));
                 tether_released_msg = TRUE;
             }
@@ -1766,29 +1801,29 @@ throwit(
                         if (tethered_weapon) {
                             /* Blind mods unnecessary; you know what you threw,
                              * and it is tethered to your arm */
-                            pline("紐のついた%sが戻ってきたが、紐があなたの%sから滑り落ちた.",
+                            pline("紐のついた%sが戻ってきたが、紐が%sから滑り落ちた.",
                                   xname(obj), jp_body_part(ARM));
                             tether_released_msg = TRUE;
                         } else {
                             if (Blind)
-                                pline("%sがあなたの%sの%sに落ちた.",
+                                pline("%sが%sの%sに落ちた.",
                                       Something, jp_body_part_plural(FOOT),
                                       Levitation ? "下" : "ところ");
                             else
-                                pline("%sが戻ってきて、あなたの%sの%sに落ちた.",
+                                pline("%sが戻ってきて、%sの%sに落ちた.",
                                       Doname2(obj), jp_body_part_plural(FOOT),
                                       Levitation ? "下" : "ところ");
                         }
                     } else {
                         dmg += rnd(3);
                         if (tethered_weapon) {
-                            Your("紐のついた%sが戻ってきてあなたの%sに当たった!",
+                            Your("紐のついた%sが戻ってきて%sに当たった!",
                                  xname(obj), jp_body_part(ARM));
                         } else {
                             pline(
                                 Blind
-                                    ? "%sがあなたの%sに当たった!"
-                                    : "%sが戻ってきてあなたの%sに当たった!",
+                                    ? "%sが%sに当たった!"
+                                    : "%sが戻ってきて%sに当たった!",
                                 Blind ? Something : Doname2(obj),
                                 jp_body_part(ARM));
                         }
@@ -1807,7 +1842,7 @@ throwit(
                             dropy(obj);
                     } else {
                         if (!tether_released_msg) {
-                            pline("%sの紐があなたの%sからはずれた.",
+                            pline("%sの紐が%sから外れた.",
                                   xname(obj), jp_body_part(ARM));
                             tether_released_msg = TRUE;
                         }
@@ -1818,7 +1853,7 @@ throwit(
             } else {
                 if (tethered_weapon) {
                    if (!tether_released_msg) {
-                       pline("紐があなたの%sからはずれた.",
+                       pline("紐が%sから外れた.",
                               jp_body_part(ARM));
                        tether_released_msg = TRUE;
                    }
@@ -2574,8 +2609,6 @@ breakobj(
                     } else {
                         const char *eyes = jp_body_part(EYE);
 
-                        if (eyecount(gy.youmonst.data) != 1)
-                            eyes = makeplural(eyes);
                         Your("%sから涙がこぼれた.", eyes);
                     }
                 }
@@ -2745,7 +2778,7 @@ throw_gold(struct obj *obj)
     if (u.dz) {
         if (u.dz < 0 && !Is_airlevel(&u.uz) && !Underwater
             && !Is_waterlevel(&u.uz)) {
-            pline_The("金貨は%sに当たり、あなたの%sの上へ落ちてきた.",
+            pline_The("金貨は%sに当たり、%sの上へ落ちてきた.",
                       ceiling(u.ux, u.uy), jp_body_part(HEAD));
             /* some self damage? */
             if (uarmh)

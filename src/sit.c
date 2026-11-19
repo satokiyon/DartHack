@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-04. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-19. */
 /* $NHDT-Header: NetHack 5.0 sit.c 2026/06/20_22:26:43 NetHack-5.0:1.114 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
@@ -75,7 +75,7 @@ throne_sit_effect(void)
             (void) adjattrib(rn2(A_MAX), 1, FALSE);
             break;
         case 3:
-            pline("あなたの体に%s電撃が走った！",
+            pline("体に%s電撃が走った!",
                   (Shock_resistance) ? "" : "物凄い");
             losehp(Shock_resistance ? rnd(6) : rnd(30), "electric chair",
                    KILLED_BY_AN);
@@ -136,7 +136,7 @@ throne_sit_effect(void)
             pline("声が響き渡る：");
             SetVoice((struct monst *) 0, 0, 80, voice_throne);
             verbalize(
-                 "A curse upon thee for sitting upon this most holy throne!");
+                 "この最も神聖なる玉座に座りし汝に呪いあれ!");
             if (Luck > 0) {
                 make_blinded(BlindedTimeout + rn1(100, 250), TRUE);
                 change_luck((Luck > 1) ? -rnd(2) : -1);
@@ -146,11 +146,11 @@ throne_sit_effect(void)
         case 10:
             if (Luck < 0 || (HSee_invisible & INTRINSIC)) {
                 if (svl.level.flags.nommap) {
-                    pline("恐ろしい音があなたの頭を満たす！");
+                    pline("恐ろしい音が頭を満たす!");
                     make_confused((HConfusion & TIMEOUT) + (long) rnd(30),
                                   FALSE);
                 } else {
-                    pline("イメージがあなたの心に浮かぶ。");
+                    pline("イメージが心に浮かぶ.");
                     do_mapping();
                 }
             } else {
@@ -167,9 +167,6 @@ throne_sit_effect(void)
                     switch (num_of_eyes) { /* 2, 1, or 0 */
                     default:
                     case 2: /* more than 1 eye */
-                        eye = makeplural(eye);
-                        FALLTHROUGH;
-                        /*FALLTHRU*/
                     case 1: /* one eye (Cyclops, floating eye) */
                         Your("%sがむずむずした...", eye);
                         break;
@@ -345,7 +342,7 @@ special_throne_effect(int effect) {
     {
         /* ability shuffle */
         int ability;
-        pline("玉座に座ると、あなたの体と心が歪み始める。");
+        pline("玉座に座ると、体と心が歪み始める.");
         for (ability = 0; ability < A_MAX; ++ability) {
             adjattrib(ability, rn2(5) - 2, -1);
         }
@@ -414,7 +411,7 @@ dosit(void)
 
     if (!can_reach_floor(FALSE)) {
         if (u.uswallow)
-            There("には席がない!");
+            There("は席がない!");
         else if (Levitation)
             You("その場でひっくり返った.");
         else
@@ -506,7 +503,7 @@ dosit(void)
     } else if ((Underwater || Is_waterlevel(&u.uz))
                 && !eggs_in_water(gy.youmonst.data)) {
         if (Is_waterlevel(&u.uz))
-            There("には近くに浮いているクッションがない.");
+            pline("近くに浮いているクッションがない.");
         else
             You("泥だらけの底に座った.");
     } else if (is_pool(u.ux, u.uy) && !eggs_in_water(gy.youmonst.data)) {

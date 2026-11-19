@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-04. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-19. */
 /* $NHDT-Header: NetHack 5.0 shk.c 2026/10/18_12:54:26 NetHack-5.0:1.329 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
@@ -61,7 +61,7 @@ staticfn void kops_gone(boolean);
 extern const struct shclass shtypes[]; /* defined in shknam.c */
 
 static const char and_its_contents[] = "と中身";
-static const char the_contents_of[] = "中身は";
+static const char the_contents_of[] = "の中身";
 
 staticfn void append_honorific(char *);
 staticfn long addupbill(struct monst *);
@@ -657,7 +657,7 @@ credit_report(struct monst *shkp, int idx, boolean silent)
             amt = credit_snap[NOW][2] - credit_snap[BEFORE][2];
         }
         if (amt)
-            Your("%s. %ld %s減った.", msg, amt, currency(amt));
+            Your("%s. %ld%s減った.", msg, amt, currency(amt));
 
     }
 }
@@ -695,7 +695,7 @@ rob_shop(struct monst *shkp)
     rouse_shk(shkp, TRUE);
     total = (addupbill(shkp) + eshkp->debit);
     if (eshkp->credit >= total) {
-        Your("%ld %sの信用枠が買い物の請求に充てられた.",
+        Your("%ld%sの信用枠が買い物の請求に充てられた.",
              eshkp->credit, currency(eshkp->credit));
         total = 0L; /* credit gets cleared by setpaid() */
     } else {
@@ -708,8 +708,8 @@ rob_shop(struct monst *shkp)
 
     /* by this point, we know an actual robbery has taken place */
     eshkp->robbed += total;
-    You("商品を%ld %s分盗んだ.", total, currency(total));
-    livelog_printf(LL_ACHIEVE, "%sの%sから %ld %s分の商品を盗み出した",
+    You("商品を%ld%s分盗んだ.", total, currency(total));
+    livelog_printf(LL_ACHIEVE, "%sの%sから %ld%s分の商品を盗み出した",
                    jp_shkname_for_display(shkp),
                    jp_shoptype_name_for_display(eshkp->shoptype - SHOPBASE),
                    total, currency(total));
@@ -816,8 +816,8 @@ u_entered_shop(char *enterstring)
     if (ANGRY(shkp)) {
         if (!Deaf && !muteshk(shkp)) {
             SetVoice(shkp, 0, 80, 0);
-            verbalize("なあ、%sよ。よくも%s%sに戻ってきやがったな！？", svp.plname,
-                      s_suffix(jp_shkname_for_display(shkp)),
+            verbalize("なあ、%sよ。よくも%sの%sに戻ってきやがったな！？", svp.plname,
+                      jp_shkname_for_display(shkp),
                       jp_shoptype_name_for_display(rt - SHOPBASE));
         } else {
             pline("%sはあなたが自分の%sに戻ってきたことに%s。",
@@ -831,9 +831,9 @@ u_entered_shop(char *enterstring)
             verbalize("また来たのか、%s？俺の%sでしっかり見張っとくぞ。",
                       svp.plname, jp_mbodypart(shkp, EYE));
         } else {
-            pline_The("%s%sは歓迎していない雰囲気だ.",
-                      s_suffix(jp_shkname_for_display(shkp)),
-                      jp_shoptype_name_for_display(rt - SHOPBASE));
+            pline("%sの%sは歓迎していない雰囲気だ.",
+                  jp_shkname_for_display(shkp),
+                  jp_shoptype_name_for_display(rt - SHOPBASE));
         }
     } else if (eshkp->robbed) {
         if (!Deaf) {
@@ -861,7 +861,7 @@ u_entered_shop(char *enterstring)
             }
         } else {
             You("%sの%s%s入った!",
-                s_suffix(jp_shkname_for_display(shkp)),
+                jp_shkname_for_display(shkp),
                 jp_shoptype_name_for_display(rt - SHOPBASE),
                 revisit ? "にまた" : "に");
         }
@@ -1037,13 +1037,13 @@ shopper_financial_report(void)
                 continue;
             eshkp = ESHK(shkp);
             if ((amt = eshkp->credit) != 0)
-                You("%ld %sの信用が%s %sにあった.", amt, currency(amt),
-                    s_suffix(jp_shkname_for_display(shkp)),
+                You("%ld%sの信用が%sの%sにあった.", amt, currency(amt),
+                    jp_shkname_for_display(shkp),
                     jp_shoptype_name_for_display(eshkp->shoptype - SHOPBASE));
             else if (shkp == this_shkp)
                 You("ここには信用がなかった.");
             if ((amt = shop_debt(eshkp)) != 0)
-                You("%sに%ld %sの借りがあった.", jp_shkname_for_display(shkp), amt, currency(amt));
+                You("%sに%ld%sの借りがあった.", jp_shkname_for_display(shkp), amt, currency(amt));
             else if (shkp == this_shkp)
                 You("ここでは金を借りていなかった.");
         }
@@ -1320,11 +1320,11 @@ check_credit(long  tmp, struct monst *shkp)
     if (credit == 0L) {
         ; /* nothing to do; just 'return tmp;' */
     } else if (credit >= tmp) {
-        pline_The("代金はあなたの信用枠から差し引かれた.");
+        pline_The("代金は信用枠から差し引かれた.");
         ESHK(shkp)->credit -= tmp;
         tmp = 0L;
     } else {
-        pline_The("代金はあなたの信用枠で一部相殺された.");
+        pline_The("代金は信用枠で一部相殺された.");
         ESHK(shkp)->credit = 0L;
         tmp -= credit;
     }
@@ -1820,7 +1820,7 @@ dopay(void)
     }
 
     if ((!sk && (!Blind || Blind_telepat)) || (!Blind && !seensk)) {
-        There("には支払いを受け取る店主がいないようだ.");
+        There("は支払いを受け取る店主がいないようだ.");
         return ECMD_OK;
     }
 
@@ -1875,7 +1875,7 @@ dopay(void)
             return ECMD_OK;
         }
         if (!mtmp) {
-            There("には支払いを受け取る者がいない.");
+            There("は支払いを受け取る者がいない.");
             return ECMD_OK;
         }
         if (!mtmp->isshk) {
@@ -1994,7 +1994,7 @@ dopay(void)
         char sbuf[BUFSZ];
 
         umoney = money_cnt(gi.invent);
-        Sprintf(sbuf, "%sに%ld %sの支払いが残っている ", jp_shkname_for_display(shkp), dtmp,
+        Sprintf(sbuf, "%sに%ld%sの支払いが残っている", jp_shkname_for_display(shkp), dtmp,
                 currency(dtmp));
         if (loan) {
             if (loan == dtmp)
@@ -2049,8 +2049,8 @@ dopay(void)
     if (pay_done && !ANGRY(shkp) && paid) {
         if (!Deaf && !muteshk(shkp)) {
             SetVoice(shkp, 0, 80, 0);
-            verbalize("%s%sでのお買い上げ、ありがとう%s",
-                      s_suffix(jp_shkname_for_display(shkp)),
+            verbalize("%sの%sでのお買い上げ、ありがとう%s",
+                      jp_shkname_for_display(shkp),
                       jp_shoptype_name_for_display(eshkp->shoptype - SHOPBASE),
                       !eshkp->surcharge ? "!" : ".");
         } else {
@@ -2309,7 +2309,7 @@ dopayobj(
          *  'a' to buy the rest without asking, 'q' to just stop.
          */
 
-        Sprintf(qsfx, "で%ld %s。支払うか?", ltmp, currency(ltmp));
+        Sprintf(qsfx, "で%ld%s。支払うか?", ltmp, currency(ltmp));
         (void) safe_qbuf(qbuf, (char *) 0, qsfx, obj,
                          (quan == 1L) ? Doname2 : doname, ansimpleoname,
                  (quan == 1L) ? "それ" : "それら");
@@ -2333,8 +2333,8 @@ dopayobj(
         if (!unseen)
             shk_names_obj(shkp, obj,
                           consumed
-                              ? "%sの代金として%ld %s%sを支払った."
-                              : "%sを%ld %s%sで買った.",
+                              ? "%sの代金として%ld%s%sを支払った."
+                              : "%sを%ld%s%sで買った.",
                           ltmp, "");
     }
 
@@ -2446,7 +2446,7 @@ buy_container(
         if (unpaidcontainer)
             container->unpaid = container->no_charge = 1;
         shk_names_obj(shkp, container,
-                      "%sを%ld %s%sで買った.",
+                      "%sを%ld%s%sで買った.",
                       totalcost, "");
         container->unpaid = container->no_charge = 0;
     }
@@ -2694,7 +2694,7 @@ inherits(
             money2mon(shkp, loss);
             disp.botl = TRUE;
             if (!silently)
-                pline("%sは%s%ld %sを%sから受け取った.", jp_shkname_for_display(shkp),
+                pline("%sは%s%ld%sを%sから受け取った.", jp_shkname_for_display(shkp),
                       takes, loss, currency(loss),
                       strncmp(eshkp->customer, svp.plname, PL_NSIZ) ? "顧客" : "あなた");
             /* shopkeeper has now been paid in full */
@@ -3597,7 +3597,7 @@ addtobill(
             return;
         }
         if (!ininv) {
-            pline("それは%s%ld %sかかるぞ。",
+            pline("それは%s%ld%sかかるぞ。",
                   (obj->quan > 1L) ? "（1個あたり）" : "",
                   ltmp, currency(ltmp));
         } else {
@@ -3612,7 +3612,7 @@ addtobill(
             }
             obj->quan = 1L; /* fool xname() into giving singular */
             set_voice(shkp, 0, 80, 0);
-            pline("%sこの%s%sは%s%ld %sだ.\"", buf, xname(obj),
+            pline("%sこの%s%sは%s%ld%sだ.\"", buf, xname(obj),
                   (contentscount && obj->unpaid) ? and_its_contents :
                   (contentscount && !obj->unpaid) ? "の中身" : "",
                   (save_quan > 1L) ? "（1個あたり）" : "",
@@ -3622,12 +3622,12 @@ addtobill(
     } else if (!silent) {
         if (ltmp) {
             set_voice(shkp, 0, 80, 0);
-            pline_The("%s%s%sの%s定価は%ld %sだ.",
-                      (contentscount && !obj->unpaid) ? the_contents_of : "",
-                      the(xname(obj)),
-                      (contentscount && obj->unpaid) ? and_its_contents : "",
-                      (obj->quan > 1L) ? "（1個あたり）" : "",
-                      ltmp, currency(ltmp));
+            pline("%s%sの%s定価は%ld%sだ.",
+                  xname(obj),
+                  (contentscount && !obj->unpaid) ? the_contents_of
+                  : (contentscount && obj->unpaid) ? and_its_contents : "",
+                  (obj->quan > 1L) ? "（1個あたり）" : "",
+                  ltmp, currency(ltmp));
         } else {
             pline("%sは気づかなかった。", jp_shkname_for_display(shkp));
         }
@@ -3864,31 +3864,32 @@ stolen_value(
             ESHK(shkp)->debit += value;
 
         if (!silent) {
-            char buf[BUFSZ];
+            char reason[BUFSZ];
             const char *still = "";
 
             if (credit_use) {
                 if (ESHK(shkp)->credit) {
-                    You("%ld %sの信用が残っていた.", ESHK(shkp)->credit,
+                    You("%ld%sの信用が残っていた.", ESHK(shkp)->credit,
                         currency(ESHK(shkp)->credit));
                     return value;
                 } else if (!value) {
                     You("信用残高がなかった.");
                     return 0;
                 }
-                still = "まだ ";
+                still = "まだ";
             }
-            Sprintf(buf, "あなたは%s%sに%ld %sの借りがある",
-                    still, jp_shkname_for_display(shkp),
-                    value, currency(value));
             if (u_count) /* u_count > 0 implies Has_contents(obj) */
-                Sprintf(eos(buf), "（%sとその中身の分）",
-                        was_unpaid ? "容器" : "");
+                Sprintf(reason, "%sの代金として、",
+                        was_unpaid ? "容器とその中身" : "その中身");
             else if (obj->oclass != COIN_CLASS)
-                Sprintf(eos(buf), "（%sの分）",
-                        (obj->quan > 1L) ? "それら" : "これ");
+                Sprintf(reason, "%sの代金として、",
+                        (obj->quan > 1L) ? "それら" : "その商品");
+            else
+                reason[0] = '\0';
 
-            You("%s!", buf);
+            You("%s%s%sに%ld%sの借りがある!",
+                reason, still, jp_shkname_for_display(shkp),
+                value, currency(value));
         }
     } else {
         ESHK(shkp)->robbed += value;
@@ -3936,10 +3937,10 @@ donate_gold(
             Your("負債は返済された.");
         }
         if (eshkp->credit == delta)
-            You("%s信用を%ld %s分確立した.",
+            You("%s信用を%ld%s分確立した.",
                 !selling ? "再び" : "", delta, currency(delta));
         else
-            pline("%ld %sが信用枠に%s加算された。現在の信用枠は%ld %sだ。",
+            pline("%ld%sが信用枠に%s加算された。現在の信用枠は%ld%sだ。",
                   delta, currency(delta), !selling ? "再び" : "",
                   eshkp->credit, currency(eshkp->credit));
     }
@@ -4088,7 +4089,7 @@ sellobj(
             c = gs.sell_response = 'y';
         } else if (gs.sell_response != 'n') {
             pline("%sは今のところあなたに支払うことができない。", jp_shkname_for_display(shkp));
-            Sprintf(qbuf, "%ld %s分をクレジットで受け取るか", tmpcr,
+            Sprintf(qbuf, "%ld%s分をクレジットで受け取るか", tmpcr,
                     currency(tmpcr));
             record_price_quote(obj->otyp, tmpcr / obj->quan, FALSE);
             c = ynaq(safe_qbuf(qbuf, qbuf, "?", obj, doname, thesimpleoname,
@@ -4103,8 +4104,8 @@ sellobj(
         if (c == 'y') {
             shk_names_obj(shkp, obj,
                           ((gs.sell_how != SELL_NORMAL)
-                          ? "%sを売り、%ld %s分の%sクレジットを受け取った."
-                      : "%sを引き渡し、%ld %s分の%sクレジットを受け取った."),
+                          ? "%sを売り、%ld%s分の%sクレジットを受け取った."
+                      : "%sを引き渡し、%ld%s分の%sクレジットを受け取った."),
                           tmpcr, (eshkp->credit > 0L) ? "追加" : "");
             eshkp->credit += tmpcr;
             if (container)
@@ -4170,13 +4171,13 @@ sellobj(
                when container's contents are unknown, plural "items"
                should be used to not give away information.
              */
-            Sprintf(qbuf, "%sは%s%ld %sで%s%s",
+            Sprintf(qbuf, "%sは%s%ld%sで%s%s",
                     jp_shkname_for_display(shkp), short_funds ? "手持ちの都合で" : "", offer,
                     currency(offer),
                     (cltmp && !ltmp)
-                        ? ((yourc == 1L) ? "あなたの容器内の品" : "あなたの容器内の品々")
+                        ? ((yourc == 1L) ? "容器内の品" : "容器内の品々")
                         : "",
-                    obj->unpaid ? "その" : "あなたの");
+                    obj->unpaid ? "未払いの" : "");
             one = !ltmp ? (yourc == 1L) : (obj->quan == 1L && !cltmp);
             Sprintf(qsfx, "%sを買い取ると言っている。%sを売るか?",
                     (cltmp && ltmp)
@@ -4218,9 +4219,9 @@ sellobj(
             shk_names_obj(shkp, obj,
                           (gs.sell_how != SELL_NORMAL)
                                                      ? ((!ltmp && cltmp && only_partially_your_contents)
-                                                                                                 ? "%s内の一部の品を%ld %s%sで売った."
-                                                                                                 : "%sを%ld %s%sで売った.")
-                                                : "%sを手放し、代償として%ld %s%sを受け取った.",
+                                                                                                 ? "%s内の一部の品を%ld%s%sで売った."
+                                                                                                 : "%sを%ld%s%sで売った.")
+                                                : "%sを手放し、代償として%ld%s%sを受け取った.",
                           offer, "");
             break;
         default:
@@ -4795,7 +4796,7 @@ repair_damage(
                 if (canseemon(shkp) && dist2(x, y, shkp->mx, shkp->my) <= 2)
                     pline("%sは%sを罠から外した。", jp_shkname_for_display(shkp), ansimpleoname(otmp));
                 else if (ttmp->tseen && cansee(ttmp->tx, ttmp->ty))
-                    pline("その%sは消える。",
+                    pline("%sは消える.",
                           jp_trapname_for_display(ttmp->ttyp, TRUE));
             }
             (void) mpickobj(shkp, otmp);
@@ -4804,12 +4805,12 @@ repair_damage(
         case PIT:
         case SPIKED_PIT:
             if (!catchup && ttmp->tseen && cansee(ttmp->tx, ttmp->ty))
-                pline("その%sは塞がった。",
+                pline("%sは塞がった.",
                       jp_trapname_for_display(ttmp->ttyp, TRUE));
             break;
         default:
             if (!catchup && ttmp->tseen && cansee(ttmp->tx, ttmp->ty))
-                pline("その%sは消える。",
+                pline("%sは消える.",
                       jp_trapname_for_display(ttmp->ttyp, TRUE));
             break;
         }
@@ -5117,10 +5118,10 @@ shopdig(int fall)
                 rile_shk(shkp);
                 return;
             } else
-                pline("%sは飛びかかってあなたのバックパックを掴んだ!",
+                pline("%sは飛びかかってバックパックを掴んだ!",
                       jp_shkname_for_display(shkp));
         } else
-            pline("%sはあなたのバックパックを掴んだ!",
+            pline("%sはバックパックを掴んだ!",
                   jp_shkname_for_display(shkp));
 
         for (obj = gi.invent; obj; obj = obj2) {
@@ -5328,10 +5329,10 @@ pay_for_damage(const char *dmgstr, boolean cant_mollify)
     if (Invis)
         Your("透明化しても%sは欺けなかった!", jp_shkname_for_display(shkp));
     if (!animal) {
-        Sprintf(qbuf, "%s%ld %s相当の損害を与えやがって！」 弁償しますか？",
+        Sprintf(qbuf, "%s%ld%s相当の損害を与えやがって！」 弁償しますか？",
                 cad(TRUE), cost_of_damage, currency(cost_of_damage));
     } else {
-        Sprintf(qbuf, "%ld %s相当の損害だ。弁償しますか？",
+        Sprintf(qbuf, "%ld%s相当の損害だ。弁償しますか？",
                 cost_of_damage, currency(cost_of_damage));
     }
     if (y_n(qbuf) != 'n') {
@@ -5464,11 +5465,11 @@ price_quote(struct obj *first_obj)
             Strcpy(price, "無料");
             contentsonly = FALSE;
         } else {
-            Sprintf(price, "%ld %s%s", cost, currency(cost),
+            Sprintf(price, "%ld%s%s", cost, currency(cost),
                     (otmp->quan) > 1L ? "（1つあたり）" : "");
         }
-        Sprintf(buf, "%s%s：%s", contentsonly ? the_contents_of : "",
-                doname(otmp), price);
+        Sprintf(buf, "%s%s：%s", doname(otmp),
+                contentsonly ? the_contents_of : "", price);
         putstr(tmpwin, 0, buf), cnt++;
     }
     if (cnt > 1) {
@@ -5481,10 +5482,10 @@ price_quote(struct obj *first_obj)
         } else {
             /* print cost in slightly different format, so can't reuse buf;
                cost and contentsonly are already set up */
-            Sprintf(buf, "%s%s", contentsonly ? the_contents_of : "",
-                    doname(first_obj));
+            Sprintf(buf, "%s%s", doname(first_obj),
+                    contentsonly ? the_contents_of : "");
             SetVoice(shkp, 0, 80, 0);
-            verbalize("%s、%s値段は%ld %s%s", upstart(buf),
+            verbalize("%s、%s値段は%ld%s%s", upstart(buf),
                       (first_obj->quan > 1L) ? "（1つあたり）" : "", cost,
                       currency(cost),
                       contentsonly ? "." : shk_embellish(first_obj, cost));
@@ -5590,17 +5591,17 @@ shk_chat(struct monst *shkp)
     } else if (eshk->billct) {
         long total = addupbill(shkp) + eshk->debit;
 
-          pline("%sは%s、請求総額が%ld %sだと伝えた.",
+          pline("%sは%s、請求総額が%ld%sだと伝えた.",
               jp_shkname_for_display(shkp),
               (!Deaf && !muteshk(shkp)) ? "言い" : "示し",
               total, currency(total));
     } else if (eshk->debit) {
-          pline("%sは%s、あなたが自分に%ld %sの支払いを残していると伝えた.",
+          pline("%sは%s、あなたが自分に%ld%sの支払いを残していると伝えた.",
               jp_shkname_for_display(shkp),
               (!Deaf && !muteshk(shkp)) ? "念を押し" : "示し",
               eshk->debit, currency(eshk->debit));
     } else if (eshk->credit) {
-        pline("%sはあなたに%ld %sのクレジットを使うことを勧めた。", jp_shkname_for_display(shkp), eshk->credit, currency(eshk->credit));
+        pline("%sはあなたに%ld%sのクレジットを使うことを勧めた。", jp_shkname_for_display(shkp), eshk->credit, currency(eshk->credit));
     } else if (eshk->robbed) {
           pline("%sは%s、最近の強盗被害をこぼした.",
               jp_shkname_for_display(shkp),
@@ -5729,23 +5730,23 @@ check_unpaid_usage(struct obj *otmp, boolean altusage)
 
     arg1 = arg2 = "";
     if (otmp->oclass == SPBOOK_CLASS) {
-        fmt = "%sあなたは%s%ld %sの借りがある。";
-        Sprintf(buf, "ここはタダの図書館じゃないぞ、%s！ ", cad(FALSE));
+        fmt = "%sあなたは%s%ld%sの借りがある。";
+        Sprintf(buf, "ここはタダの図書館じゃないぞ、%s！", cad(FALSE));
         arg1 = rn2(2) ? buf : "";
         arg2 = ESHK(shkp)->debit > 0L ? "さらに" : "";
     } else if (otmp->otyp == POT_OIL) {
-        fmt = "%s%sそれには%ld %sかかるぞ（イェンダー燃料税だ）。";
+        fmt = "%s%sそれには%ld%sかかるぞ（イェンダー燃料税だ）。";
     } else if (altusage && (otmp->otyp == BAG_OF_TRICKS
                             || otmp->otyp == HORN_OF_PLENTY)) {
-        fmt = "%s%sそれを空にするには%ld %sかかるぞ。";
+        fmt = "%s%sそれを空にするには%ld%sかかるぞ。";
         if (!rn2(3))
-            arg1 = "おい！ ";
+            arg1 = "おい！";
         if (!rn2(3))
-            arg1 = "気をつけろ！ ";
+            arg1 = "気をつけろ！";
     } else {
-        fmt = "%s%s使用料として%ld %sいただくぞ。";
+        fmt = "%s%s使用料として%ld%sいただくぞ。";
         if (!rn2(3))
-            arg1 = "へい！ ";
+            arg1 = "へい！";
         if (!rn2(3))
             arg2 = "ゴホン。";
     }
@@ -5790,7 +5791,7 @@ costly_gold(
     if (eshkp->credit >= amount) {
         if (!silent) {
             if (eshkp->credit > amount)
-                Your("信用枠は%ld %s減った.", amount, currency(amount));
+                Your("信用枠は%ld%s減った.", amount, currency(amount));
             else
                 Your("信用枠は消えた.");
         }
@@ -5801,9 +5802,9 @@ costly_gold(
             if (eshkp->credit)
                 Your("信用枠は消えた.");
             if (eshkp->debit)
-                Your("負債は%ld %s増えた.", delta, currency(delta));
+                Your("負債は%ld%s増えた.", delta, currency(delta));
             else
-                You("%sに%ld %sの借りがあった.", jp_shkname_for_display(shkp), delta, currency(delta));
+                You("%sに%ld%sの借りがあった.", jp_shkname_for_display(shkp), delta, currency(delta));
         }
         eshkp->debit += delta;
         eshkp->loan += delta;
@@ -5883,7 +5884,7 @@ block_entry(coordxy x, coordxy y)
     return FALSE;
 }
 
-/* "your " or "Foobar's " (note the trailing space) */
+/* "" (所持品) or "店主の" or "ゴブリンの" (末尾スペースなし) */
 char *
 shk_your(char *buf, struct obj *obj)
 {
@@ -5891,29 +5892,21 @@ shk_your(char *buf, struct obj *obj)
 
     buf[0] = '\0';
     if (chk_pm && type_is_pname(&mons[obj->corpsenm]))
-        return buf; /* skip ownership prefix and space: "Medusa's corpse" */
+        return buf; /* skip ownership prefix: "メデューサの死体" */
     else if (chk_pm && the_unique_pm(&mons[obj->corpsenm]))
-#ifdef JAPAN
         return buf;
-#else
-        Strcpy(buf, "the"); /* override ownership: "the Oracle's corpse" */
-#endif
     else if (!shk_owns(buf, obj) && !mon_owns(buf, obj)) {
-#ifdef JAPAN
-        Strcpy(buf, carried(obj) ? "あなたの" : "");
-        if (!buf[0]) return buf;
-#else
-        Strcpy(buf, the_your[carried(obj) ? 1 : 0]);
-#endif
+        buf[0] = '\0';
     }
-    return strcat(buf, " ");
+    return buf;
 }
 
 char *
 Shk_Your(char *buf, struct obj *obj)
 {
     (void) shk_your(buf, obj);
-    *buf = highc(*buf);
+    if ((unsigned char) *buf < 0x80)
+        *buf = highc(*buf);
     return buf;
 }
 
@@ -5927,7 +5920,10 @@ shk_owns(char *buf, struct obj *obj)
         && (obj->unpaid || (obj->where == OBJ_FLOOR && !obj->no_charge
                             && costly_spot(x, y)))) {
         shkp = shop_keeper(inside_shop(x, y));
-        return strcpy(buf, shkp ? s_suffix(jp_shkname_for_display(shkp)) : the_your[0]);
+        if (shkp) {
+            Sprintf(buf, "%sの", jp_shkname_for_display(shkp));
+            return buf;
+        }
     }
     return (char *) 0;
 }
@@ -5935,8 +5931,10 @@ shk_owns(char *buf, struct obj *obj)
 staticfn char *
 mon_owns(char *buf, struct obj *obj)
 {
-    if (obj->where == OBJ_MINVENT)
-        return strcpy(buf, s_suffix(y_monnam(obj->ocarry)));
+    if (obj->where == OBJ_MINVENT) {
+        Sprintf(buf, "%sの", y_monnam(obj->ocarry));
+        return buf;
+    }
     return (char *) 0;
 }
 
@@ -6105,11 +6103,11 @@ globby_bill_fixup(struct obj *obj_absorber, struct obj *obj_absorbed)
                     Your("負債は返済された.");
                 }
                 if (eshkp->credit == delta)
-                    pline_The("%sで%ld %sの信用が生じた.",
+                    pline_The("%sで%ld%sの信用が生じた.",
                               obj_typename(obj_absorbed->otyp),
                               delta, currency(delta));
                 else
-                    pline_The("%sで%ld %sの信用が増え、合計は%ld %sになった.",
+                    pline_The("%sで%ld%sの信用が増え、合計は%ld%sになった.",
                               obj_typename(obj_absorbed->otyp),
                               delta, currency(delta),
                               eshkp->credit, currency(eshkp->credit));

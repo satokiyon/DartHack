@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-14. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-19. */
 /* $NHDT-Header: NetHack 5.0 spell.c 2026/06/20_22:26:43 NetHack-5.0:1.191 $ */
 /*      Copyright (c) M. Stephenson 1988                          */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -173,7 +173,7 @@ cursed_book(struct obj *bp)
             shieldeff(u.ux, u.uy);
             pline_The("本は爆発したが、あなたは無傷だった!");
         } else {
-            pline("本を読んでいると、それはあなたの顔の前で爆発した!");
+            pline("本を読んでいると、顔の前で爆発した!");
             dmg = 2 * rnd(10) + 5;
             losehp(Maybe_Half_Phys(dmg), "exploding rune", KILLED_BY_AN);
         }
@@ -361,6 +361,15 @@ learn(void)
     boolean costly = TRUE, faded_to_blank = FALSE;
     struct obj *book = svc.context.spbook.book;
 
+    /* the book can be destroyed mid-study without interrupting the hero
+       (burned by a fire explosion, for one); book_disappears() has
+       cleared the pointer, so just stop */
+    if (!book) {
+        svc.context.spbook.delay = 0;
+        svc.context.spbook.o_id = 0;
+        return 0;
+    }
+
     /* JDS: lenses give 50% faster reading; 33% smaller read time */
     if (svc.context.spbook.delay && ublindf
         && ublindf->otyp == LENSES && rn2(2))
@@ -483,8 +492,6 @@ study_book(struct obj *spellbook)
 
         if (dullbook > 0) {
             eyes = jp_body_part(EYE);
-            if (eyecount(gy.youmonst.data) > 1)
-                eyes = makeplural(eyes);
             pline("この本はあまりに退屈で、%sを開けていられない。",
                   eyes);
             dullbook += rnd(2 * objects[booktype].oc_level);

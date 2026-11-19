@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-14. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-19. */
 /* $NHDT-Header: NetHack 5.0 objnam.c 2026/11/02_21:05:17 NetHack-5.0:1.474 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2011. */
@@ -1598,8 +1598,7 @@ doname_base(
                    || obj->otyp == BRASS_LANTERN || Is_candle(obj)) {
             if (Is_candle(obj)) {
                 anything timer;
-                long full_burn_time = 20L * (long) objects[obj->otyp].oc_cost,
-                     turns_left = obj->age;
+                long turns_left = obj->age;
 
                 if (obj->lamplit) {
                     timer = cg.zeroany;
@@ -1612,7 +1611,7 @@ doname_base(
                        not partly used after all) */
                     turns_left += peek_timer(BURN_OBJECT, &timer) - svm.moves;
                 }
-                if (turns_left < full_burn_time)
+                if (turns_left < candle_max_burn_time(obj))
                     prefix_append(prefix, sizeof prefix, "使いかけの");
             }
             if (obj->lamplit)
@@ -1800,7 +1799,7 @@ doname_base(
         long quotedprice = unpaid_cost(obj, COST_CONTENTS);
 
         /* separately formatted suffix avoids need for ConcatF3() */
-        Sprintf(pricebuf, "%ld %s", quotedprice, currency(quotedprice));
+        Sprintf(pricebuf, "%ld%s", quotedprice, currency(quotedprice));
         ConcatF2(bp, 0, " (%s, %s)",
                  obj->unpaid ? "未払い" : "中身", pricebuf);
 
@@ -1812,7 +1811,7 @@ doname_base(
         if (price > 0L) {
             char pricebuf[BUFSZ];
 
-            Sprintf(pricebuf, "%ld %s", price, currency(price));
+            Sprintf(pricebuf, "%ld%s", price, currency(price));
             ConcatF2(bp, 0, " (%s, %s)",
                      nochrg ? "中身" : "販売中", pricebuf);
         } else if (nochrg > 0) {
@@ -2955,7 +2954,8 @@ paydoname(struct obj *obj)
                 p += 2;
             else if (!strncmp(p, "an ", 3))
                 p += 3;
-            p = strprepend(p, obj->unpaid ? "未払いの" : "あなたの");
+            if (obj->unpaid)
+                p = strprepend(p, "未払いの");
         }
 
         if (!obj->cknown) {

@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-04. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-19. */
 /* $NHDT-Header: NetHack 5.0 engrave.c 2026/06/20_22:26:43 NetHack-5.0:1.181 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
@@ -928,7 +928,7 @@ doengrave_sfx_item(struct _doengrave_ctx *de)
                       xname(de->otmp), surface(u.ux, u.uy));
             else if ((int) de->otmp->spe <= -3)
                 pline("%sは鈍すぎて刻めなかった.",
-                      Yobjnam2(de->otmp, "are"));
+                      Yobjnam2(de->otmp, (char *) 0));
             else
                 de->type = ENGRAVE;
         }
@@ -1105,7 +1105,7 @@ doengrave(void)
     }
 
     if (de->otmp == &hands_obj) {
-        Strcat(strcpy(de->fbuf, "あなたの"), jp_body_part(FINGERTIP));
+        Strcpy(de->fbuf, jp_body_part(FINGERTIP));
         de->writer = de->fbuf;
     } else {
         de->writer = xname(de->otmp);
@@ -1301,7 +1301,7 @@ doengrave(void)
             }
         } else if (de->oep
                    && Strlen(de->oep->engr_txt[actual_text]) >= BUFSZ - 1) {
-            There("ここにはもうこれ以上書き足す余地がなかった.");
+            pline("ここにはもうこれ以上書き足す余地がなかった.");
             de->ret = ECMD_TIME;
             goto doengr_exit;
         }

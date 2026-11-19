@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-04. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-19. */
 /* $NHDT-Header: NetHack 5.0 sounds.c 2026/09/30_14:47:34 NetHack-5.0:1.179 $ */
 /*      Copyright (c) 1989 Janet Walz, Mike Threepoint */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -99,11 +99,11 @@ morgue_mon_sound(struct monst *mtmp)
             You("不自然なほど静かなことに突然気づいた.");
             break;
         case 1:
-            pline_The("あなたの%sの後ろの%sが逆立った.", jp_body_part(NECK),
+            pline_The("%sの後ろの%sが逆立った.", jp_body_part(NECK),
                       hair);
             break;
         case 2:
-            pline_The("あなたの%sの%sが逆立っているようだ.",
+            pline_The("%sの%sが逆立っているようだ.",
                       jp_body_part(HEAD), hair);
             break;
         }
@@ -818,8 +818,11 @@ domonnoise(struct monst *mtmp)
     if (Deaf)
         return ECMD_OK;
     /* shk_chat can handle nonverbal monsters */
-    if (is_silent(ptr) && !mtmp->isshk)
+    if (is_silent(ptr) && !mtmp->isshk) {
+        pline("%sは%s", Monnam(mtmp),
+              Hallucination ? walltalkmsg() : "何も音を出さなかった.");
         return ECMD_OK;
+    }
 
     /* leader might be poly'd; if he can still speak, give leader speech */
     if (mtmp->m_id == svq.quest_status.leader_m_id && msound > MS_ANIMAL)
@@ -1380,6 +1383,27 @@ dotalk(void)
     return result;
 }
 
+/* suffix message for when talking to a non-responsive whatever */
+const char *
+walltalkmsg(void)
+{
+    static const char *const walltalk[] = {
+        "自分の仕事への不満をこぼした.",
+        "おかしな冗談を言った!",
+        "あなたの出自をけなした!",
+        "くすくす笑った.",
+        "陽気にげらげら笑った!",
+        "あなたの探索をこき下ろした.",
+        "しばらく更生施設に行けと勧めた...",
+        "どうやら興味がないようだ.",
+    };
+    int idx = rn2(10);
+
+    if (idx >= SIZE(walltalk))
+        idx = SIZE(walltalk) - 1;
+    return walltalk[idx];
+}
+
 staticfn int
 dochat(void)
 {
@@ -1479,21 +1503,7 @@ dochat(void)
             } else if (!Hallucination) {
                 pline("壁に話しかけているようなものだ.");
             } else {
-                static const char *const walltalk[] = {
-                    "自分の仕事への不満をこぼした.",
-                    "おかしな冗談を言った!",
-                    "あなたの出自をけなした!",
-                    "くすくす笑った.",
-                    "陽気にげらげら笑った!",
-                    "あなたの探索をこき下ろした.",
-                    "しばらく更生施設に行けと勧めた...",
-                    "どうやら興味がないようだ.",
-                };
-                int idx = rn2(10);
-
-                if (idx >= SIZE(walltalk))
-                    idx = SIZE(walltalk) - 1;
-                pline_The("壁は%s", walltalk[idx]);
+                pline_The("壁は%s", walltalkmsg());
             }
             return ECMD_OK;
         }

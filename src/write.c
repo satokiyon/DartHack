@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-08. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-19. */
 /* $NHDT-Header: NetHack 5.0 write.c 2026/10/31_22:59:35 NetHack-5.0:1.57 $ */
 /* Copyright (c) Michael Allison 2024. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -107,7 +107,7 @@ dowrite(struct obj *pen)
                  : "巻物";
     if (Blind) {
         if (!paper->dknown) {
-            You("その%sが白紙かどうかわからなかった.", typeword);
+            You("%sが白紙かどうかわからなかった.", typeword);
             return ECMD_OK;
         } else if (paper->oclass == SPBOOK_CLASS) {
             /* can't write a magic book while blind */
@@ -118,7 +118,7 @@ dowrite(struct obj *pen)
     }
     observe_object(paper);
     if (paper->otyp != SCR_BLANK_PAPER && paper->otyp != SPE_BLANK_PAPER) {
-        pline("その%sは白紙ではない!", typeword);
+        pline("%sは白紙ではない!", typeword);
         exercise(A_WIS, FALSE);
         return ECMD_TIME;
     }

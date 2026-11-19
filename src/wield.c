@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-04. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-19. */
 /* $NHDT-Header: NetHack 5.0 wield.c 2026/06/20_22:26:43 NetHack-5.0:1.126 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2009. */
@@ -723,8 +723,6 @@ wield_tool(struct obj *obj,
         if (flags.verbose) {
             const char *hand = jp_body_part(HAND);
 
-            if (bimanual(uwep))
-                hand = makeplural(hand);
             if (strstri(what, "pair of ") != 0)
                 more_than_1 = FALSE;
             pline("武器があなたの%sに貼り付いているため、%sを%sことはできない.",
@@ -788,8 +786,6 @@ can_twoweapon(void)
     } else if (!uwep || !uswapwep) {
         const char *hand_s = jp_body_part(HAND);
 
-        if (!uwep && !uswapwep)
-            hand_s = makeplural(hand_s);
         /* "your hands are empty" or "your {left|right} hand is empty" */
         Your("%s%sが空だった.", uwep ? "左" : uswapwep ? "右" : "", hand_s);
     } else if (!TWOWEAPOK(uwep) || !TWOWEAPOK(uswapwep)) {
@@ -1075,8 +1071,6 @@ weldmsg(struct obj *obj)
     long savewornmask;
     const char *hand = jp_body_part(HAND);
 
-    if (bimanual(obj))
-        hand = makeplural(hand);
     savewornmask = obj->owornmask;
     obj->owornmask = 0L; /* suppress doname()'s "(weapon in hand)";
                           * Yobjnam2() doesn't actually need this because
