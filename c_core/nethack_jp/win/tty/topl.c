@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-04. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-19. */
 /* $NHDT-Header: NetHack 5.0 topl.c 2026/06/20_22:26:43 NetHack-5.0:1.96 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2009. */
@@ -327,7 +327,7 @@ more(void)
     }
 
     if (ttyDisplay->toplin && cw->cury) {
-        docorner(1, cw->cury + 1, 0);
+        docorner(1, cw->cury + 1, 0, cw);
         cw->curx = cw->cury = 0;
         home();
     } else if (morc == '\033') {
@@ -366,8 +366,8 @@ update_topl(const char *bp)
         if (ttyDisplay->toplin == TOPLINE_NEED_MORE) {
             more();
         } else if (cw->cury) { /* for toplin==TOPLINE_NON_EMPTY && cury > 1 */
-            docorner(1, cw->cury + 1, 0); /* reset cury = 0 if redraw screen */
-            cw->curx = cw->cury = 0;   /* from home--cls() & docorner(1,n,0) */
+            docorner(1, cw->cury + 1, 0, cw); /* reset cury = 0 if redraw screen */
+            cw->curx = cw->cury = 0;   /* from home--cls() & docorner(1, n,0,cw) */
         }
     }
     remember_topl();
@@ -417,14 +417,16 @@ topl_putsym(char c)
         ttyDisplay->cury++;
         cw->cury = ttyDisplay->cury;
 #ifdef WIN32CON
-        (void) putchar(c);
+        if (!wincon_WindowsTerminalActive())
+            (void) putchar(c);
 #endif
         break;
     default:
         if (ttyDisplay->curx == CO - 1)
             topl_putsym('\n'); /* 1 <= curx < CO; avoid CO */
 #ifdef WIN32CON
-        (void) putchar(c);
+        if (!wincon_WindowsTerminalActive())
+            (void) putchar(c);
 #endif
         ttyDisplay->curx++;
     }
@@ -433,6 +435,9 @@ topl_putsym(char c)
         cl_end();
 #ifndef WIN32CON
     (void) putchar(c);
+#else
+    if (wincon_WindowsTerminalActive())
+        (void) putchar(c);
 #endif
 }
 

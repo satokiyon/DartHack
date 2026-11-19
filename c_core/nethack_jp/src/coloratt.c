@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-04. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-19. */
 /* $NHDT-Header: NetHack 5.0 coloratt.c 2026/06/20_22:26:43 NetHack-5.0:1.22 $ */
 /* Copyright (c) Pasi Kallinen, 2024 */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -365,7 +365,7 @@ match_str2clr(char *str, boolean suppress_msg)
 
     if (c < 0 || c >= CLR_MAX) {
         if (!suppress_msg)
-            config_error_add("Unknown color '%.60s'", str);
+            config_error_add("不明な色 '%.60s'", str);
         c = CLR_MAX; /* "none of the above" */
     }
     return c;
@@ -384,7 +384,7 @@ match_str2attr(const char *str, boolean complain)
         }
 
     if (a == -1 && complain)
-        config_error_add("Unknown text attribute '%.50s'", str);
+        config_error_add("不明なテキスト属性 '%.50s'", str);
 
     return a;
 }
@@ -625,7 +625,7 @@ add_menu_coloring(char *tmpstr) /* never Null but could be empty */
     str[sizeof str - 1] = '\0';
 
     if ((cs = strchr(str, '=')) == 0) {
-        config_error_add("Malformed MENUCOLOR");
+        config_error_add("MENUCOLOR の書式が不正です");
         return FALSE;
     }
 

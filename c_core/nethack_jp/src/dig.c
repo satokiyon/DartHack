@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-14. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-19. */
 /* $NHDT-Header: NetHack 5.0 dig.c 2026/06/20_22:26:43 NetHack-5.0:1.238 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2012. */
@@ -98,7 +98,7 @@ mkcavearea(boolean rockit)
         Soundeffect(se_crashing_rock, 100);
         pline("ガラガラ!  頭上の天井が崩れてきた!");
     } else {
-        pline("不思議な力があなたの周りに洞窟を%s!",
+        pline("不思議な力が周囲に洞窟を%s!",
               (levl[u.ux][u.uy].typ == CORR) ? "作り出した" : "広げた");
     }
     display_nhwindow(WIN_MESSAGE, TRUE);
@@ -1209,9 +1209,9 @@ use_pick_axe2(struct obj *obj)
             if (trap && trap->ttyp == WEB) {
                 if (!trap->tseen) {
                     seetrap(trap);
-                    There("そこにクモの巣がある!");
+                    There("クモの巣がある!");
                 }
-                pline("%sがクモの巣に絡まった.", Yobjnam2(obj, "become"));
+                pline("%sがクモの巣に絡まった.", Yobjnam2(obj, (char *) 0));
                 /* you ought to be able to let go; tough luck */
                 /* (maybe `move_into_trap()' would be better) */
                 nomul(-d(2, 2));
@@ -1829,7 +1829,7 @@ adj_pit_checks(coord *cc, char *msg)
 
         if (supporting) {
             Sprintf(msg, "%sを支える構造は無傷のままだ.",
-                    s_suffix(supporting));
+                    supporting);
             return FALSE;
         }
     }
@@ -2074,7 +2074,7 @@ bury_objs(int x, int y)
     maybe_unhide_at(x, y);
 
     if (costly && loss) {
-        You("商品を引き埋めた代金として、%sに%ld %sの借りがある.",
+        You("商品を埋めた代金として、%sに%ld%sの借りがある.",
             jp_shkname_for_display(shkp), loss, currency(loss));
     }
 }
@@ -2156,8 +2156,8 @@ rot_corpse(anything *arg, long timeout)
         if (flags.verbose) {
             char *cname = jp_corpse_xname(obj, (const char *) 0, CXN_NO_PFX);
 
-            Your("%s%sは腐って%s%c", obj == uwep ? "構えていた" : "", cname,
-                 otense(obj, "なくなった"), obj == uwep ? '!' : '.');
+            Your("%s%sは腐ってなくなった%c", obj == uwep ? "構えていた" : "", cname,
+                 obj == uwep ? '!' : '.');
         }
         if (obj->owornmask) {
             remove_worn_item(obj, TRUE);

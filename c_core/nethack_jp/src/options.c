@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-04. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-19. */
 /* $NHDT-Header: NetHack 5.0 options.c 2026/09/30_14:47:34 NetHack-5.0:1.799 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2008. */
@@ -524,7 +524,7 @@ parseoptions(
             retval = FALSE;
     }
     if (strlen(opts) > BUFSZ / 2) {
-        config_error_add("Option too long, max length is %i characters",
+        config_error_add("オプションが長すぎます（最大 %i 文字）",
                          (BUFSZ / 2));
         return FALSE;
     }
@@ -537,7 +537,7 @@ parseoptions(
         *op = '\0';
 
     if (!*opts) {
-        config_error_add("Empty statement");
+        config_error_add("空の記述です");
         return FALSE;
     }
     negated = FALSE;
@@ -588,7 +588,7 @@ parseoptions(
         if (got_match) {
             if (!allopt[i].pfx && optlen < allopt[i].minmatch) {
                 config_error_add(
-             "Ambiguous option %s, %d characters are needed to differentiate",
+             "オプション %s が曖昧です（識別には %d 文字必要です）",
                                  opts, allopt[i].minmatch);
                 break;
             }
@@ -682,7 +682,7 @@ parseoptions(
         Snprintf(pfxbuf, sizeof pfxbuf, "%s", opts);
         if ((pfxp = strchr(pfxbuf, ':')) != 0)
             *pfxp = '\0';
-        config_error_add("bad option suffix variation '%s'", pfxbuf);
+        config_error_add("不正なオプション接尾辞 '%s'", pfxbuf);
         return FALSE;
     }
     if (got_match && optresult == optn_err)
@@ -691,7 +691,7 @@ parseoptions(
         return retval;
 
     /* out of valid options */
-    config_error_add("Unknown option '%s'", opts);
+    config_error_add("不明なオプション '%s'", opts);
     return FALSE;
 }
 
@@ -949,7 +949,7 @@ optfn_align_message(
             else if (!strncmpi(op, "bottom", sizeof "bottom" - 1))
                 iflags.wc_align_message = ALIGN_BOTTOM;
             else {
-                config_error_add("Unknown %s parameter '%s'",
+                config_error_add("不明な %s パラメータ '%s'",
                                  allopt[optidx].name, op);
                 return optn_err;
             }
@@ -998,7 +998,7 @@ optfn_align_status(
             else if (!strncmpi(op, "bottom", sizeof "bottom" - 1))
                 iflags.wc_align_status = ALIGN_BOTTOM;
             else {
-                config_error_add("Unknown %s parameter '%s'",
+                config_error_add("不明な %s パラメータ '%s'",
                                  allopt[optidx].name, op);
                 return optn_err;
             }
@@ -1135,7 +1135,7 @@ optfn_autounlock(
                 }
             }
             if (!matched) {
-                config_error_add("Invalid value for \"%s\": \"%s\"",
+                config_error_add("\"%s\" の値が不正です: \"%s\"",
                                  allopt[optidx].name, op);
                 return optn_silenterr;
             }
@@ -1143,7 +1143,7 @@ optfn_autounlock(
         }
         if (negated && newflags != 0) {
             config_error_add(
-                     "Invalid value combination for \"%s\": 'none' with some",
+                     "\"%s\" の値の組み合わせが不正です（'none' と他値の併用不可）",
                              allopt[optidx].name);
             return optn_silenterr;
         }
@@ -1205,13 +1205,12 @@ optfn_boulder(
         else if (opts[0] >= '1' && opts[0] < WARNCOUNT + '0')
             clash = 2;
         if (opts[0] < ' ') {
-            config_error_add("boulder symbol cannot be a control character");
+            config_error_add("boulder 記号に制御文字は指定できません");
             return optn_ok;
         } else if (clash) {
             /* symbol chosen matches a used monster or warning
                symbol which is not good - reject it */
-            config_error_add("Badoption - boulder symbol '%s' would conflict "
-                             "with a %s symbol",
+            config_error_add("不正なオプション: boulder 記号 '%s' が %s 記号と競合します",
                              visctrl(opts[0]),
                              (clash == 1) ? "monster" : "warning");
         } else {
@@ -1235,7 +1234,7 @@ optfn_boulder(
         }
         return optn_ok;
 #else
-        config_error_add("'%s' no longer supported; use S_boulder:c instead",
+        config_error_add("'%s' は廃止されました。代わりに S_boulder:c を使用してください",
                          allopt[optidx].name);
         return optn_err;
 #endif
@@ -1328,8 +1327,7 @@ optfn_crash_urlmax(
             int temp = atoi(op);
 
             if (temp < 75){
-                config_error_add("Invalid value %d for crash_urlmax. "
-                                 " Minimum value is 75.", temp);
+                config_error_add("crash_urlmax の値 %d は無効です（最小値は 75）。", temp);
                 return optn_err;
             }
             gc.crash_urlmax = temp;
@@ -1378,14 +1376,14 @@ optfn_cursesgraphics(
                     switch_symbols(TRUE);
             }
             if (badflag) {
-                config_error_add("Failure to load symbol set %s.",
+                config_error_add("シンボルセット %s の読み込みに失敗しました。",
                                  allopt[optidx].name);
                 return optn_err;
             }
         }
         return optn_ok;
 #else
-        config_error_add("'%s' no longer supported; use 'symset:%s' instead",
+        config_error_add("'%s' は廃止されました。代わりに 'symset:%s' を使用してください",
                          allopt[optidx].name, allopt[optidx].name);
         return optn_err;
 #endif
@@ -1427,14 +1425,14 @@ optfn_DECgraphics(
                     switch_symbols(TRUE);
             }
             if (badflag) {
-                config_error_add("Failure to load symbol set %s.",
+                config_error_add("シンボルセット %s の読み込みに失敗しました。",
                                  allopt[optidx].name);
                 return optn_err;
             }
         }
         return optn_ok;
 #else
-        config_error_add("'%s' no longer supported; use 'symset:%s' instead",
+        config_error_add("'%s' は廃止されました。代わりに 'symset:%s' を使用してください",
                          allopt[optidx].name, allopt[optidx].name);
         return optn_err;
 #endif
@@ -1543,7 +1541,7 @@ optfn_disclose(
             } else if (c == ' ') {
                 ; /* do nothing */
             } else {
-                config_error_add("Unknown %s parameter '%c'",
+                config_error_add("不明な %s パラメータ '%c'",
                                  allopt[optidx].name, *op);
                 return optn_err;
             }
@@ -1747,7 +1745,7 @@ optfn_fruit(
 
                 if (!forig && fnum >= 100) {
                     config_error_add(
-                        "Doing that so many times isn't very fruitful.");
+                        "それを何度も繰り返してもあまり意味がありません。");
                     return optn_ok;
                 }
             }
@@ -1875,7 +1873,7 @@ optfn_hilite_status(
             clear_status_hilites();
             return optn_ok;
         } else if (op == empty_optstr) {
-            config_error_add("Value is mandatory for hilite_status");
+            config_error_add("hilite_status には値の指定が必須です");
             return optn_err;
         }
         if (!parse_status_hl1(op, go.opt_from_file))
@@ -1884,7 +1882,7 @@ optfn_hilite_status(
 #else
         nhUse(negated);
         nhUse(op);
-        config_error_add("'%s' is not supported", allopt[optidx].name);
+        config_error_add("'%s' はサポートされていません", allopt[optidx].name);
         return optn_err;
 #endif
     }
@@ -1945,7 +1943,7 @@ optfn_IBMgraphics(
                 }
             }
             if (badflag) {
-                config_error_add("Failure to load symbol set %s.", sym_name);
+                config_error_add("シンボルセット %s の読み込みに失敗しました。", sym_name);
                 return optn_err;
             } else {
                 switch_symbols(TRUE);
@@ -1955,7 +1953,7 @@ optfn_IBMgraphics(
         }
         return optn_ok;
 #else
-        config_error_add("'%s' no longer supported; use 'symset:%s' instead",
+        config_error_add("'%s' は廃止されました。代わりに 'symset:%s' を使用してください",
                          allopt[optidx].name, allopt[optidx].name);
         return optn_err;
 #endif
@@ -2018,7 +2016,7 @@ optfn_map_mode(
                                sizeof "tiles_fit_to_screen" - 1))
                 iflags.wc_map_mode = MAP_MODE_TILES_FIT_TO_SCREEN;
             else {
-                config_error_add("Unknown %s parameter '%s'",
+                config_error_add("不明な %s パラメータ '%s'",
                                  allopt[optidx].name, op);
                 return optn_err;
             }
@@ -2258,7 +2256,7 @@ optfn_menu_objsyms(
         } else if (digit(*op)) {
             i = atoi(op);
             if (i >= SIZE(objsymvals)) {
-                config_error_add("Illegal %s parameter '%s'",
+                config_error_add("不正な %s パラメータ '%s'",
                                  allopt[optidx].name, op);
                 return optn_err;
             }
@@ -2309,7 +2307,7 @@ optfn_menuinvertmode(
             int mode = atoi(op);
 
             if (mode < 0 || mode > 2) {
-                config_error_add("Illegal %s parameter '%s'",
+                config_error_add("不正な %s パラメータ '%s'",
                                  allopt[optidx].name, op);
                 return optn_err;
             }
@@ -2366,7 +2364,7 @@ optfn_menustyle(
             flags.menu_style = MENU_PARTIAL;
             break;
         default:
-            config_error_add("Unknown %s parameter '%s'", allopt[optidx].name,
+            config_error_add("不明な %s パラメータ '%s'", allopt[optidx].name,
                              op);
             return optn_err;
         }
@@ -2423,7 +2421,7 @@ optfn_mouse_support(
             int mode = atoi(op);
 
             if (mode < 0 || mode > 2 || (mode == 0 && *op != '0')) {
-                config_error_add("Illegal %s parameter '%s'",
+                config_error_add("不正な %s パラメータ '%s'",
                                  allopt[optidx].name, op);
                 return optn_err;
             } else { /* mode >= 0 */
@@ -2543,7 +2541,7 @@ optfn_msg_window(
             iflags.prevmsg_window = (char) tmp;
             break;
         default:
-            config_error_add("Unknown %s parameter '%s'", allopt[optidx].name,
+            config_error_add("不明な %s パラメータ '%s'", allopt[optidx].name,
                              op);
             retval = optn_err;
         }
@@ -2658,7 +2656,7 @@ optfn_number_pad(
             int mode = atoi(op);
 
             if (mode < -1 || mode > 4 || (mode == 0 && *op != '0')) {
-                config_error_add("Illegal %s parameter '%s'",
+                config_error_add("不正な %s パラメータ '%s'",
                                  allopt[optidx].name, op);
                 return optn_err;
             } else if (mode <= 0) {
@@ -2773,7 +2771,7 @@ optfn_palette(
              *  palette (adjust an RGB color in palette (color/R-G-B)
              */
             if (!alternative_palette(op)) {
-                config_error_add("Error in palette parameter '%s'", op);
+                config_error_add("palette パラメータ '%s' にエラーがあります", op);
                 return optn_err;
             }
             if (!go.opt_initial)
@@ -2926,7 +2924,7 @@ optfn_paranoid_confirmation(
                    bad; back when prayconfirm was in active use, tacking on
                    an explicit value to a boolean option wasn't supported */
                 config_error_add(
-           "deprecated %sprayconfirm option takes no parameters (found '%s')",
+           "非推奨の %sprayconfirm オプションはパラメータを取りません（指定値: '%s'）",
                                  opt_negated ? "!" : "", op);
                 return optn_silenterr;
             }
@@ -2936,7 +2934,7 @@ optfn_paranoid_confirmation(
                that isn't supported [not important since this is considered
                temporary until 'prayconfirm' gets removed altogether] */
             config_error_add(
-                 "%sprayconfirm option is deprecated; switching to %s:%cpray",
+                 "%sprayconfirm オプションは非推奨です。%s:%cpray に切り替えます",
                              opt_negated ? "!" : "",
                              allopt[optidx].name,
                              opt_negated ? '-' : '+');
@@ -2960,13 +2958,13 @@ optfn_paranoid_confirmation(
                 flags.paranoia_bits = 0;
                 return optn_ok;
             } else {
-                config_error_add("!%s does not accept a value",
+                config_error_add("!%s は値を受け付けません",
                                  allopt[optidx].name);
                 return optn_silenterr;
             }
         } else if (!*op) {
             /* "paranoid_confirm" without any arguments is disallowed */
-            config_error_add("%s requires a value; use 'none' to cancel all",
+            config_error_add("%s には値が必要です（すべて解除するには 'none' を指定）",
                              allopt[optidx].name);
             return optn_silenterr;
         }
@@ -3067,7 +3065,7 @@ optfn_paranoid_confirmation(
             if (i == SIZE(paranoia)) {
                 /* didn't match anything, so arg is bad;
                    any flags already modified will stay modified */
-                config_error_add("Unknown %s parameter '%s'",
+                config_error_add("不明な %s パラメータ '%s'",
                                  allopt[optidx].name, op);
                 return optn_silenterr;
             }
@@ -3143,7 +3141,7 @@ optfn_perminv_mode(
                     if (strstri(pi0, "+grid") && !WINDOWPORT(tty)) {
                         i &= ~InvSparse;
                         config_error_add(
-                          "%s: unavailable perm_invent mode '%s', using '%s'",
+                          "%s: 利用できない perm_invent モード '%s' のため '%s' を使用します",
                                          allopt[optidx].name, pi0,
                                          perminv_modes[i][0]);
                     }
@@ -3154,7 +3152,7 @@ optfn_perminv_mode(
                 }
             }
             if (i == SIZE(perminv_modes)) {
-                config_error_add("Unknown %s parameter '%s'",
+                config_error_add("不明な %s パラメータ '%s'",
                                  allopt[optidx].name, op);
                 iflags.perminv_mode = InvOptNone;
                 iflags.perm_invent = FALSE;
@@ -3217,7 +3215,7 @@ optfn_petattr(
             int itmp = match_str2attr(op, FALSE);
 
             if (itmp == -1) {
-                config_error_add("Unknown %s parameter '%s'",
+                config_error_add("不明な %s パラメータ '%s'",
                                  allopt[optidx].name, opts);
                 retval = optn_err;
             } else
@@ -3287,7 +3285,7 @@ optfn_pettype(
                 gp.preferred_pet = '\0';
                 break;
             default:
-                config_error_add("Unrecognized pet type '%s'.", op);
+                config_error_add("認識できないペット種別 '%s' です。", op);
                 return optn_err;
                 break;
             }
@@ -3347,7 +3345,7 @@ optfn_pickup_burden(
                 flags.pickup_burden = OVERLOADED;
                 break;
             default:
-                config_error_add("Unknown %s parameter '%s'",
+                config_error_add("不明な %s パラメータ '%s'",
                                  allopt[optidx].name, op);
                 return optn_err;
             }
@@ -3443,7 +3441,7 @@ optfn_pickup_types(
                 op++;
             }
             if (badopt) {
-                config_error_add("Unknown %s parameter '%s'",
+                config_error_add("不明な %s パラメータ '%s'",
                                  allopt[optidx].name, op);
                 return optn_err;
             }
@@ -3513,7 +3511,7 @@ optfn_player_selection(
             } else if (!strncmpi(op, "prompt", sizeof "prompt" - 1)) {
                 iflags.wc_player_selection = VIA_PROMPTS;
             } else {
-                config_error_add("Unknown %s parameter '%s'",
+                config_error_add("不明な %s パラメータ '%s'",
                                  allopt[optidx].name, op);
                 return optn_err;
             }
@@ -3551,7 +3549,7 @@ optfn_playmode(
         } else if (!strncmpi(op, "debug", 5) || !strncmpi(op, "wizard", 6)) {
             wizard = TRUE, discover = FALSE;
         } else {
-            config_error_add("Invalid value for \"%s\":%s",
+            config_error_add("\"%s\" の値が不正です: %s",
                              allopt[optidx].name, op);
             return optn_err;
         }
@@ -3619,7 +3617,7 @@ optfn_roguesymset(
             if (!read_sym_file(ROGUESET)) {
                 clear_symsetentry(ROGUESET, TRUE);
                 config_error_add(
-                    "Unable to load symbol set \"%s\" from \"%s\"", op,
+                    "シンボルセット \"%s\" を \"%s\" から読み込めません", op,
                     SYMBOLS);
                 return optn_err;
             } else {
@@ -3705,12 +3703,12 @@ optfn_runmode(
             else if (str_start_is("crawl", op, TRUE))
                 flags.runmode = RUN_CRAWL;
             else {
-                config_error_add("Unknown %s parameter '%s'",
+                config_error_add("不明な %s パラメータ '%s'",
                                  allopt[optidx].name, op);
                 return optn_err;
             }
         } else {
-            config_error_add("Value is mandatory for %s",
+            config_error_add("%s には値の指定が必須です",
                              allopt[optidx].name);
             return optn_err;
         }
@@ -3780,7 +3778,7 @@ optfn_scores(
             case '-':
                 if (digit(*(op + 1))) {
                     config_error_add(
-                       "Values for %s:top and %s:around must not be negative",
+                       "%s:top および %s:around に負の値は指定できません",
                                      allopt[optidx].name,
                                      allopt[optidx].name);
                     return optn_silenterr;
@@ -3788,7 +3786,7 @@ optfn_scores(
                 FALLTHROUGH;
                 /*FALLTHRU*/
             default:
-                config_error_add("Unknown %s parameter '%s'",
+                config_error_add("不明な %s パラメータ '%s'",
                                  allopt[optidx].name, op);
                 return optn_silenterr;
             }
@@ -3952,7 +3950,7 @@ optfn_sortdiscoveries(
                 flags.discosort = 'a';
                 break;
             default:
-                config_error_add("Unknown %s parameter '%s'",
+                config_error_add("不明な %s パラメータ '%s'",
                                  allopt[optidx].name, op);
                 return optn_silenterr;
             }
@@ -3993,7 +3991,7 @@ optfn_sortloot(
                 flags.sortloot = c;
                 break;
             default:
-                config_error_add("Unknown %s parameter '%s'",
+                config_error_add("不明な %s パラメータ '%s'",
                                  allopt[optidx].name, op);
                 return optn_err;
             }
@@ -4041,7 +4039,7 @@ optfn_sortvanquished(
             } else if (strchr("01234567", *op)) {
                 vndx = *op - '0';
             } else {
-                config_error_add("Unknown %s parameter '%s'", optname, op);
+                config_error_add("不明な %s パラメータ '%s'", optname, op);
                 return optn_silenterr;
             }
             flags.vanq_sortmode = (uchar) vndx;
@@ -4098,7 +4096,7 @@ optfn_statushilites(
 #else
         nhUse(negated);
         nhUse(op);
-        config_error_add("'%s' is not supported", allopt[optidx].name);
+        config_error_add("'%s' はサポートされていません", allopt[optidx].name);
         return optn_err;
 #endif
     }
@@ -4147,7 +4145,7 @@ optfn_statuslines(
             itmp = atoi(op);
         }
         if (itmp < 2 || itmp > 3) {
-            config_error_add("'%s:%s' is invalid; must be 2 or 3",
+            config_error_add("'%s:%s' は無効です（2 または 3 を指定してください）",
                              allopt[optidx].name, op);
             retval = optn_silenterr;
         } else {
@@ -4241,7 +4239,7 @@ optfn_symset(
             if (!read_sym_file(PRIMARYSET)) {
                 clear_symsetentry(PRIMARYSET, TRUE);
                 config_error_add(
-                    "Unable to load symbol set \"%s\" from \"%s\"", op,
+                    "シンボルセット \"%s\" を \"%s\" から読み込めません", op,
                     SYMBOLS);
                 return optn_err;
             } else {
@@ -4249,7 +4247,7 @@ optfn_symset(
 #ifndef ENHANCED_SYMBOLS
                     if (gs.symset[PRIMARYSET].handling == H_UTF8) {
                         config_error_add(
-                                   "Unavailable symset handler \"%s\" for %s",
+                                   "%s 用の symset ハンドラ \"%s\" は利用できません",
                                          known_handling[H_UTF8], op);
                         load_symset("default", PRIMARYSET);
                     }
@@ -4611,14 +4609,13 @@ optfn_versinfo(
         }
         op = string_for_opt(opts, FALSE);
         if (op == empty_optstr) {
-            config_error_add("'%s' requires a value; defaulting to %d",
+            config_error_add("'%s' には値が必要です（デフォルト値 %d を使用）",
                              optname, dflt);
             return optn_silenterr;
         }
         val = atoi(op);
         if (!val || (val & ~7) != 0) {
-            config_error_add("'%s' must be one of 1, 2, 4, or"
-                             " the sum of two or all three of those",
+            config_error_add("'%s' は 1, 2, 4 またはそれらの合計値で指定してください",
                              optname);
             return optn_silenterr;
         }
@@ -4626,9 +4623,8 @@ optfn_versinfo(
     } else if (req == do_handler) {
         /* return handler_versinfo(); */
         (void) handler_versinfo();
-        pline("'%s' %s %u.", optname,
-              (flags.versinfo == vi) ? "not changed, still" : "changed to",
-              flags.versinfo);
+        pline("'%s' は %u %s.", optname, flags.versinfo,
+              (flags.versinfo == vi) ? "のまま変更されませんでした" : "に変更されました");
     } else if (req == get_val) {
         char vbuf[QBUFSZ];
         boolean g = (vi & VI_NAME) != 0,
@@ -4665,7 +4661,7 @@ optfn_videocolors(
             return optn_err;
         }
         if (!assign_videocolors(opts)) {
-            config_error_add("Unknown error handling '%s'",
+            config_error_add("不明なエラー処理指定 '%s'",
                              allopt[optidx].name);
             return optn_err;
         }
@@ -4700,7 +4696,7 @@ optfn_videoshades(
             return optn_err;
         }
         if (!assign_videoshades(opts)) {
-            config_error_add("Unknown error handling '%s'",
+            config_error_add("不明なエラー処理指定 '%s'",
                              allopt[optidx].name);
             return optn_err;
         }
@@ -4773,7 +4769,7 @@ optfn_video(
             return optn_err;
         }
         if (!assign_video(opts)) {
-            config_error_add("Unknown error handling '%s'",
+            config_error_add("不明なエラー処理指定 '%s'",
                              allopt[optidx].name);
             return optn_err;
         }
@@ -4836,7 +4832,7 @@ optfn_whatis_coord(
             if (c && strchr(gpcoords, c))
                 iflags.getpos_coords = c;
             else {
-                config_error_add("Unknown %s parameter '%s'",
+                config_error_add("不明な %s パラメータ '%s'",
                                  allopt[optidx].name, op);
                 return optn_err;
             }
@@ -4886,7 +4882,7 @@ optfn_whatis_filter(
                 iflags.getloc_filter = GFILTER_AREA;
                 break;
             default: {
-                config_error_add("Unknown %s parameter '%s'",
+                config_error_add("不明な %s パラメータ '%s'",
                                  allopt[optidx].name, op);
                 return optn_err;
             }
@@ -4936,7 +4932,7 @@ optfn_windowborders(
                 itmp = atoi(op);
 
             if (itmp < 0 || itmp > 4) {
-                config_error_add("Invalid %s (should be within 0 to 4): %s",
+                config_error_add("不正な %s（0 から 4 の範囲で指定してください）: %s",
                                  allopt[optidx].name, opts);
                 retval = optn_silenterr;
             } else {
@@ -5026,7 +5022,7 @@ optfn_windowcolors(
          */
         if ((op = string_for_opt(opts, FALSE)) != empty_optstr) {
             if (!wc_set_window_colors(op)) {
-                config_error_add("Could not set %s '%s'", allopt[optidx].name,
+                config_error_add("%s '%s' を設定できませんでした", allopt[optidx].name,
                                  op);
                 return optn_err;
             }
@@ -5125,12 +5121,12 @@ pfxfn_cond_(
             opt_set_in_config[pfx_cond_] = TRUE;
             break;
         case 3:
-            config_error_add("Ambiguous condition option %s", opts);
+            config_error_add("条件オプション %s が曖昧です", opts);
             break;
         case 1:
         case 2:
         default:
-            config_error_add("Unknown condition option %s (%d)", opts, reslt);
+            config_error_add("不明な条件オプション %s (%d)", opts, reslt);
             break;
         }
         if (reslt != 0)
@@ -5187,7 +5183,7 @@ pfxfn_font(int optidx, int req, boolean negated, char *opts, char *op)
             else if (optidx == opt_font_size_status)
                 opttype = STATUS_OPTION;
             else {
-                config_error_add("Unknown %s parameter '%s'",
+                config_error_add("不明な %s パラメータ '%s'",
                              allopt[optidx].name, opts);
                 return optn_err;
             }
@@ -5215,7 +5211,7 @@ pfxfn_font(int optidx, int req, boolean negated, char *opts, char *op)
             }
             return optn_ok;
         } else {
-            config_error_add("Unknown %s parameter '%s'",
+            config_error_add("不明な %s パラメータ '%s'",
                              "font", opts);
             return FALSE;
         }
@@ -5330,7 +5326,7 @@ optfn_boolean(
         if (op != empty_optstr) {
             if (negated) {
                 config_error_add(
-                           "Negated boolean '%s' should not have a parameter",
+                           "否定された真偽オプション '%s' にパラメータは指定できません",
                                  allopt[optidx].name);
                 return optn_silenterr;
             }
@@ -5347,7 +5343,7 @@ optfn_boolean(
                        || (digit(*op) && atoi(op) == 0)) {
                 negated = TRUE;
             } else if (!allopt[optidx].valok) {
-                config_error_add("'%s' is not valid for a boolean", opts);
+                config_error_add("'%s' は真偽値として無効です", opts);
                 return optn_silenterr;
             }
         }
@@ -5394,7 +5390,7 @@ optfn_boolean(
         if (nosexchange) {
             /* can't arbitrarily change sex after game has started;
                magic (amulet or polymorph) is required for that */
-            config_error_add("'%s' is not anatomically possible.", opts);
+            config_error_add("'%s' は解剖学的に不可能です。", opts);
             return optn_silenterr;
         }
 
@@ -5427,10 +5423,15 @@ optfn_boolean(
             break;
 #ifndef IDLECHECKPOINT
         case opt_idlecheckpoint:
-            pline("There is no underlying support for 'idlecheckpoint'"
-                  " compiled in.");
+            pline("'idlecheckpoint' のサポートはこのビルドに含まれていません。");
             iflags.idlecheckpoint = FALSE;
             give_opt_msg = FALSE;
+            break;
+#endif
+#ifdef WIN32CON
+        case opt_windowsterminal:
+            iflags.wt_how =
+                (negated) ? wt_in_config_negated : wt_in_config_not_negated;
             break;
 #endif
         default:
@@ -5451,7 +5452,7 @@ optfn_boolean(
         case opt_armorstatus:
             if (!wc2_supported(allopt[optidx].name)) {
                 /* not actually an error */
-                config_error_add("'%s' is not supported.",
+                config_error_add("'%s' はサポートされていません。",
                                  allopt[optidx].name);
                 return optn_ok;
             }
@@ -6983,7 +6984,7 @@ string_for_opt(char *opts, boolean val_optional)
 
     if (!colon || !*++colon) {
         if (!val_optional)
-            config_error_add("Missing parameter for '%s'", opts);
+            config_error_add("'%s' のパラメータが不足しています", opts);
         return empty_optstr;
     }
     return colon;
@@ -7002,8 +7003,8 @@ string_for_env_opt(const char *optname, char *opts, boolean val_optional)
 staticfn void
 bad_negation(const char *optname, boolean with_parameter)
 {
-    config_error_add("The %s option may not %sbe negated.", optname,
-                     with_parameter ? "both have a value and " : "");
+    config_error_add("%s オプションは%s否定できません。", optname,
+                     with_parameter ? "値を指定したまま" : "");
 }
 
 /* go through all of the options and set the minmatch value
@@ -7109,10 +7110,9 @@ complain_about_duplicate(int optidx)
 #else /* !MAC68K */
     buf[0] = '\0';
     if (using_alias)
-        Sprintf(buf, " (via alias: %s)", allopt[optidx].alias);
-    config_error_add("%s option specified multiple times: %s%s",
-                     (allopt[optidx].opttyp == CompOpt) ? "compound"
-                                                        : "boolean",
+        Sprintf(buf, " (エイリアス: %s)", allopt[optidx].alias);
+    config_error_add("%sオプションが重複指定されています: %s%s",
+                     (allopt[optidx].opttyp == CompOpt) ? "複合" : "真偽",
                      allopt[optidx].name, buf);
 #endif /* ?MAC68K */
     return;
@@ -7708,7 +7708,7 @@ initoptions_finish(void)
      * is even initialized, so check for that too.
      */
     if (iflags.hilite_delta && !wc2_supported("statushilites")) {
-        raw_printf("Status highlighting not supported for %s interface.",
+        raw_printf("%s インターフェースではステータスハイライトはサポートされていません。",
                     windowprocs.name);
         iflags.hilite_delta = 0;
     }
@@ -7849,18 +7849,18 @@ change_inv_order(char *op)
         oc_sym = def_char_to_objclass(*sp);
         /* reject bad or duplicate entries */
         if (oc_sym == MAXOCLASSES) { /* not an object class char */
-            config_error_add("Not an object class '%c'", *sp);
+            config_error_add("'%c' はアイテム分類ではありません", *sp);
             retval = 0;
             fail = TRUE;
         } else if (!strchr(flags.inv_order, oc_sym)) {
             /* VENOM_CLASS, RANDOM_CLASS, and ILLOBJ_CLASS are excluded
                because they aren't in def_inv_order[] so don't make it
                into flags.inv_order, hence always fail this strchr() test */
-            config_error_add("Object class '%c' not allowed", *sp);
+            config_error_add("アイテム分類 '%c' は許可されていません", *sp);
             retval = 0;
             fail = TRUE;
         } else if (strchr(sp + 1, *sp)) {
-            config_error_add("Duplicate object class '%c'", *sp);
+            config_error_add("アイテム分類 '%c' が重複しています", *sp);
             retval = 0;
             fail = TRUE;
         }
@@ -7938,7 +7938,7 @@ feature_alert_opts(char *op, const char *optn)
             You_cant("将来のバージョンの新機能アラートを無効にすることはできなかった。");
         } else {
             config_error_add(
-                        "%s=%s Invalid reference to a future version ignored",
+                        "%s=%s 未来バージョンへの無効な参照を無視しました",
                              optn, op);
         }
         return 0;
@@ -7949,7 +7949,7 @@ feature_alert_opts(char *op, const char *optn)
         Sprintf(buf, "%lu.%lu.%lu", FEATURE_NOTICE_VER_MAJ,
                 FEATURE_NOTICE_VER_MIN, FEATURE_NOTICE_VER_PATCH);
         pline(
-          "Feature change alerts disabled for NetHack %s features and prior.",
+          "NetHack %s 以前の機能変更アラートを無効化しました。",
               buf);
     }
     return 1;
@@ -8006,7 +8006,7 @@ parsebindings(char *bindings)
     for (i = 0; i < SIZE(mousebtn_names); i++)
         if (!strcmp(bindings, mousebtn_names[i])) {
             if (!bind_mousebtn(i + 1, bind)) {
-                config_error_add("Error binding mouse button %i", i + 1);
+                config_error_add("マウスボタン %i のバインドエラー", i + 1);
             } else {
                 return ret;
             }
@@ -8015,7 +8015,7 @@ parsebindings(char *bindings)
     /* read the key to be bound */
     key = txt2key(bindings);
     if (!key) {
-        config_error_add("Unknown key binding key '%s'", bindings);
+        config_error_add("不明なキーバインドのキー '%s'", bindings);
         return FALSE;
     }
 
@@ -8027,7 +8027,7 @@ parsebindings(char *bindings)
     for (i = 0; default_menu_cmd_info[i].name; i++) {
         if (!strcmp(default_menu_cmd_info[i].name, bind)) {
             if (illegal_menu_cmd_key(key)) {
-                config_error_add("Bad menu key %s:%s", visctrl(key), bind);
+                config_error_add("不正なメニューキー %s:%s", visctrl(key), bind);
                 return FALSE;
             } else {
                 add_menu_cmd_alias((char) key, default_menu_cmd_info[i].cmd);
@@ -8038,7 +8038,7 @@ parsebindings(char *bindings)
 
     /* extended command? */
     if (!bind_key(key, bind, TRUE)) {
-        config_error_add("Unknown key binding command '%s'", bind);
+        config_error_add("不明なキーバインドコマンド '%s'", bind);
         return FALSE;
     }
     return ret;
@@ -8229,9 +8229,9 @@ msgtype_parse_add(char *str)
         if (typ != -1)
             return msgtype_add(typ, pattern);
         else
-            config_error_add("Unknown message type '%s'", msgtype);
+            config_error_add("不明なメッセージ種別 '%s'", msgtype);
     } else {
-        config_error_add("Malformed MSGTYPE");
+        config_error_add("MSGTYPE の書式が不正です");
     }
     return FALSE;
 }
@@ -8316,18 +8316,18 @@ parse_role_opt(
                 op += (*op == '!') ? 1 : (op[2] != '-') ? 2 : 3;
             }
             if (!*op || *op == ' ') {
-                config_error_add("Negated nothing for '%s'", fullname);
+                config_error_add("'%s' の否定対象が空です", fullname);
                 return FALSE;
             }
             if (!first) {
                 if ((val_negated ^ prev_negated)
                     || (negated && val_negated)) {
-                    config_error_add("Invalid mixed negation for '%s%s'",
+                    config_error_add("'%s%s' の否定の混在が不正です",
                                      negated ? "!" : "", fullname);
                     return FALSE;
                 } else if (!negated && !val_negated) {
                     config_error_add(
-                    "Multiple role values only allowed when list is negated");
+                    "複数の職業指定は否定リストの場合のみ許可されます");
                     return FALSE;
                 }
             }
@@ -8409,14 +8409,14 @@ illegal_menu_cmd_key(uchar c)
 {
     if (c == 0 || c == '\r' || c == '\n' || c == '\033' || c == ' '
         || digit((char) c) || (letter((char) c) && c != '@')) {
-        config_error_add("Reserved menu command key '%s'", visctrl((char) c));
+        config_error_add("予約済みのメニューコマンドキー '%s'", visctrl((char) c));
         return TRUE;
     } else { /* reject default object class symbols */
         int j;
 
         for (j = 1; j < MAXOCLASSES; j++)
             if (c == (uchar) def_oc_syms[j].sym) {
-                config_error_add("Menu command key '%s' is an object class",
+                config_error_add("メニューコマンドキー '%s' はアイテム分類と重複しています",
                                  visctrl((char) c));
                 return TRUE;
             }

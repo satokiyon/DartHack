@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-04. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-19. */
 /* $NHDT-Header: NetHack 5.0 decl.h 2026/10/18_12:54:26 NetHack-5.0:1.415 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2007. */
@@ -702,6 +702,9 @@ struct instance_globals_n {
     short nocreate3;
     short nocreate4;
 
+    /* new */
+    boolean no_terms; /* runtime differentiation of NO_TERMS */
+
     boolean havestate;
 };
 
@@ -990,7 +993,11 @@ struct instance_globals_u {
     /* decl.c */
     boolean unweapon;
 
-        /* revision.c */
+    /* polyself.c */
+    unsigned long uasmon_generation;
+    unsigned long uasmon_top_of_moveloop;
+
+    /* revision.c */
     int uplift_needed_rev0_to_rev1;
 
     /* role.c */

@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-14. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-19. */
 /* $NHDT-Header: NetHack 5.0 mthrowu.c 2026/08/07_12:46:53 NetHack-5.0:1.195 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Pasi Kallinen, 2016. */
@@ -150,7 +150,7 @@ thitu(
             if (obj && objects[obj->otyp].oc_material == SILVER
                 && Hate_silver) {
                 /* extra damage already applied by dmgval() */
-                pline_The("銀があなたの肉を焼いた!");
+                pline_The("銀が肉を焼いた!");
                 exercise(A_CON, FALSE);
             }
             if (is_acid) {
@@ -781,13 +781,11 @@ m_throw(
                     if (!Blind)
                         pline("うわっ!  パイまみれになった.");
                     else
-                        pline("%sがあなたの%s一面にべったり付いている.",
+                        pline("%sが%s一面にべったり付いている.",
                               something, jp_body_part(FACE));
                 } else if (singleobj->otyp == BLINDING_VENOM) {
                     const char *eyes = jp_body_part(EYE);
 
-                    if (eyecount(gy.youmonst.data) != 1)
-                        eyes = makeplural(eyes);
                     /* venom in the eyes */
                     if (!Blind)
                         pline_The("毒液で目がくらんだ.");
@@ -1238,8 +1236,7 @@ thrwmu(struct monst *mtmp)
 
         if (canseemon(mtmp)) {
             onm = xname(otmp);
-            pline_mon(mtmp, "%sは%sで攻撃した.", Monnam(mtmp),
-                obj_is_pname(otmp) ? the(onm) : an(onm));
+            pline_mon(mtmp, "%sは%sで攻撃した.", Monnam(mtmp), onm);
         }
 
         dam = dmgval(otmp, &gy.youmonst);

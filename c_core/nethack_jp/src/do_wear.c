@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-12. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-19. */
 /* $NHDT-Header: NetHack 5.0 do_wear.c 2026/06/20_22:26:43 NetHack-5.0:1.214 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
@@ -1848,7 +1848,7 @@ dotakeoff(void)
     if (!Narmorpieces && !Naccessories) {
         /* assert( GRAY_DRAGON_SCALES > YELLOW_DRAGON_SCALE_MAIL ); */
         if (uskin)
-            pline_The("%sはあなたの皮膚と一体化した!",
+            pline_The("%sは皮膚と一体化した!",
                       uskin->otyp >= GRAY_DRAGON_SCALES
                           ? "ドラゴンの鱗"
                           : "ドラゴンの鱗鎧");
@@ -2062,7 +2062,7 @@ canwearobj(struct obj *otmp, long *mask, boolean noisy)
                 : !WrappingAllowed(gy.youmonst.data)))
         && (racial_exception(&gy.youmonst, otmp) < 1)) {
         if (noisy)
-            pline_The("%sはあなたの体には合わない.", which);
+            pline_The("%sは体に合わない.", which);
         return 0;
     } else if (otmp->owornmask & W_ARMOR) {
         if (noisy)
@@ -2085,7 +2085,7 @@ canwearobj(struct obj *otmp, long *mask, boolean noisy)
         } else if (Upolyd && has_horns(gy.youmonst.data) && !is_flimsy(otmp)) {
             /* (flimsy exception matches polyself handling) */
             if (noisy)
-                pline_The("%sはあなたの角が邪魔でかぶれない.",
+                pline_The("%sは角が邪魔でかぶれない.",
                           helm_simple_name(otmp));
             err++;
         } else
@@ -2318,8 +2318,6 @@ accessory_or_armor_on(struct obj *obj)
                     const char *hand = jp_body_part(HAND);
 
                     /* welded will set bknown */
-                    if (bimanual(uwep))
-                        hand = makeplural(hand);
                     You("指輪をはめるために武器を持つ%sを空けられない.",
                         hand);
                     /* uses move iff we learned weapon is cursed */
@@ -2727,13 +2725,13 @@ select_off(struct obj *otmp)
     /* special glove checks */
     if (otmp == uarmg) {
         if (welded(uwep)) {
-            You("その%sを装備したままでは%sを外せない.",
+            You("%sを装備したままでは%sを外せない.",
                 c_gloves, is_sword(uwep) ? c_sword : c_weapon);
             set_bknown(uwep, 1);
             return 0;
         } else if (Glib) {
             pline("%s%sは滑りすぎて外せない.",
-                uarmg->unpaid ? "その" : "あなたの", /* simplified Shk_Your() */
+                uarmg->unpaid ? "未払いの" : "", /* simplified Shk_Your() */
                   gloves_simple_name(uarmg));
             return 0;
         }
@@ -3211,7 +3209,7 @@ disintegrate_arm(struct obj *atmp)
      */
 
     if ((otmp = maybe_destroy_armor(uarmc, atmp, &resistedc)) != 0) {
-        urgent_pline("あなたの%sが崩れて塵になった！",
+        urgent_pline("%sが崩れて塵になった!",
                      /* cloak/robe/apron/smock (ID'd apron)/wrapping */
                      cloak_simple_name(otmp));
     } else if (!resistedc
@@ -3222,22 +3220,22 @@ disintegrate_arm(struct obj *atmp)
            stops shining _after_ we've been told that it is destroyed */
         if (otmp->lamplit)
             end_burn(otmp, FALSE);
-        urgent_pline("あなたの%sが塵と化して%sに崩れ落ちた！",
+        urgent_pline("%sが塵と化して%sに崩れ落ちた!",
                      suit, surface(u.ux, u.uy));
     } else if (!resistedc && !resistedsuit
              && (otmp = maybe_destroy_armor(uarmu, atmp, &resisted)) != 0) {
-        urgent_pline("あなたの%sが細かい糸くずに崩れてバラバラになった！",
+        urgent_pline("%sが細かい糸くずに崩れてバラバラになった!",
                      shirt_simple_name(otmp)); /* always "shirt" */
     } else if ((otmp = maybe_destroy_armor(uarmh, atmp, &resisted)) != 0) {
-        urgent_pline("あなたの%sが塵になって吹き飛んだ！",
+        urgent_pline("%sが塵になって吹き飛んだ!",
                      helm_simple_name(otmp)); /* "helm" or "hat" */
     } else if ((otmp = maybe_destroy_armor(uarmg, atmp, &resisted)) != 0) {
-        urgent_pline("あなたの%sが消えてしまった！", gloves_simple_name(otmp));
+        urgent_pline("%sが消えてしまった!", gloves_simple_name(otmp));
         losing_gloves = TRUE;
     } else if ((otmp = maybe_destroy_armor(uarmf, atmp, &resisted)) != 0) {
-        urgent_pline("あなたの%sが崩壊した！", boots_simple_name(otmp));
+        urgent_pline("%sが崩壊した!", boots_simple_name(otmp));
     } else if ((otmp = maybe_destroy_armor(uarms, atmp, &resisted)) != 0) {
-        urgent_pline("あなたの%sが崩れ去った！", shield_simple_name(otmp));
+        urgent_pline("%sが崩れ去った!", shield_simple_name(otmp));
     } else {
         return 0; /* could not destroy anything */
     }

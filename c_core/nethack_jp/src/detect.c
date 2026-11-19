@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-14. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-19. */
 /* $NHDT-Header: NetHack 5.0 detect.c 2026/06/20_22:26:43 NetHack-5.0:1.199 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2018. */
@@ -394,11 +394,11 @@ gold_detect(struct obj *sobj)
                "将来の懐事情が心配になった.");
         else if (steedgold)
             Sprintf(buf, "%sの懐事情が気になった.",
-                    s_suffix(x_monnam(u.usteed,
-                                      u.usteed->mtame ? ARTICLE_YOUR
-                                                      : ARTICLE_THE,
-                                      (char *) 0,
-                                      SUPPRESS_SADDLE, FALSE)));
+                    x_monnam(u.usteed,
+                             u.usteed->mtame ? ARTICLE_YOUR
+                                             : ARTICLE_THE,
+                             (char *) 0,
+                             SUPPRESS_SADDLE, FALSE));
         else
             Strcpy(buf, "懐が寂しい気分になった.");
 
@@ -1231,17 +1231,17 @@ use_crystal_ball(struct obj **optr)
             break;
         case 3:
             if (!resists_blnd(&gy.youmonst)) {
-                pline("%sはあなたの視界を傷つけた!", Tobjnam(obj, (char *)0));
+                pline("%sは視界を傷つけた!", Tobjnam(obj, (char *)0));
                 make_blinded(BlindedTimeout + impair, FALSE);
                 if (!Blind)
                     Your1(vision_clears);
             } else {
-                pline("%sはあなたの視界を襲った.", Tobjnam(obj, (char *)0));
+                pline("%sは視界を襲った.", Tobjnam(obj, (char *)0));
                 You("影響を受けなかった!");
             }
             break;
         case 4:
-            pline("%sはあなたの精神を打った!", Tobjnam(obj, (char *)0));
+            pline("%sは精神を打った!", Tobjnam(obj, (char *)0));
             (void) make_hallucinated((HHallucination & TIMEOUT) + impair,
                                      FALSE, 0L);
             break;

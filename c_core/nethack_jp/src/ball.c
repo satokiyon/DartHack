@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-14. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-19. */
 /* $NHDT-Header: NetHack 5.0 ball.c 2026/06/20_22:26:43 NetHack-5.0:1.80 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) David Cohrs, 2006. */
@@ -54,7 +54,7 @@ ballfall(void)
     if (gets_hit) {
         int dmg = rn1(7, 25);
 
-        pline_The("鉄球があなたの%sに落ちてきた.", jp_body_part(HEAD));
+        pline_The("鉄球が%sに落ちてきた.", jp_body_part(HEAD));
         if (uarmh) {
             if (hard_helmet(uarmh)) {
                 pline("幸運にも、頑丈なかぶとを身に着けていた.");

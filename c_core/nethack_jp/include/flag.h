@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-12. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-19. */
 /* $NHDT-Header: NetHack 5.0 flag.h 2026/06/20_22:26:43 NetHack-5.0:1.268 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2006. */
@@ -242,7 +242,15 @@ enum debug_fuzzer_states {
     fuzzer_impossible_panic,
     fuzzer_impossible_continue
 };
-
+#ifdef WIN32
+#ifdef WIN32CON
+enum windowsterminal_how {
+    wt_not_in_config_at_all,
+    wt_in_config_not_negated,
+    wt_in_config_negated
+};
+#endif
+#endif
 /*
  * Stuff that really isn't option or platform related and does not
  * get saved and restored.  They are set and cleared during the game
@@ -510,6 +518,7 @@ struct instance_flags {
 #ifdef WIN32
 #ifdef WIN32CON
     boolean windowsterminal;
+    enum windowsterminal_how wt_how;
 #endif
 #endif
 };

@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-04. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-19. */
 /* $NHDT-Header: NetHack 5.0 tcap.h 2026/06/20_22:26:43 NetHack-5.0:1.20 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1989. */
 /*-Copyright (c) Kenneth Lorber, Kensington, Maryland, 2015. */
@@ -15,7 +15,7 @@
 
 /* might display need graphics code? */
 #if !defined(AMIGA) && !defined(TOS) && !defined(MAC68K)
-#if defined(TERMLIB) || defined(OS2) || defined(MSDOS)
+#if defined(TERMLIB) || defined(OS2) || defined(MSDOS) || defined(WIN32CON)
 #define ASCIIGRAPH
 #endif
 #endif

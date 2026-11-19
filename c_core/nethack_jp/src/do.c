@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-14. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-19. */
 /* $NHDT-Header: NetHack 5.0 do.c 2026/10/17_14:49:13 NetHack-5.0:1.416 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Derek S. Ray, 2015. */
@@ -293,7 +293,7 @@ flooreffects(
                 Soundeffect(se_item_tumble_downwards, 50);
                 You_hear("%sが落ちていくのが聞こえた.", xname(obj));
             } else {
-                pline("%sが%sの落とし穴へ転がり落ちた.", xname(obj),
+                pline("%sが%s落とし穴へ転がり落ちた.", xname(obj),
                       the_your[t->madeby_u]);
             }
         } else if (ship_object(obj, x, y, FALSE)) {
@@ -676,9 +676,7 @@ canletgo(struct obj *obj, const char *word)
         if (*word) {
             const char *hand = jp_body_part(HAND);
 
-            if (bimanual(uwep))
-                hand = makeplural(hand);
-            Norep("あなたの%sに溶接された%sを%sことはできない.", hand, something,
+            Norep("%sに溶接された%sを%sことはできない.", hand, something,
                   action_jp);
         }
         return FALSE;
@@ -707,7 +705,7 @@ canletgo(struct obj *obj, const char *word)
     }
     if (obj->otyp == LEASH && obj->leashmon != 0) {
         if (*word)
-            pline_The("綱があなたの%sに結ばれている.", jp_body_part(HAND));
+            pline_The("綱が%sに結ばれている.", jp_body_part(HAND));
         return FALSE;
     }
     if (obj->owornmask & W_SADDLE) {
@@ -1602,7 +1600,7 @@ goto_level(
      * (s)he has been given the go-ahead by the leader.
      */
     if (on_level(&u.uz, &qstart_level) && !newdungeon && !ok_to_quest()) {
-        pline("謎の力があなたの下降を阻んだ.");
+        pline("謎の力が下降を阻んだ.");
         return;
     }
 
@@ -2181,7 +2179,7 @@ revive_corpse(struct obj *corpse)
         switch (where) {
         case OBJ_INVENT:
             if (is_uwep)
-                pline_The("%sがあなたの手からうねって抜け出した!", cname);
+                pline_The("%sが手からうねって抜け出した!", cname);
             else
                 You_feel("バックパックの中で何かがもぞもぞ動いている!");
             break;
@@ -2441,8 +2439,6 @@ legs_in_no_shape(const char *for_what, /* jumping, kicking, riding */
         long wl = (EWounded_legs & BOTH_SIDES);
         const char *bp = jp_body_part(LEG);
 
-        if (wl == BOTH_SIDES)
-            bp = makeplural(bp);
         Your("%s%sは%sができる状態ではない.",
              (wl == LEFT_SIDE) ? "左の" : (wl == RIGHT_SIDE) ? "右の" : "",
              bp, for_what);
@@ -2490,8 +2486,6 @@ heal_legs(
         if (!u.usteed && how != 2) {
             const char *legs = jp_body_part(LEG);
 
-            if ((EWounded_legs & BOTH_SIDES) == BOTH_SIDES)
-                legs = makeplural(legs);
             /* this used to say "somewhat better" but that was
                misleading since legs are being fully healed */
             Your("%sの具合が良くなった.", legs);

@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-14. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-19. */
 /* $NHDT-Header: NetHack 5.0 pray.c 2026/06/20_22:26:43 NetHack-5.0:1.255 $ */
 /* Copyright (c) Benson I. Margulies, Mike Stephenson, Steve Linhart, 1989. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -560,8 +560,6 @@ fix_worst_trouble(int trouble)
 
         msgbuf[0] = '\0';
         if (Blinded) {
-            if (eyecount(gy.youmonst.data) != 1)
-                eyes = makeplural(eyes);
             Sprintf(msgbuf, "%sの調子が良くなった", eyes);
             u.ucreamed = 0;
             make_blinded(0L, FALSE);
@@ -635,7 +633,7 @@ god_zaps_you(aligntyp resp_god)
             if (Blind)
                 pline("なぜか影響を受けなかった.");
             else
-                (void) ureflects("しかし%sはあなたの%sで跳ね返った!", "雷");
+                (void) ureflects("しかし%sは%sで跳ね返った!", "雷");
             monstseesu(M_SEEN_REFL);
         } else if (Shock_resistance) {
             shieldeff(u.ux, u.uy);
@@ -797,9 +795,9 @@ at_your_feet(const char *str)
     if (u.uswallow) {
         /* barrier between you and the floor */
         pline("%sは%sの%sへ落ちていった.",
-              str, s_suffix(mon_nam(u.ustuck)), jp_mbodypart(u.ustuck, STOMACH));
+              str, mon_nam(u.ustuck), jp_mbodypart(u.ustuck, STOMACH));
     } else {
-        pline("%sはあなたの%s%sに現れた!", str,
+        pline("%sは%s%sに現れた!", str,
               jp_body_part_plural(FOOT), Levitation ? "の下" : "元");
     }
 }
@@ -1534,7 +1532,7 @@ staticfn void
 offer_real_amulet(struct obj *otmp, aligntyp altaralign)
 {
     static NEARDATA const char
-        cloud_of_smoke[] = "%s色の煙があなたの周囲を取り囲んだ...";
+        cloud_of_smoke[] = "%s色の煙が周囲を取り囲んだ...";
 
     /* The final Test.  Did you win? */
     if (uamul == otmp)

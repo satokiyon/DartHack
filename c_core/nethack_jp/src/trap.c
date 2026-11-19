@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-14. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-19. */
 /* $NHDT-Header: NetHack 5.0 trap.c 2026/11/02_21:05:17 NetHack-5.0:1.653 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2013. */
@@ -1403,7 +1403,7 @@ trapeffect_rocktrap(
             otmp = t_missile(ROCK, trap);
             place_object(otmp, u.ux, u.uy);
 
-            pline("%sの落とし戸が開き、%sがあなたの%sに落ちてきた!",
+            pline("%sの落とし戸が開き、%sが%sに落ちてきた!",
                 ceiling(u.ux, u.uy), xname(otmp), jp_body_part(HEAD));
             if (uarmh) {
                 /* normally passes_rocks() would protect against a falling
@@ -1572,11 +1572,11 @@ trapeffect_bear_trap(
             if (thitm(0, u.usteed, (struct obj *) 0, dmg, FALSE))
                 reset_utrap(TRUE); /* steed died, hero not trapped */
         } else {
-            pline("トラバサミがあなたの%sを挟んだ!", jp_body_part(FOOT));
+            pline("トラバサミが%sを挟んだ!", jp_body_part(FOOT));
             if (u.umonnum == PM_OWLBEAR || u.umonnum == PM_BUGBEAR)
                 You("怒ってうなった!");
             if (wearing_iron_shoes(mtmp))
-                pline("%sはあなたの脚を守ってくれた.", xname(uarmf));
+                pline("%sが脚を守ってくれた.", xname(uarmf));
             else {
                 set_wounded_legs(rn2(2) ? RIGHT_SIDE : LEFT_SIDE, rn1(10, 10));
                 losehp(Maybe_Half_Phys(dmg), "bear trap", KILLED_BY_AN);
@@ -1674,11 +1674,11 @@ trapeffect_rust_trap(
          */
         switch (rn2(5)) {
         case 0:
-            pline("%sあなたの%sを打った!", A_gush_of_water_hits, jp_body_part(HEAD));
+            pline("%s%sを打った!", A_gush_of_water_hits, jp_body_part(HEAD));
             (void) water_damage(uarmh, helm_simple_name(uarmh), TRUE);
             break;
         case 1:
-            pline("%sあなたの左%sを打った!", A_gush_of_water_hits, jp_body_part(ARM));
+            pline("%s左%sを打った!", A_gush_of_water_hits, jp_body_part(ARM));
             if (water_damage(uarms, shield_simple_name(uarms), TRUE) != ER_NOTHING)
                 break;
             if (u.twoweap || (uwep && bimanual(uwep)))
@@ -1687,7 +1687,7 @@ trapeffect_rust_trap(
             (void) water_damage(uarmg, gloves_simple_name(uarmg), TRUE);
             break;
         case 2:
-            pline("%sあなたの右%sを打った!", A_gush_of_water_hits, jp_body_part(ARM));
+            pline("%s右%sを打った!", A_gush_of_water_hits, jp_body_part(ARM));
             (void) water_damage(uwep, 0, TRUE);
             goto uglovecheck;
         default:
@@ -1924,7 +1924,7 @@ trapeffect_pit(
                 You_see("%s落とし穴が足元に見える.",
                         ttype == SPIKED_PIT ? "棘だらけの" : "");
             } else {
-                pline("%s落とし穴があなたの足元で開いた!",
+                pline("%s落とし穴が足元で開いた!",
                       ttype == SPIKED_PIT ? "棘だらけの" : "");
                 You("しかし落ちなかった!");
             }
@@ -1962,7 +1962,7 @@ trapeffect_pit(
         /* wumpus reference */
         if (Role_if(PM_RANGER) && !trap->madeby_u && !trap->once
             && In_quest(&u.uz) && Is_qlocate(&u.uz)) {
-            pline("幸いにも、その落とし穴にはちゃんと底があった...");
+            pline("幸いにも、落とし穴にはちゃんと底があった...");
             trap->once = 1;
         } else if (u.umonnum == PM_PIT_VIPER || u.umonnum == PM_PIT_FIEND) {
             pline("なんて悲惨なんだ.");
@@ -4841,14 +4841,14 @@ water_damage(
     } else if (Is_container(obj)
                && (!Waterproof_container(obj) || (obj->cursed && !rn2(3)))) {
         if (in_invent) {
-            pline("水があなたの%sに入り込んだ!", ostr);
+            pline("水が%sに入り込んだ!", ostr);
             gm.mentioned_water = !Hallucination;
         }
         water_damage_chain(obj->cobj, FALSE);
         return ER_DAMAGED; /* contents were damaged */
     } else if (Waterproof_container(obj)) {
         if (in_invent && !Blind && !Underwater) {
-            pline("水はあなたの%sには入り込めなかった.", ostr);
+            pline("水は%sには入り込めなかった.", ostr);
             gm.mentioned_water = !Hallucination;
             makeknown(obj->otyp); /* if an oilskin sack, discover it; doesn't
                                    * matter for chest, large box, ice box */
@@ -5612,7 +5612,7 @@ try_disarm(
             }
         } else {
             pline("%s%sを%sのは難しかった.",
-                  ttmp->madeby_u ? "あなたの" : under_u ? "この" : "その",
+                  ttmp->madeby_u ? "自分で仕掛けた" : "",
                 jp_trapname_for_display(ttype, FALSE),
                   (ttype == WEB) ? "取り除く" : "解除する");
         }
@@ -5908,7 +5908,7 @@ disarm_box(struct obj *box, boolean force, boolean confused)
         }
         exercise(A_DEX, TRUE);
     } else {
-        pline("その%sには罠がなかった.", xname(box));
+        pline("%sには罠がなかった.", xname(box));
         box->tknown = 1; /* known not trapped */
     }
 }
@@ -5921,7 +5921,7 @@ untrap_box(
     boolean confused)
 {
     if (box->tknown && !box->otrapped) {
-        You("その%sには罠がないことを知っている.", xname(box));
+        You("%sには罠がないことを知っている.", xname(box));
         return;
     }
 
@@ -6086,7 +6086,7 @@ untrap(
                     }
                     return help_monster_out(mtmp, ttmp);
                 default:
-                    You("%s罠を無効化できない.", !here ? "その" : "この");
+                    You("罠を無効化できない.");
                     return 0;
                 }
             }
@@ -6121,7 +6121,7 @@ untrap(
                     }
                     /* 'n' => continue to next box */
             }
-            There("ここに他の箱やチェストはない.");
+            pline("ここに他の箱やチェストはない.");
         }
 
         if (stumble_on_door_mimic(x, y))
@@ -6235,7 +6235,7 @@ openholdingtrap(
             trapdescr = "地面";
             break;
         case TT_BURIEDBALL:
-            trapdescr = "あなたの錨";
+            trapdescr = "錨";
             which = "";
             break;
         case TT_BEARTRAP:
@@ -6261,7 +6261,7 @@ openholdingtrap(
     }
     assert(t != NULL);
     if (!which)
-        which = t->tseen ? the_your[t->madeby_u] : "1つの";
+        which = t->tseen ? the_your[t->madeby_u] : "";
     assert(which != 0);
     if (*which)
         which = strcpy(whichbuf, which);

@@ -1,5 +1,5 @@
 <!-- Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-09. -->
-# NetHack 5.0 (非公式)日本語化プロジェクト
+# NetHackJP : NetHack 5.0 (非公式)日本語化プロジェクト
 
 NetHackJPは、ローグライクゲームの金字塔 [NetHack](https://www.nethack.org/)5.0 を日本語で快適にプレイできるようにすることを目的とした非公式プロジェクトです。(対象OSはWindowsとLinuxのみ)
 
@@ -30,6 +30,11 @@ NetHackJPは、ローグライクゲームの金字塔 [NetHack](https://www.net
    <figurecaption>Linux Qt版 PixelHackタイル使用</figurecaption>
    <img width="1311" height="780" alt="2026-09-26_13h13_20" src="https://github.com/user-attachments/assets/50857768-a79b-4f10-9aeb-87f458424fb5" />
 </figure>
+---
+
+## Youtube
+- [NetHack再生リスト](https://www.youtube.com/playlist?list=PLKBNYid2v3B8)
+
 ---
 
 ## 🎮 プレイヤー向け情報（ゲームの始め方）

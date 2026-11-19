@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-14. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-19. */
 /* $NHDT-Header: NetHack 5.0 region.c 2026/06/20_22:26:43 NetHack-5.0:1.114 $ */
 /* Copyright (c) 1996 by Jean-Christophe Collet  */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -459,7 +459,7 @@ run_regions(void)
     }
 
     if (gg.gas_cloud_diss_within) {
-        pline_The("あなたの周囲のガス雲は消散した.");
+        pline_The("周囲のガス雲は消散した.");
         /* normally won't see additional dissipation when within */
         /* FIXME? this assumes that additional dissipation is close by */
         if (u.xray_range <= 1)
@@ -686,7 +686,7 @@ visible_region_summary(winid win)
 
         if (!hdr_done++) {
             putstr(win, 0, "");
-            putstr(win, 0, "Visible regions");
+            putstr(win, 0, "可視領域");
         }
         /*
          * TODO? sort the regions by time-to-live or by bounding box.
@@ -700,9 +700,9 @@ visible_region_summary(winid win)
         Sprintf(buf, "%5ld", reg->ttl + 1L);
         damg = reg->arg.a_int;
         if (damg)
-            Sprintf(typbuf, "poison gas (%d)", damg);
+            Sprintf(typbuf, "毒ガス (%d)", damg);
         else
-            Strcpy(typbuf, "vapor");
+            Strcpy(typbuf, "蒸気");
         Sprintf(eos(buf), "%s%-16s", fldsep, typbuf);
         Sprintf(eos(buf), "%s@[%d,%d..%d,%d]", fldsep,
                 reg->bounding_box.lx, reg->bounding_box.ly,
