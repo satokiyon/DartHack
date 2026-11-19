@@ -54,6 +54,15 @@ dev_dependencies:
   flutter_lints: ^6.0.0
   flutter_launcher_icons: ^0.14.4
 
+# jni 1.2.0 で Jni.findClass() から 'L...;' 除去処理が削除された一方、
+# path_provider_android 2.3.1 / shared_preferences_android 2.5.5 が
+# JType.className 未対応のため Android 実機で ClassNotFoundException が発生する。
+# jni_flutter 1.1.0 は jni 1.2.0 専用 API に依存するためセットで固定する。
+# 解除条件: jni 側の互換修正、または両プラグインの jnigen >= 1.1.0 対応版公開後。
+dependency_overrides:
+  jni: 1.1.2
+  jni_flutter: 1.0.4+1
+
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
 
