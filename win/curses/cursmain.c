@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-12. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-21. */
 /* vim:set cin ft=c sw=4 sts=4 ts=8 et ai cino=Ls\:0t0(0 : -*- mode:c;fill-column:80;tab-width:8;c-basic-offset:4;indent-tabs-mode:nil;c-file-style:"k&r" -*-*/
 /* $NHDT-Header: NetHack 5.0 cursmain.c 2026/11/07_00:19:58 NetHack-5.0:1.141 $ */
 /* Copyright (c) Karl Garrison, 2010. */
@@ -76,6 +76,7 @@ struct window_procs curses_procs = {
      | WC2_STATUSLINES | WC2_WINDOWBORDERS | WC2_PETATTR | WC2_GUICOLOR
      | WC2_SUPPRESS_HIST | WC2_URGENT_MESG | WC2_MENU_SHIFT
      | WC2_EXTRASTATUS
+     | WC2_WRAPTEXT
     ),
     {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1}, /* color availability */
     curses_init_nhwindows,

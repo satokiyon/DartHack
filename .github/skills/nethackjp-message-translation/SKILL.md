@@ -1,4 +1,4 @@
-<!-- Modified by NetHackJP contributor @satokiyon; latest change date: 2026-05-27. -->
+<!-- Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-20. -->
 ---
 name: nethackjp-message-translation
 description: NetHackJP のメッセージ翻訳作業で、内部キー互換を壊さず自然な日本語へ改善し、最小変更で検証まで行うための実務手順。
@@ -22,10 +22,11 @@ NetHackJP の表示メッセージ翻訳を安全に進めるためのプロジ�
 - 変更対象は原則として表示文言（文字列リテラル）を優先し、不要なロジック変更を避ける。
 - フォーマット指定子（`%s`, `%d`, `%ld` など）の個数・順序・型を維持する。
 - 質問文（入力/確認）は敬体（です・ます調）を優先し、文末は半角 `?` を使う。
-- `You_*` 系は接頭辞自動付与を前提に、主語重複を避ける。
+- `You_*` 系（`あなたは`）および `There(...)`（`そこに`）は接頭辞自動付与を前提に、呼び出し側での重複（`そこにそこに`、`そこにには` 等）を避ける。`Your(...)` は自動「あなたの」付与を行わない。
 - 英語活用ヘルパー（`vtense`, `makeplural`, `an`）を日本語文に直接流用しない。
 - 内部キー（wish/Lua/照合用の英語文字列）を直接日本語化しない。表示は専用ヘルパー経由で分離する。
 - 能力値ステータスUIの略称は英語を固定で使う（`St`, `Dx`, `Co`, `In`, `Wi`, `Ch`）。この行は翻訳しない。
+- `"O"` コマンド等で表示されるオプション名および `.nethackrc`・ガイドブックに対応する設定値キーワードは翻訳せず英語のまま保持する（エラー本文や周辺説明のみ日本語化する）。
 
 ## Workflow
 
@@ -43,20 +44,27 @@ NetHackJP の表示メッセージ翻訳を安全に進めるためのプロジ�
 
 4. 検証する
 - 変更ファイルに対して `get_errors` で構文/型エラーを確認する。
-- 必要に応じて Windows 環境でビルド確認する。
+- 必要に応じて Windows（`build_one.bat`）および WSL（`build_wsl.sh --qt`）環境でビルド確認する。
 
-## Build Check (Windows)
+## Build Check (Windows & WSL)
 
-`MSBuild.exe` を使う場合の代表例:
+Windows（`Release|x64`）:
 
 ```powershell
-MSBuild.exe sys\windows\vs\NetHack.sln /t:"NetHack;NetHackW" /p:Configuration=Debug /p:Platform=x64
+cmd /c "C:\Users\satok\NetHackJP\sys\windows\vs\build_one.bat"
+```
+
+WSL（Ubuntu-26.04 / TTY・Curses・X11・Qt6）:
+
+```powershell
+wsl -d Ubuntu-26.04 -- bash -lc "cd /mnt/c/Users/satok/NetHackJP && ./sys/unix/build_wsl.sh --qt"
 ```
 
 確認事項:
 
 - Exit Code が 0
-- `binary\Debug\x64\NetHack.exe` と `NetHackW.exe` が生成される
+- Windows: `binary\Release\x64\NetHack.exe` と `NetHackW.exe` が生成される
+- WSL: `src/nethack` および Qt アセット（`nhtiles.bmp`, `nhsplash.xpm`, `rip.xpm`）がエラーなく生成される
 
 ## Translation Quality Checklist
 
@@ -68,7 +76,5 @@ MSBuild.exe sys\windows\vs\NetHack.sln /t:"NetHack;NetHackW" /p:Configuration=De
 
 ## Notes Specific to This Repo
 
-- 進捗と再発防止の知見は `/memories/repo/translation-notes.md` を優先参照する。
-- 技術運用は `.github/copilot-instructions.md`、翻訳方針は `docs/translation-instructions-ja.md` を基準にする。
-- 安全確認は `docs/message-translation-safety-checklist.md` を使う。
+- 常時適用ルール・技術運用は `AGENTS.md`、翻訳方針は `docs/translation-instructions-ja.md` を基準にする。
 

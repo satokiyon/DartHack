@@ -1,4 +1,4 @@
-<!-- Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-09. -->
+<!-- Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-21. -->
 <!--
   IMPORTANT POLICY FOR NetHackJP-ONLY MODIFICATIONS
   =================================================
@@ -95,16 +95,11 @@ WSL または Linux 環境上で、ワンステップ用ビルドスクリプト
   - `QT_IM_MODULE=fcitx` は getlin / askname / plsel / メニューSearch への Mozc による日本語入力（`fcitx5-frontend-qt6`）に必須。
   - `QT_QPA_PLATFORM=xcb` は WSLg での Qt プラットフォームを X11/xcb に固定する指定（Wayland は対象外）。
   - CI (`weekly-release.yml`) Linux ジョブは `build_wsl.sh --qt --default=tty` / `install_wsl.sh --qt --default=tty` で tty/curses/X11/Qt 全部入り 1 バイナリを作成し、デフォルトポートは tty のまま。配布 zip 内のランチャーは `nethack` (コンソール) / `nethackX11` (X11 GUI) / `nethackQt` (Qt6 GUI) の3本構成（旧 `nethackW` は廃止）。
-- スクリプト実行により、日本語対応ヒントファイル `sys/unix/hints/linux-jp` が使用され、`src/nethack` に `tty` / `curses`（`ncursesw` による UTF-8 日本語表示対応）/ `X11`（Xft UTF-8 描画 + XIM 日本語入力対応）の **3 インターフェースに対応した実行ファイル**が生成されます（`--qt` 指定時は `Qt`（Qt6 / UTF-8 入出力対応）を含む **4 インターフェース**）。
-- *手動でステップを実行する場合*:
-  ```bash
-  sh sys/unix/setup.sh sys/unix/hints/linux-jp
-  make WANT_WIN_CURSES=1 WANT_WIN_TTY=1 WANT_WIN_X11=1 WANT_DEFAULT=tty all x11tiles
-  ```
+- スクリプト実行により、日本語対応ヒントファイル `sys/unix/hints/linux-jp` が使用され、`src/nethack` に `tty` / `curses`（`ncursesw` による UTF-8 日本語表示対応）/ `X11`（Xft UTF-8 描画 + XIM 日本語入力対応）の 3 インターフェースに対応した実行ファイルが生成されます（`--qt` 指定時は `Qt`（Qt6 / UTF-8 入出力対応）を含む **4 インターフェース**）。
 
-#### 2.2.1. インストール（`make install`）— 必須
+#### 2.2.1. インストール（`sys/unix/install_wsl.sh`）— 必須
 
-ビルド完了後、**必ず `make install` を実行してください**。
+ビルド完了後、**必ず `sh sys/unix/install_wsl.sh`（Qt6 ビルド時は `sh sys/unix/install_wsl.sh --qt`）を実行してください**。
 `src/nethack` を直接実行しても、起動直後に下記のようなエラーが発生して終了します。
 
 ```
@@ -113,10 +108,10 @@ Cannot chdir to /mnt/c/Users/satok/NetHackJP/playground.
 ```
 
 これは `nethack` 実行ファイルが起動時に `HACKDIR`（= `playground/`）へ `chdir()` しようとするためです。
-`playground/` ディレクトリとその中身は `make install` によって初めて作成されます。
+`playground/` ディレクトリとその中身は `install_wsl.sh`（内部でビルド時と同一の `WANT_WIN_*` フラグを付与して `make install` を実行）によって初めて作成されます。
 
 ```bash
-make install
+sh sys/unix/install_wsl.sh --qt
 ```
 
 `make install` が行う主な処理：
@@ -267,42 +262,11 @@ XAPPLRESDIR=./playground ./playground/nethack -wX11  # X11 GUI インターフ�
 
 ## 3. 翻訳方針と補足情報
 
-### 日本語助詞とモノ名の連結問題
-* `You_feel` / `You_hear` / `You_see` は接頭辞を自動付与するため、呼び出し側リテラルで主語重複や助詞衝突を起こさないようにします。
-* `%s` の直後に助詞（`は/を/に/へ/が/の/と/から`）が来る文では、`mon_nam()` / `Monnam()` より `l_monnam()` の利用を優先します。
-* `%s%sから` のような複合テンプレートは機械置換せず、文脈ごとに語順を手動で整えます。
-* 英語冠詞を返す補助（`just_an()` など）の結果は、日本語文へ直接連結しません。
-* `%s`, `%d`, `%ld`, `%c` などのフォーマット指定子は、個数・順序・型を変更しません。
-* 原則として文字列リテラルのみを変更し、ゲームロジックや条件分岐の意味は変えません。
-* `隠し%s` のようなテンプレートは、展開後の最終語形 (`隠し扉`, `隠し通路`) が自然か確認します。
+翻訳の基本方針・常時適用制約・安全チェックおよびビルド確認の詳細は [AGENTS.md](AGENTS.md) および [docs/translation-instructions-ja.md](docs/translation-instructions-ja.md) を参照してください。本節では、それらに未記載の実装規約・汎用ノウハウ・ガイドブック保守手順のみを記載します。
 
 ### コーディング規約とビルド対応
 * **MSVC警告対応**: MSVC (Visual Studio) でのビルド時に `warning C4210` (関数内のextern宣言) などの警告が出ないよう、宣言は原則としてファイルスコープで行います。
 * **日本語対応関数の命名**: 日本語化に関連する独自の補助関数には `jp_` 接頭辞（例: `jp_insight_has_nonascii`）を付与し、既存コードとの区別を明確にします。
-
-### 再発防止と品質管理
-翻訳やコード修正を行う際は、以下の点に注意して問題の発生を未然に防ぎます。
-
-* **コミット前のビルド確認**: 変更を加えた後は、必ず `sys\windows\vs\build_one.bat` を実行してビルドが通ることを確認してください。構文エラーや未使用変数の警告などはこの段階で排除します。
-* **構文と括弧の整合性**: 大規模な翻訳やリファクタリングを行った後は、中括弧 `{}` や括弧 `()` の対応が崩れていないか細心の注意を払ってください。
-* **内部ロジックの再確認**: 死因 (`killer`) や中断理由 (`multi_reason`) などの内部キーとしても機能する文字列を翻訳した場合は、それらを参照している他の箇所（`topten.c` や `end.c` など）のロジックが壊れていないか、広範囲に調査して整合性を保ってください。
-* **文字コードと文字化けの防止**: ソースファイルは UTF-8 で保存し、マルチバイト文字が不自然に分割されたり、特殊な制御文字が混入したりしないように注意してください。
-* **未使用コードの整理**: 翻訳によって不要になった変数（英語メッセージ用の `message` や `verb` など）は、放置せずに削除してコンパイラの警告を最小限に抑えてください。
-
-### 実施済みの翻訳改善・検証実績
-* **`dat/tribute_jp` 内の冗長な「だった」表現および不自然な日本語訳の全面刷新（2026年8月完了）**:
-  - `dat/tribute_jp` に存在していた、過去の機械翻訳に起因する「〜のだった」「〜だったのだった」といった冗長な文末表現を徹底して排除し、自然な日本語の過去形表現（例: 「判断した」「確信を持っていた」等）に修正しました。
-  - 英語の指示代名詞（`it`, `this`, `he` など）が機械翻訳によって「色」「色彩」と直訳されていた箇所の誤訳を元の文脈（「これ」「彼」など）に修復しました。
-  - カタカナ表記の「アンド」を「そして」「また」「〜と」などの自然な日本語表現に置き換えました。
-  - マッピングズレ（アライメントの崩れ）を完全に同期・修復し、英語原本 `dat/tribute` の各パッセージと1対1で対応する状態（Offset 0）を最終パッセージ（ID 561）まで完全に維持しました。
-
-  #### 品質維持・検証プロセス:
-  1. **表示幅（75文字以内）と制御行の自動検証 (`validate_tribute.js`)**:
-     - 編集時、およびコミット前には必ず自動検証スクリプトを実行し、以下の項目を検証して整合性を確保します：
-       - **表示幅の厳守**: 各行の表示幅（全角2, 半角1）が 75 表示幅を超過していないこと。
-       - **制御行の完全一致**: 全 561 パッセージおよび 2,249 行の制御行（`%section`, `%title`, `%passage`, `%e` 等）のシーケンスが原本と完全一致していること。
-  2. **データビルドツールによる最終実地検証**:
-     - `cmd /c "cd dat && ..\tools\Release\x64\makedefs.exe --make d"` を実行し、データ変換エラーが 0 件で正常コンパイルされることを確認します。
 
 ### 開発で得た汎用のノウハウと落とし穴（積立型）
 ポート移植・GUI 対応・WSL 開発を通じて得た、特定の §4 エントリに留まらない汎用の知見。
@@ -439,15 +403,9 @@ Linux/WSL や Android (Bionic libc) 環境において、Windows 側でチェッ
 * **アップストリーム追従手順**:
   - アップストリーム側で CRLF の取扱い向上や `utf8_text_wrap_index` の全 tty ポート対応、あるいは tty ディスプレイライブラリの UTF-8 行頭文字処理が入った場合は、本変更箇所のマーカータグを確認し追従または整理を行う。
 
-### 6. curses メッセージウィンドウの UTF-8 ワイド文字カラーペア取得修復（アップストリーム 5.0.1 にて統合・追従完了）
-ncursesw (Linux/WSL ワイド文字 curses) や PDCursesMod (Windows) 環境において、`windowtype:curses` でターン経過時に過去メッセージがアンハイライト（ボールド解除）される際、古いメッセージの文字色が緑・紫・黄色・オレンジ等にランダム化けする現象を防止するための修復です。
-
-* **背景**:
-  - `win/curses/cursmesg.c` の `curses_clear_unhighlight_message_window()` 内で、1バイト ASCII 用関数 `mvwinch` と `PAIR_NUMBER` マクロを使って画面セルの既存カラーペアを取得していた。
-  - ワイド文字セルに対して `mvwinch` を使うと文字コードビットが `PAIR_NUMBER` が抽出するカラーペア番号領域に混入し、不正なカラーペア番号として計算され文字色が化けていた。
-* **アップストリーム追従と対応**:
-  - アップストリーム 5.0.1 (コミット `d649a0a68`) にて `CURSES_WIDE_PAIRS` マクロおよび `mvwin_wch` / `getcchar` によるワイド文字カラーペア取得が本家に導入された。
-  - これに伴い、NetHackJP では `include/wincurs.h` にて `CURSES_WIDE_PAIRS` の有効化条件を `NCURSES_WIDECHAR` だけでなく `PDC_WIDE` および `CURSES_UNICODE`（PDCursesMod や Linux/WSL UTF-8 環境）にも拡張し、`win/curses/cursmesg.c` はアップストリーム実装に統合・追従した。
+### 6. `include/wincurs.h` における `CURSES_WIDE_PAIRS` 有効化条件の拡張
+* **対象ファイル**: `include/wincurs.h`
+* **変更内容**: アップストリーム 5.0.1（`d649a0a68`）で `win/curses/cursmesg.c` に `CURSES_WIDE_PAIRS` が導入されたため本体実装は上流へ追従済み。NetHackJP 独自差分として、`include/wincurs.h` の `CURSES_WIDE_PAIRS` 有効化条件を `NCURSES_WIDECHAR` に加えて `PDC_WIDE` および `CURSES_UNICODE`（PDCursesMod・Linux/WSL UTF-8 環境）へ拡張している。
 
 ### 7. 日本語メッセージ内の複数形 "s" (plur) の排除と日本語化
 日本語メッセージが表示される箇所において、英語の複数形接尾辞 `"s"`（`plur()` マクロ）がそのまま表示されてしまう翻訳バグや、英語の単語がそのまま出力されてしまっていた箇所を修正しました。
@@ -483,13 +441,11 @@ GitHub CodeQL によるコードスキャン警告（Critical）を修正する�
    - **アップストリーム追従手順**:
      1. アップストリーム（本家）で同等のバッファサイズ変更やキャスト修正が入った場合は、本修正を削除して追従します。
 
-### 9. ステータスハイライトメニューにおけるキャンセル時の無限ループ修正
+### 9. ステータスハイライトメニューにおけるキャンセル時の無限ループ修正（上流追従済み）
 ステータスハイライトルール追加時 (`status_hilite_menu_add()`) に、文字列型フィールドや値入力のない動作で色選択をキャンセル（`-1`）した際、`goto choose_value` からそのまま `choose_color` に直線落下して即座に色選択が再表示される無限ループバグの修正です。
 
-* **マーカータグ**: `/* NetHackJP: Fix infinite loop on cancel in status_hilite_menu_add */`
-* **対象ファイル**:
-  - **`src/botl.c`**: `status_hilite_menu_add()` 内の色選択キャンセル判定を修正し、数値入力を行わない動作または文字列型フィールドの場合は `goto choose_behavior` へジャンプして動作選択メニューへ復帰するよう変更。
-* **アップストリーム追従手順**:
+* **状態**: アップストリーム 5.0.1（PR #1639 / `4857fccc7`）へ取り込まれたため、`src/botl.c` の独自マーカーコメント（`/* NetHackJP: Fix infinite loop on cancel in status_hilite_menu_add */`）を削除し、上流実装へ追従済み。
+* **対象ファイル**: `src/botl.c`
 ### 10. C23 規格 / GCC 14+ / Clang 18+ 基準でのビルド警告・型厳格化対応
 現代の C コンパイラ（GCC 14+ / Clang 18+）および C23 規格でのビルド厳格化に伴うコンパイルエラー・警告の解体と、マルチプラットフォーム（Linux / WSL, Android NDK, Windows MSVC）互換性を維持するための修正です。アップストリーム（本家 NetHack）のマージ時にコンフリクトが発生した場合は、以下の指針に従って競合解決を行ってください。
 
@@ -536,6 +492,7 @@ Linux/UNIX 環境の X11 ウィンドウポート（`win/X11`）において、X
   5. **`win/X11/winmap.c`**: マップ描画部の `XftDrawString8` を `XftDrawStringUtf8` に更新。また、`XpmReadFileToImage` 呼び出し前に Windows CRLF 改行に起因する `\r` (0x0D) 文字のトリム処理および `fopen_datafile` で `HACKDIR`（`playground/` 等）配下の `tile_file` パスを正常解決する処理を追加。
   6. **`win/X11/winstat.c`**: ステータス表示の `XftTextExtents8` / `XftDrawString8` を `XftTextExtentsUtf8` / `XftDrawStringUtf8` に更新。
   7. **`win/X11/NetHack.ad`**: Xft デフォルトフォント注釈に CJK 日本語フォント（`Noto Sans CJK JP` 等）のフォールバックガイドを追加。
+  8. **X11 タイル指定・`tile2x11` 修復 (`win/X11/winmap.c`, `win/X11/winX.c`, `include/winX.h`, `win/X11/NetHack.ad`, `win/X11/tile2x11.c`)**: `.nethackrc` の `OPTIONS=tile_file:...,tile_width:W,tile_height:H` および X11 リソースによるタイル指定・フォールバックに対応。`tile2x11.c` に安全な ASCII 色記号マップ（`xpm_chars[]`）と `convert_tiles` の絶対座標計算方式を導入し、XPM 読み込み中断とタイル横滑りを防止。
 * **`XtSetLanguageProc(NULL, NULL, NULL)`** は `X11_init_nhwindows` の先頭で呼んでロケールを初期化（`LC_CTYPE=ja_JP.UTF-8` 等）。**これは XIM 接続ではない**。
 * **ダイアログ入力の XIM 化は当初 `AsciiText` Widget の `XtNinternational=True` で試行したが、WSLg/XWayland 環境で fcitx5 が engage しなかった**。`win/X11/dialogs.c` 側の `XtNinternational` 指定は無効で、§4.16 の `wingetlin.c` 自前ダイアログに置き換えた。
 * **アップストリーム追従手順**:
@@ -958,9 +915,9 @@ git fetch --all
 3. **競合（コンフリクト）が発生した場合**
    - 競合を手動で解決します。
    - `sys/windows/vs/build_one.bat` を実行し、コンパイルエラーやリンクエラーがないことを確認します。
-   - 解消後、変更をインデックスに追加してコミットします。
+   - 解消後、変更したファイルを個別にステージングしてコミットします（`git add .` は使用しません）。
      ```bash
-     git add .
+     git add <解決したファイル>
      git commit -m "Merge upstream changes into main"
      ```
 4. **プッシュ**
@@ -973,7 +930,7 @@ git fetch --all
 ## 7. リリース手順
 
 ### リリース用バイナリのビルド
-`sys/windows/vs/build_one.bat` を用いて、`Release|x64` または `Release|Win32` で最終パッケージ用バイナリをビルドします。
+`sys/windows/vs/build_one.bat` を用いて、`Release|x64` で最終パッケージ用バイナリをビルドします。
 
 ### タグの作成とプッシュ
 リリース用コミットが `main` ブランチにプッシュされた後、リリース用タグを作成してプッシュします。
@@ -985,20 +942,3 @@ git push origin NetHackJP-5.0.1-20261005
 
 ### GitHub Release の作成
 GitHub上の Releases ページから新規リリースを作成し、ビルドされた Windows 用バイナリをアタッチして公開します。
-
----
-
-## 8. X11 GUI ポートにおける XPM タイル描画および生成ツールの修復（2026年9月完了）
-
-WSL (Linux) 環境上の NetHack X11 ポート (`windowtype:X11`) において、タイル画像が未探索マスや一部グラフィックで崩れる問題、および生成される `x11tiles` 画像が途中で読み込み中断を起こす問題についての技術注釈です。
-
-* **タイルファイル指定および解像度の設定ファイル対応と自動判定フォールバック (`win/X11/winmap.c`, `win/X11/winX.c`, `include/winX.h`, `win/X11/NetHack.ad`)**:
-  - 従来はファイル名が `x11tiles` 固定で解像度は画像からの自動計算のみだったが、Windows版と同様に `.nethackrc` の `OPTIONS=tile_file:...,tile_width:W,tile_height:H` および X11 リソース（`NetHack.tile_file`, `NetHack.tile_width` / `NetHack.tile_height`）での柔軟なファイル指定および 1 タイルのピクセルサイズ明示指定に対応。
-  - 要求サイズが指定されている場合は、画像の幅・高さの割り切れチェックおよび総タイル数チェック（`total_tiles_used`）を行い、不一致時は警告を出してテキストモードにフォールバック。
-  - 省略（未指定）時は、既定のファイル名（`x11tiles`）および従来の画像幅からの自動判定（`tile_width = image_width / TILES_PER_ROW`, `tile_height = tile_width`）をフォールバックとして継続サポート。
-* **`tile2x11` における XPM 色記号文字コード破壊の修正 (`win/X11/tile2x11.c`)**:
-  - 単純な `(char)(i + '0')` による文字コード加算では、色数増加時に `"` (ダブルクォーテーション) 等の制御文字が混入して libXpm で構文エラーを起こし、画像ロードが途中で打ち切られていた。安全な ASCII キャラクターマップ (`xpm_chars[]`) を導入してエスケープ破綻を保護した。
-* **`convert_tiles` ポインタ移動計算の「絶対座標計算方式」への変更 (`win/X11/tile2x11.c`)**:
-  - 相対ポインタ加算のバグにより1行（40個）終わるごとに画像が対角線状に横滑りしていた計算式を、`total`（タイル番号）からの絶対座標計算 (`tb = tile_bytes + (total / header.per_row)...`) へ修正し、ポインタズレを物理的に排除した。
-* **`objects.txt` 1行目のコメント記号補正 (`win/share/objects.txt`)**:
-  - `win/share/tiletext.c` のパーサーが `#` で始まらないヘッダー行 `NOTICE:` をカラー定義行と誤認して `objects.txt` のパースに失敗 (`0 tiles`) していた問題を、行頭を `# NOTICE:` にコメントアウトすることで修復した。

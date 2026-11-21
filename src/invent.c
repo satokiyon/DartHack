@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-19. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-21. */
 /* $NHDT-Header: NetHack 5.0 invent.c 2026/06/20 16:30:52 NetHack-5.0:1.569 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Derek S. Ray, 2015. */
@@ -1902,7 +1902,7 @@ getobj(
 {
     struct obj *otmp;
     char ilet = 0;
-    char buf[BUFSZ], qbuf[BUFSZ];
+    char buf[BUFSZ], qbuf[BUFSZ], contbuf[QBUFSZ];
     char lets[BUFSZ], altlets[BUFSZ];
     int suggested = 0;
     char *bp = buf, *ap = altlets;
@@ -2060,10 +2060,18 @@ getobj(
             action_missing_jp(word));
         return (struct obj *) 0;
     }
+    /* when stashing into a container, name it in the prompt */
+    contbuf[0] = '\0';
+    if (gc.current_container && !strcmp(word, "stash"))
+        (void) safe_qbuf(contbuf, "", "に何をしまいますか?",
+                         gc.current_container, doname, ansimpleoname,
+                         "それ");
     for (;;) {
         cnt = 0L;
         cntgiven = FALSE;
-        {
+        if (*contbuf) {
+            Strcpy(qbuf, contbuf);
+        } else {
             const char *prompt = action_prompt_jp(word);
 
             Sprintf(qbuf, "%s", prompt ? prompt : "どれを選択しますか?");
@@ -2122,10 +2130,14 @@ getobj(
 
             menuquery[0] = qbuf[0] = '\0';
             if (iflags.force_invmenu) {
-                const char *prompt = action_prompt_jp(word);
+                if (*contbuf) {
+                    Strcpy(menuquery, contbuf);
+                } else {
+                    const char *prompt = action_prompt_jp(word);
 
-                Snprintf(menuquery, sizeof menuquery, "%s",
-                         prompt ? prompt : "どれを選択しますか?");
+                    Snprintf(menuquery, sizeof menuquery, "%s",
+                             prompt ? prompt : "どれを選択しますか?");
+                }
             }
             if (!allowed_choices || *allowed_choices == HANDS_SYM
                 || *buf == HANDS_SYM)

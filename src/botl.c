@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-12. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-21. */
 /* $NHDT-Header: NetHack 5.0 botl.c 2026/06/20_16:30:42 NetHack-5.0:1.289 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2006. */
@@ -4747,7 +4747,6 @@ status_hilite_menu_add(int origfld)
  choose_color:
     clr = query_color(colorqry, NO_COLOR);
     if (clr == -1) {
-        /* NetHackJP: Fix infinite loop on cancel in status_hilite_menu_add */
         if (behavior == BL_TH_VAL_PERCENTAGE
             || behavior == BL_TH_VAL_ABSOLUTE
             || (behavior == BL_TH_UPDOWN && initblstats[fld].anytype != ANY_STR))

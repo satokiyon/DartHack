@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-04. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-21. */
 /* $NHDT-Header: NetHack 5.0 date.c 2026/06/20_22:26:43 NetHack-5.0:1.14 $ */
 /* Copyright (c) Michael Allison, 2021.                           */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -19,6 +19,14 @@ extern unsigned long md_ignored_features(void);
 extern char *mdlib_version_string(char *, const char *);
 extern char *version_id_string(char *, size_t, const char *);
 extern char *bannerc_string(char *, size_t, const char *);
+
+#ifndef NETHACK_GIT_SHA
+#if defined(HAS_INCLUDE)
+#if __has_include("nhgitsha.h")
+#include "nhgitsha.h"
+#endif  /* __has_include */
+#endif  /* HAS_INCLUDE */
+#endif  /* !NETHACK_GIT_SHA */
 
 /* nomakedefs_populated: flag for whether 'nomakedefs' should be freed */
 static int nomakedefs_populated = 0;

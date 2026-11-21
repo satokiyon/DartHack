@@ -1,4 +1,4 @@
-<!-- Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-09. -->
+<!-- Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-19. -->
 # NetHackJP : NetHack 5.0 (非公式)日本語化プロジェクト
 
 NetHackJPは、ローグライクゲームの金字塔 [NetHack](https://www.nethack.org/)5.0 を日本語で快適にプレイできるようにすることを目的とした非公式プロジェクトです。(対象OSはWindowsとLinuxのみ)
@@ -290,6 +290,9 @@ OPTIONS=align_status:right,msw_stat_cols:15
 * [NetHack-cn](https://nethack-cn.github.io/): NetHack中国語版
 * [nethack-ru](https://github.com/Skadga/nethack-ru): NetHackロシア語版
 * [Nethack500_Lubuntu2604](https://github.com/HackTechDev/Nethack500_Lubuntu2604): NetHackフランス語版
+* [HanNetHack](https://github.com/timfr09/HanNetHack): NetHack韓国語版
+* [変愚蛮怒HD](https://higesho.github.io/): NetHack/NetHackJPを3D表示でプレイできる。他にも 変愚蛮怒・短愚蛮怒・幻想蛮怒・TOband・Sil-Q・FroxComposband・Angband・Umoria・Rogue 3.6・Rogue 5.4・RogueClone2・Dungeon Crawl Stone Soupがプレイできる。( [github](https://github.com/higesho/hengband-hd2d))
+* [Rogue_5.4.5_JEC](https://github.com/leopard-gecko/rogue_5.4.5_jec): Rogue 5.4.5 日本語対応(NetHackではないが記載)
 * [DartHack](https://github.com/satokiyon/DartHack): Android向け日本語アプリ
 * …他にも見つけたら追記する
 

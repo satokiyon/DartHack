@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-04. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-21. */
 /* $NHDT-Header: NetHack 5.0 tradstdc.h 2026/06/20_22:26:43 NetHack-5.0:1.73 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2006. */
@@ -395,6 +395,12 @@ typedef genericptr genericptr_t; /* (void *) または (char *) */
 #endif
 #endif  /* __has_c_attribute(maybe_unused) */
 #endif  /* NH_C >= 202300L */
+/*
+ * __has_include
+ */
+#if defined(__has_include)
+#define HAS_INCLUDE 1
+#endif
 
 /*
  * コンパイラ固有

@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-19. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-21. */
 /* $NHDT-Header: NetHack 5.0 pickup.c 2026/06/27_15:18:44 NetHack-5.0:1.405 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
@@ -12,7 +12,7 @@
 
 #define CONTAINED_SYM '>' /* from invent.c */
 
-staticfn void simple_look(struct obj *, boolean);
+staticfn boolean simple_look(struct obj *, boolean);
 staticfn const char *jp_action_phrase_for_display(const char *);
 staticfn boolean query_classes(char *, boolean *, boolean *, const char *,
                              struct obj *, boolean, int *);
@@ -71,8 +71,6 @@ static const char
     nearloadpfx[] = "かなり苦労して",
     overloadpfx[] = "極めて苦労して";
 
-/* BUG: this lets you look at cockatrice corpses while blind without
-   touching them */
 staticfn const char *
 jp_action_phrase_for_display(const char *action)
 {
@@ -94,7 +92,7 @@ jp_action_phrase_for_display(const char *action)
 }
 
 /* much simpler version of the look-here code; used by query_classes() */
-staticfn void
+staticfn boolean
 simple_look(struct obj *otmp, /* list of objects */
             boolean here)     /* flag for type of obj list linkage */
 {
@@ -106,17 +104,29 @@ simple_look(struct obj *otmp, /* list of objects */
         impossible("simple_look(null)");
     } else if (!(here ? otmp->nexthere : otmp->nobj)) {
         pline1(doname(otmp));
+        if (otmp->where != OBJ_INVENT && will_feel_cockatrice(otmp, FALSE)) {
+            feel_cockatrice(otmp, FALSE);
+            return FALSE;
+        }
     } else {
         winid tmpwin = create_nhwindow(NHW_MENU);
 
         putstr(tmpwin, 0, "");
         do {
             putstr(tmpwin, 0, doname(otmp));
+            if (otmp->where != OBJ_INVENT
+                && will_feel_cockatrice(otmp, FALSE))
+                break;
             otmp = here ? otmp->nexthere : otmp->nobj;
         } while (otmp);
         display_nhwindow(tmpwin, TRUE);
         destroy_nhwindow(tmpwin);
+        if (otmp) {
+            feel_cockatrice(otmp, FALSE);
+            return FALSE;
+        }
     }
+    return TRUE;
 }
 
 int
@@ -172,7 +182,7 @@ query_classes(
     char ilets[36], inbuf[BUFSZ] = DUMMY; /* FIXME: hardcoded ilets[] length */
     int iletct, oclassct;
     boolean not_everything, filtered;
-    char qbuf[QBUFSZ];
+    char qbuf[BUFSZ * 2];
     boolean m_seen;
     int itemcount, bcnt, ucnt, ccnt, xcnt, ocnt, jcnt;
 
@@ -221,8 +231,26 @@ query_classes(
         oclasses[oclassct = 0] = '\0';
         *one_at_a_time = *everything = FALSE;
         not_everything = filtered = FALSE;
-        Sprintf(qbuf, "どの種類の物を%sしますか? [%s]",
-            jp_action_phrase_for_display(action), ilets);
+        if (!strncmp(action, "put into ", 9))
+            Snprintf(qbuf, sizeof qbuf,
+                     "%sにどの種類の物を入れますか? [%s]",
+                     action + 9, ilets);
+        else if (!strncmp(action, "take out of ", 12))
+            Snprintf(qbuf, sizeof qbuf,
+                     "%sからどの種類の物を取り出しますか? [%s]",
+                     action + 12, ilets);
+        else if (!strcmp(action, "pick up"))
+            Snprintf(qbuf, sizeof qbuf,
+                     "どの種類の物を拾いますか? [%s]", ilets);
+        else if (!strcmp(action, "take out"))
+            Snprintf(qbuf, sizeof qbuf,
+                     "どの種類の物を取り出しますか? [%s]", ilets);
+        else if (!strcmp(action, "put in"))
+            Snprintf(qbuf, sizeof qbuf,
+                     "どの種類の物を入れますか? [%s]", ilets);
+        else
+            Snprintf(qbuf, sizeof qbuf, "どの種類の物を%sしますか? [%s]",
+                     jp_action_phrase_for_display(action), ilets);
         getlin(qbuf, inbuf);
         if (*inbuf == '\033')
             return FALSE;
@@ -236,7 +264,9 @@ query_classes(
             else if (sym == 'a')
                 *everything = TRUE;
             else if (sym == ':') {
-                simple_look(objs, here); /* dumb if objs==invent */
+                /* Stop after a dangerous touch, even if hero survives. */
+                if (!simple_look(objs, here))
+                    return FALSE;
                 /* if we just scanned the contents of a container
                    then mark it as having known contents */
                 if (objs->where == OBJ_CONTAINED)
@@ -259,7 +289,7 @@ query_classes(
                 } else {
                     if (!where)
                         where = !strcmp(action, "pick up") ? "ここに"
-                                : !strcmp(action, "take out") ? "中に" : "";
+                                : !strncmp(action, "take out", 8) ? "中に" : "";
                     if (*where)
                         There("%cが%sない.", sym, where);
                     else
@@ -3283,6 +3313,7 @@ traditional_loot(boolean put_in)
     int (*actionfunc)(OBJ_P), (*checkfunc)(OBJ_P);
     struct obj **objlist;
     char selection[MAXOCLASSES + 10]; /* +10: room for B,U,C,X plus slop */
+    char actbuf[QBUFSZ];
     const char *action;
     boolean one_by_one, allflag;
     int used = ECMD_OK, menu_on_request = 0;
@@ -3300,7 +3331,10 @@ traditional_loot(boolean put_in)
         gp.pickup_encumbrance = 0; /* used to limit verbosity */
     }
 
-    if (query_classes(selection, &one_by_one, &allflag, action, *objlist,
+    /* prompt names the container; per-item prompts keep the short verb */
+    (void) safe_qbuf(actbuf, put_in ? "put into " : "take out of ", "",
+                     gc.current_container, doname, ansimpleoname, "それ");
+    if (query_classes(selection, &one_by_one, &allflag, actbuf, *objlist,
                       FALSE, &menu_on_request)) {
         if (askchain(objlist, (one_by_one ? (char *) 0 : selection), allflag,
                      actionfunc, checkfunc, 0, action))
@@ -3319,7 +3353,6 @@ menu_loot(int retry, boolean put_in)
     boolean all_categories = TRUE, loot_everything = FALSE, autopick = FALSE;
     char buf[BUFSZ];
     boolean loot_justpicked = FALSE;
-    const char *action_disp = put_in ? "入れ" : "取り出し";
     struct obj *otmp, *otmp2;
     menu_item *pick_list;
     int mflags, res;
@@ -3331,7 +3364,12 @@ menu_loot(int retry, boolean put_in)
         all_categories = (retry == -2);
     } else if (flags.menu_style == MENU_FULL) {
         all_categories = FALSE;
-        Sprintf(buf, "どの種類の物を%sますか?", action_disp);
+        /* name the container so it's clear what is being loaded/unloaded */
+        (void) safe_qbuf(buf, "",
+                         put_in ? "にどの種類の物を入れますか?"
+                                : "からどの種類の物を取り出しますか?",
+                         gc.current_container, doname, ansimpleoname,
+                         "それ");
         mflags = (ALL_TYPES | UNPAID_TYPES | BUCX_TYPES | CHOOSE_ALL
                   | JUSTPICKED );
         n = query_category(buf,
@@ -3409,7 +3447,11 @@ menu_loot(int retry, boolean put_in)
             mflags |= JUSTPICKED;
         if (!put_in)
             gc.current_container->cknown = 1;
-        Sprintf(buf, "何を%sますか?", action_disp);
+        (void) safe_qbuf(buf, "",
+                         put_in ? "に何を入れますか?"
+                                : "から何を取り出しますか?",
+                         gc.current_container, doname, ansimpleoname,
+                         "それ");
         n = query_objlist(buf,
                           put_in ? &gi.invent : &(gc.current_container->cobj),
                           mflags, &pick_list, PICK_ANY,

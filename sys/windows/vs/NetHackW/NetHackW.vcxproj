@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Modified by NetHackJP contributor @satokiyon; latest change date: 2026-09-01. -->
+<!-- Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-21. -->
 <Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <Import Project="..\config.props" />
   <ItemGroup Label="ProjectConfigurations">
@@ -415,6 +415,19 @@
   </Target>
   <Target Name="AfterRebuild">
     <MSBuild Projects="$(vsDir)NetHack\afternethack.proj" Targets="Build" Properties="Configuration=$(Configuration)" />
+  </Target>
+  <Target Name="InjectGitHash" BeforeTargets="ClCompile" Condition="Exists('$(VSInstallDir)$(GitExeSub)git.exe') And Exists('$(RootDir).git')">
+    <!-- Run git rev-parse and capture output into a property -->
+    <Exec Command="git rev-parse --verify HEAD" ConsoleToMSBuild="true" IgnoreExitCode="true">
+      <Output TaskParameter="ConsoleOutput" PropertyName="GitCommitHash" />
+    </Exec>
+
+    <!-- Pass it to the C++ compiler as a preprocessor definition -->
+    <ItemGroup>
+      <ClCompile>
+        <PreprocessorDefinitions>NETHACK_GIT_SHA="$(GitCommitHash)";%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      </ClCompile>
+    </ItemGroup>
   </Target>
 </Project>
 

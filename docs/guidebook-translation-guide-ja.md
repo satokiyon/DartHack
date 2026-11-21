@@ -1,4 +1,4 @@
-<!-- Modified by NetHackJP contributor @satokiyon; latest change date: 2026-10-24. -->
+<!-- Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-20. -->
 # NetHack ガイドブック翻訳方針および保守・作成手順
 
 本ドキュメントは、NetHack の公式ガイドブック（`Guidebook`）の日本語訳方針、テキスト版と Markdown 版のデュアルフォーマット運用、ビルドスクリプトを用いた生成手順、および保守方法についてまとめたものです。
@@ -37,7 +37,7 @@ NetHackJP/
 
 ### 2.1. 用語の統一と対訳基準
 - **公式対訳テーブルとの完全一致**:
-  - モンスター名、アイテム名、アーティファクト名などの固有名詞は、NetHackJP リポジトリ内の公式対訳データ（`src/mon_jp.c` の `mon_jp_name[]`、`src/objects.c` の `jp_item_name()` 等）、および用語集リファレンス（`glossary_references/obj_jp.txt`, `mon_jp.txt`）の訳語と完全に一致させてください。
+  - モンスター名、アイテム名、アーティファクト名などの固有名詞は、NetHackJP リポジトリ内の公式対訳データ（`src/mon_jp.c`、`src/obj_jp.c` の `jp_item_name()` 等）の訳語と完全に一致させてください。
 - **代表的な定訳**:
   - `Sokoban` ➔ 「**倉庫番**」（「ソコバン」等のカタカナ表記は禁止）
   - `Genocide` ➔ 「**虐殺**」（「根絶」等へのブレを防止）
