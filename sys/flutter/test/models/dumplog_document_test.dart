@@ -294,5 +294,71 @@ Game over:
       expect(tomb.lines.last.startsWith('_________'), isTrue);
       expect(tomb.lines.any((l) => l.contains('| ノームに倒された |')), isTrue);
     });
+
+    test('英語モード実機形式（Fare thee well 等）でも墓石と結末サマリーが分離され、墓石の左空白がデデントされること', () {
+      const enRealDeviceSample = '''
+Unix NetHack Version 5.0.1-0
+
+Game began 2026-11-21 20:35:49, ended 2026-11-21 20:41:31.
+
+Player, lawful male human Knight
+
+   -----
+   |@..|
+   -----
+Player the Esquire       St:11 Dx:9 Co:11 In:9 Wi:14 Ch:18  Lawful
+Dlvl:3  \$:3  HP:0(24) Pw:31(31) AC:3  Xp:3/59 T:565  Burdened
+
+Latest messages:
+ You die...
+
+Voluntary challenges:
+ You were an atheist.
+
+ The Dungeons of Doom: levels 1 to 2
+    Level 1:
+ The Gnomish Mines:
+    Level 3: <- You were here.
+
+No species were genocided or became extinct.
+
+Game over:
+                       ----------
+                      /          \\
+                     /    REST    \\
+                    /      IN      \\
+                   /     PEACE      \\
+                  /                  \\
+                  |      Player      |
+                  |       3 Au       |
+                  |   killed by a    |
+                  |      gnome       |
+                  |                  |
+                  |                  |
+                  |       2026       |
+                 *|     *  *  *      | *
+        _________)\\\\_//(\\/(/\\)/\\//\\/|_)_______
+
+Fare thee well Player the Knight...
+
+You died in The Gnomish Mines on dungeon level 3 with 339 points,
+and 3 pieces of gold, after 565 moves.
+''';
+      final doc = DumplogDocument.parse(enRealDeviceSample, isJp: false);
+
+      final overview =
+          doc.sections.firstWhere((s) => s.type == DumplogSectionType.overview);
+      expect(overview.lines.join('\n'), contains('The Dungeons of Doom'));
+
+      final tomb = doc.sections
+          .firstWhere((s) => s.type == DumplogSectionType.tombstone);
+      expect(tomb.lines.join('\n'), isNot(contains('Fare thee well')));
+      expect(tomb.lines.last.startsWith('_________'), isTrue);
+
+      final summary =
+          doc.sections.firstWhere((s) => s.type == DumplogSectionType.summary);
+      expect(summary.lines.first, 'Fare thee well Player the Knight...');
+      expect(summary.lines.join('\n'), contains('339 points'));
+    });
   });
 }

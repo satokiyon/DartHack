@@ -253,7 +253,7 @@ class DumplogDocument {
       final line = allLines[i];
       final trimmed = line.trim();
 
-      // 墓石ブロック中: 結末サマリー行が来たら墓石終了
+      // 墓石ブロック中: 結末サマリー行、または底辺行（_________）の直後で墓石終了
       if (inTombstone) {
         if (_isSummaryStart(trimmed)) {
           flushCurrent();
@@ -263,6 +263,11 @@ class DumplogDocument {
           continue;
         }
         currentLines.add(line);
+        if (line.contains('_________')) {
+          flushCurrent();
+          inTombstone = false;
+          currentType = DumplogSectionType.summary;
+        }
         continue;
       }
 
@@ -419,8 +424,14 @@ class DumplogDocument {
 
   static bool _isSummaryStart(String trimmed) {
     return trimmed.startsWith('さようなら ') ||
+        trimmed.startsWith('ごきげんよう ') ||
+        trimmed.startsWith('アロハ ') ||
         trimmed.startsWith('さらば ') ||
         trimmed.startsWith('Goodbye ') ||
+        trimmed.startsWith('Fare thee well ') ||
+        trimmed.startsWith('Sayonara ') ||
+        trimmed.startsWith('Aloha ') ||
+        trimmed.startsWith('Farvel ') ||
         trimmed.startsWith('Farewell ') ||
         trimmed.startsWith('So long ');
   }
@@ -521,6 +532,8 @@ class DumplogDocument {
         return '背景:';
       case 'Basics:':
         return '基本情報:';
+      case 'Final Characteristics:':
+        return '最終能力値:';
       case 'Final Status:':
         return '最終状態:';
       case 'Status:':
