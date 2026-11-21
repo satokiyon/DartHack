@@ -11,7 +11,7 @@
 
 #define CONTAINED_SYM '>' /* from invent.c */
 
-staticfn void simple_look(struct obj *, boolean);
+staticfn boolean simple_look(struct obj *, boolean);
 staticfn boolean query_classes(char *, boolean *, boolean *, const char *,
                              struct obj *, boolean, int *);
 staticfn boolean fatal_corpse_mistake(struct obj *, boolean);
@@ -69,10 +69,8 @@ static const char
     nearloadpfx[] = "You have much trouble",
     overloadpfx[] = "You have extreme difficulty";
 
-/* BUG: this lets you look at cockatrice corpses while blind without
-   touching them */
 /* much simpler version of the look-here code; used by query_classes() */
-staticfn void
+staticfn boolean
 simple_look(struct obj *otmp, /* list of objects */
             boolean here)     /* flag for type of obj list linkage */
 {
@@ -84,17 +82,29 @@ simple_look(struct obj *otmp, /* list of objects */
         impossible("simple_look(null)");
     } else if (!(here ? otmp->nexthere : otmp->nobj)) {
         pline1(doname(otmp));
+        if (otmp->where != OBJ_INVENT && will_feel_cockatrice(otmp, FALSE)) {
+            feel_cockatrice(otmp, FALSE);
+            return FALSE;
+        }
     } else {
         winid tmpwin = create_nhwindow(NHW_MENU);
 
         putstr(tmpwin, 0, "");
         do {
             putstr(tmpwin, 0, doname(otmp));
+            if (otmp->where != OBJ_INVENT
+                && will_feel_cockatrice(otmp, FALSE))
+                break;
             otmp = here ? otmp->nexthere : otmp->nobj;
         } while (otmp);
         display_nhwindow(tmpwin, TRUE);
         destroy_nhwindow(tmpwin);
+        if (otmp) {
+            feel_cockatrice(otmp, FALSE);
+            return FALSE;
+        }
     }
+    return TRUE;
 }
 
 int
@@ -213,7 +223,9 @@ query_classes(
             else if (sym == 'a')
                 *everything = TRUE;
             else if (sym == ':') {
-                simple_look(objs, here); /* dumb if objs==invent */
+                /* Stop after a dangerous touch, even if hero survives. */
+                if (!simple_look(objs, here))
+                    return FALSE;
                 /* if we just scanned the contents of a container
                    then mark it as having known contents */
                 if (objs->where == OBJ_CONTAINED)
@@ -3243,6 +3255,7 @@ traditional_loot(boolean put_in)
     int (*actionfunc)(OBJ_P), (*checkfunc)(OBJ_P);
     struct obj **objlist;
     char selection[MAXOCLASSES + 10]; /* +10: room for B,U,C,X plus slop */
+    char actbuf[QBUFSZ];
     const char *action;
     boolean one_by_one, allflag;
     int used = ECMD_OK, menu_on_request = 0;
@@ -3260,7 +3273,10 @@ traditional_loot(boolean put_in)
         gp.pickup_encumbrance = 0; /* used to limit verbosity */
     }
 
-    if (query_classes(selection, &one_by_one, &allflag, action, *objlist,
+    /* prompt names the container; per-item prompts keep the short verb */
+    (void) safe_qbuf(actbuf, put_in ? "put into " : "take out of ", "",
+                     gc.current_container, doname, ansimpleoname, "it");
+    if (query_classes(selection, &one_by_one, &allflag, actbuf, *objlist,
                       FALSE, &menu_on_request)) {
         if (askchain(objlist, (one_by_one ? (char *) 0 : selection), allflag,
                      actionfunc, checkfunc, 0, action))
@@ -3279,7 +3295,6 @@ menu_loot(int retry, boolean put_in)
     boolean all_categories = TRUE, loot_everything = FALSE, autopick = FALSE;
     char buf[BUFSZ];
     boolean loot_justpicked = FALSE;
-    const char *action = put_in ? "Put in" : "Take out";
     struct obj *otmp, *otmp2;
     menu_item *pick_list;
     int mflags, res;
@@ -3291,7 +3306,11 @@ menu_loot(int retry, boolean put_in)
         all_categories = (retry == -2);
     } else if (flags.menu_style == MENU_FULL) {
         all_categories = FALSE;
-        Sprintf(buf, "%s what type of objects?", action);
+        /* name the container so it's clear what is being loaded/unloaded */
+        (void) safe_qbuf(buf, put_in ? "Put what type of objects into "
+                                     : "Take what type of objects out of ",
+                         "?", gc.current_container, doname, ansimpleoname,
+                         "it");
         mflags = (ALL_TYPES | UNPAID_TYPES | BUCX_TYPES | CHOOSE_ALL
                   | JUSTPICKED );
         n = query_category(buf,
@@ -3369,7 +3388,9 @@ menu_loot(int retry, boolean put_in)
             mflags |= JUSTPICKED;
         if (!put_in)
             gc.current_container->cknown = 1;
-        Sprintf(buf, "%s what?", action);
+        (void) safe_qbuf(buf, put_in ? "Put what into " : "Take what out of ",
+                         "?", gc.current_container, doname, ansimpleoname,
+                         "it");
         n = query_objlist(buf,
                           put_in ? &gi.invent : &(gc.current_container->cobj),
                           mflags, &pick_list, PICK_ANY,
