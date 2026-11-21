@@ -19,7 +19,7 @@ enum FontSizePreset {
   extraLarge,
 }
 
-/// フォント設定の対象コンポーネント（5系統）
+/// フォント設定の対象コンポーネント（6系統）
 enum FontTarget {
   /// ダンジョンマップ（アスキーアート描画）: 日本語フォールバック完全禁止
   map,
@@ -32,6 +32,9 @@ enum FontTarget {
 
   /// メニュー & テキストウィンドウ（インベントリ、遠見、案内等）
   menu,
+
+  /// 常時表示インベントリパネル (perm_invent)
+  permInvent,
 
   /// 全体UI・仮想コントローラ・設定画面ダイアログ
   ui,
@@ -94,11 +97,13 @@ class FontManager extends ChangeNotifier {
   static const String prefFontMessage = 'pref_font_message';
   static const String prefFontStatus = 'pref_font_status';
   static const String prefFontMenu = 'pref_font_menu';
+  static const String prefFontPermInvent = 'pref_font_perm_invent';
   static const String prefFontUi = 'pref_font_ui';
   static const String prefMapAsciiScale = 'pref_map_ascii_scale';
   static const String prefMsgFontSize = 'msg_font_size';
   static const String prefStatusFontSize = 'status_font_size';
   static const String prefMenuFontSize = 'menu_font_size';
+  static const String prefPermInventFontSize = 'perm_invent_font_size';
   static const String prefUiFontScale = 'ui_font_scale';
 
   static bool _licensesRegistered = false;
@@ -235,6 +240,7 @@ http://creativecommons.org/publicdomain/zero/1.0/''',
     FontTarget.message: 'system',
     FontTarget.status: 'system',
     FontTarget.menu: 'system',
+    FontTarget.permInvent: 'system',
     FontTarget.ui: 'system',
   };
 
@@ -249,6 +255,9 @@ http://creativecommons.org/publicdomain/zero/1.0/''',
 
   /// メニュー＆テキスト領域フォントサイズ (pt: 8.0〜32.0、デフォルト 14.0)
   double _menuFontSize = 14.0;
+
+  /// 常時表示インベントリ領域フォントサイズ (pt: 8.0〜32.0、デフォルト 13.0)
+  double _permInventFontSize = 13.0;
 
   /// UI全体拡大倍率 (0.5〜2.5、デフォルト 1.0)
   double _uiFontScale = 1.0;
@@ -283,6 +292,9 @@ http://creativecommons.org/publicdomain/zero/1.0/''',
 
   /// メニュー＆テキスト領域のフォントサイズ（8.0 〜 32.0 pt）
   double get menuFontSize => _menuFontSize;
+
+  /// 常時表示インベントリ領域のフォントサイズ（8.0 〜 32.0 pt）
+  double get permInventFontSize => _permInventFontSize;
 
   /// UI全体の拡大倍率（0.5 〜 2.5）
   double get uiFontScale => _uiFontScale;
@@ -335,6 +347,8 @@ http://creativecommons.org/publicdomain/zero/1.0/''',
         _prefs!.getString(prefFontStatus) ?? 'system';
     _selectedFontIds[FontTarget.menu] =
         _prefs!.getString(prefFontMenu) ?? 'system';
+    _selectedFontIds[FontTarget.permInvent] =
+        _prefs!.getString(prefFontPermInvent) ?? 'system';
     _selectedFontIds[FontTarget.ui] =
         _prefs!.getString(prefFontUi) ?? 'system';
     _mapAsciiScale =
@@ -345,6 +359,8 @@ http://creativecommons.org/publicdomain/zero/1.0/''',
         (_prefs!.getDouble(prefStatusFontSize) ?? 13.0).clamp(8.0, 32.0);
     _menuFontSize =
         (_prefs!.getDouble(prefMenuFontSize) ?? 14.0).clamp(8.0, 32.0);
+    _permInventFontSize =
+        (_prefs!.getDouble(prefPermInventFontSize) ?? 13.0).clamp(8.0, 32.0);
     _uiFontScale =
         (_prefs!.getDouble(prefUiFontScale) ?? 1.0).clamp(0.5, 2.5);
   }
@@ -478,6 +494,15 @@ http://creativecommons.org/publicdomain/zero/1.0/''',
     notifyListeners();
   }
 
+  /// 常時表示インベントリ領域フォントサイズの設定（8.0 〜 32.0 pt）
+  Future<void> setPermInventFontSize(double size) async {
+    _permInventFontSize = size.clamp(8.0, 32.0);
+    if (_prefs != null) {
+      await _prefs!.setDouble(prefPermInventFontSize, _permInventFontSize);
+    }
+    notifyListeners();
+  }
+
   /// UI全体拡大倍率の設定（0.5 〜 2.5）
   Future<void> setUiFontScale(double scale) async {
     _uiFontScale = scale.clamp(0.5, 2.5);
@@ -495,6 +520,7 @@ http://creativecommons.org/publicdomain/zero/1.0/''',
         _messageFontSize = 13.0;
         _statusFontSize = 13.0;
         _menuFontSize = 14.0;
+        _permInventFontSize = 13.0;
         _uiFontScale = 1.0;
         break;
       case FontSizePreset.large:
@@ -502,6 +528,7 @@ http://creativecommons.org/publicdomain/zero/1.0/''',
         _messageFontSize = 17.0;
         _statusFontSize = 16.0;
         _menuFontSize = 18.0;
+        _permInventFontSize = 16.0;
         _uiFontScale = 1.25;
         break;
       case FontSizePreset.extraLarge:
@@ -509,6 +536,7 @@ http://creativecommons.org/publicdomain/zero/1.0/''',
         _messageFontSize = 21.0;
         _statusFontSize = 20.0;
         _menuFontSize = 22.0;
+        _permInventFontSize = 20.0;
         _uiFontScale = 1.5;
         break;
     }
@@ -518,6 +546,7 @@ http://creativecommons.org/publicdomain/zero/1.0/''',
       await _prefs!.setDouble(prefMsgFontSize, _messageFontSize);
       await _prefs!.setDouble(prefStatusFontSize, _statusFontSize);
       await _prefs!.setDouble(prefMenuFontSize, _menuFontSize);
+      await _prefs!.setDouble(prefPermInventFontSize, _permInventFontSize);
       await _prefs!.setDouble(prefUiFontScale, _uiFontScale);
     }
     notifyListeners();
@@ -726,6 +755,8 @@ http://creativecommons.org/publicdomain/zero/1.0/''',
         return prefFontStatus;
       case FontTarget.menu:
         return prefFontMenu;
+      case FontTarget.permInvent:
+        return prefFontPermInvent;
       case FontTarget.ui:
         return prefFontUi;
     }

@@ -35,6 +35,7 @@ class DefaultsHelper {
     'weaponstatus',
     'armorstatus',
     'terrainstatus',
+    'perm_invent',
   };
 
   /// NetHack 5.0 symbols で定義されている有効な通常階層用シンボルセット名
@@ -608,11 +609,12 @@ class DefaultsHelper {
       await prefs.setInt('nh_opt_statuslines', 2);
     }
 
-    // 追加ステータス項目 (weaponstatus / armorstatus / terrainstatus): デフォルト false
+    // 追加ステータス項目 (weaponstatus / armorstatus / terrainstatus) および常時表示インベントリ (perm_invent): デフォルト false
     for (final entry in const {
       'weaponstatus': 'nh_opt_weaponstatus',
       'armorstatus': 'nh_opt_armorstatus',
       'terrainstatus': 'nh_opt_terrainstatus',
+      'perm_invent': 'nh_opt_perm_invent',
     }.entries) {
       final val = getOption(entry.key);
       if (val != null) {
@@ -717,6 +719,9 @@ class DefaultsHelper {
     if (prefs.containsKey('nh_opt_terrainstatus')) {
       setBoolOption('terrainstatus', prefs.getBool('nh_opt_terrainstatus') ?? false);
     }
+    if (prefs.containsKey('nh_opt_perm_invent')) {
+      setBoolOption('perm_invent', prefs.getBool('nh_opt_perm_invent') ?? false);
+    }
 
     final prefSymset = prefs.getString('nh_opt_symset');
     if (prefSymset != null && prefSymset.isNotEmpty) {
@@ -811,7 +816,8 @@ class DefaultsHelper {
             optKey == 'pauper' ||
             optKey == 'weaponstatus' ||
             optKey == 'armorstatus' ||
-            optKey == 'terrainstatus') {
+            optKey == 'terrainstatus' ||
+            optKey == 'perm_invent') {
           await prefs.setBool(prefKey, false);
           debugPrint("DefaultsHelper: Added default option '$prefKey' = false");
         }

@@ -5,6 +5,7 @@ import '../services/font_manager.dart';
 /// 操作ヘルプを表示するコンテキスト種別
 enum KeyboardHelpContext {
   game,
+  permInvent, // 常時表示インベントリ (#perminv / |) スクロールモード
   menu,
   yn,
   guidebook,
@@ -395,9 +396,25 @@ class _KeyboardHelpDialogState extends State<KeyboardHelpDialog> {
         return [
           _HelpItem('Ctrl+M / F10', isJp ? 'ドロワーメニューを一発起動' : 'Open drawer menu directly'),
           _HelpItem('F9 / Alt-z', isJp ? '階層の全体地図を表示' : 'Show full level map'),
-          _HelpItem('Tab / Shift+Tab', isJp ? '半透明ボタン（メニュー／全体マップ）のフォーカス選択' : 'Focus floating buttons'),
+          _HelpItem('PgUp / PgDn', isJp ? '常時表示インベントリのページスクロール' : 'Scroll permanent inventory by page'),
+          _HelpItem('Home / End', isJp ? '常時表示インベントリの先頭 / 末尾へ移動' : 'Jump permanent inventory to top / bottom'),
+          _HelpItem('| (#perminv)', isJp ? '常時表示インベントリのスクロールモードを開始' : 'Enter permanent inventory scroll mode'),
+          _HelpItem('Tab / Shift+Tab', isJp ? 'メニュー／全体マップ／常時表示インベントリのフォーカス切替' : 'Cycle focus (Menu / Full Map / Perm Inventory)'),
           _HelpItem('Enter / Space', isJp ? '選択中の半透明ボタンを実行' : 'Execute focused floating button'),
           _HelpItem('?', isJp ? 'NetHack標準のヘルプ・コマンド一覧を表示' : 'Show standard NetHack help and command list'),
+          _HelpItem('F1 / Alt-h', isJp ? '操作ヘルプの表示' : 'Show controls help'),
+        ];
+
+      case KeyboardHelpContext.permInvent:
+        return [
+          _HelpItem('a-z / A-Z / \$', isJp ? '該当アイテムのアクションメニューを開く' : 'Open action menu for item'),
+          _HelpItem('↑ / ↓', isJp ? '1行スクロール' : 'Scroll 1 line up/down'),
+          _HelpItem('PgUp / PgDn (< / >)', isJp ? 'ページ戻り / ページ送り' : 'Page up / Page down'),
+          _HelpItem('Home / End (^ / |)', isJp ? '最先頭 / 最末尾へジャンプ' : 'Jump to top / bottom'),
+          _HelpItem('Space', isJp ? 'ページ送り（最下部到達時は先頭に戻って終了）' : 'Page down (resets & exits at bottom)'),
+          _HelpItem('Tab / Shift+Tab', isJp ? 'フォーカス解除 / 前のフォーカス先へ移動' : 'Clear focus / Move to previous focus target'),
+          _HelpItem('Enter / BackSpace', isJp ? '先頭に戻ってスクロールモードを終了' : 'Reset to top and exit scroll mode'),
+          _HelpItem('Esc / Ctrl+C', isJp ? '現在のスクロール位置を保って終了' : 'Exit scroll mode keeping position'),
           _HelpItem('F1 / Alt-h', isJp ? '操作ヘルプの表示' : 'Show controls help'),
         ];
 

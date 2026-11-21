@@ -272,6 +272,16 @@ class NetHackWorkerSession {
       } else if (type == 'trigger_database_search') {
         onLog("trigger_database_search message received in worker isolate");
         activeFfi.triggerDatabaseSearch();
+      } else if (type == 'set_perm_invent') {
+        final enabled = message['enabled'] as bool? ?? false;
+        onLog("set_perm_invent message received: enabled=$enabled");
+        activeFfi.setPermInvent(enabled);
+      } else if (type == 'trigger_item_action') {
+        final invlet = message['invlet'] as int? ?? 0;
+        if (invlet > 0) {
+          onLog("trigger_item_action message received: invlet=$invlet");
+          activeFfi.triggerItemAction(invlet);
+        }
       }
     } catch (e, st) {
       if (!isCoreThreadStarted && currentPhase != WorkerErrorPhase.workerRuntime) {
@@ -349,6 +359,9 @@ class NetHackWorker {
 
     // 効果音・サウンド再生用 NativeCallable
     late final NativeCallable<DartSoundEventCallback> soundEventCallable;
+
+    // 常時表示インベントリ (perm_invent) イベント用 NativeCallable
+    late final NativeCallable<PermInventEventCallback> permInventCallable;
 
     void wlog(String text) {
       uiSendPort.send({'type': 'worker_log', 'text': text});
@@ -605,6 +618,18 @@ class NetHackWorker {
       });
     });
 
+    permInventCallable = NativeCallable<PermInventEventCallback>.listener((
+      int eventType,
+      Pointer<Utf8> payloadPtr,
+    ) {
+      final payload = payloadPtr != nullptr ? _utf8DecodeLossy(payloadPtr) : '';
+      uiSendPort.send({
+        'type': 'perm_invent_event',
+        'eventType': eventType,
+        'payload': payload,
+      });
+    });
+
     final activeSession = NetHackWorkerSession(
       onLog: wlog,
       onSendToUi: uiSendPort.send,
@@ -634,6 +659,7 @@ class NetHackWorker {
           structPtr.ref.putMixedCb = putMixedCallable.nativeFunction;
           structPtr.ref.newLevelRestCb = newLevelRestCallable.nativeFunction;
           structPtr.ref.soundEventCb = soundEventCallable.nativeFunction;
+          structPtr.ref.permInventCb = permInventCallable.nativeFunction;
 
           wlog("Calling ffi.registerCallbacksStruct...");
           loadedFfi.registerCallbacksStruct(structPtr);

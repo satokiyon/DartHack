@@ -263,7 +263,14 @@ do_autosave(void)
         u.uinwater = 1, iflags.save_uinwater = 0;
     if (iflags.save_uburied)
         u.uburied = 1, iflags.save_uburied = 0;
-    done_object_cleanup();
+    /* DartHack: do_autosave() はゲームを終了しないため、done_object_cleanup() 内の
+       perm_invent 無効化および WIN_INVEN 破棄を抑止する */
+    {
+        boolean saved_perm_invent = iflags.perm_invent;
+        iflags.perm_invent = FALSE;
+        done_object_cleanup();
+        iflags.perm_invent = saved_perm_invent;
+    }
 
     /* 削除予約されたオブジェクトを事前に完全解放 */
     if (go.objs_deleted)

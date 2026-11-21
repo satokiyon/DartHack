@@ -28,6 +28,9 @@ enum KeyInputContext {
   /// 通常メニュー（インベントリ、ドロップ等）
   menu,
 
+  /// 常時表示インベントリ (`#perminv` / `|`) スクロール専用モード
+  permInvent,
+
   /// ゲーム本編（マップ・コマンド入力待ち）
   game,
 
@@ -871,6 +874,155 @@ class TitleSelectLanguage extends KeyAction {
   int get hashCode => language.hashCode;
 }
 
+/// 常時表示インベントリの1行スクロール (direction: 1=下, -1=上)
+class PermInventScroll extends KeyAction {
+  final int direction;
+  const PermInventScroll(this.direction);
+
+  @override
+  String toString() => 'PermInventScroll($direction)';
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is PermInventScroll &&
+          runtimeType == other.runtimeType &&
+          direction == other.direction;
+
+  @override
+  int get hashCode => direction.hashCode;
+}
+
+/// 常時表示インベントリの1ページスクロール (direction: 1=次, -1=前)
+class PermInventPage extends KeyAction {
+  final int direction;
+  const PermInventPage(this.direction);
+
+  @override
+  String toString() => 'PermInventPage($direction)';
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is PermInventPage &&
+          runtimeType == other.runtimeType &&
+          direction == other.direction;
+
+  @override
+  int get hashCode => direction.hashCode;
+}
+
+/// 常時表示インベントリの先頭／末尾ジャンプ (toTop: true=先頭, false=末尾)
+class PermInventJumpEdge extends KeyAction {
+  final bool toTop;
+  const PermInventJumpEdge(this.toTop);
+
+  @override
+  String toString() => 'PermInventJumpEdge($toTop)';
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is PermInventJumpEdge &&
+          runtimeType == other.runtimeType &&
+          toTop == other.toTop;
+
+  @override
+  int get hashCode => toTop.hashCode;
+}
+
+/// 常時表示インベントリ (`#perminv`) モードでの Space 操作（次ページ、末尾到達時は先頭リセット＆終了）
+class PermInventSpaceAction extends KeyAction {
+  const PermInventSpaceAction();
+
+  @override
+  String toString() => 'PermInventSpaceAction()';
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) || other is PermInventSpaceAction;
+
+  @override
+  int get hashCode => runtimeType.hashCode;
+}
+
+/// 常時表示インベントリ (`#perminv`) スクロールモードの終了
+class PermInventExit extends KeyAction {
+  final bool resetScroll;
+  const PermInventExit({required this.resetScroll});
+
+  @override
+  String toString() => 'PermInventExit(resetScroll: $resetScroll)';
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is PermInventExit &&
+          runtimeType == other.runtimeType &&
+          resetScroll == other.resetScroll;
+
+  @override
+  int get hashCode => resetScroll.hashCode;
+}
+
+/// マップ画面での Tab / Shift+Tab フォーカス循環先
+enum GameFocusStop {
+  none,
+  menu,
+  fullMap,
+  permInvent,
+}
+
+/// マップ画面での Tab / Shift+Tab による次のフォーカス先を算出する純関数
+/// 順方向: menu -> fullMap -> permInvent -> none（非表示の項目はスキップ）
+GameFocusStop cycleGameFocusStop({
+  required GameFocusStop current,
+  required bool forward,
+  required bool hasMenuButton,
+  required bool hasMapButton,
+  required bool hasPermInvent,
+}) {
+  final available = <GameFocusStop>[
+    if (hasMenuButton) GameFocusStop.menu,
+    if (hasMapButton) GameFocusStop.fullMap,
+    if (hasPermInvent) GameFocusStop.permInvent,
+  ];
+  if (available.isEmpty) return GameFocusStop.none;
+
+  if (current == GameFocusStop.none) {
+    return forward ? available.first : available.last;
+  }
+  final idx = available.indexOf(current);
+  if (idx == -1) {
+    return forward ? available.first : available.last;
+  }
+  if (forward) {
+    return (idx + 1 < available.length)
+        ? available[idx + 1]
+        : GameFocusStop.none;
+  }
+  return (idx > 0) ? available[idx - 1] : GameFocusStop.none;
+}
+
+/// 常時表示インベントリ (`#perminv` / `|`) フォーカス中のアクセラレータ文字によるアイテム選択
+class PermInventSelectItem extends KeyAction {
+  final int charCode;
+  const PermInventSelectItem(this.charCode);
+
+  @override
+  String toString() => 'PermInventSelectItem($charCode)';
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is PermInventSelectItem &&
+          runtimeType == other.runtimeType &&
+          charCode == other.charCode;
+
+  @override
+  int get hashCode => charCode.hashCode;
+}
+
 /// テキスト入力オーバーレイ・拡張コマンドメニューの候補補完アクション (Tab)
 class TextOverlayAutocomplete extends KeyAction {
   const TextOverlayAutocomplete();
@@ -914,6 +1066,7 @@ class HardwareKeyRouter {
     bool isAltPressed = false,
     bool isTextFieldFocused = false,
     bool isAnyKeyButtonFocused = false,
+    bool hasPermInvent = false,
   }) {
     // KeyDownEvent または KeyRepeatEvent のみを処理（KeyUp は無視）
     if (event is! KeyDownEvent && event is! KeyRepeatEvent) {
@@ -1063,6 +1216,16 @@ class HardwareKeyRouter {
       return _routeMenu(event, isShiftPressed: isShiftPressed);
     }
 
+    // 5b. 常時表示インベントリ (`#perminv` / `|`) フォーカスモード
+    if (context == KeyInputContext.permInvent) {
+      return _routePermInvent(
+        event,
+        isShiftPressed: isShiftPressed,
+        isControlPressed: isControlPressed,
+        isAltPressed: isAltPressed,
+      );
+    }
+
     // 6. ゲーム本編
     if (context == KeyInputContext.game) {
       return _routeGame(
@@ -1071,6 +1234,7 @@ class HardwareKeyRouter {
         isShiftPressed: isShiftPressed,
         isControlPressed: isControlPressed,
         isAltPressed: isAltPressed,
+        hasPermInvent: hasPermInvent,
       );
     }
 
@@ -1494,6 +1658,79 @@ class HardwareKeyRouter {
     return const SwallowKey();
   }
 
+  /// テンキー物理キー (NumLock OFF 時に PageUp/PageDown/Home/End になるキー) かどうか
+  static bool _isNumpadPhysicalKey(PhysicalKeyboardKey key) {
+    return key == PhysicalKeyboardKey.numpad1 ||
+        key == PhysicalKeyboardKey.numpad2 ||
+        key == PhysicalKeyboardKey.numpad3 ||
+        key == PhysicalKeyboardKey.numpad4 ||
+        key == PhysicalKeyboardKey.numpad5 ||
+        key == PhysicalKeyboardKey.numpad6 ||
+        key == PhysicalKeyboardKey.numpad7 ||
+        key == PhysicalKeyboardKey.numpad8 ||
+        key == PhysicalKeyboardKey.numpad9;
+  }
+
+  /// 常時表示インベントリ (`#perminv` / `|`) フォーカスモードのキー判定
+  static KeyAction _routePermInvent(
+    KeyEvent event, {
+    required bool isShiftPressed,
+    required bool isControlPressed,
+    required bool isAltPressed,
+  }) {
+    final key = event.logicalKey;
+    final isDown = event is KeyDownEvent;
+
+    if (key == LogicalKeyboardKey.tab) {
+      return isDown ? GameTab(forward: !isShiftPressed) : const SwallowKey();
+    }
+    if (key == LogicalKeyboardKey.escape ||
+        (isControlPressed && key == LogicalKeyboardKey.keyC)) {
+      return isDown ? const PermInventExit(resetScroll: false) : const SwallowKey();
+    }
+    if (key == LogicalKeyboardKey.enter ||
+        key == LogicalKeyboardKey.numpadEnter ||
+        key == LogicalKeyboardKey.backspace) {
+      return isDown ? const PermInventExit(resetScroll: true) : const SwallowKey();
+    }
+    if (key == LogicalKeyboardKey.space) {
+      if (isShiftPressed) return const PermInventPage(-1);
+      return isDown ? const PermInventSpaceAction() : const SwallowKey();
+    }
+    if (key == LogicalKeyboardKey.arrowDown) return const PermInventScroll(1);
+    if (key == LogicalKeyboardKey.arrowUp) return const PermInventScroll(-1);
+    if (key == LogicalKeyboardKey.pageDown || key == LogicalKeyboardKey.arrowRight) {
+      return const PermInventPage(1);
+    }
+    if (key == LogicalKeyboardKey.pageUp || key == LogicalKeyboardKey.arrowLeft) {
+      return const PermInventPage(-1);
+    }
+    if (key == LogicalKeyboardKey.home) return const PermInventJumpEdge(true);
+    if (key == LogicalKeyboardKey.end) return const PermInventJumpEdge(false);
+
+    String? char = event.character;
+    if (char != null && char.isNotEmpty) {
+      char = normalizeCharacter(char);
+      if (char == '>') return const PermInventPage(1);
+      if (char == '<') return const PermInventPage(-1);
+      if (char == '^') return const PermInventJumpEdge(true);
+      if (char == '|') return const PermInventJumpEdge(false);
+
+      // アクセラレータ文字 (a-z / A-Z / $) の KeyDown でアイテムアクション起動
+      if (isDown && !isControlPressed && !isAltPressed && char.length == 1) {
+        final code = char.codeUnitAt(0);
+        final isAcc = (code >= 0x61 && code <= 0x7A) || // a-z
+            (code >= 0x41 && code <= 0x5A) || // A-Z
+            code == 0x24; // $
+        if (isAcc) {
+          return PermInventSelectItem(code);
+        }
+      }
+    }
+
+    return const SwallowKey();
+  }
+
   /// ゲーム本編のキー判定
   static KeyAction _routeGame({
     required KeyEvent event,
@@ -1501,6 +1738,7 @@ class HardwareKeyRouter {
     required bool isShiftPressed,
     required bool isControlPressed,
     required bool isAltPressed,
+    bool hasPermInvent = false,
   }) {
     // 0. ドロワーメニュー起動キー（F10, ContextMenu, Ctrl+M）
     if (event.logicalKey == LogicalKeyboardKey.f10 ||
@@ -1517,6 +1755,25 @@ class HardwareKeyRouter {
       return (event is KeyDownEvent)
           ? const OpenFullMap()
           : const SwallowKey();
+    }
+
+    // 0-2. 常時表示インベントリ直接スクロール (PageUp/PageDown/Home/End、テンキー物理キーは除外)
+    if (hasPermInvent &&
+        !isAltPressed &&
+        !isControlPressed &&
+        !_isNumpadPhysicalKey(event.physicalKey)) {
+      if (event.logicalKey == LogicalKeyboardKey.pageDown) {
+        return const PermInventPage(1);
+      }
+      if (event.logicalKey == LogicalKeyboardKey.pageUp) {
+        return const PermInventPage(-1);
+      }
+      if (event.logicalKey == LogicalKeyboardKey.home) {
+        return const PermInventJumpEdge(true);
+      }
+      if (event.logicalKey == LogicalKeyboardKey.end) {
+        return const PermInventJumpEdge(false);
+      }
     }
 
     // A. Alt (Meta) キーとの組み合わせ (M-a〜M-z, M-A〜M-Z, M-2, M-?)

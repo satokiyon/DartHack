@@ -170,6 +170,9 @@ class _SettingsPageState extends State<SettingsPage> {
   int _scrollAmount = 3;
   String _mapFixedMsgInsetMode = 'auto';
   bool _mapFixedMsgAvoidFlip = true;
+  bool _optPermInvent = false;
+  String _permInventPosition = 'right';
+  double _permInventWidthRatio = 0.28;
   bool _autosaveEnabled = true;
   int _autosaveInterval = 50;
 
@@ -408,6 +411,11 @@ class _SettingsPageState extends State<SettingsPage> {
       _scrollAmount = prefs.getInt('scroll_amount') ?? 3;
       _mapFixedMsgInsetMode = prefs.getString('map_fixed_msg_inset_mode') ?? 'auto';
       _mapFixedMsgAvoidFlip = prefs.getBool('map_fixed_msg_avoid_flip') ?? true;
+      _optPermInvent = prefs.getBool('nh_opt_perm_invent') ?? false;
+      final rawPermPos = prefs.getString('perm_invent_position') ?? 'right';
+      _permInventPosition = (rawPermPos == 'left') ? 'left' : 'right';
+      _permInventWidthRatio =
+          (prefs.getDouble('perm_invent_width_ratio') ?? 0.28).clamp(0.20, 0.45);
       _padOpacity = prefs.getDouble('pad_opacity') ?? 0.8;
       _dpadScale = prefs.getDouble('dpad_scale') ?? 1.0;
       _shortcutPadScale = prefs.getDouble('shortcut_pad_scale') ?? 1.0;
@@ -684,12 +692,14 @@ class _SettingsPageState extends State<SettingsPage> {
         'msg_opacity',
         'msg_font_size',
         'menu_font_size',
+        'perm_invent_font_size',
         'ui_font_scale',
         FontManager.prefMapAsciiScale,
         'sound_bgm_volume',
         'sound_se_volume',
         'sound_ambience_volume',
         'sound_voice_volume',
+        'perm_invent_width_ratio',
       };
 
       for (final entry in settingsMap.entries) {
@@ -1048,6 +1058,78 @@ class _SettingsPageState extends State<SettingsPage> {
                     _saveSetting('map_fixed_msg_avoid_flip', val);
                   }
                 : null,
+          ),
+          _SettingsSwitchTile(
+            title: Text(l10n.optPermInvent),
+            subtitle: Text(l10n.permInventSub),
+            value: _optPermInvent,
+            onChanged: (val) {
+              setState(() => _optPermInvent = val);
+              _saveGameOption('nh_opt_perm_invent', val);
+            },
+          ),
+          _buildDropdownSettingTile<String>(
+            title: l10n.permInventPosition,
+            value: _permInventPosition,
+            items: [
+              DropdownMenuItem(value: 'right', child: Text(l10n.permInventPosRight)),
+              DropdownMenuItem(value: 'left', child: Text(l10n.permInventPosLeft)),
+            ],
+            onChanged: (val) {
+              if (_optPermInvent && val != null) {
+                setState(() => _permInventPosition = val);
+                _saveSetting('perm_invent_position', val);
+              }
+            },
+          ),
+          _SettingsSliderTile(
+            child: ListTile(
+              enabled: _optPermInvent,
+              title: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    l10n.permInventWidth,
+                    style: TextStyle(color: _optPermInvent ? Colors.white : Colors.white38),
+                  ),
+                  Text(
+                    '${(_permInventWidthRatio * 100).round()}%',
+                    style: TextStyle(
+                      fontSize: 14,
+                      color: _optPermInvent ? Colors.white70 : Colors.white38,
+                    ),
+                  ),
+                ],
+              ),
+              subtitle: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  _SettingsSlider(
+                    child: Slider(
+                      value: _permInventWidthRatio.clamp(0.20, 0.45),
+                      min: 0.20,
+                      max: 0.45,
+                      divisions: 25,
+                      label: '${(_permInventWidthRatio * 100).round()}%',
+                      onChanged: _optPermInvent
+                          ? (val) {
+                              final rounded = (val * 100).round() / 100.0;
+                              setState(() => _permInventWidthRatio = rounded);
+                              _saveSetting('perm_invent_width_ratio', rounded);
+                            }
+                          : null,
+                    ),
+                  ),
+                  Text(
+                    l10n.permInventWidthSub,
+                    style: TextStyle(
+                      fontSize: 12,
+                      color: _optPermInvent ? Colors.white60 : Colors.white38,
+                    ),
+                  ),
+                ],
+              ),
+            ),
           ),
         ]),
       ),
@@ -1522,7 +1604,22 @@ class _SettingsPageState extends State<SettingsPage> {
               fontMgr.setMenuFontSize(val);
             },
           ),
-          // 5. UIフォント ＋ UI全体拡大倍率
+          // 5. 常時表示インベントリフォント ＋ 常時表示インベントリフォントサイズ
+          _buildFontTargetTile(
+            target: FontTarget.permInvent,
+            title: l10n.fontPermInventLabel,
+          ),
+          _buildFontSizePtTile(
+            title: l10n.permInventFontSizeTitle,
+            description: l10n.permInventFontSizeDesc,
+            value: fontMgr.permInventFontSize,
+            labelText: l10n.fontSizePtLabel(fontMgr.permInventFontSize.round().toString()),
+            onChanged: (val) {
+              setState(() {});
+              fontMgr.setPermInventFontSize(val);
+            },
+          ),
+          // 6. UIフォント ＋ UI全体拡大倍率
           _buildFontTargetTile(
             target: FontTarget.ui,
             title: l10n.fontUiLabel,

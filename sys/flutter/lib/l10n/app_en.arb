@@ -661,5 +661,18 @@
   "optTerrainstatus": "Current Terrain (terrainstatus)",
   "terrainstatusSub": "Show current floor/terrain name on status bar",
   "statusSingleAllNote": "Note: '1 line (All fields)' works best with Variable Height or wide screens.",
-  "statusCompactHiddenHint": "* Hidden in 1 line (Ultra compact) mode"
+  "statusCompactHiddenHint": "* Hidden in 1 line (Ultra compact) mode",
+  "optPermInvent": "Permanent Inventory (perm_invent)",
+  "permInventSub": "Split-display your inventory on the side in landscape mode (auto-hidden in portrait)",
+  "permInventPosition": "Permanent Inventory Position",
+  "permInventPosRight": "Right",
+  "permInventPosLeft": "Left",
+  "permInventWidth": "Permanent Inventory Width",
+  "permInventWidthSub": "Width ratio in landscape mode (auto-clamped or hidden on narrow screens)",
+  "permInventTitle": "Inventory",
+  "permInventScrollModeHint": "Focused (a-z:Item / ↑↓/PgUp/PgDn/Space/Enter/Esc)",
+  "permInventEmpty": "Not carrying anything",
+  "fontPermInventLabel": "Permanent Inventory",
+  "permInventFontSizeTitle": "Permanent Inventory Font Size",
+  "permInventFontSizeDesc": "Adjusts the font size of the persistent inventory panel in landscape mode."
 }

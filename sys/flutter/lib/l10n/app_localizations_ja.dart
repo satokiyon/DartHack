@@ -1738,4 +1738,44 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get statusCompactHiddenHint => '※「1行（超コンパクト）」選択中は表示されません';
+
+  @override
+  String get optPermInvent => '常時表示インベントリ (perm_invent)';
+
+  @override
+  String get permInventSub => '横長画面で持ち物一覧を画面端に分割表示します（縦長画面では自動非表示）';
+
+  @override
+  String get permInventPosition => '常時表示インベントリの配置';
+
+  @override
+  String get permInventPosRight => '右側';
+
+  @override
+  String get permInventPosLeft => '左側';
+
+  @override
+  String get permInventWidth => '常時表示インベントリの幅';
+
+  @override
+  String get permInventWidthSub => '横長画面に対する表示幅の割合（画面が狭い場合は自動で縮小・非表示になります）';
+
+  @override
+  String get permInventTitle => '持ち物';
+
+  @override
+  String get permInventScrollModeHint =>
+      '操作中 (a-z:アイテム / ↑↓/PgUp/PgDn/Space/Enter/Esc)';
+
+  @override
+  String get permInventEmpty => '何も持っていない';
+
+  @override
+  String get fontPermInventLabel => '常時表示インベントリ';
+
+  @override
+  String get permInventFontSizeTitle => '常時表示インベントリフォントサイズ';
+
+  @override
+  String get permInventFontSizeDesc => '横長画面の常時表示インベントリパネルの文字サイズを調整します。';
 }

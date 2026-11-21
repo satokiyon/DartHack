@@ -62,7 +62,70 @@ class MenuItemData {
   }
 }
 
+class PermInventState {
+  final bool enabledByCore;
+  final List<MenuItemData> items;
+  final int revision;
+
+  const PermInventState({
+    this.enabledByCore = false,
+    this.items = const [],
+    this.revision = 0,
+  });
+}
+
 class NetHackScreen extends ChangeNotifier {
+  /// 常時表示インベントリ専用の状態通知（マップ再描画と分離）
+  final ValueNotifier<PermInventState> permInventNotifier =
+      ValueNotifier<PermInventState>(const PermInventState());
+
+  PermInventState get permInventState => permInventNotifier.value;
+
+  /// C 側の `\x1E` / `\x1F` 区切りスナップショットをパースして更新する
+  void applyPermInventSnapshot(String payload) {
+    final parsed = <MenuItemData>[];
+    if (payload.isNotEmpty) {
+      final records = payload.split('\x1E');
+      for (final rec in records) {
+        if (rec.isEmpty) continue;
+        final cols = rec.split('\x1F');
+        if (cols.length < 7) continue;
+        final ident = int.tryParse(cols[0]) ?? 0;
+        final accelerator = int.tryParse(cols[1]) ?? 0;
+        final groupacc = int.tryParse(cols[2]) ?? 0;
+        final attr = int.tryParse(cols[3]) ?? 0;
+        final color = int.tryParse(cols[4]) ?? -1;
+        final tile = int.tryParse(cols[5]) ?? -1;
+        final text = cols.sublist(6).join('\x1F');
+        parsed.add(MenuItemData(
+          ident: ident,
+          accelerator: accelerator,
+          groupacc: groupacc,
+          attr: attr,
+          text: text,
+          preselected: 0,
+          color: color,
+          tile: tile,
+        ));
+      }
+    }
+    permInventNotifier.value = PermInventState(
+      enabledByCore: true,
+      items: List<MenuItemData>.unmodifiable(parsed),
+      revision: permInventNotifier.value.revision + 1,
+    );
+  }
+
+  /// 常時表示インベントリをクリア・非表示状態にする
+  void clearPermInvent() {
+    final cur = permInventNotifier.value;
+    if (!cur.enabledByCore && cur.items.isEmpty) return;
+    permInventNotifier.value = PermInventState(
+      enabledByCore: false,
+      items: const [],
+      revision: cur.revision + 1,
+    );
+  }
   // ウィンドウタイプ定義
   static const int nhwMessage = 1;
   static const int nhwStatus = 2;

@@ -1303,5 +1303,364 @@ void main() {
         equals(const IgnoreKey()),
       );
     });
+
+    test('Game mode direct perm_invent scroll (PageUp/PageDown/Home/End) & numpad exclusion', () {
+      const pgDn = KeyDownEvent(
+        physicalKey: PhysicalKeyboardKey.pageDown,
+        logicalKey: LogicalKeyboardKey.pageDown,
+        timeStamp: Duration.zero,
+      );
+      const pgUp = KeyDownEvent(
+        physicalKey: PhysicalKeyboardKey.pageUp,
+        logicalKey: LogicalKeyboardKey.pageUp,
+        timeStamp: Duration.zero,
+      );
+      const home = KeyDownEvent(
+        physicalKey: PhysicalKeyboardKey.home,
+        logicalKey: LogicalKeyboardKey.home,
+        timeStamp: Duration.zero,
+      );
+      const end = KeyDownEvent(
+        physicalKey: PhysicalKeyboardKey.end,
+        logicalKey: LogicalKeyboardKey.end,
+        timeStamp: Duration.zero,
+      );
+      // NumLock OFF テンキー9 (logical=pageUp, physical=numpad9) は除外
+      const numpadPgUp = KeyDownEvent(
+        physicalKey: PhysicalKeyboardKey.numpad9,
+        logicalKey: LogicalKeyboardKey.pageUp,
+        timeStamp: Duration.zero,
+      );
+
+      expect(
+        HardwareKeyRouter.route(event: pgDn, context: KeyInputContext.game, hasPermInvent: true),
+        equals(const PermInventPage(1)),
+      );
+      expect(
+        HardwareKeyRouter.route(event: pgUp, context: KeyInputContext.game, hasPermInvent: true),
+        equals(const PermInventPage(-1)),
+      );
+      expect(
+        HardwareKeyRouter.route(event: home, context: KeyInputContext.game, hasPermInvent: true),
+        equals(const PermInventJumpEdge(true)),
+      );
+      expect(
+        HardwareKeyRouter.route(event: end, context: KeyInputContext.game, hasPermInvent: true),
+        equals(const PermInventJumpEdge(false)),
+      );
+      expect(
+        HardwareKeyRouter.route(event: pgDn, context: KeyInputContext.game, hasPermInvent: false),
+        equals(const SwallowKey()),
+      );
+      expect(
+        HardwareKeyRouter.route(event: numpadPgUp, context: KeyInputContext.game, hasPermInvent: true),
+        equals(const SwallowKey()),
+      );
+    });
+
+    test('permInvent scroll-only mode (#perminv / |) routes curses-compatible keys', () {
+      expect(
+        HardwareKeyRouter.route(
+          event: const KeyDownEvent(
+            physicalKey: PhysicalKeyboardKey.arrowDown,
+            logicalKey: LogicalKeyboardKey.arrowDown,
+            timeStamp: Duration.zero,
+          ),
+          context: KeyInputContext.permInvent,
+        ),
+        equals(const PermInventScroll(1)),
+      );
+      expect(
+        HardwareKeyRouter.route(
+          event: const KeyDownEvent(
+            physicalKey: PhysicalKeyboardKey.arrowUp,
+            logicalKey: LogicalKeyboardKey.arrowUp,
+            timeStamp: Duration.zero,
+          ),
+          context: KeyInputContext.permInvent,
+        ),
+        equals(const PermInventScroll(-1)),
+      );
+      expect(
+        HardwareKeyRouter.route(
+          event: const KeyDownEvent(
+            physicalKey: PhysicalKeyboardKey.period,
+            logicalKey: LogicalKeyboardKey.greater,
+            character: '>',
+            timeStamp: Duration.zero,
+          ),
+          context: KeyInputContext.permInvent,
+        ),
+        equals(const PermInventPage(1)),
+      );
+      expect(
+        HardwareKeyRouter.route(
+          event: const KeyDownEvent(
+            physicalKey: PhysicalKeyboardKey.comma,
+            logicalKey: LogicalKeyboardKey.less,
+            character: '<',
+            timeStamp: Duration.zero,
+          ),
+          context: KeyInputContext.permInvent,
+        ),
+        equals(const PermInventPage(-1)),
+      );
+      expect(
+        HardwareKeyRouter.route(
+          event: const KeyDownEvent(
+            physicalKey: PhysicalKeyboardKey.space,
+            logicalKey: LogicalKeyboardKey.space,
+            character: ' ',
+            timeStamp: Duration.zero,
+          ),
+          context: KeyInputContext.permInvent,
+        ),
+        equals(const PermInventSpaceAction()),
+      );
+      expect(
+        HardwareKeyRouter.route(
+          event: const KeyDownEvent(
+            physicalKey: PhysicalKeyboardKey.enter,
+            logicalKey: LogicalKeyboardKey.enter,
+            timeStamp: Duration.zero,
+          ),
+          context: KeyInputContext.permInvent,
+        ),
+        equals(const PermInventExit(resetScroll: true)),
+      );
+      expect(
+        HardwareKeyRouter.route(
+          event: const KeyDownEvent(
+            physicalKey: PhysicalKeyboardKey.escape,
+            logicalKey: LogicalKeyboardKey.escape,
+            timeStamp: Duration.zero,
+          ),
+          context: KeyInputContext.permInvent,
+        ),
+        equals(const PermInventExit(resetScroll: false)),
+      );
+      expect(
+        HardwareKeyRouter.route(
+          event: const KeyDownEvent(
+            physicalKey: PhysicalKeyboardKey.keyC,
+            logicalKey: LogicalKeyboardKey.keyC,
+            timeStamp: Duration.zero,
+          ),
+          context: KeyInputContext.permInvent,
+          isControlPressed: true,
+        ),
+        equals(const PermInventExit(resetScroll: false)),
+      );
+      // アクセラレータ文字 (a-z / A-Z / $) は KeyDownEvent で PermInventSelectItem
+      expect(
+        HardwareKeyRouter.route(
+          event: const KeyDownEvent(
+            physicalKey: PhysicalKeyboardKey.keyA,
+            logicalKey: LogicalKeyboardKey.keyA,
+            character: 'a',
+            timeStamp: Duration.zero,
+          ),
+          context: KeyInputContext.permInvent,
+        ),
+        equals(const PermInventSelectItem(97)),
+      );
+      expect(
+        HardwareKeyRouter.route(
+          event: const KeyDownEvent(
+            physicalKey: PhysicalKeyboardKey.keyZ,
+            logicalKey: LogicalKeyboardKey.keyZ,
+            character: 'Z',
+            timeStamp: Duration.zero,
+          ),
+          context: KeyInputContext.permInvent,
+          isShiftPressed: true,
+        ),
+        equals(const PermInventSelectItem(90)),
+      );
+      expect(
+        HardwareKeyRouter.route(
+          event: const KeyDownEvent(
+            physicalKey: PhysicalKeyboardKey.digit4,
+            logicalKey: LogicalKeyboardKey.dollar,
+            character: r'$',
+            timeStamp: Duration.zero,
+          ),
+          context: KeyInputContext.permInvent,
+          isShiftPressed: true,
+        ),
+        equals(const PermInventSelectItem(36)),
+      );
+      // KeyRepeatEvent や非アクセラレータ文字 (数字等) は SwallowKey
+      expect(
+        HardwareKeyRouter.route(
+          event: const KeyRepeatEvent(
+            physicalKey: PhysicalKeyboardKey.keyA,
+            logicalKey: LogicalKeyboardKey.keyA,
+            character: 'a',
+            timeStamp: Duration.zero,
+          ),
+          context: KeyInputContext.permInvent,
+        ),
+        equals(const SwallowKey()),
+      );
+      expect(
+        HardwareKeyRouter.route(
+          event: const KeyDownEvent(
+            physicalKey: PhysicalKeyboardKey.digit1,
+            logicalKey: LogicalKeyboardKey.digit1,
+            character: '1',
+            timeStamp: Duration.zero,
+          ),
+          context: KeyInputContext.permInvent,
+        ),
+        equals(const SwallowKey()),
+      );
+      // Tab / Shift+Tab で GameTab へルーティング（KeyRepeat は SwallowKey）
+      expect(
+        HardwareKeyRouter.route(
+          event: const KeyDownEvent(
+            physicalKey: PhysicalKeyboardKey.tab,
+            logicalKey: LogicalKeyboardKey.tab,
+            timeStamp: Duration.zero,
+          ),
+          context: KeyInputContext.permInvent,
+        ),
+        equals(const GameTab(forward: true)),
+      );
+      expect(
+        HardwareKeyRouter.route(
+          event: const KeyDownEvent(
+            physicalKey: PhysicalKeyboardKey.tab,
+            logicalKey: LogicalKeyboardKey.tab,
+            timeStamp: Duration.zero,
+          ),
+          context: KeyInputContext.permInvent,
+          isShiftPressed: true,
+        ),
+        equals(const GameTab(forward: false)),
+      );
+      expect(
+        HardwareKeyRouter.route(
+          event: const KeyRepeatEvent(
+            physicalKey: PhysicalKeyboardKey.tab,
+            logicalKey: LogicalKeyboardKey.tab,
+            timeStamp: Duration.zero,
+          ),
+          context: KeyInputContext.permInvent,
+        ),
+        equals(const SwallowKey()),
+      );
+    });
+
+    test('cycleGameFocusStop cycles menu -> fullMap -> permInvent -> none and reverse', () {
+      // 順方向 (Tab): none -> menu -> fullMap -> permInvent -> none
+      var stop = GameFocusStop.none;
+      stop = cycleGameFocusStop(
+        current: stop,
+        forward: true,
+        hasMenuButton: true,
+        hasMapButton: true,
+        hasPermInvent: true,
+      );
+      expect(stop, GameFocusStop.menu);
+
+      stop = cycleGameFocusStop(
+        current: stop,
+        forward: true,
+        hasMenuButton: true,
+        hasMapButton: true,
+        hasPermInvent: true,
+      );
+      expect(stop, GameFocusStop.fullMap);
+
+      stop = cycleGameFocusStop(
+        current: stop,
+        forward: true,
+        hasMenuButton: true,
+        hasMapButton: true,
+        hasPermInvent: true,
+      );
+      expect(stop, GameFocusStop.permInvent);
+
+      stop = cycleGameFocusStop(
+        current: stop,
+        forward: true,
+        hasMenuButton: true,
+        hasMapButton: true,
+        hasPermInvent: true,
+      );
+      expect(stop, GameFocusStop.none);
+
+      // 逆方向 (Shift+Tab): none -> permInvent -> fullMap -> menu -> none
+      stop = cycleGameFocusStop(
+        current: stop,
+        forward: false,
+        hasMenuButton: true,
+        hasMapButton: true,
+        hasPermInvent: true,
+      );
+      expect(stop, GameFocusStop.permInvent);
+
+      stop = cycleGameFocusStop(
+        current: stop,
+        forward: false,
+        hasMenuButton: true,
+        hasMapButton: true,
+        hasPermInvent: true,
+      );
+      expect(stop, GameFocusStop.fullMap);
+
+      stop = cycleGameFocusStop(
+        current: stop,
+        forward: false,
+        hasMenuButton: true,
+        hasMapButton: true,
+        hasPermInvent: true,
+      );
+      expect(stop, GameFocusStop.menu);
+
+      stop = cycleGameFocusStop(
+        current: stop,
+        forward: false,
+        hasMenuButton: true,
+        hasMapButton: true,
+        hasPermInvent: true,
+      );
+      expect(stop, GameFocusStop.none);
+
+      // permInvent 非表示時は fullMap -> none になること
+      expect(
+        cycleGameFocusStop(
+          current: GameFocusStop.fullMap,
+          forward: true,
+          hasMenuButton: true,
+          hasMapButton: true,
+          hasPermInvent: false,
+        ),
+        GameFocusStop.none,
+      );
+
+      // ボタン非表示＋permInvent 表示時は none <-> permInvent
+      expect(
+        cycleGameFocusStop(
+          current: GameFocusStop.none,
+          forward: true,
+          hasMenuButton: false,
+          hasMapButton: false,
+          hasPermInvent: true,
+        ),
+        GameFocusStop.permInvent,
+      );
+      expect(
+        cycleGameFocusStop(
+          current: GameFocusStop.permInvent,
+          forward: true,
+          hasMenuButton: false,
+          hasMapButton: false,
+          hasPermInvent: true,
+        ),
+        GameFocusStop.none,
+      );
+    });
   });
 }

@@ -261,6 +261,18 @@ void main() {
       expect(manager.menuFontSize, 20.0);
       expect(mockPrefs.getDouble(FontManager.prefMenuFontSize), 20.0);
 
+      await manager.setPermInventFontSize(11.0);
+      expect(manager.permInventFontSize, 11.0);
+      expect(mockPrefs.getDouble(FontManager.prefPermInventFontSize), 11.0);
+
+      await manager.setPermInventFontSize(50.0);
+      expect(manager.permInventFontSize, 32.0);
+      expect(mockPrefs.getDouble(FontManager.prefPermInventFontSize), 32.0);
+
+      await manager.setFont(FontTarget.permInvent, 'MisakiGothic');
+      expect(manager.getSelectedFont(FontTarget.permInvent).id, 'MisakiGothic');
+      expect(mockPrefs.getString(FontManager.prefFontPermInvent), 'MisakiGothic');
+
       await manager.setUiFontScale(3.0);
       expect(manager.uiFontScale, 2.5);
       expect(mockPrefs.getDouble(FontManager.prefUiFontScale), 2.5);
@@ -279,6 +291,7 @@ void main() {
       expect(manager.messageFontSize, 17.0);
       expect(manager.statusFontSize, 16.0);
       expect(manager.menuFontSize, 18.0);
+      expect(manager.permInventFontSize, 16.0);
       expect(manager.uiFontScale, 1.25);
 
       await manager.applySizePreset(FontSizePreset.extraLarge);
@@ -286,6 +299,7 @@ void main() {
       expect(manager.messageFontSize, 21.0);
       expect(manager.statusFontSize, 20.0);
       expect(manager.menuFontSize, 22.0);
+      expect(manager.permInventFontSize, 20.0);
       expect(manager.uiFontScale, 1.5);
 
       await manager.applySizePreset(FontSizePreset.standard);
@@ -293,6 +307,7 @@ void main() {
       expect(manager.messageFontSize, 13.0);
       expect(manager.statusFontSize, 13.0);
       expect(manager.menuFontSize, 14.0);
+      expect(manager.permInventFontSize, 13.0);
       expect(manager.uiFontScale, 1.0);
     });
 

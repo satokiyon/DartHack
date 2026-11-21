@@ -59,7 +59,18 @@ typedef DartSoundEventCallback = Void Function(
   Int32 loopOrFlag,
 );
 
-// ★21個の引数による ARM64 スタック破綻を回避する構造体定義
+typedef PermInventEventCallback = Void Function(
+  Int32 eventType,
+  Pointer<Utf8> payload,
+);
+
+typedef SetPermInventFunc = Void Function(Int32 enabled);
+typedef SetPermInventDart = void Function(int enabled);
+
+typedef TriggerItemActionFunc = Void Function(Int32 invlet);
+typedef TriggerItemActionDart = void Function(int invlet);
+
+// ★22個の引数による ARM64 スタック破綻を回避する構造体定義
 final class FlutterCallbacksStruct extends Struct {
   external Pointer<NativeFunction<CreateWindowCallback>> createCb;
   external Pointer<NativeFunction<ClearWindowCallback>> clearCb;
@@ -82,6 +93,7 @@ final class FlutterCallbacksStruct extends Struct {
   external Pointer<NativeFunction<PutMixedWithTileCallback>> putMixedCb;
   external Pointer<NativeFunction<NewLevelRestCallback>> newLevelRestCb;
   external Pointer<NativeFunction<DartSoundEventCallback>> soundEventCb;
+  external Pointer<NativeFunction<PermInventEventCallback>> permInventCb;
 }
 
 typedef RegisterCallbacksStructFunc = Void Function(Pointer<FlutterCallbacksStruct> cbs);
@@ -261,6 +273,8 @@ class NetHackFfi {
   late final RequestSymsetChangeDart requestSymsetChangeNative;
   late final SetStatusLayoutDart setStatusLayoutNative;
   late final RequestStatusOptionsChangeDart requestStatusOptionsChangeNative;
+  late final SetPermInventDart setPermInventNative;
+  late final TriggerItemActionDart triggerItemActionNative;
 
   NetHackFfi([String? langCode]) {
     final effectiveLang = langCode ?? NetHackCoreLoader.currentLanguage;
@@ -436,6 +450,38 @@ class NetHackFfi {
           .asFunction<RequestStatusOptionsChangeDart>();
     } catch (e) {
       requestStatusOptionsChangeNative = (_, _, _, _, _, _, _, _, _) {};
+    }
+
+    try {
+      setPermInventNative = _lib
+          .lookup<NativeFunction<SetPermInventFunc>>('flutter_set_perm_invent')
+          .asFunction<SetPermInventDart>();
+    } catch (e) {
+      setPermInventNative = (_) {};
+    }
+
+    try {
+      triggerItemActionNative = _lib
+          .lookup<NativeFunction<TriggerItemActionFunc>>('flutter_trigger_item_action')
+          .asFunction<TriggerItemActionDart>();
+    } catch (e) {
+      triggerItemActionNative = (_) {};
+    }
+  }
+
+  void setPermInvent(bool enabled) {
+    try {
+      setPermInventNative(enabled ? 1 : 0);
+    } catch (e) {
+      debugPrint("Warning: Failed to set perm_invent: $e");
+    }
+  }
+
+  void triggerItemAction(int invlet) {
+    try {
+      triggerItemActionNative(invlet);
+    } catch (e) {
+      debugPrint("Warning: Failed to trigger item action: $e");
     }
   }
 

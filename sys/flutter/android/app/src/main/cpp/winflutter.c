@@ -108,7 +108,7 @@ int nhcolor_to_RGB(int c)
 struct window_procs and_procs = {
     "and",
     (enum wp_ids) 0,
-    WC_COLOR | WC_HILITE_PET | WC_INVERSE | WC_EIGHT_BIT_IN,
+    WC_COLOR | WC_HILITE_PET | WC_INVERSE | WC_EIGHT_BIT_IN | WC_PERM_INVENT,
     WC2_HILITE_STATUS | WC2_FLUSH_STATUS | WC2_SUPPRESS_HIST | WC2_STATUSLINES | WC2_EXTRASTATUS,
     {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0},
 };
@@ -492,8 +492,25 @@ typedef void (*DartNumberPadModeCallback)(int state);
 typedef void (*DartCliparoundCallback)(int x, int y, int playerX, int playerY);
 typedef void (*DartPutMixedWithTileCallback)(int winId, int attr, int tile, const char* str);
 typedef void (*DartNewLevelRestCallback)(void);
+typedef void (*DartPermInventEventCallback)(int eventType, const char* payload);
 
 static DartNewLevelRestCallback g_new_level_rest_cb = NULL;
+static DartPermInventEventCallback g_perm_invent_cb = NULL;
+
+/* 常時表示インベントリ (perm_invent) 専用スナップショットバッファ (4面×16KB) */
+#define PERMINV_EVT_CLEAR 0
+#define PERMINV_EVT_SNAPSHOT 1
+#define PERMINV_EVT_ENTER_SCROLL 2
+#define PERMINV_SNAP_COUNT 4
+#define PERMINV_SNAP_SIZE 16384
+static char g_perminv_snaps[PERMINV_SNAP_COUNT][PERMINV_SNAP_SIZE];
+static int g_perminv_snap_idx = 0;
+static char g_perminv_work[PERMINV_SNAP_SIZE];
+static size_t g_perminv_work_len = 0;
+static int g_perminv_initial_synced = 0;
+static volatile int g_pending_perm_invent_update = 0;
+static volatile int g_pending_perm_invent_val = 0;
+static volatile int g_pending_item_action_let = 0;
 
 static DartCreateWindowCallback g_create_window_cb = NULL;
 static DartClearWindowCallback g_clear_window_cb = NULL;
@@ -700,6 +717,7 @@ typedef struct {
     DartPutMixedWithTileCallback putmixed_cb;
     DartNewLevelRestCallback newlevel_rest_cb;
     DartSoundEventCallback sound_event_cb;
+    DartPermInventEventCallback perm_invent_cb;
 } FlutterCallbacksStruct;
 
 NH_EXPORT void RegisterFlutterCallbacksStruct(const FlutterCallbacksStruct *cbs) {
@@ -725,6 +743,7 @@ NH_EXPORT void RegisterFlutterCallbacksStruct(const FlutterCallbacksStruct *cbs)
     g_putmixed_cb = cbs->putmixed_cb;
     g_new_level_rest_cb = cbs->newlevel_rest_cb;
     g_sound_event_cb = cbs->sound_event_cb;
+    g_perm_invent_cb = cbs->perm_invent_cb;
     LOGD("All Flutter callbacks registered successfully via struct!");
 }
 
@@ -1446,6 +1465,13 @@ static void flutter_display_nhwindow(winid window, boolean blocking) {
 
 static void flutter_destroy_nhwindow(winid window) {
     debuglog("flutter_destroy_nhwindow win=%d", window);
+    if (WIN_INVEN != WIN_ERR && window == WIN_INVEN) {
+        g_perminv_initial_synced = 0;
+        if (g_perm_invent_cb) {
+            g_perm_invent_cb(PERMINV_EVT_CLEAR, "");
+        }
+        return;
+    }
     if (g_destroy_window_cb) {
         g_destroy_window_cb((int)window);
     }
@@ -1868,6 +1894,55 @@ static void check_and_apply_pending_status_options(void) {
     }
 }
 
+static void flutter_update_inventory(int status);
+
+NH_EXPORT void flutter_set_perm_invent(int enabled) {
+    g_pending_perm_invent_val = enabled ? 1 : 0;
+    g_pending_perm_invent_update = 1;
+    debuglog("flutter_set_perm_invent queued: enabled=%d", g_pending_perm_invent_val);
+}
+
+NH_EXPORT void flutter_trigger_item_action(int invlet) {
+    if (invlet > 0 && invlet < 128) {
+        g_pending_item_action_let = invlet;
+        debuglog("flutter_trigger_item_action queued: invlet='%c' (%d)", (char)invlet, invlet);
+    }
+}
+
+static int check_and_apply_pending_perm_invent(void) {
+    if (g_pending_perm_invent_update) {
+        g_pending_perm_invent_update = 0;
+        iflags.perm_invent = g_pending_perm_invent_val ? TRUE : FALSE;
+        if (iflags.perm_invent && iflags.perminv_mode == InvOptNone) {
+            iflags.perminv_mode = InvOptOn;
+        }
+        if (program_state.in_moveloop) {
+            flutter_update_inventory(0);
+        } else if (!iflags.perm_invent && g_perm_invent_cb) {
+            g_perminv_initial_synced = 0;
+            g_perm_invent_cb(PERMINV_EVT_CLEAR, "");
+        }
+    }
+
+    if (program_state.in_moveloop && iflags.perm_invent && !g_perminv_initial_synced) {
+        flutter_update_inventory(0);
+    }
+
+    if (g_pending_item_action_let != 0) {
+        int let = g_pending_item_action_let;
+        g_pending_item_action_let = 0;
+        if (program_state.in_moveloop && program_state.input_state == commandInp && !g_in_display_blocking) {
+            extern void cmdq_add_key(int q, char key);
+            cmdq_add_key(0 /* CQ_CANNED */, (char)let);
+            g_key_available = 1;
+            g_last_received_key = 'i';
+            debuglog("check_and_apply_pending_perm_invent: dispatching item action for '%c'", (char)let);
+            return 'i';
+        }
+    }
+    return 0;
+}
+
 // ユーザー入力待ち (キー取得)
 static int flutter_nhgetch(void) {
     debuglog("flutter_nhgetch called. Waiting for key...");
@@ -1875,6 +1950,12 @@ static int flutter_nhgetch(void) {
     check_and_perform_autosave();
     check_and_apply_pending_symset();
     check_and_apply_pending_status_options();
+    {
+        int injected = check_and_apply_pending_perm_invent();
+        if (injected != 0) {
+            return injected;
+        }
+    }
 
     if (g_poscmd_count > 0) {
         PosCmdEntry cmd = g_poscmd_queue[g_poscmd_head];
@@ -1938,6 +2019,12 @@ static int flutter_nhgetch(void) {
         check_and_perform_autosave();
         check_and_apply_pending_symset();
         check_and_apply_pending_status_options();
+        {
+            int injected = check_and_apply_pending_perm_invent();
+            if (injected != 0) {
+                return injected;
+            }
+        }
         if (g_poscmd_count > 0) {
             PosCmdEntry cmd = g_poscmd_queue[g_poscmd_head];
             g_poscmd_head = (g_poscmd_head + 1) % FLUTTER_MAX_POSCMD;
@@ -2314,8 +2401,77 @@ static void flutter_print_glyph(winid wid, coordxy x, coordxy y, const glyph_inf
 // メニューウィンドウ用のハイジャック関数群
 // ----------------------------------------------------
 
+static int is_perminv_active_window(winid wid) {
+    return (WIN_INVEN != WIN_ERR && wid == WIN_INVEN && iflags.perm_invent && !iflags.in_dumplog);
+}
+
+static int is_perminv_init_dummy(winid wid) {
+    return (WIN_INVEN != WIN_ERR && wid == WIN_INVEN && !iflags.perm_invent && !program_state.in_moveloop);
+}
+
+static void perminv_work_append_raw(const char *s, size_t n) {
+    if (!s || n == 0) return;
+    if (g_perminv_work_len + n >= PERMINV_SNAP_SIZE - 1) {
+        return;
+    }
+    memcpy(g_perminv_work + g_perminv_work_len, s, n);
+    g_perminv_work_len += n;
+    g_perminv_work[g_perminv_work_len] = '\0';
+}
+
+/* 共有リングバッファを使わずに CP437→UTF-8 変換して専用バッファへ追記する */
+static void perminv_work_append_cp437(const char *str) {
+    if (!str) return;
+    const unsigned char *p = (const unsigned char *)str;
+    while (*p && g_perminv_work_len < PERMINV_SNAP_SIZE - 8) {
+        unsigned char c = *p;
+        if (c == '\r' || c == '\n' || c == 0x1E || c == 0x1F) {
+            g_perminv_work[g_perminv_work_len++] = ' ';
+            p++;
+            continue;
+        }
+        if (c < 0x80) {
+            g_perminv_work[g_perminv_work_len++] = (char)c;
+            p++;
+            continue;
+        }
+        /* 有効な UTF-8 マルチバイト文字はそのままコピー */
+        int utf8_len = 0;
+        if ((c & 0xE0) == 0xC0 && p[1] && (p[1] & 0xC0) == 0x80) utf8_len = 2;
+        else if ((c & 0xF0) == 0xE0 && p[1] && p[2] && (p[1] & 0xC0) == 0x80 && (p[2] & 0xC0) == 0x80) utf8_len = 3;
+        else if ((c & 0xF8) == 0xF0 && p[1] && p[2] && p[3] && (p[1] & 0xC0) == 0x80 && (p[2] & 0xC0) == 0x80 && (p[3] & 0xC0) == 0x80) utf8_len = 4;
+        if (utf8_len > 0) {
+            memcpy(g_perminv_work + g_perminv_work_len, p, (size_t)utf8_len);
+            g_perminv_work_len += (size_t)utf8_len;
+            p += utf8_len;
+            continue;
+        }
+        unsigned short uval = cp437_to_unicode[c];
+        if (uval < 0x80) {
+            g_perminv_work[g_perminv_work_len++] = (char)uval;
+        } else if (uval < 0x800) {
+            g_perminv_work[g_perminv_work_len++] = (char)(0xC0 | ((uval >> 6) & 0x1F));
+            g_perminv_work[g_perminv_work_len++] = (char)(0x80 | (uval & 0x3F));
+        } else {
+            g_perminv_work[g_perminv_work_len++] = (char)(0xE0 | ((uval >> 12) & 0x0F));
+            g_perminv_work[g_perminv_work_len++] = (char)(0x80 | ((uval >> 6) & 0x3F));
+            g_perminv_work[g_perminv_work_len++] = (char)(0x80 | (uval & 0x3F));
+        }
+        p++;
+    }
+    g_perminv_work[g_perminv_work_len] = '\0';
+}
+
 static void flutter_start_menu(winid wid, unsigned long behavior) {
     debuglog("flutter_start_menu win=%d", wid);
+    if (is_perminv_active_window(wid)) {
+        g_perminv_work_len = 0;
+        g_perminv_work[0] = '\0';
+        return;
+    }
+    if (is_perminv_init_dummy(wid)) {
+        return;
+    }
     if (g_start_menu_cb) {
         g_start_menu_cb((int)wid);
     }
@@ -2324,6 +2480,30 @@ static void flutter_start_menu(winid wid, unsigned long behavior) {
 static void flutter_add_menu(winid wid, const glyph_info *glyphinfo, const anything *ident, char accelerator, char groupacc, int attr, int color, const char *str, unsigned int itemflags) {
     debuglog("flutter_add_menu win=%d, acc=%c, str=%s", wid, accelerator, str);
     int tile = (glyphinfo == &nul_glyphinfo) ? -1 : glyphinfo->gm.tileidx;
+
+    if (is_perminv_active_window(wid)) {
+        if (!str) return;
+        intptr_t menu_ident = 0;
+        if (ident) {
+            memcpy(&menu_ident, ident, sizeof(void *));
+            if ((sizeof(void *) == 8) && ((menu_ident & 0xFFFFFFFF00000000ULL) == 0) && (((int)ident->a_int) < 0)) {
+                menu_ident = (intptr_t)(int)ident->a_int;
+            }
+        }
+        char hdr[128];
+        int n = snprintf(hdr, sizeof(hdr), "%lld\x1F%d\x1F%d\x1F%d\x1F%d\x1F%d\x1F",
+                         (long long)menu_ident, (int)(unsigned char)accelerator,
+                         (int)(unsigned char)groupacc, attr, color, tile);
+        if (n > 0) {
+            perminv_work_append_raw(hdr, (size_t)n);
+            perminv_work_append_cp437(str);
+            perminv_work_append_raw("\x1E", 1);
+        }
+        return;
+    }
+    if (is_perminv_init_dummy(wid)) {
+        return;
+    }
     
     if (g_add_menu_cb && str) {
         char* conv = convert_cp437_to_utf8(str);
@@ -2350,6 +2530,18 @@ static void flutter_add_menu(winid wid, const glyph_info *glyphinfo, const anyth
 
 static void flutter_end_menu(winid wid, const char *prompt) {
     debuglog("flutter_end_menu win=%d, prompt=%s", wid, prompt ? prompt : "");
+    if (is_perminv_active_window(wid)) {
+        if (g_perm_invent_cb) {
+            int idx = g_perminv_snap_idx;
+            g_perminv_snap_idx = (g_perminv_snap_idx + 1) % PERMINV_SNAP_COUNT;
+            memcpy(g_perminv_snaps[idx], g_perminv_work, g_perminv_work_len + 1);
+            g_perm_invent_cb(PERMINV_EVT_SNAPSHOT, g_perminv_snaps[idx]);
+        }
+        return;
+    }
+    if (is_perminv_init_dummy(wid)) {
+        return;
+    }
     if (g_end_menu_cb) {
         char* conv = prompt ? convert_cp437_to_utf8(prompt) : NULL;
         g_end_menu_cb((int)wid, conv ? conv : (prompt ? prompt : ""));
@@ -2358,6 +2550,10 @@ static void flutter_end_menu(winid wid, const char *prompt) {
 
 static int flutter_select_menu(winid wid, int how, menu_item **selected) {
     debuglog("flutter_select_menu win=%d, how=%d", wid, how);
+    if (is_perminv_active_window(wid)) {
+        if (selected) *selected = NULL;
+        return 0;
+    }
     
     g_selected_menu_item = -2; // 未選択状態
     g_selected_menu_count = -2;
@@ -2615,7 +2811,24 @@ static void flutter_wait_synch(void) {
         debuglog("flutter_wait_synch: early init phase, returning to allow progress.");
     }
 }
-static void flutter_update_inventory(int status UNUSED) {}
+static void flutter_update_inventory(int status) {
+    if (!iflags.perm_invent) {
+        g_perminv_initial_synced = 0;
+        if (g_perm_invent_cb) {
+            g_perm_invent_cb(PERMINV_EVT_CLEAR, "");
+        }
+        return;
+    }
+    if (status != 0) {
+        /* #perminv ('|') コマンドからのスクロールモード開始通知 */
+        if (g_perm_invent_cb) {
+            g_perm_invent_cb(PERMINV_EVT_ENTER_SCROLL, "");
+        }
+        return;
+    }
+    g_perminv_initial_synced = 1;
+    repopulate_perminvent();
+}
 static win_request_info *flutter_ctrl_nhwindow(winid window UNUSED, int request UNUSED, win_request_info *wri UNUSED) {
     return (win_request_info *) 0;
 }
@@ -2691,6 +2904,7 @@ static void HijackWindowProcs(void) {
     flutter_procs.win_update_inventory = flutter_update_inventory;
     flutter_procs.win_ctrl_nhwindow = flutter_ctrl_nhwindow;
 
+    flutter_procs.wincap |= WC_PERM_INVENT;
     flutter_procs.wincap2 |= (WC2_HILITE_STATUS | WC2_FLUSH_STATUS | WC2_HITPOINTBAR | WC2_STATUSLINES | WC2_EXTRASTATUS);
 
     and_procs = flutter_procs;

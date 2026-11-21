@@ -662,5 +662,18 @@
   "optTerrainstatus": "足元地形表示 (terrainstatus)",
   "terrainstatusSub": "現在立っている場所の地形名をステータス欄に表示します",
   "statusSingleAllNote": "※「1行（全項目を1行表示）」は項目が多いため、「可変高さ」表示または横長画面での利用を推奨します",
-  "statusCompactHiddenHint": "※「1行（超コンパクト）」選択中は表示されません"
+  "statusCompactHiddenHint": "※「1行（超コンパクト）」選択中は表示されません",
+  "optPermInvent": "常時表示インベントリ (perm_invent)",
+  "permInventSub": "横長画面で持ち物一覧を画面端に分割表示します（縦長画面では自動非表示）",
+  "permInventPosition": "常時表示インベントリの配置",
+  "permInventPosRight": "右側",
+  "permInventPosLeft": "左側",
+  "permInventWidth": "常時表示インベントリの幅",
+  "permInventWidthSub": "横長画面に対する表示幅の割合（画面が狭い場合は自動で縮小・非表示になります）",
+  "permInventTitle": "持ち物",
+  "permInventScrollModeHint": "操作中 (a-z:アイテム / ↑↓/PgUp/PgDn/Space/Enter/Esc)",
+  "permInventEmpty": "何も持っていない",
+  "fontPermInventLabel": "常時表示インベントリ",
+  "permInventFontSizeTitle": "常時表示インベントリフォントサイズ",
+  "permInventFontSizeDesc": "横長画面の常時表示インベントリパネルの文字サイズを調整します。"
 }

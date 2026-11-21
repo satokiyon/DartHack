@@ -467,4 +467,33 @@ OPTIONS=statuslines:3, weaponstatus, armorstatus, terrainstatus
     expect(saved.contains('!terrainstatus'), isTrue);
     expect(prefs.getInt('nh_opt_statuslines'), equals(2));
   });
+
+  test('perm_invent の defaults.nh 読込・保存・未記載時デフォルト false の検証', () async {
+    final file = File(testFilePath);
+    await file.writeAsString('OPTIONS=autopickup\n');
+    await AppPrefs.setMockInitialValues({});
+
+    final helper = DefaultsHelper();
+    await helper.syncFromFileToPrefs(testFilePath);
+    final prefs = await AppPrefs.getInstance();
+    expect(prefs.getBool('nh_opt_perm_invent'), isFalse);
+
+    // ON にして defaults.nh へ保存
+    await prefs.setBool('nh_opt_perm_invent', true);
+    await helper.syncFromPrefsToFile(testFilePath);
+    var saved = await file.readAsString();
+    expect(saved.contains('perm_invent'), isTrue);
+    expect(saved.contains('!perm_invent'), isFalse);
+
+    // 再読込して true が復元されること
+    await AppPrefs.setMockInitialValues({});
+    await helper.syncFromFileToPrefs(testFilePath);
+    expect((await AppPrefs.getInstance()).getBool('nh_opt_perm_invent'), isTrue);
+
+    // OFF にして !perm_invent で保存されること
+    await (await AppPrefs.getInstance()).setBool('nh_opt_perm_invent', false);
+    await helper.syncFromPrefsToFile(testFilePath);
+    saved = await file.readAsString();
+    expect(saved.contains('!perm_invent'), isTrue);
+  });
 }

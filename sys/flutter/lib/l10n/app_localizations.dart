@@ -3373,6 +3373,84 @@ abstract class AppLocalizations {
   /// In ja, this message translates to:
   /// **'※「1行（超コンパクト）」選択中は表示されません'**
   String get statusCompactHiddenHint;
+
+  /// No description provided for @optPermInvent.
+  ///
+  /// In ja, this message translates to:
+  /// **'常時表示インベントリ (perm_invent)'**
+  String get optPermInvent;
+
+  /// No description provided for @permInventSub.
+  ///
+  /// In ja, this message translates to:
+  /// **'横長画面で持ち物一覧を画面端に分割表示します（縦長画面では自動非表示）'**
+  String get permInventSub;
+
+  /// No description provided for @permInventPosition.
+  ///
+  /// In ja, this message translates to:
+  /// **'常時表示インベントリの配置'**
+  String get permInventPosition;
+
+  /// No description provided for @permInventPosRight.
+  ///
+  /// In ja, this message translates to:
+  /// **'右側'**
+  String get permInventPosRight;
+
+  /// No description provided for @permInventPosLeft.
+  ///
+  /// In ja, this message translates to:
+  /// **'左側'**
+  String get permInventPosLeft;
+
+  /// No description provided for @permInventWidth.
+  ///
+  /// In ja, this message translates to:
+  /// **'常時表示インベントリの幅'**
+  String get permInventWidth;
+
+  /// No description provided for @permInventWidthSub.
+  ///
+  /// In ja, this message translates to:
+  /// **'横長画面に対する表示幅の割合（画面が狭い場合は自動で縮小・非表示になります）'**
+  String get permInventWidthSub;
+
+  /// No description provided for @permInventTitle.
+  ///
+  /// In ja, this message translates to:
+  /// **'持ち物'**
+  String get permInventTitle;
+
+  /// No description provided for @permInventScrollModeHint.
+  ///
+  /// In ja, this message translates to:
+  /// **'操作中 (a-z:アイテム / ↑↓/PgUp/PgDn/Space/Enter/Esc)'**
+  String get permInventScrollModeHint;
+
+  /// No description provided for @permInventEmpty.
+  ///
+  /// In ja, this message translates to:
+  /// **'何も持っていない'**
+  String get permInventEmpty;
+
+  /// No description provided for @fontPermInventLabel.
+  ///
+  /// In ja, this message translates to:
+  /// **'常時表示インベントリ'**
+  String get fontPermInventLabel;
+
+  /// No description provided for @permInventFontSizeTitle.
+  ///
+  /// In ja, this message translates to:
+  /// **'常時表示インベントリフォントサイズ'**
+  String get permInventFontSizeTitle;
+
+  /// No description provided for @permInventFontSizeDesc.
+  ///
+  /// In ja, this message translates to:
+  /// **'横長画面の常時表示インベントリパネルの文字サイズを調整します。'**
+  String get permInventFontSizeDesc;
 }
 
 class _AppLocalizationsDelegate

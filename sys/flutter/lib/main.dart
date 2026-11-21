@@ -53,6 +53,7 @@ import 'widgets/overlays/getline_overlay.dart';
 import 'widgets/overlays/askname_overlay.dart';
 import 'widgets/overlays/text_overlay.dart';
 import 'widgets/status_bar_view.dart';
+import 'widgets/permanent_inventory_panel.dart';
 
 export 'widgets/status_bar_view.dart'
     show
@@ -232,6 +233,10 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
   String _mapFixedMsgInsetMode = 'auto'; // 'auto' | 'always_on' | 'always_off'
   bool _mapFixedMsgAvoidFlip = true; // メッセージ位置の自動反転
   String? _dynamicMsgPositionOverride; // 動的反転による一時的な配置オーバーライド
+  String _permInventPosition = 'right'; // 'right' | 'left'
+  double _permInventWidthRatio = 0.28; // 0.20 .. 0.45
+  bool _isPermInventScrollMode = false; // #perminv ('|') スクロール専用モード
+  final ScrollController _permInventScrollController = ScrollController();
 
   // --- 新規同期ダイアログ用状態変数 ---
   bool _isYnVisible = false;
@@ -455,6 +460,10 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
       _scrollAmount = prefs.getInt('scroll_amount') ?? 3;
       _mapFixedMsgInsetMode = prefs.getString('map_fixed_msg_inset_mode') ?? 'auto';
       _mapFixedMsgAvoidFlip = prefs.getBool('map_fixed_msg_avoid_flip') ?? true;
+      final rawPermPos = prefs.getString('perm_invent_position') ?? 'right';
+      _permInventPosition = (rawPermPos == 'left') ? 'left' : 'right';
+      _permInventWidthRatio =
+          (prefs.getDouble('perm_invent_width_ratio') ?? 0.28).clamp(0.20, 0.45);
       if (_cameraFollowMode == 'center' && _currentScale < 0.5) {
         _currentScale = 0.5;
       }
@@ -743,10 +752,13 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
     double? right;
 
     final mediaQuery = MediaQuery.of(context);
+    final permLayout = _computePermInventLayout(mediaQuery.size);
     final statusTopShift = (_statusPosition == 'top') ? _statusHeight : 0.0;
     final statusBottomShift = (_statusPosition == 'bottom') ? _statusHeight : 0.0;
-    final statusLeftShift = (_statusPosition == 'left') ? _statusWidth : 0.0;
-    final statusRightShift = (_statusPosition == 'right') ? _statusWidth : 0.0;
+    final statusLeftShift =
+        ((_statusPosition == 'left') ? _statusWidth : 0.0) + permLayout.leftInset;
+    final statusRightShift =
+        ((_statusPosition == 'right') ? _statusWidth : 0.0) + permLayout.rightInset;
 
     final isControllerVisible = _shouldShowController;
 
@@ -885,10 +897,13 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
     double? right;
 
     final mediaQuery = MediaQuery.of(context);
+    final permLayout = _computePermInventLayout(mediaQuery.size);
     final statusTopShift = (_statusPosition == 'top') ? _statusHeight : 0.0;
     final statusBottomShift = (_statusPosition == 'bottom') ? _statusHeight : 0.0;
-    final statusLeftShift = (_statusPosition == 'left') ? _statusWidth : 0.0;
-    final statusRightShift = (_statusPosition == 'right') ? _statusWidth : 0.0;
+    final statusLeftShift =
+        ((_statusPosition == 'left') ? _statusWidth : 0.0) + permLayout.leftInset;
+    final statusRightShift =
+        ((_statusPosition == 'right') ? _statusWidth : 0.0) + permLayout.rightInset;
 
     final isControllerVisible = _shouldShowController;
 
@@ -1066,8 +1081,132 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
       }
       return KeyInputContext.menu;
     }
+    if (_isPermInventScrollMode && _isPermInventVisibleForContext(context)) {
+      return KeyInputContext.permInvent;
+    }
     if (_waitingForInput) return KeyInputContext.game;
     return KeyInputContext.inactive;
+  }
+
+  PermInventLayoutResult _computePermInventLayout(Size screenSize) {
+    final bool enabled = _isGameRunning &&
+        _isMainGameStarted &&
+        _screen.permInventState.enabledByCore;
+    final statusLeft = (_statusPosition == 'left') ? _statusWidth : 0.0;
+    final statusRight = (_statusPosition == 'right') ? _statusWidth : 0.0;
+    final bool isVerticalCmdVisible = _shouldShowController &&
+        (_cmdPanelPosition == 'left' || _cmdPanelPosition == 'right');
+    final verticalCmdWidth =
+        isVerticalCmdVisible ? (130.0 * _cmdPanelEffectiveScale) : 0.0;
+    return calculatePermInventLayout(
+      enabled: enabled,
+      screenWidth: screenSize.width,
+      screenHeight: screenSize.height,
+      position: _permInventPosition,
+      widthRatio: _permInventWidthRatio,
+      statusLeftWidth: statusLeft,
+      statusRightWidth: statusRight,
+      verticalCmdPanelWidth: verticalCmdWidth,
+    );
+  }
+
+  bool _isPermInventVisibleForContext(BuildContext ctx) {
+    return _computePermInventLayout(MediaQuery.of(ctx).size).isVisible;
+  }
+
+  void _scrollPermInventByLines(int direction) {
+    if (!_permInventScrollController.hasClients) return;
+    final pos = _permInventScrollController.position;
+    final next = (pos.pixels + direction * 26.0).clamp(0.0, pos.maxScrollExtent);
+    _permInventScrollController.animateTo(
+      next,
+      duration: const Duration(milliseconds: 90),
+      curve: Curves.easeOut,
+    );
+  }
+
+  void _scrollPermInventByPage(int direction) {
+    if (!_permInventScrollController.hasClients) return;
+    final pos = _permInventScrollController.position;
+    final step = pos.viewportDimension > 0 ? pos.viewportDimension * 0.85 : 220.0;
+    final next = (pos.pixels + direction * step).clamp(0.0, pos.maxScrollExtent);
+    _permInventScrollController.animateTo(
+      next,
+      duration: const Duration(milliseconds: 140),
+      curve: Curves.easeOut,
+    );
+  }
+
+  void _jumpPermInventEdge(bool toTop) {
+    if (!_permInventScrollController.hasClients) return;
+    final pos = _permInventScrollController.position;
+    final target = toTop ? 0.0 : pos.maxScrollExtent;
+    _permInventScrollController.animateTo(
+      target,
+      duration: const Duration(milliseconds: 140),
+      curve: Curves.easeOut,
+    );
+  }
+
+  void _handlePermInventSpace() {
+    if (_permInventScrollController.hasClients) {
+      final pos = _permInventScrollController.position;
+      if (pos.maxScrollExtent > 8.0 && pos.pixels < pos.maxScrollExtent - 4.0) {
+        _scrollPermInventByPage(1);
+        return;
+      }
+      _jumpPermInventEdge(true);
+    }
+    if (_isPermInventScrollMode) {
+      setState(() => _isPermInventScrollMode = false);
+    }
+  }
+
+  void _exitPermInventScrollMode({required bool resetScroll}) {
+    if (resetScroll) {
+      _jumpPermInventEdge(true);
+    }
+    if (_isPermInventScrollMode) {
+      setState(() => _isPermInventScrollMode = false);
+    }
+  }
+
+  void _triggerPermInventItemAction(MenuItemData item) {
+    if (item.accelerator <= 0) return;
+    if (_isPermInventScrollMode) {
+      setState(() => _isPermInventScrollMode = false);
+    }
+    _ensureGameFocus();
+    _workerSendPort?.send({
+      'type': 'trigger_item_action',
+      'invlet': item.accelerator,
+    });
+  }
+
+  void _handlePermInventItemTap(MenuItemData item) {
+    if (!_isGameRunning ||
+        !_isMainGameStarted ||
+        !_waitingForInput ||
+        _hasAnyActiveOverlay) {
+      return;
+    }
+    _triggerPermInventItemAction(item);
+  }
+
+  void _handlePermInventKeySelect(int charCode) {
+    if (!_isGameRunning ||
+        !_isMainGameStarted ||
+        !_waitingForInput ||
+        _hasAnyActiveOverlay ||
+        !_isPermInventScrollMode) {
+      return;
+    }
+    for (final item in _screen.permInventState.items) {
+      if (item.ident != 0 && item.accelerator == charCode) {
+        _triggerPermInventItemAction(item);
+        return;
+      }
+    }
   }
 
   /// ルートの Focus ウィジェットから呼び出される物理キーイベントハンドラ
@@ -1125,6 +1264,7 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
       isAltPressed: isAlt,
       isTextFieldFocused: isTextFieldFocused,
       isAnyKeyButtonFocused: isAnyKeyButtonFocused,
+      hasPermInvent: _isPermInventVisibleForContext(context),
     );
 
     switch (action) {
@@ -1235,30 +1375,40 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
         return KeyEventResult.handled;
 
       case GameTab(:final forward):
-        final available = <MapButtonFocus>[
-          if (_isMenuButtonVisible) MapButtonFocus.menu,
-          if (_isMapButtonVisible) MapButtonFocus.fullMap,
-        ];
-        if (available.isEmpty) return KeyEventResult.handled;
-
-        MapButtonFocus nextFocus;
-        if (_mapButtonFocus == MapButtonFocus.none) {
-          nextFocus = forward ? available.first : available.last;
-        } else {
-          final idx = available.indexOf(_mapButtonFocus);
-          if (idx == -1) {
-            nextFocus = forward ? available.first : available.last;
-          } else if (forward) {
-            nextFocus = (idx + 1 < available.length)
-                ? available[idx + 1]
-                : MapButtonFocus.none;
-          } else {
-            nextFocus = (idx > 0)
-                ? available[idx - 1]
-                : MapButtonFocus.none;
+        final currentStop = _isPermInventScrollMode
+            ? GameFocusStop.permInvent
+            : (_mapButtonFocus == MapButtonFocus.menu
+                ? GameFocusStop.menu
+                : (_mapButtonFocus == MapButtonFocus.fullMap
+                    ? GameFocusStop.fullMap
+                    : GameFocusStop.none));
+        final nextStop = cycleGameFocusStop(
+          current: currentStop,
+          forward: forward,
+          hasMenuButton: _isMenuButtonVisible,
+          hasMapButton: _isMapButtonVisible,
+          hasPermInvent: _isPermInventVisibleForContext(context),
+        );
+        setState(() {
+          switch (nextStop) {
+            case GameFocusStop.menu:
+              _isPermInventScrollMode = false;
+              _mapButtonFocus = MapButtonFocus.menu;
+              break;
+            case GameFocusStop.fullMap:
+              _isPermInventScrollMode = false;
+              _mapButtonFocus = MapButtonFocus.fullMap;
+              break;
+            case GameFocusStop.permInvent:
+              _mapButtonFocus = MapButtonFocus.none;
+              _isPermInventScrollMode = true;
+              break;
+            case GameFocusStop.none:
+              _isPermInventScrollMode = false;
+              _mapButtonFocus = MapButtonFocus.none;
+              break;
           }
-        }
-        setState(() => _mapButtonFocus = nextFocus);
+        });
         return KeyEventResult.handled;
 
       case AnyKeyTab(:final forward):
@@ -1667,6 +1817,30 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
         }
         return KeyEventResult.handled;
 
+      case PermInventScroll(:final direction):
+        _scrollPermInventByLines(direction);
+        return KeyEventResult.handled;
+
+      case PermInventPage(:final direction):
+        _scrollPermInventByPage(direction);
+        return KeyEventResult.handled;
+
+      case PermInventJumpEdge(:final toTop):
+        _jumpPermInventEdge(toTop);
+        return KeyEventResult.handled;
+
+      case PermInventSpaceAction():
+        _handlePermInventSpace();
+        return KeyEventResult.handled;
+
+      case PermInventExit(:final resetScroll):
+        _exitPermInventScrollMode(resetScroll: resetScroll);
+        return KeyEventResult.handled;
+
+      case PermInventSelectItem(:final charCode):
+        _handlePermInventKeySelect(charCode);
+        return KeyEventResult.handled;
+
       case ShowKeyboardHelp():
         if (_usePhysicalKeyboardNotation) {
           _showKeyboardHelp();
@@ -1713,6 +1887,8 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
       helpContext = KeyboardHelpContext.anyKey;
     } else if (_isYnVisible) {
       helpContext = KeyboardHelpContext.yn;
+    } else if (_isPermInventScrollMode && _isPermInventVisibleForContext(context)) {
+      helpContext = KeyboardHelpContext.permInvent;
     } else {
       helpContext = KeyboardHelpContext.game;
     }
@@ -1994,6 +2170,7 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
     _askNameController.dispose();
     _extCmdFilterController.dispose();
     _extCmdMenuFilterController.dispose();
+    _permInventScrollController.dispose();
     super.dispose();
   }
 
@@ -3014,6 +3191,29 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
           unawaited(_showNewLevelRestDialog());
         } else if (type == 'sound_event') {
           SoundManager.instance.handleSoundEvent(message);
+        } else if (type == 'perm_invent_event') {
+          final eventType = (message['eventType'] as int?) ?? 0;
+          final payload = (message['payload'] as String?) ?? '';
+          final prevEnabled = _screen.permInventState.enabledByCore;
+          if (eventType == 0) {
+            _screen.clearPermInvent();
+            if (prevEnabled || _isPermInventScrollMode) {
+              setState(() {
+                _isPermInventScrollMode = false;
+              });
+            }
+          } else if (eventType == 1) {
+            _screen.applyPermInventSnapshot(payload);
+            if (!prevEnabled) {
+              setState(() {});
+            }
+          } else if (eventType == 2) {
+            if (_isPermInventVisibleForContext(context) && !_hasAnyActiveOverlay) {
+              setState(() {
+                _isPermInventScrollMode = true;
+              });
+            }
+          }
         } else if (type == 'startMenu') {
           _screen.startMenu(message['winId']);
         } else if (type == 'game_exit') {
@@ -4269,34 +4469,34 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
           },
         );
 
-        if (_statusPosition == 'left') {
-          return Row(
-            children: [
-              _buildVerticalStatusPanel(false),
-              Expanded(child: mapWidget),
-            ],
-          );
-        } else if (_statusPosition == 'right') {
-          return Row(
-            children: [
-              Expanded(child: mapWidget),
-              _buildVerticalStatusPanel(true),
-            ],
-          );
-        } else if (_statusPosition == 'bottom') {
-          return Column(
-            children: [
-              Expanded(child: mapWidget),
-              horizontalStatusWidget,
-            ],
-          );
-        }
+        final permLayout = _computePermInventLayout(MediaQuery.of(context).size);
+        final Widget? permInventWidget = permLayout.isVisible
+            ? PermanentInventoryPanel(
+                permInventNotifier: _screen.permInventNotifier,
+                scrollController: _permInventScrollController,
+                width: permLayout.width,
+                isLeftSide: _permInventPosition == 'left',
+                isScrollMode: _isPermInventScrollMode,
+                canTapItem: _isGameRunning &&
+                    _isMainGameStarted &&
+                    _waitingForInput &&
+                    !_hasAnyActiveOverlay,
+                useTiles: _useTiles,
+                tileImage: _tileImage,
+                tileWidth: _tileWidth,
+                tileHeight: _tileHeight,
+                onItemTap: _handlePermInventItemTap,
+              )
+            : null;
 
-        return Column(
-          children: [
-            horizontalStatusWidget,
-            Expanded(child: mapWidget),
-          ],
+        return buildGameSplitLayout(
+          statusPosition: _statusPosition,
+          mapWidget: mapWidget,
+          horizontalStatusWidget: horizontalStatusWidget,
+          buildVerticalStatusPanel: _buildVerticalStatusPanel,
+          showPermInvent: permLayout.isVisible,
+          permInventPosition: _permInventPosition,
+          permInventWidget: permInventWidget,
         );
       },
     );
@@ -4397,6 +4597,7 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
     final beforeArmorstatus = beforePrefs.getBool('nh_opt_armorstatus') ?? false;
     final beforeTerrainstatus = beforePrefs.getBool('nh_opt_terrainstatus') ?? false;
     final beforeStatusLayout = beforePrefs.getString('status_line_layout') ?? 'standard';
+    final beforePermInvent = beforePrefs.getBool('nh_opt_perm_invent') ?? false;
 
     if (!mounted) return;
     await Navigator.of(context).push(
@@ -4422,6 +4623,13 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
       final afterArmorstatus = afterPrefs.getBool('nh_opt_armorstatus') ?? false;
       final afterTerrainstatus = afterPrefs.getBool('nh_opt_terrainstatus') ?? false;
       final afterStatusLayout = afterPrefs.getString('status_line_layout') ?? 'standard';
+      final afterPermInvent = afterPrefs.getBool('nh_opt_perm_invent') ?? false;
+      if (beforePermInvent != afterPermInvent) {
+        _workerSendPort?.send({
+          'type': 'set_perm_invent',
+          'enabled': afterPermInvent,
+        });
+      }
       if (beforeHpBar != afterHpBar ||
           beforeHilite != afterHilite ||
           beforeTime != afterTime ||
@@ -4496,11 +4704,15 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
 
         if (displayedLines.isEmpty) return const SizedBox.shrink();
 
-        final screenWidth = MediaQuery.of(context).size.width;
-        final screenHeight = MediaQuery.of(context).size.height;
-        final isLandscape = screenWidth > screenHeight;
+        final screenSize = MediaQuery.of(context).size;
+        final permLayout = _computePermInventLayout(screenSize);
+        final availWidth = permLayout.mapAreaWidth;
+        final screenHeight = screenSize.height;
+        final isLandscape = screenSize.width > screenHeight;
         final effectivePos = _dynamicMsgPositionOverride ?? _msgPosition;
-        final double maxWidth = isLandscape ? (screenWidth * 0.65) : (screenWidth - 16.0);
+        final double maxWidth = isLandscape
+            ? (availWidth * 0.65).clamp(160.0, availWidth)
+            : (availWidth - 16.0).clamp(120.0, availWidth);
 
         return Align(
           alignment: _getAlignment(effectivePos),
@@ -4585,15 +4797,18 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
     }
 
     final screenSize = MediaQuery.of(context).size;
+    final permLayout = _computePermInventLayout(screenSize);
     final screenWidth = screenSize.width;
     final screenHeight = screenSize.height;
 
     final statusTopOffset = (_statusPosition == 'top') ? _statusHeight : 0.0;
     final statusBottomOffset = (_statusPosition == 'bottom') ? _statusHeight : 0.0;
-    final statusLeftOffset = (_statusPosition == 'left') ? _statusWidth : 0.0;
-    final statusRightOffset = (_statusPosition == 'right') ? _statusWidth : 0.0;
+    final statusLeftOffset =
+        ((_statusPosition == 'left') ? _statusWidth : 0.0) + permLayout.leftInset;
+    final statusRightOffset =
+        ((_statusPosition == 'right') ? _statusWidth : 0.0) + permLayout.rightInset;
 
-    final cmdWidth = screenWidth - statusLeftOffset - statusRightOffset;
+    final cmdWidth = (screenWidth - statusLeftOffset - statusRightOffset).clamp(0.0, screenWidth);
     final cmdHeight = screenHeight - statusTopOffset - statusBottomOffset;
 
     final cmdPanelScaledHeight = _cmdPanelHeight * _cmdPanelEffectiveScale;
@@ -4726,8 +4941,8 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
         // 2. キーボード (キーボードモード時のみ)
         if (_controllerMode == ControllerMode.keyboard) ...[
           Positioned(
-            left: 0,
-            right: 0,
+            left: statusLeftOffset,
+            right: statusRightOffset,
             top: _cmdPanelPosition == 'top'
                 ? (statusTopOffset + cmdPanelScaledHeight)
                 : null,
@@ -4831,10 +5046,13 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
       return const SizedBox.shrink();
     }
 
+    final permLayout = _computePermInventLayout(MediaQuery.of(context).size);
     final statusTopOffset = (_statusPosition == 'top') ? _statusHeight : 0.0;
     final statusBottomOffset = (_statusPosition == 'bottom') ? _statusHeight : 0.0;
-    final statusLeftOffset = (_statusPosition == 'left') ? _statusWidth : 0.0;
-    final statusRightOffset = (_statusPosition == 'right') ? _statusWidth : 0.0;
+    final statusLeftOffset =
+        ((_statusPosition == 'left') ? _statusWidth : 0.0) + permLayout.leftInset;
+    final statusRightOffset =
+        ((_statusPosition == 'right') ? _statusWidth : 0.0) + permLayout.rightInset;
 
     final isControllerVisible = _shouldShowController;
 
@@ -4913,7 +5131,17 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
 
   @override
   Widget build(BuildContext context) {
-    _updateEffectiveScales(MediaQuery.of(context).size.width);
+    final screenSize = MediaQuery.of(context).size;
+    final permLayout = _computePermInventLayout(screenSize);
+    _updateEffectiveScales(permLayout.padClampAvailableWidth);
+    if (_isPermInventScrollMode &&
+        (!permLayout.isVisible || _hasAnyActiveOverlay || _screen.isMoreActive || !_isGameRunning)) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted && _isPermInventScrollMode) {
+          setState(() => _isPermInventScrollMode = false);
+        }
+      });
+    }
     return PopScope(
       canPop: false,
       onPopInvokedWithResult: (didPop, result) async {

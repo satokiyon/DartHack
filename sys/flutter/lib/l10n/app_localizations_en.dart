@@ -1783,4 +1783,47 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get statusCompactHiddenHint =>
       '* Hidden in 1 line (Ultra compact) mode';
+
+  @override
+  String get optPermInvent => 'Permanent Inventory (perm_invent)';
+
+  @override
+  String get permInventSub =>
+      'Split-display your inventory on the side in landscape mode (auto-hidden in portrait)';
+
+  @override
+  String get permInventPosition => 'Permanent Inventory Position';
+
+  @override
+  String get permInventPosRight => 'Right';
+
+  @override
+  String get permInventPosLeft => 'Left';
+
+  @override
+  String get permInventWidth => 'Permanent Inventory Width';
+
+  @override
+  String get permInventWidthSub =>
+      'Width ratio in landscape mode (auto-clamped or hidden on narrow screens)';
+
+  @override
+  String get permInventTitle => 'Inventory';
+
+  @override
+  String get permInventScrollModeHint =>
+      'Focused (a-z:Item / ↑↓/PgUp/PgDn/Space/Enter/Esc)';
+
+  @override
+  String get permInventEmpty => 'Not carrying anything';
+
+  @override
+  String get fontPermInventLabel => 'Permanent Inventory';
+
+  @override
+  String get permInventFontSizeTitle => 'Permanent Inventory Font Size';
+
+  @override
+  String get permInventFontSizeDesc =>
+      'Adjusts the font size of the persistent inventory panel in landscape mode.';
 }
