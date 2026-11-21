@@ -227,10 +227,13 @@ class DumplogDocument {
 
     void flushCurrent() {
       if (currentType == null) return;
-      final trimmed = _trimOuterBlankLines(currentLines);
+      var trimmed = _trimOuterBlankLines(currentLines);
       if (trimmed.isNotEmpty) {
         final type = currentType;
         final isMono = _isMonospaceScrollable(type);
+        if (type == DumplogSectionType.tombstone) {
+          trimmed = _dedentLines(trimmed);
+        }
         final displayLines = (!isMono && isJp)
             ? trimmed.map(_localizeLineLightweight).toList()
             : trimmed;
@@ -377,11 +380,10 @@ class DumplogDocument {
         trimmed == 'No species were genocided or became extinct.') {
       return DumplogSectionType.genocided;
     }
-    // ダンジョン概要（自主的な縛りの後に空行を挟んでダンジョン名が来る）
+    // ダンジョン概要（自主的な縛りの後に空行を挟んでダンジョン名が来る。行頭に1スペース付く場合あり）
     if (currentType == DumplogSectionType.conduct &&
         index > 0 &&
-        lines[index - 1].trim().isEmpty &&
-        !lines[index].startsWith(' ')) {
+        lines[index - 1].trim().isEmpty) {
       if (trimmed.startsWith('The ') ||
           trimmed.contains('ダンジョン') ||
           trimmed.contains('迷宮') ||
@@ -396,6 +398,12 @@ class DumplogDocument {
           trimmed.contains('Sokoban')) {
         return DumplogSectionType.overview;
       }
+    }
+    // 墓石直前の "Game over:" 行を墓石セクション開始として扱う
+    if (trimmed == 'Game over:' &&
+        index + 1 < lines.length &&
+        _tombTopRegExp.hasMatch(lines[index + 1])) {
+      return DumplogSectionType.tombstone;
     }
     // 墓石 ASCII アート開始検出（"----------" の次行が "/        \" など）
     if (_tombTopRegExp.hasMatch(lines[index]) &&
@@ -446,9 +454,31 @@ class DumplogDocument {
             trimmed == 'Genocided species:' ||
             trimmed == 'Extinct species:' ||
             trimmed == 'Genocided or extinct species:';
+      case DumplogSectionType.tombstone:
+        return trimmed == 'Game over:';
       default:
         return false;
     }
+  }
+
+  /// 非空行の最小共通先頭空白数を除去する（墓石 ASCII アートの相対配置を保持）
+  static List<String> _dedentLines(List<String> lines) {
+    int? minSpaces;
+    for (final line in lines) {
+      if (line.trim().isEmpty) continue;
+      int count = 0;
+      while (count < line.length && line.codeUnitAt(count) == 0x20) {
+        count++;
+      }
+      if (minSpaces == null || count < minSpaces) {
+        minSpaces = count;
+      }
+    }
+    if (minSpaces == null || minSpaces <= 0) return lines;
+    final cut = minSpaces;
+    return lines
+        .map((line) => line.length >= cut ? line.substring(cut) : line.trimLeft())
+        .toList();
   }
 
   static List<String> _trimOuterBlankLines(List<String> lines) {

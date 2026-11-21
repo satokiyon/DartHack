@@ -82,6 +82,20 @@ Taro（秩序・女・ドワーフ・ワルキューレ）
 倒した怪物:
   ゴブリン 1体
 
+Game over:
+                       ----------
+                      /          \\
+                     /    REST    \\
+                    /      IN      \\
+                   /     PEACE      \\
+                  /                  \\
+                  |      Player      |
+                  |      46 Au       |
+                  | ノームに倒された |
+                  |       2026       |
+                 *|     *  *  *      | *
+        _________)\\\\_//(\\/(/\\)/\\//\\/|_)_______
+
 さようなら ワルキューレのTaro...
 あなたはメインダンジョンで死んだ。
 ''';
@@ -338,6 +352,17 @@ void main() {
       await tester.tap(find.byTooltip('全文コピー'));
       await tester.pumpAndSettle();
       expect(copiedText, _sampleDumplogText);
+
+      // 最終マップは通常の monospace を使用すること（PixelMplus10 固定にしない）
+      final mapTextWidget = tester.widget<Text>(find.textContaining('|.@..|'));
+      expect(mapTextWidget.style?.fontFamily, 'monospace');
+
+      // 墓石内の日本語行は通常の日本語フォント（fontFamily 継承 = null）で描画され、
+      // 枠行は monospace で描画されること
+      final jpTombText = tester.widget<Text>(find.text('ノームに倒された'));
+      expect(jpTombText.style?.fontFamily, isNull);
+      final asciiTombLine = tester.widget<Text>(find.textContaining('|      Player      |'));
+      expect(asciiTombLine.style?.fontFamily, 'monospace');
     });
   });
 }

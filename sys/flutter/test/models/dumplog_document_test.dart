@@ -232,5 +232,67 @@ and 50 pieces of gold, after 120 moves.
       expect(unknownDoc.sections.first.type, DumplogSectionType.other);
       expect(unknownDoc.sections.first.lines, ['custom line 1', 'custom line 2']);
     });
+
+    test('実機形式の Game over: 付き墓石デデントと行頭スペース付きダンジョン概要を正しく分離すること', () {
+      const realDeviceSample = '''
+Unix NetHack Version 5.0.1-0
+
+ゲーム開始: 2026-11-21 13:54:18 / 終了: 2026-11-21 18:47:42.
+
+Player（中立・女性・人間・野蛮人）
+
+         G@.
+Player 略奪者  筋力:18
+階層:6 金貨:\$:46
+
+最新メッセージ:
+ あなたは死んでしまった.
+
+自主的な縛り:
+ あなたは無神論者だった
+
+ 運命の大迷宮: 1階から4階
+    1階:
+ ノームの鉱山: 4階から6階
+    6階: <- ここで倒れた。
+
+虐殺または絶滅した種はいなかった。
+
+Game over:
+                       ----------
+                      /          \\
+                     /    REST    \\
+                    /      IN      \\
+                   /     PEACE      \\
+                  /                  \\
+                  |      Player      |
+                  |      46 Au       |
+                  | ノームに倒された |
+                  |       2026       |
+                 *|     *  *  *      | *
+        _________)\\\\_//(\\/(/\\)/\\//\\/|_)_______
+
+さようなら 野蛮人のPlayer...
+''';
+      final doc = DumplogDocument.parse(realDeviceSample, isJp: true);
+
+      // ダンジョン概要が独立セクションになっていること
+      final overview =
+          doc.sections.firstWhere((s) => s.type == DumplogSectionType.overview);
+      expect(overview.lines.join('\n'), contains('運命の大迷宮: 1階から4階'));
+
+      // 虐殺セクションに "Game over:" が混入していないこと
+      final genocided = doc.sections
+          .firstWhere((s) => s.type == DumplogSectionType.genocided);
+      expect(genocided.nonEmptyLineCount, 1);
+      expect(genocided.lines.join('\n'), isNot(contains('Game over:')));
+
+      // 墓石セクションは共通先頭空白(8文字)がデデントされ、"Game over:" を含まないこと
+      final tomb = doc.sections
+          .firstWhere((s) => s.type == DumplogSectionType.tombstone);
+      expect(tomb.lines.join('\n'), isNot(contains('Game over:')));
+      expect(tomb.lines.last.startsWith('_________'), isTrue);
+      expect(tomb.lines.any((l) => l.contains('| ノームに倒された |')), isTrue);
+    });
   });
 }
