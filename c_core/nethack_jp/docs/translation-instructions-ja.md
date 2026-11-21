@@ -1,7 +1,7 @@
-<!-- Modified by NetHackJP contributor @satokiyon; latest change date: 2026-06-01. -->
+<!-- Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-20. -->
 # NetHackJP 翻訳作業 指示ファイル
 
-この文書は、NetHackJP の日本語化作業における翻訳方針、スタイル、および実務上の知見をまとめたものです。ビルド手順やプロジェクト管理などの技術的な運用については `.github/copilot-instructions.md` を参照してください。
+この文書は、NetHackJP の日本語化作業における翻訳方針、スタイル、および実務上の知見をまとめたものです。ビルド手順やプロジェクト管理などの常時適用ルールについては [AGENTS.md](../AGENTS.md) を参照してください。
 
 ## 1. 目的と対象
 
@@ -55,7 +55,7 @@
 - **skill**: スキル
 
 
-なお、その他の用語についてはJNetHack-3.6.7の日本語化パッチ( `docs/jnethack-3.6.7-0.1.diff.UTF8` )も参考にする
+なお、その他の用語については JNetHack-3.6.7 の訳語も参考にする。
 
 ### 職業・種族・性別・属性（全UI共通の統一語彙）
 
@@ -79,7 +79,7 @@
 - **性別**: 男性 / 女性
 - **属性**: 秩序 / 中立 / 混沌
 
-なお、その他の用語についてはJNetHack-3.6.7の日本語化パッチ( `docs/jnethack-3.6.7-0.1.diff.UTF8` )も参考にする
+なお、その他の用語については JNetHack-3.6.7 の訳語も参考にする。
 
 ## 4. フォーマット指定子の厳守
 
@@ -91,8 +91,8 @@
 
 - **最終表示文の確認**: 複数のリテラルや分岐で構成される文は、結合後の全体像で自然か確認する。
 - **pline系関数**: 文言以外の位置制御や履歴制御（`pline_dir` 等）には触れない。
-- **補助関数の活用**: `Monnam()`, `body_part()`, `Tobjnam()` 等の返り値を前提に語順を調整する。
-- **接頭辞の自動付与**: `You_hear()`, `You_feel()`, `You_see()` 等は主語を自動付与するため、リテラル側で主語を重複させない。
+- **補助関数の活用**: `l_monnam()`, `body_part()`, `Tobjnam()` 等の返り値を前提に語順を調整する。
+- **接頭辞の自動付与**: `You()`, `You_hear()`, `You_feel()`, `You_see()` は主語を、`There()` は「そこに」を自動付与するため、呼び出し側リテラルで主語や「そこに」「ここに」「には」等を重複させない。`Your()` は自動「あなたの」付与を行わない。
 - **不自然な連結の回避**: `隠し%s` などのテンプレートは、展開後の語（扉、通路等）との連結が自然か確認する。
 
 ### 部位名翻訳（body_part/mbodypart）の指針（2026-05 追加知見）
@@ -142,13 +142,13 @@
 2. 最初は小さな単位で適用する。
 3. 次にやや複雑な処理を実施する(識別子の数や並びの変更、メッセージ組み立て処理の変更など)
 4. 実際にゲーム実行時に組み立てられるメッセージが自然な日本語になることを確認する。不自然であればさらに修正する。
-4. ビルド（手順は `.github/copilot-instructions.md` 参照）でエラーがないか確認する。
-5. 可能であれば実機で `--More--` や表示崩れを確認する。
+5. ビルド（手順は [AGENTS.md](../AGENTS.md) §6 参照）でエラーがないか確認する。
+6. 可能であれば実機で `--More--` や表示崩れを確認する。
 
 ## 7. 参照ドキュメント
 
-- **安全チェックリスト**: `docs/message-translation-safety-checklist.md`
-- **Quest 用語集・知見**: `docs/translation-glossary-quest.md`
+- **常時適用ルール・ビルド手順**: [AGENTS.md](../AGENTS.md)
+- **Quest 用語集・知見**: [docs/translation-glossary-quest.md](translation-glossary-quest.md)
 ## 8. 百科事典(dat/data_jp.base)の翻訳知見
 
 ### 構文維持ルール
@@ -169,7 +169,7 @@
 ## 9. ステータスUI 用語辞書と狭幅tty規則（2026-05 追加）
 
 ### ラベル方針
-- status UI の表示ラベルは **漢字のみ** を優先する。
+- status UI の表示ラベルは **漢字のみ** を優先する（ただし能力値 6 項目 `St`, `Dx`, `Co`, `In`, `Wi`, `Ch` は英語略称固定とし翻訳しない）。
 - 可読性のため、3文字以上になっても許容する。
 - GUI/tty は意味を統一し、表示幅に応じた省略のみ差分を許容する。
 - OPTIONS 指定や内部参照キー（status-hilite の field/condition 名）は英語を維持する。
@@ -185,21 +185,14 @@
 - Gold: 金額
 - Dlvl: 階層
 - Score: 得点
-
-- Str/St : 筋力
-- Int/In : 知力
-- Wis/Wi : 賢明
-- Dex/Dx : 器用
-- Con/Co : 耐久
-- Cha/Ch : 魅力
-
+- 能力値 6 項目（ステータス UI 表示は英語略称固定）: `St`, `Dx`, `Co`, `In`, `Wi`, `Ch`
 
 ### 狭幅ttyでのラベル省略順（固定）
 1. 条件表示の短縮（既存の段階短縮）
 2. 低優先度項目のラベルを省略: version, terrain, armor, weapon, time
 3. 次点項目のラベルを省略: dungeon-level, gold, AC, Xp, HD, Pw, HP
 4. 次に省略: alignment, carrying-capacity, score
-5. 最後に能力値6項目（筋力/器用/体力/知力/賢明/魅力）のラベルを省略
+5. 最後に能力値6項目（`St`/`Dx`/`Co`/`In`/`Wi`/`Ch`）のラベルを省略
 6. それでも収まらない場合のみ、encumbrance短縮・Dlvl短縮・最終切り詰めを実施
 
 

@@ -118,12 +118,8 @@ sys/lib/
 !/docs/
 !/docs/translation-instructions-ja.md
 !/docs/translation-glossary-quest.md
-!/docs/quest-translation-review-progress.md
 !/docs/modification-notice-template-en.md
-!/docs/message-translation-safety-checklist.md
-!/docs/emoji_support_investigation.md
 !/docs/wizloadlua_guide.md
-!/docs/plan_fix_save_filename_consistency.md
 !/docs/guidebook-translation-guide-ja.md
 !/docs/input_guide_jp.md
 !/docs/scripts/
@@ -146,3 +142,5 @@ __pycache__/
 
 # graphify output
 graphify-out/
+nethack-???-src.tar.gz
+nethack-???-src.zip

@@ -1,4 +1,4 @@
-# Modified by NetHackJP contributor @satokiyon; latest change date: 2026-09-23.
+# Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-20.
 #!/bin/sh
 # NetHackJP install script for WSL (Linux)
 # NetHackJP: install counterpart of build_wsl.sh (2026-09-23).
@@ -8,7 +8,7 @@
 #   because hints-level VARDATND0 additions (e.g. the Qt port's
 #   nhtiles.bmp / nhsplash.xpm) are evaluated by make at run time, so an
 #   install invoked with different flags would silently skip the Qt data
-#   assets (see DEVELOPMENT.md §2.2 / §4.17).
+#   assets (see DEVELOPMENT.md §2.2 / §4.21).
 #   --default=<port> overrides the default window port (WANT_DEFAULT);
 #   useful for an all-in-one build that still starts in the tty console.
 

@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-19. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-21. */
 /* $NHDT-Header: NetHack 5.0 options.c 2026/09/30_14:47:34 NetHack-5.0:1.799 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2008. */
@@ -5543,6 +5543,11 @@ optfn_boolean(
             break;
         case opt_accessiblemsg:
             a11y.msg_loc.x = a11y.msg_loc.y = 0;
+            break;
+        case opt_wraptext:
+#if defined(CURSES_GRAPHICS)
+            go.opt_need_redraw = TRUE;
+#endif
             break;
         default:
             break;
