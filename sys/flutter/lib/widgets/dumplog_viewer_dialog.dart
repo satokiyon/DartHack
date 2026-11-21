@@ -7,6 +7,7 @@ import '../models/topten_entry.dart';
 import '../services/font_manager.dart';
 import '../utils/app_prefs.dart';
 import 'keyboard_help_dialog.dart';
+import 'tombstone_widget.dart';
 
 /// dumplog をセクション別折りたたみカード・目次チップ付きで見やすく表示するダイアログ
 class DumplogViewerDialog extends StatefulWidget {
@@ -463,103 +464,12 @@ class _DumplogViewerDialogState extends State<DumplogViewerDialog> {
     );
   }
 
-  static final RegExp _tombWallRegExp = RegExp(r'^([^|]*\|)(.*)(\|[^|]*)$');
-  static final RegExp _asciiOnlyRegExp = RegExp(r'^[\x00-\x7F]*$');
-
-  /// 墓石 ASCII アート描画:
-  /// 枠・屋根・芝生は通常の monospace で揃え、日本語を含む石面行の内側だけ
-  /// 実測した内枠幅の固定ボックス内に通常日本語フォント(FontTarget.menu)で中央揃えする。
   Widget _buildTombstoneBlock(int index, List<String> lines) {
-    final hCtrl = _horizontalControllerFor(index);
-    const monoStyle = TextStyle(
-      fontFamily: 'monospace',
+    return TombstoneAsciiView(
+      lines: lines,
       fontSize: 11.5,
-      height: 1.25,
-      color: Colors.white,
-    );
-
-    // 墓石内の ASCII のみで構成された |...| 行から内枠カラム数（標準 18）を取得
-    int innerCols = 18;
-    for (final line in lines) {
-      if (line.contains('____')) continue;
-      final m = _tombWallRegExp.firstMatch(line);
-      if (m != null && _asciiOnlyRegExp.hasMatch(m.group(2)!)) {
-        innerCols = m.group(2)!.length;
-        break;
-      }
-    }
-
-    // monospace で innerCols 文字分の正確なピクセル幅を実測
-    // （DefaultTextStyle をマージし、行末空白トリミングを避けるため非空白文字で計測）
-    final effectiveMonoStyle = DefaultTextStyle.of(context).style.merge(monoStyle);
-    final textScaler = MediaQuery.textScalerOf(context);
-    final tp = TextPainter(
-      text: TextSpan(text: 'M' * innerCols, style: effectiveMonoStyle),
-      textDirection: TextDirection.ltr,
-      textScaler: textScaler,
-      maxLines: 1,
-    )..layout();
-    final innerWidth = tp.width;
-    final lineHeight = tp.height;
-
-    return Scrollbar(
-      controller: hCtrl,
-      thumbVisibility: true,
-      child: SingleChildScrollView(
-        controller: hCtrl,
-        scrollDirection: Axis.horizontal,
-        padding: const EdgeInsets.only(bottom: 10),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: lines.map((line) {
-            if (!line.contains('____') && !line.trimLeft().startsWith('*|')) {
-              final m = _tombWallRegExp.firstMatch(line);
-              if (m != null) {
-                final leftPart = m.group(1)!;
-                final innerRaw = m.group(2)!;
-                final rightPart = m.group(3)!;
-                final innerText = innerRaw.trim();
-                // 非 ASCII 文字を含む行は通常の日本語フォント(menu継承)で固定幅中央揃え
-                if (!_asciiOnlyRegExp.hasMatch(innerRaw)) {
-                  return SizedBox(
-                    height: lineHeight,
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        Text(leftPart, softWrap: false, style: monoStyle),
-                        SizedBox(
-                          width: innerWidth,
-                          height: lineHeight,
-                          child: Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 2),
-                            child: FittedBox(
-                              fit: BoxFit.scaleDown,
-                              alignment: Alignment.center,
-                              child: Text(
-                                innerText,
-                                maxLines: 1,
-                                textAlign: TextAlign.center,
-                                style: const TextStyle(
-                                  fontSize: 11.5,
-                                  height: 1.25,
-                                  color: Colors.white,
-                                ),
-                              ),
-                            ),
-                          ),
-                        ),
-                        Text(rightPart, softWrap: false, style: monoStyle),
-                      ],
-                    ),
-                  );
-                }
-              }
-            }
-            return Text(line, softWrap: false, style: monoStyle);
-          }).toList(),
-        ),
-      ),
+      horizontalController: _horizontalControllerFor(index),
+      dedent: false,
     );
   }
 

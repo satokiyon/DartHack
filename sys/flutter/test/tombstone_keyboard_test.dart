@@ -47,5 +47,56 @@ void main() {
     // scrollController がクライアント（SingleChildScrollView）にアタッチされていることを検証
     expect(controller.hasClients, isTrue);
   });
+
+  testWidgets('UniversalTombstoneWidget のテキスト表示モードでも日本語死因行が固定幅中央揃え・枠 monospace で描画されること', (tester) async {
+    final controller = ScrollController();
+    addTearDown(() => controller.dispose());
+
+    const jpTextLines = [
+      '                       ----------',
+      '                      /          \\',
+      '                     /    REST    \\',
+      '                    /      IN      \\',
+      '                   /     PEACE      \\',
+      '                  /                  \\',
+      '                  |      Player      |',
+      '                  |      46 Au       |',
+      '                  | ノームに倒された |',
+      '                  |       2026       |',
+      '                 *|     *  *  *      | *',
+      '        _________)\\\\_//(\\/(/\\)/\\//\\/|_)_______',
+      '',
+      'さようなら 野蛮人のPlayer...',
+      'あなたはノームの鉱山で死んだ。',
+    ];
+
+    await tester.pumpWidget(
+      MaterialApp(
+        locale: const Locale('ja'),
+        home: Scaffold(
+          body: UniversalTombstoneWidget(
+            mode: TombstoneDisplayMode.text,
+            lines: jpTextLines,
+            scrollController: controller,
+          ),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(controller.hasClients, isTrue);
+    expect(find.byType(TombstoneAsciiView), findsOneWidget);
+
+    // 日本語死因行は通常フォント継承（fontFamily == null）で描画されること
+    final jpDeathText = tester.widget<Text>(find.text('ノームに倒された'));
+    expect(jpDeathText.style?.fontFamily, isNull);
+
+    // ASCII 枠行は monospace で描画されること
+    final asciiLine = tester.widget<Text>(find.textContaining('|      Player      |'));
+    expect(asciiLine.style?.fontFamily, 'monospace');
+
+    // 底辺より下の結末テキストも表示されること
+    expect(find.textContaining('さようなら 野蛮人のPlayer...'), findsOneWidget);
+  });
 }
 
