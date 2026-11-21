@@ -105,9 +105,10 @@ OPTIONS=boulder:0
 # over. It contains a view of the map and a record of
 # the player's belonging, attributes, etc.
 #
-# The logs are written to the "Documents" folder
-# normally located at /sdcard/Documents/
-#OPTIONS=dumplog
+# Enabled by default in DartHack and automatically pruned
+# to keep only logs matching scores on the scoreboard.
+# Uncomment the line below to disable dump logs:
+#OPTIONS=!dumplog
 
 # Colorize individual rows on a menu based on what
 # regular expressions match its text

@@ -13,6 +13,7 @@ class TopTenEntry {
   final bool isCurrent;
   final RecordLogEntry? rawRecord;
   final XLogEntry? xlog;
+  final String? dumplogPath;
 
   TopTenEntry({
     required this.rank,
@@ -22,12 +23,14 @@ class TopTenEntry {
     required this.isCurrent,
     this.rawRecord,
     this.xlog,
+    this.dumplogPath,
   });
 
-  /// record / xlogfile 詳細情報を付与したコピーを生成する
+  /// record / xlogfile / dumplog 詳細情報を付与したコピーを生成する
   TopTenEntry copyWith({
     RecordLogEntry? rawRecord,
     XLogEntry? xlog,
+    String? dumplogPath,
   }) {
     return TopTenEntry(
       rank: rank,
@@ -37,6 +40,7 @@ class TopTenEntry {
       isCurrent: isCurrent,
       rawRecord: rawRecord ?? this.rawRecord,
       xlog: xlog ?? this.xlog,
+      dumplogPath: dumplogPath ?? this.dumplogPath,
     );
   }
 
@@ -3281,11 +3285,30 @@ List<TopTenEntry> parseRecordFile(String filePath, {bool isJp = true, bool loadX
 
     List<XLogEntry> xlogEntries = const [];
     List<bool> xlogConsumed = const [];
+    final dumplogFiles = <String>{};
+    final dumplogsDirPath = '${file.parent.path}${Platform.pathSeparator}dumplogs';
     if (loadXLog) {
       final xlogPath = findSiblingLogFilePath(filePath, 'xlogfile');
       if (xlogPath != null) {
         xlogEntries = parseXLogFile(xlogPath);
         xlogConsumed = List<bool>.filled(xlogEntries.length, false);
+      }
+      final dumplogsDir = Directory(dumplogsDirPath);
+      if (dumplogsDir.existsSync()) {
+        try {
+          for (final entity in dumplogsDir.listSync()) {
+            if (entity is File) {
+              final name = entity.uri.pathSegments.isNotEmpty
+                  ? entity.uri.pathSegments.last
+                  : entity.path.split(Platform.pathSeparator).last;
+              if (name.startsWith('dump_') && name.endsWith('.txt')) {
+                dumplogFiles.add(name);
+              }
+            }
+          }
+        } catch (_) {
+          // 読み取り失敗時は dumplog なしとして継続
+        }
       }
     }
 
@@ -3342,6 +3365,18 @@ List<TopTenEntry> parseRecordFile(String filePath, {bool isJp = true, bool loadX
         }
       }
 
+      String? matchedDumplogPath;
+      if (matchedXLog != null &&
+          matchedXLog.starttime > 0 &&
+          matchedXLog.endtime > 0) {
+        final expectedName =
+            'dump_${matchedXLog.starttime}_${matchedXLog.endtime}.txt';
+        if (dumplogFiles.contains(expectedName)) {
+          matchedDumplogPath =
+              '$dumplogsDirPath${Platform.pathSeparator}$expectedName';
+        }
+      }
+
       entries.add(TopTenEntry(
         rank: rank,
         score: '${e.points}',
@@ -3350,6 +3385,7 @@ List<TopTenEntry> parseRecordFile(String filePath, {bool isJp = true, bool loadX
         isCurrent: false,
         rawRecord: e,
         xlog: matchedXLog,
+        dumplogPath: matchedDumplogPath,
       ));
     }
 
@@ -3392,6 +3428,7 @@ List<TopTenEntry> enrichTopTenEntriesWithXLog(
     return entry.copyWith(
       rawRecord: rec.rawRecord,
       xlog: rec.xlog,
+      dumplogPath: rec.dumplogPath,
     );
   }).toList();
 }

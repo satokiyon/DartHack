@@ -145,7 +145,9 @@ class NetHackAssets {
 
       // 既存のユーザーデータファイル（スコア、ログ、設定ファイル等）の上書き保護
       if (await dstFile.exists()) {
-        if (_protectedDataFiles.contains(relativePath) || relativePath.startsWith('save/')) {
+        if (_protectedDataFiles.contains(relativePath) ||
+            relativePath.startsWith('save/') ||
+            relativePath.startsWith('dumplogs/')) {
           debugPrint("NetHackAssets: Skipping overwrite for existing file '$relativePath'");
           continue;
         }
@@ -497,14 +499,16 @@ class NetHackAssets {
     return _syncLogsWithRecord(nethackDir);
   }
 
-  /// 既存の logfile / xlogfile が存在する場合に限り、record の有効行に合わせてトリム整理する
+  /// 既存の logfile / xlogfile / dumplogs が存在する場合に限り、record の有効行に合わせてトリム整理する
   static Future<void> _syncLogsWithRecord(Directory nethackDir) async {
     try {
       final logFile = File('${nethackDir.path}/logfile');
       final xlogFile = File('${nethackDir.path}/xlogfile');
+      final dumplogsDir = Directory('${nethackDir.path}/dumplogs');
       final hasLog = await logFile.exists();
       final hasXLog = await xlogFile.exists();
-      if (!hasLog && !hasXLog) return;
+      final hasDumplogsDir = await dumplogsDir.exists();
+      if (!hasLog && !hasXLog && !hasDumplogsDir) return;
 
       final recordFile = File('${nethackDir.path}/record');
       final List<RecordLogEntry> recordEntries;
@@ -563,6 +567,8 @@ class NetHackAssets {
         }
       }
 
+      final validDumplogNames = <String>{};
+
       if (hasXLog) {
         final xlogBytes = await xlogFile.readAsBytes();
         final xlogText = utf8.decode(xlogBytes, allowMalformed: true);
@@ -606,6 +612,9 @@ class NetHackAssets {
               )) {
                 consumed[j] = true;
                 keptLines.add(xl.rawLine);
+                if (xl.starttime > 0 && xl.endtime > 0) {
+                  validDumplogNames.add('dump_${xl.starttime}_${xl.endtime}.txt');
+                }
                 break;
               }
             }
@@ -618,8 +627,32 @@ class NetHackAssets {
           debugPrint("NetHackAssets: Synced xlogfile with ${recordEntries.length} record entries.");
         }
       }
-    } catch (e) {
-      debugPrint("Warning: Exception during syncLogsWithRecord: $e");
+
+      if (hasDumplogsDir) {
+        int removedCount = 0;
+        await for (final entity in dumplogsDir.list()) {
+          if (entity is! File) continue;
+          final fileName = entity.uri.pathSegments.isNotEmpty
+              ? entity.uri.pathSegments.last
+              : entity.path.split(Platform.pathSeparator).last;
+          if (!fileName.startsWith('dump_') || !fileName.endsWith('.txt')) {
+            continue;
+          }
+          if (!validDumplogNames.contains(fileName)) {
+            try {
+              await entity.delete();
+              removedCount++;
+            } catch (e, st) {
+              debugPrint("Warning: Failed to delete orphaned dumplog '$fileName': $e\n$st");
+            }
+          }
+        }
+        if (removedCount > 0) {
+          debugPrint("NetHackAssets: Pruned $removedCount orphaned dumplog file(s).");
+        }
+      }
+    } catch (e, st) {
+      debugPrint("Warning: Exception during syncLogsWithRecord: $e\n$st");
     }
   }
 }

@@ -298,8 +298,10 @@ static int optfn_##a(int, int, boolean, char *, char *);
     NHOPTB(dropped_nopick, Behavior, 0, opt_out, set_in_game,
            On, Yes, No, No, NoAlias, &flags.nopick_dropped, Term_False,
            "don't autopickup dropped items")
-#ifdef ANDROID
-    NHOPTB(dumplog, General, 0, opt_in, set_in_game, On, Yes, No, No, NoAlias, &iflags.dumplog, Term_False, "enable/disable dump logs")
+    /* DartHack: dumplog is enabled by default on Android and Windows (FLUTTER_PORT). */
+#if defined(ANDROID) || defined(FLUTTER_PORT)
+    NHOPTB(dumplog, General, 0, opt_out, set_in_game, On, Yes, No, No, NoAlias,
+           &iflags.dumplog, Term_False, "write end-of-game dump log")
 #endif
     NHOPTC(dungeon, Advanced, MAXDCHARS + 1,opt_in, set_in_config,
                 No, Yes, No, No, NoAlias,

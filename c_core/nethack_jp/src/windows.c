@@ -1255,6 +1255,14 @@ dump_open_log(time_t now)
     char buf[BUFSZ];
     char *fname;
 
+    /* DartHack: skip dumplog when disabled or for wizard/discover/panicking games */
+    if (wizard || discover || program_state.panicking)
+        return;
+#if defined(ANDROID) || defined(FLUTTER_PORT)
+    if (!iflags.dumplog)
+        return;
+#endif
+
     dumplog_now = now;
 #ifdef SYSCF
     if (!sysopt.dumplogfile)
@@ -1595,6 +1603,13 @@ void
 flutter_check_new_level_rest(void)
 {
     /* unused for non-Flutter ports */
+}
+
+/* DartHack: stub implementation for non-Android/Flutter builds */
+void
+flutter_sync_dumplogs_with_xlogfile(const char *xlog_path)
+{
+    (void) xlog_path; /* unused for non-Flutter ports */
 }
 #endif
 

@@ -1197,6 +1197,10 @@ topten(int how, time_t when)
         sync_xlogfile_with_topten(tt_head, t0, t0_used, how);
 #endif
     }
+#if (defined(ANDROID) || defined(FLUTTER_PORT)) && defined(DUMPLOG) && defined(XLOGFILE)
+    /* DartHack: remove dumplogs not referenced by remaining xlogfile entries */
+    flutter_sync_dumplogs_with_xlogfile(fqname(XLOGFILE, SCOREPREFIX, 0));
+#endif
     free_ttlist(tt_head);
 
  showwin:

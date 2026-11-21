@@ -40,7 +40,7 @@ void main() {
       File('${nethackDir.path}/10301OldHero.0').writeAsStringSync('old0');
       File('${nethackDir.path}/10301OldHero.2').writeAsStringSync('old2');
 
-      // 保護されるべきファイル群（骨・スコア・ログ・設定）
+      // 保護されるべきファイル群（骨・スコア・ログ・設定・dumplogs）
       File('${nethackDir.path}/bonD0.1').writeAsStringSync('bones');
       File('${nethackDir.path}/bonM0.2').writeAsStringSync('bones2');
       File('${nethackDir.path}/record').writeAsStringSync('100 Hero');
@@ -49,6 +49,8 @@ void main() {
       File('${nethackDir.path}/livelog').writeAsStringSync('livelog');
       File('${nethackDir.path}/defaults.nh').writeAsStringSync('OPTIONS=time');
       File('${nethackDir.path}/perm').writeAsStringSync('');
+      final dumplogsDir = Directory('${nethackDir.path}/dumplogs')..createSync();
+      File('${dumplogsDir.path}/dump_1000_2000.txt').writeAsStringSync('dumplog');
 
       await NetHackAssets.migrateLegacyLevelFilesForTesting(
         nethackDir,
@@ -76,6 +78,7 @@ void main() {
       expect(File('${nethackDir.path}/livelog').existsSync(), isTrue);
       expect(File('${nethackDir.path}/defaults.nh').existsSync(), isTrue);
       expect(File('${nethackDir.path}/perm').existsSync(), isTrue);
+      expect(File('${dumplogsDir.path}/dump_1000_2000.txt').existsSync(), isTrue);
     });
 
     test('端末移行等でカスタムタイルの絶対パスが変わってもファイル名ベースで自動修復されること', () async {
@@ -125,6 +128,36 @@ void main() {
 
       final found = findRecordFilePath(nethackDir.path);
       expect(found, '${nethackDir.path}/record');
+    });
+
+    test('Android Auto Backup 設定で nethackdir/dumplogs がクラウドバックアップ対象に含まれていること', () {
+      final backupRulesFile = File('android/app/src/main/res/xml/backup_rules.xml');
+      final extractionRulesFile = File('android/app/src/main/res/xml/data_extraction_rules.xml');
+
+      expect(backupRulesFile.existsSync(), isTrue);
+      expect(extractionRulesFile.existsSync(), isTrue);
+
+      final backupXml = backupRulesFile.readAsStringSync();
+      expect(backupXml, contains('<include domain="file" path="nethackdir"'));
+      expect(backupXml, contains('<exclude domain="file" path="nethackdir/save"'));
+      expect(backupXml, contains('<exclude domain="file" path="nethackdir/levels"'));
+      expect(backupXml, isNot(contains('dumplogs')));
+
+      final extractionXml = extractionRulesFile.readAsStringSync();
+      final cloudMatch = RegExp(r'<cloud-backup>([\s\S]*?)</cloud-backup>').firstMatch(extractionXml);
+      final transferMatch = RegExp(r'<device-transfer>([\s\S]*?)</device-transfer>').firstMatch(extractionXml);
+      expect(cloudMatch, isNotNull);
+      expect(transferMatch, isNotNull);
+
+      final cloudBlock = cloudMatch!.group(1)!;
+      expect(cloudBlock, contains('<include domain="file" path="nethackdir"'));
+      expect(cloudBlock, contains('<exclude domain="file" path="nethackdir/save"'));
+      expect(cloudBlock, contains('<exclude domain="file" path="nethackdir/levels"'));
+      expect(cloudBlock, isNot(contains('dumplogs')));
+
+      final transferBlock = transferMatch!.group(1)!;
+      expect(transferBlock, contains('<include domain="file" path="nethackdir"'));
+      expect(transferBlock, isNot(contains('dumplogs')));
     });
   });
 }

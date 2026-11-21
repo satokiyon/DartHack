@@ -596,11 +596,13 @@ dump_everything(
     putstr(0, 0, "");
 
     /* character name and basic role info */
-    Sprintf(pbuf, "%s, %s %s %s %s",
-            svp.plname, aligns[1 - u.ualign.type].adj,
-            genders[flags.female].adj, gu.urace.adj,
-            (flags.female && gu.urole.name.f) ? gu.urole.name.f
-                                             : gu.urole.name.m);
+    /* DartHack: localize character profile line in dumplog */
+    Sprintf(pbuf, "%s（%s・%s・%s・%s）",
+            svp.plname,
+            jp_align_for_display(1 - u.ualign.type),
+            jp_gender_for_display(flags.female ? 1 : 0),
+            jp_race_noun_for_display(flags.initrace),
+            jp_role_name_for_display(flags.initrole, flags.female ? 1 : 0));
     putstr(0, 0, pbuf);
     putstr(0, 0, "");
 

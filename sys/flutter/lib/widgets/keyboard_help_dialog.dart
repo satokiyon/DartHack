@@ -552,8 +552,9 @@ class _KeyboardHelpDialogState extends State<KeyboardHelpDialog> {
           _HelpItem('> / PgDown', isJp ? '1画面分下スクロール' : 'Scroll down 1 page'),
           _HelpItem('↑ / ↓ (k / j)', isJp ? '1行ずつ上下スクロール' : 'Scroll 1 line up/down'),
           _HelpItem('Home / End', isJp ? '最先頭 / 最末尾へジャンプ' : 'Jump to top / bottom'),
-          _HelpItem('Tab', isJp ? '閉じるボタンのフォーカス切替' : 'Toggle Close button focus'),
-          _HelpItem('Enter / Esc / q', isJp ? '詳細画面を閉じる' : 'Close details'),
+          _HelpItem('d', isJp ? 'ダンプログを表示（存在時）' : 'View dumplog (if available)'),
+          _HelpItem('Tab / ← / →', isJp ? 'ボタンのフォーカス切替' : 'Switch button focus'),
+          _HelpItem('Enter / Esc / q', isJp ? '決定 / 詳細画面を閉じる' : 'Confirm / close details'),
           _HelpItem('F1 / Alt-h', isJp ? '操作ヘルプの表示' : 'Show controls help'),
         ];
     }

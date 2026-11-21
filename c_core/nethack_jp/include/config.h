@@ -691,7 +691,8 @@ typedef unsigned char uchar;
 #undef LIVELOG
 #endif /* NO_CHRONICLE */
 
-/* #define DUMPLOG */  /* End-of-game dump logs */
+/* DartHack: enable DUMPLOG by default */
+#define DUMPLOG /* End-of-game dump logs */
 
 #define USE_ISAAC64 /* Use cross-platform, bundled RNG */
 

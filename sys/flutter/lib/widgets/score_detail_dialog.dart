@@ -5,7 +5,10 @@ import '../models/topten_entry.dart';
 import '../models/xlog_entry.dart';
 import '../services/font_manager.dart';
 import '../utils/app_prefs.dart';
+import 'dumplog_viewer_dialog.dart';
 import 'keyboard_help_dialog.dart';
+
+enum _DetailFooterFocus { none, dumplog, close }
 
 /// スコアボードのレコードタップ時に表示する詳細スコアダイアログ（スクロール＆キーボード対応）
 class ScoreDetailDialog extends StatefulWidget {
@@ -27,8 +30,28 @@ class ScoreDetailDialog extends StatefulWidget {
 class _ScoreDetailDialogState extends State<ScoreDetailDialog> {
   late final ScrollController _scrollController;
   late final FocusNode _focusNode;
-  bool _isCloseButtonFocused = false;
+  _DetailFooterFocus _footerFocus = _DetailFooterFocus.none;
   bool _usePhysicalKeyboardNotation = false;
+
+  bool get _hasDumplog =>
+      widget.entry.dumplogPath != null && widget.entry.dumplogPath!.isNotEmpty;
+
+  void _openDumplogViewer() {
+    if (!_hasDumplog) return;
+    final jaMode =
+        widget.isJp ?? (Localizations.localeOf(context).languageCode == 'ja');
+    showDialog<void>(
+      context: context,
+      builder: (context) => DumplogViewerDialog(
+        entry: widget.entry,
+        dumplogPath: widget.entry.dumplogPath,
+        isJp: jaMode,
+        usePhysicalKeyboardNotation: _usePhysicalKeyboardNotation,
+      ),
+    ).then((_) {
+      if (mounted) _focusNode.requestFocus();
+    });
+  }
 
   @override
   void initState() {
@@ -109,20 +132,62 @@ class _ScoreDetailDialogState extends State<ScoreDetailDialog> {
       return KeyEventResult.handled;
     }
 
-    // 閉じる: Escape / q / Enter / NumpadEnter
-    if (key == LogicalKeyboardKey.escape ||
-        (key == LogicalKeyboardKey.keyQ && !isCtrl) ||
-        key == LogicalKeyboardKey.enter ||
-        key == LogicalKeyboardKey.numpadEnter) {
-      if (isDown) Navigator.of(context).pop();
+    // ダンプ表示ショートカット: d
+    if (key == LogicalKeyboardKey.keyD && !isCtrl && _hasDumplog) {
+      if (isDown) _openDumplogViewer();
       return KeyEventResult.handled;
     }
 
-    // Tab: 閉じるボタンのフォーカス切替
-    if (key == LogicalKeyboardKey.tab) {
+    // 閉じる / フォーカス中ボタン実行: Escape / q / Enter / NumpadEnter
+    if (key == LogicalKeyboardKey.escape ||
+        (key == LogicalKeyboardKey.keyQ && !isCtrl)) {
+      if (isDown) Navigator.of(context).pop();
+      return KeyEventResult.handled;
+    }
+    if (key == LogicalKeyboardKey.enter ||
+        key == LogicalKeyboardKey.numpadEnter) {
+      if (isDown) {
+        if (_footerFocus == _DetailFooterFocus.dumplog && _hasDumplog) {
+          _openDumplogViewer();
+        } else {
+          Navigator.of(context).pop();
+        }
+      }
+      return KeyEventResult.handled;
+    }
+
+    // Tab / ← / →: フッターボタンのフォーカス切替
+    if (key == LogicalKeyboardKey.tab ||
+        key == LogicalKeyboardKey.arrowLeft ||
+        key == LogicalKeyboardKey.arrowRight) {
       if (isDown) {
         setState(() {
-          _isCloseButtonFocused = !_isCloseButtonFocused;
+          if (!_hasDumplog) {
+            _footerFocus = _footerFocus == _DetailFooterFocus.close
+                ? _DetailFooterFocus.none
+                : _DetailFooterFocus.close;
+          } else {
+            final backward =
+                key == LogicalKeyboardKey.arrowLeft ||
+                (key == LogicalKeyboardKey.tab && isShift);
+            if (!backward) {
+              if (_footerFocus == _DetailFooterFocus.none) {
+                _footerFocus = _DetailFooterFocus.dumplog;
+              } else if (_footerFocus == _DetailFooterFocus.dumplog) {
+                _footerFocus = _DetailFooterFocus.close;
+              } else {
+                _footerFocus = _DetailFooterFocus.none;
+              }
+            } else {
+              if (_footerFocus == _DetailFooterFocus.none) {
+                _footerFocus = _DetailFooterFocus.close;
+              } else if (_footerFocus == _DetailFooterFocus.close) {
+                _footerFocus = _DetailFooterFocus.dumplog;
+              } else {
+                _footerFocus = _DetailFooterFocus.none;
+              }
+            }
+          }
         });
       }
       return KeyEventResult.handled;
@@ -648,33 +713,84 @@ class _ScoreDetailDialogState extends State<ScoreDetailDialog> {
                 ),
 
                 const SizedBox(height: 10),
-                // 固定フッター
+                // 固定フッター（狭幅画面でも溢れないよう Wrap で折り返し対応）
                 Center(
-                  child: ElevatedButton(
-                    onPressed: () => Navigator.of(context).pop(),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: _isCloseButtonFocused
-                          ? Colors.amber[700]
-                          : Colors.teal[600],
-                      foregroundColor:
-                          _isCloseButtonFocused ? Colors.black : Colors.white,
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 32, vertical: 10),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8),
-                        side: _isCloseButtonFocused
-                            ? const BorderSide(
-                                color: Colors.amberAccent, width: 2)
-                            : BorderSide.none,
+                  child: Wrap(
+                    alignment: WrapAlignment.center,
+                    spacing: 12,
+                    runSpacing: 8,
+                    children: [
+                      if (_hasDumplog)
+                        ElevatedButton.icon(
+                          onPressed: _openDumplogViewer,
+                          icon: Icon(
+                            Icons.article_outlined,
+                            size: 17,
+                            color: _footerFocus == _DetailFooterFocus.dumplog
+                                ? Colors.black
+                                : Colors.white,
+                          ),
+                          label: Text(
+                            _usePhysicalKeyboardNotation
+                                ? (jaMode ? 'd:ダンプを見る' : 'd: View Dumplog')
+                                : (jaMode ? 'ダンプを見る' : 'View Dumplog'),
+                            style: const TextStyle(fontWeight: FontWeight.bold),
+                          ),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor:
+                                _footerFocus == _DetailFooterFocus.dumplog
+                                    ? Colors.amber[700]
+                                    : const Color(0xFF1E4A6E),
+                            foregroundColor:
+                                _footerFocus == _DetailFooterFocus.dumplog
+                                    ? Colors.black
+                                    : Colors.white,
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 20, vertical: 10),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(8),
+                              side: _footerFocus == _DetailFooterFocus.dumplog
+                                  ? const BorderSide(
+                                      color: Colors.amberAccent, width: 2)
+                                  : BorderSide.none,
+                            ),
+                            elevation:
+                                _footerFocus == _DetailFooterFocus.dumplog
+                                    ? 6
+                                    : 2,
+                          ),
+                        ),
+                      ElevatedButton(
+                        onPressed: () => Navigator.of(context).pop(),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor:
+                              _footerFocus == _DetailFooterFocus.close
+                                  ? Colors.amber[700]
+                                  : Colors.teal[600],
+                          foregroundColor:
+                              _footerFocus == _DetailFooterFocus.close
+                                  ? Colors.black
+                                  : Colors.white,
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 32, vertical: 10),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8),
+                            side: _footerFocus == _DetailFooterFocus.close
+                                ? const BorderSide(
+                                    color: Colors.amberAccent, width: 2)
+                                : BorderSide.none,
+                          ),
+                          elevation:
+                              _footerFocus == _DetailFooterFocus.close ? 6 : 2,
+                        ),
+                        child: Text(
+                          _usePhysicalKeyboardNotation
+                              ? (jaMode ? 'Esc:閉じる' : 'Esc: Close')
+                              : (jaMode ? '閉じる' : 'Close'),
+                          style: const TextStyle(fontWeight: FontWeight.bold),
+                        ),
                       ),
-                      elevation: _isCloseButtonFocused ? 6 : 2,
-                    ),
-                    child: Text(
-                      _usePhysicalKeyboardNotation
-                          ? (jaMode ? 'Esc:閉じる' : 'Esc: Close')
-                          : (jaMode ? '閉じる' : 'Close'),
-                      style: const TextStyle(fontWeight: FontWeight.bold),
-                    ),
+                    ],
                   ),
                 ),
               ],

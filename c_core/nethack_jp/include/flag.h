@@ -503,7 +503,8 @@ struct instance_flags {
     Bitfield(save_uswallow, 1);
     Bitfield(save_uinwater, 1);
     Bitfield(save_uburied, 1);
-#ifdef ANDROID
+/* DartHack: enable dumplog flag on both Android and Windows (FLUTTER_PORT) */
+#if defined(ANDROID) || defined(FLUTTER_PORT)
 	boolean dumplog; /* enable/disable dump logs */
 #endif
     struct debug_flags debug;

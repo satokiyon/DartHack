@@ -200,7 +200,8 @@ class TopTenWidgetState extends State<TopTenWidget> {
           ea.score != eb.score ||
           ea.nameAndProfile != eb.nameAndProfile ||
           ea.isCurrent != eb.isCurrent ||
-          ea.xlog?.rawLine != eb.xlog?.rawLine) {
+          ea.xlog?.rawLine != eb.xlog?.rawLine ||
+          ea.dumplogPath != eb.dumplogPath) {
         return false;
       }
     }

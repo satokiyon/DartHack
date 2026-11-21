@@ -13,3 +13,4 @@ SEDUCE=1
 HIDEUSAGE=0
 CHECK_SAVE_UID=0
 LEVELDIR=levels
+DUMPLOGFILE=dumplogs/dump_%t_%T.txt

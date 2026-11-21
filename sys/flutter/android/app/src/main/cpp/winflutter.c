@@ -5,6 +5,13 @@
 #include "dlb.h"
 #include <stdarg.h>
 #include <errno.h>
+#ifdef FLUTTER_WIN32
+#include <direct.h>
+#include <io.h>
+#else
+#include <dirent.h>
+#include <sys/stat.h>
+#endif
 
 #define LOG_TAG "NetHackFlutter"
 
@@ -123,6 +130,155 @@ void and_get_dumplog_dir(char *buf) {
     if (buf) {
         Strcpy(buf, ".");
     }
+}
+
+/* xlogfile の1行から指定キー（例: "starttime="）の数値トークンを抽出する */
+static int extract_xlog_token(const char *line, const char *key, char *out, size_t out_sz) {
+    size_t klen = strlen(key);
+    const char *p = line;
+    while (p && *p) {
+        const char *sep = strchr(p, '\t');
+        size_t tok_len = sep ? (size_t)(sep - p) : strlen(p);
+        if (tok_len > klen && strncmp(p, key, klen) == 0) {
+            size_t vlen = tok_len - klen;
+            while (vlen > 0 && (p[klen + vlen - 1] == '\r' || p[klen + vlen - 1] == '\n')) {
+                vlen--;
+            }
+            if (vlen == 0 || vlen >= out_sz) return 0;
+            memcpy(out, p + klen, vlen);
+            out[vlen] = '\0';
+            return 1;
+        }
+        if (!sep) break;
+        p = sep + 1;
+    }
+    return 0;
+}
+
+/* xlogfile に残存するスコアと紐付かない dumplogs/dump_*.txt を削除する */
+void flutter_sync_dumplogs_with_xlogfile(const char *xlog_path) {
+    const char *path = (xlog_path && *xlog_path) ? xlog_path : "xlogfile";
+    char **valid_names = NULL;
+    size_t valid_count = 0;
+    size_t valid_cap = 0;
+
+    errno = 0;
+    FILE *fp = fopen(path, "r");
+    if (!fp) {
+        /* 未存在(ENOENT)以外のエラー時は誤削除を防ぐためスキップ */
+        if (errno != ENOENT) {
+            LOGE("flutter_sync_dumplogs_with_xlogfile: fopen('%s') failed (errno=%d), skipping GC", path, errno);
+            return;
+        }
+    } else {
+        size_t line_cap = 8192;
+        char *line = (char *)malloc(line_cap);
+        if (!line) {
+            fclose(fp);
+            return;
+        }
+        int ch;
+        size_t len = 0;
+        while (1) {
+            ch = fgetc(fp);
+            if (ch == '\n' || ch == EOF) {
+                if (len > 0) {
+                    line[len] = '\0';
+                    char st[64], et[64];
+                    if (extract_xlog_token(line, "starttime=", st, sizeof(st)) &&
+                        extract_xlog_token(line, "endtime=", et, sizeof(et))) {
+                        char fname[160];
+                        snprintf(fname, sizeof(fname), "dump_%s_%s.txt", st, et);
+                        if (valid_count >= valid_cap) {
+                            size_t new_cap = valid_cap ? valid_cap * 2 : 128;
+                            char **tmp = (char **)realloc(valid_names, new_cap * sizeof(char *));
+                            if (tmp) {
+                                valid_names = tmp;
+                                valid_cap = new_cap;
+                            }
+                        }
+                        if (valid_count < valid_cap) {
+                            char *dup = (char *)malloc(strlen(fname) + 1);
+                            if (dup) {
+                                strcpy(dup, fname);
+                                valid_names[valid_count++] = dup;
+                            }
+                        }
+                    }
+                    len = 0;
+                }
+                if (ch == EOF) break;
+            } else if (ch != '\r') {
+                if (len + 1 >= line_cap && line_cap < 65536) {
+                    size_t new_cap = line_cap * 2;
+                    char *new_line = (char *)realloc(line, new_cap);
+                    if (new_line) {
+                        line = new_line;
+                        line_cap = new_cap;
+                    }
+                }
+                if (len + 1 < line_cap) {
+                    line[len++] = (char)ch;
+                }
+            }
+        }
+        free(line);
+        fclose(fp);
+    }
+
+#ifdef FLUTTER_WIN32
+    struct _finddata_t fd;
+    intptr_t h = _findfirst("dumplogs\\dump_*.txt", &fd);
+    if (h != -1) {
+        do {
+            if (fd.attrib & _A_SUBDIR) continue;
+            int keep = 0;
+            for (size_t i = 0; i < valid_count; i++) {
+                if (strcmp(fd.name, valid_names[i]) == 0) {
+                    keep = 1;
+                    break;
+                }
+            }
+            if (!keep) {
+                char full[512];
+                snprintf(full, sizeof(full), "dumplogs\\%s", fd.name);
+                remove(full);
+            }
+        } while (_findnext(h, &fd) == 0);
+        _findclose(h);
+    }
+#else
+    DIR *dir = opendir("dumplogs");
+    if (dir) {
+        struct dirent *ent;
+        while ((ent = readdir(dir)) != NULL) {
+            const char *name = ent->d_name;
+            size_t nlen = strlen(name);
+            if (nlen <= 9 || strncmp(name, "dump_", 5) != 0 ||
+                strcmp(name + nlen - 4, ".txt") != 0) {
+                continue;
+            }
+            int keep = 0;
+            for (size_t i = 0; i < valid_count; i++) {
+                if (strcmp(name, valid_names[i]) == 0) {
+                    keep = 1;
+                    break;
+                }
+            }
+            if (!keep) {
+                char full[512];
+                snprintf(full, sizeof(full), "dumplogs/%s", name);
+                remove(full);
+            }
+        }
+        closedir(dir);
+    }
+#endif
+
+    for (size_t i = 0; i < valid_count; i++) {
+        free(valid_names[i]);
+    }
+    free(valid_names);
 }
 
 void and_you_die(void) {
@@ -3353,10 +3509,12 @@ static unsigned __stdcall NetHackThreadFuncWin32(void* arg) {
               "ENTRYMAX=100\n"
               "MAX_REROLL_RATE=10\n"
               "SEDUCE=1\n"
-              "HIDEUSAGE=0\n", f_syscf);
+              "HIDEUSAGE=0\n"
+              "DUMPLOGFILE=dumplogs/dump_%t_%T.txt\n", f_syscf);
         fclose(f_syscf);
         LOGD("sysconf file updated to latest valid content at: sysconf");
     }
+    _mkdir("dumplogs");
 
     // perm ファイルが存在しなければ自動作成して getlock() での Fatal 終了を完全防止
     FILE* f_perm = fopen("perm", "r");
@@ -3415,9 +3573,15 @@ static void* NetHackThreadFunc(void* arg) {
               "ENTRYMAX=100\n"
               "MAX_REROLL_RATE=10\n"
               "SEDUCE=1\n"
-              "HIDEUSAGE=0\n", f_syscf);
+              "HIDEUSAGE=0\n"
+              "DUMPLOGFILE=dumplogs/dump_%t_%T.txt\n", f_syscf);
         fclose(f_syscf);
         LOGD("sysconf file updated to latest valid content at: %s", syscf_path);
+    }
+    {
+        char dumplog_dir[512];
+        snprintf(dumplog_dir, sizeof(dumplog_dir), "%s/dumplogs", args->path);
+        mkdir(dumplog_dir, 0755);
     }
 
     // perm ファイルが存在しなければ自動作成して getlock() での Fatal 終了を完全防止
