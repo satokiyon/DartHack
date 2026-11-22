@@ -228,6 +228,47 @@ http://creativecommons.org/publicdomain/zero/1.0/''',
     'sans-serif',
   ];
 
+  /// プラットフォーム別に確実なシステム等幅フォントファミリ名を返す
+  /// （Windows では 'monospace' が等幅解決されずプロポーショナルに落ちるため Consolas を指定）
+  static String get platformMonospaceFontFamily {
+    if (Platform.isWindows) return 'Consolas';
+    if (Platform.isMacOS || Platform.isIOS) return 'Menlo';
+    return 'monospace';
+  }
+
+  /// プラットフォーム別の等幅＋日本語フォールバックリスト
+  static List<String> get platformMonospaceFallbacks {
+    if (Platform.isWindows) {
+      return const [
+        'Courier New',
+        'BIZ UDGothic',
+        'MS Gothic',
+        'Meiryo',
+        'Yu Gothic',
+        'monospace',
+      ];
+    }
+    if (Platform.isMacOS || Platform.isIOS) {
+      return const ['Monaco', 'Courier', 'Hiragino Sans', 'monospace'];
+    }
+    return const ['monospace', ...defaultJapaneseFallbacks];
+  }
+
+  /// プラットフォーム共通の等幅 TextStyle を生成する
+  static TextStyle platformMonospaceStyle({
+    double fontSize = 11.5,
+    double height = 1.25,
+    Color color = const Color(0xFFFFFFFF),
+  }) {
+    return TextStyle(
+      fontFamily: platformMonospaceFontFamily,
+      fontFamilyFallback: platformMonospaceFallbacks,
+      fontSize: fontSize,
+      height: height,
+      color: color,
+    );
+  }
+
   AppPrefs? _prefs;
   Directory? _customFontsDir;
 

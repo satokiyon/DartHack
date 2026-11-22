@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../models/tombstone_data.dart';
+import '../services/font_manager.dart';
 
 /// 墓石 ASCII アートを等幅枠＋固定幅ボックス内通常日本語フォント中央揃えで描画する共通ウィジェット。
 /// 日本語死因行でも右枠 `|` が一切ズレず一直線に揃う。
@@ -44,8 +45,7 @@ class TombstoneAsciiView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final displayLines = dedent ? _dedentLines(lines) : lines;
-    final monoStyle = TextStyle(
-      fontFamily: 'monospace',
+    final monoStyle = FontManager.platformMonospaceStyle(
       fontSize: fontSize,
       height: 1.25,
       color: Colors.white,

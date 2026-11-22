@@ -489,8 +489,7 @@ class _DumplogViewerDialogState extends State<DumplogViewerDialog> {
             child: Text(
               text,
               softWrap: false,
-              style: const TextStyle(
-                fontFamily: 'monospace',
+              style: FontManager.platformMonospaceStyle(
                 fontSize: 11.5,
                 height: 1.25,
                 color: Colors.white,

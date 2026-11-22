@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:darthack/models/tombstone_data.dart';
+import 'package:darthack/services/font_manager.dart';
 import 'package:darthack/widgets/tombstone_widget.dart';
 
 void main() {
@@ -91,9 +92,9 @@ void main() {
     final jpDeathText = tester.widget<Text>(find.text('ノームに倒された'));
     expect(jpDeathText.style?.fontFamily, isNull);
 
-    // ASCII 枠行は monospace で描画されること
+    // ASCII 枠行はプラットフォーム標準等幅フォントで描画されること
     final asciiLine = tester.widget<Text>(find.textContaining('|      Player      |'));
-    expect(asciiLine.style?.fontFamily, 'monospace');
+    expect(asciiLine.style?.fontFamily, FontManager.platformMonospaceFontFamily);
 
     // 底辺より下の結末テキストも表示されること
     expect(find.textContaining('さようなら 野蛮人のPlayer...'), findsOneWidget);

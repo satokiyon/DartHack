@@ -6,6 +6,7 @@ import 'package:darthack/models/dumplog_document.dart';
 import 'package:darthack/models/topten_entry.dart';
 import 'package:darthack/models/xlog_entry.dart';
 import 'package:darthack/nethack_assets.dart';
+import 'package:darthack/services/font_manager.dart';
 import 'package:darthack/widgets/dumplog_viewer_dialog.dart';
 import 'package:darthack/widgets/score_detail_dialog.dart';
 
@@ -353,16 +354,16 @@ void main() {
       await tester.pumpAndSettle();
       expect(copiedText, _sampleDumplogText);
 
-      // 最終マップは通常の monospace を使用すること（PixelMplus10 固定にしない）
+      // 最終マップはプラットフォーム標準等幅フォントを使用すること（PixelMplus10 固定にしない）
       final mapTextWidget = tester.widget<Text>(find.textContaining('|.@..|'));
-      expect(mapTextWidget.style?.fontFamily, 'monospace');
+      expect(mapTextWidget.style?.fontFamily, FontManager.platformMonospaceFontFamily);
 
       // 墓石内の日本語行は通常の日本語フォント（fontFamily 継承 = null）で描画され、
-      // 枠行は monospace で描画されること
+      // 枠行はプラットフォーム標準等幅フォントで描画されること
       final jpTombText = tester.widget<Text>(find.text('ノームに倒された'));
       expect(jpTombText.style?.fontFamily, isNull);
       final asciiTombLine = tester.widget<Text>(find.textContaining('|      Player      |'));
-      expect(asciiTombLine.style?.fontFamily, 'monospace');
+      expect(asciiTombLine.style?.fontFamily, FontManager.platformMonospaceFontFamily);
     });
   });
 }
