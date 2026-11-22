@@ -123,7 +123,6 @@ class _SpoilerDialogState extends State<SpoilerDialog> {
   // 一時透過（覗き見）制御用状態
   bool _isHoldPeeking = false;
   bool _isTapPeeking = false;
-  bool _usePhysicalKeyboardNotation = false;
   _SpoilerButtonFocus _buttonFocus = _SpoilerButtonFocus.none;
 
   bool get _isPeeking => _isHoldPeeking || _isTapPeeking;
@@ -134,16 +133,6 @@ class _SpoilerDialogState extends State<SpoilerDialog> {
     _searchFocusNode.onKeyEvent = _handleSearchKeyEvent;
     _itemPositionsListener.itemPositions.addListener(_onItemPositionsChanged);
     _loadSpoilers();
-    AppPrefs.getInstance().then((prefs) {
-      if (mounted) {
-        setState(() {
-          _usePhysicalKeyboardNotation =
-              prefs.getBool('use_physical_keyboard_notation') ?? false;
-        });
-      }
-    }).catchError((_) {
-      // テスト環境などで AppPrefs がモックされていない場合の安全なフォールバック
-    });
   }
 
   final Map<int, ScrollController> _horizontalScrollControllers = {};
@@ -715,7 +704,7 @@ class _SpoilerDialogState extends State<SpoilerDialog> {
     final isHelpKey = key == LogicalKeyboardKey.f1 ||
         (isAlt && key == LogicalKeyboardKey.keyH);
     if (isHelpKey) {
-      if (isDown && _usePhysicalKeyboardNotation) {
+      if (isDown) {
         KeyboardHelpDialog.show(
           context,
           helpContext: KeyboardHelpContext.guidebook,

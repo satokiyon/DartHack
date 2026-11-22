@@ -1722,11 +1722,11 @@ class AppLocalizationsEn extends AppLocalizations {
   String get gameEndDialogTitle => 'Game Over';
 
   @override
-  String get usePhysicalKeyboardNotation => 'Enable Physical Keyboard Help';
+  String get usePhysicalKeyboardNotation => 'Show Shortcut Keys on Buttons';
 
   @override
   String get usePhysicalKeyboardNotationSub =>
-      'Show shortcut keys (y:, n:, Esc:, etc.) on buttons. When ON, press F1 or M-h (Alt-h) to display controls help';
+      'Show shortcut keys (y:, n:, Esc:, etc.) on buttons (press F1 or M-h (Alt-h) anytime for controls help)';
 
   @override
   String get statusFontSize => 'Font Size';

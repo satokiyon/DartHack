@@ -377,7 +377,7 @@ void main() {
       expect(controller.value.storage[13], closeTo(initialTy, 0.1));
     });
 
-    testWidgets('Alt+h does not pan the map, and opens KeyboardHelpDialog when usePhysicalKeyboardNotation is true', (tester) async {
+    testWidgets('Alt+h does not pan the map, and Alt+h / F1 always opens KeyboardHelpDialog', (tester) async {
       final screen = NetHackScreen();
 
       await tester.pumpWidget(
@@ -397,7 +397,6 @@ void main() {
                       tileImage: null,
                       tileWidth: 16,
                       tileHeight: 16,
-                      usePhysicalKeyboardNotation: true,
                     );
                   },
                   child: const Text('Open'),
@@ -439,57 +438,6 @@ void main() {
       await tester.sendKeyEvent(LogicalKeyboardKey.f1);
       await tester.pumpAndSettle();
       expect(find.byType(KeyboardHelpDialog), findsOneWidget);
-    });
-
-    testWidgets('Alt+h or F1 does not open KeyboardHelpDialog when usePhysicalKeyboardNotation is false', (tester) async {
-      final screen = NetHackScreen();
-
-      await tester.pumpWidget(
-        MaterialApp(
-          locale: const Locale('ja'),
-          localizationsDelegates: AppLocalizations.localizationsDelegates,
-          supportedLocales: AppLocalizations.supportedLocales,
-          home: Scaffold(
-            body: Builder(
-              builder: (context) {
-                return ElevatedButton(
-                  onPressed: () {
-                    showFullMapDialog(
-                      context: context,
-                      screen: screen,
-                      useTiles: false,
-                      tileImage: null,
-                      tileWidth: 16,
-                      tileHeight: 16,
-                      usePhysicalKeyboardNotation: false,
-                    );
-                  },
-                  child: const Text('Open'),
-                );
-              },
-            ),
-          ),
-        ),
-      );
-
-      await tester.tap(find.text('Open'));
-      await tester.pumpAndSettle();
-
-      // Alt+h を送信
-      await tester.sendKeyDownEvent(LogicalKeyboardKey.altLeft);
-      await tester.sendKeyEvent(LogicalKeyboardKey.keyH);
-      await tester.sendKeyUpEvent(LogicalKeyboardKey.altLeft);
-      await tester.pumpAndSettle();
-
-      // ヘルプが開かないこと
-      expect(find.byType(KeyboardHelpDialog), findsNothing);
-
-      // F1 を送信
-      await tester.sendKeyEvent(LogicalKeyboardKey.f1);
-      await tester.pumpAndSettle();
-
-      // ヘルプが開かないこと
-      expect(find.byType(KeyboardHelpDialog), findsNothing);
     });
   });
 }

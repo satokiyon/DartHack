@@ -3269,13 +3269,13 @@ abstract class AppLocalizations {
   /// No description provided for @usePhysicalKeyboardNotation.
   ///
   /// In ja, this message translates to:
-  /// **'物理キーボード用ヘルプを有効化'**
+  /// **'ボタンに割り当てキーを表示'**
   String get usePhysicalKeyboardNotation;
 
   /// No description provided for @usePhysicalKeyboardNotationSub.
   ///
   /// In ja, this message translates to:
-  /// **'ボタンに割り当てキー（y:、n:、Esc:等）を表示します。ON時はF1またはM-h (Alt-h)キーで操作ヘルプを表示できます'**
+  /// **'各種ボタンに割り当てキー（y:、n:、Esc:等）を表示します（操作ヘルプは設定に関わらずF1またはM-h (Alt-h)で表示可能）'**
   String get usePhysicalKeyboardNotationSub;
 
   /// No description provided for @statusFontSize.

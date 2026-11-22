@@ -1046,7 +1046,6 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
       tileWidth: _tileWidth,
       tileHeight: _tileHeight,
       isTransparentTileset: TilesetManager.instance.getTilesetById(_selectedTileset).isTransparent,
-      usePhysicalKeyboardNotation: _usePhysicalKeyboardNotation,
     ).then((_) {
       _ensureGameFocus();
     });
@@ -1842,9 +1841,7 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
         return KeyEventResult.handled;
 
       case ShowKeyboardHelp():
-        if (_usePhysicalKeyboardNotation) {
-          _showKeyboardHelp();
-        }
+        _showKeyboardHelp();
         return KeyEventResult.handled;
 
       case IgnoreKey():

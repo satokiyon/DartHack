@@ -15,7 +15,6 @@ Future<void> showFullMapDialog({
   required int tileWidth,
   required int tileHeight,
   bool isTransparentTileset = false,
-  bool usePhysicalKeyboardNotation = false,
 }) {
   final l10n = AppLocalizations.of(context)!;
   return showDialog(
@@ -38,7 +37,6 @@ Future<void> showFullMapDialog({
           tileHeight: tileHeight,
           isTransparentTileset: isTransparentTileset,
           l10n: l10n,
-          usePhysicalKeyboardNotation: usePhysicalKeyboardNotation,
         ),
       );
     },
@@ -53,7 +51,6 @@ class _FullMapDialogContent extends StatefulWidget {
   final int tileHeight;
   final bool isTransparentTileset;
   final AppLocalizations l10n;
-  final bool usePhysicalKeyboardNotation;
 
   const _FullMapDialogContent({
     required this.screen,
@@ -63,7 +60,6 @@ class _FullMapDialogContent extends StatefulWidget {
     required this.tileHeight,
     this.isTransparentTileset = false,
     required this.l10n,
-    this.usePhysicalKeyboardNotation = false,
   });
 
   @override
@@ -262,7 +258,7 @@ class _FullMapDialogContentState extends State<_FullMapDialogContent>
     final isHelpKey = key == LogicalKeyboardKey.f1 ||
         (isAlt && key == LogicalKeyboardKey.keyH);
     if (isHelpKey) {
-      if (isDown && widget.usePhysicalKeyboardNotation) {
+      if (isDown) {
         KeyboardHelpDialog.show(
           context,
           helpContext: KeyboardHelpContext.fullMap,

@@ -275,11 +275,11 @@ void main() {
       await tester.pumpAndSettle();
       expect(find.byType(SettingsPage), findsOneWidget);
 
-      // 「画面表示設定」を展開して「物理キーボード用ヘルプを有効化」を確実に ON にする
+      // 「画面表示設定」を展開して「ボタンに割り当てキーを表示」を確実に ON にする
       await tester.tap(find.text('画面表示設定'));
       await tester.pumpAndSettle();
 
-      final textFinder = find.text('物理キーボード用ヘルプを有効化');
+      final textFinder = find.text('ボタンに割り当てキーを表示');
       await tester.ensureVisible(textFinder);
       await tester.pumpAndSettle();
 
@@ -322,7 +322,7 @@ void main() {
       expect(find.byType(KeyboardHelpDialog), findsNothing);
     });
 
-    testWidgets('use_physical_keyboard_notation が OFF の時は F1 や Alt+h を押しても操作ヘルプが表示されないこと', (tester) async {
+    testWidgets('use_physical_keyboard_notation が OFF の時でも F1 や Alt+h で操作ヘルプダイアログが表示されること', (tester) async {
       await tester.pumpWidget(buildTestableSettingsApp());
       await tester.pumpAndSettle();
 
@@ -330,12 +330,42 @@ void main() {
       await tester.pumpAndSettle();
       expect(find.byType(SettingsPage), findsOneWidget);
 
+      // 「画面表示設定」を展開して「ボタンに割り当てキーを表示」を確実に OFF にする
+      await tester.tap(find.text('画面表示設定'));
+      await tester.pumpAndSettle();
+
+      final textFinder = find.text('ボタンに割り当てキーを表示');
+      await tester.ensureVisible(textFinder);
+      await tester.pumpAndSettle();
+
+      final switchFinder = find.descendant(
+        of: find.ancestor(of: textFinder, matching: find.byType(ListTile)),
+        matching: find.byType(Switch),
+      );
+      final switchWidget = tester.widget<Switch>(switchFinder);
+      if (switchWidget.value) {
+        await tester.tap(textFinder);
+        await tester.pumpAndSettle();
+      }
+
       // F1 キーを押下
+      await tester.sendKeyEvent(LogicalKeyboardKey.f1);
+      await tester.pumpAndSettle();
+      expect(find.byType(KeyboardHelpDialog), findsOneWidget);
+
+      // F1 で閉じる
       await tester.sendKeyEvent(LogicalKeyboardKey.f1);
       await tester.pumpAndSettle();
       expect(find.byType(KeyboardHelpDialog), findsNothing);
 
       // Alt+h キーを押下
+      await tester.sendKeyDownEvent(LogicalKeyboardKey.altLeft);
+      await tester.sendKeyEvent(LogicalKeyboardKey.keyH);
+      await tester.sendKeyUpEvent(LogicalKeyboardKey.altLeft);
+      await tester.pumpAndSettle();
+      expect(find.byType(KeyboardHelpDialog), findsOneWidget);
+
+      // Alt+h で閉じる
       await tester.sendKeyDownEvent(LogicalKeyboardKey.altLeft);
       await tester.sendKeyEvent(LogicalKeyboardKey.keyH);
       await tester.sendKeyUpEvent(LogicalKeyboardKey.altLeft);
@@ -629,9 +659,9 @@ void main() {
       await tester.tap(sectionTitleFinder);
       await tester.pumpAndSettle();
 
-      // 「物理キーボード用ヘルプを有効化」の _SettingsSwitchTile を探す
+      // 「ボタンに割り当てキーを表示」の _SettingsSwitchTile を探す
       final switchTileFinder = find.ancestor(
-        of: find.text('物理キーボード用ヘルプを有効化'),
+        of: find.text('ボタンに割り当てキーを表示'),
         matching: find.byWidgetPredicate((w) => w.runtimeType.toString().startsWith('_SettingsSwitchTile')),
       ).first;
       await tester.ensureVisible(switchTileFinder);
@@ -673,13 +703,13 @@ void main() {
       await tester.sendKeyEvent(LogicalKeyboardKey.space);
       await tester.pumpAndSettle();
       expect(tester.widget<Switch>(switchFinder).value, equals(!initialVal));
-      expect(find.text('物理キーボード用ヘルプを有効化'), findsOneWidget); // カードが開いたまま
+      expect(find.text('ボタンに割り当てキーを表示'), findsOneWidget); // カードが開いたまま
 
       // Enter キーを押下 -> 値が再度反転し、かつカードが閉じていないこと
       await tester.sendKeyEvent(LogicalKeyboardKey.enter);
       await tester.pumpAndSettle();
       expect(tester.widget<Switch>(switchFinder).value, equals(initialVal));
-      expect(find.text('物理キーボード用ヘルプを有効化'), findsOneWidget); // カードが開いたまま
+      expect(find.text('ボタンに割り当てキーを表示'), findsOneWidget); // カードが開いたまま
     });
 
     testWidgets('自動セーブのターン間隔項目が共通プルダウンとして描画され左右キーやEnterキーで操作できること', (tester) async {

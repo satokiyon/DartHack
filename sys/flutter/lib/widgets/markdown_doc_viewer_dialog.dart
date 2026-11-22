@@ -6,7 +6,6 @@ import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 
 import '../l10n/app_localizations.dart';
 import '../services/font_manager.dart';
-import '../utils/app_prefs.dart';
 import 'keyboard_help_dialog.dart';
 
 /// 汎用 Markdown ドキュメントビューワのスクロール位置保持用データ
@@ -145,7 +144,6 @@ class _MarkdownDocViewerDialogState extends State<MarkdownDocViewerDialog> {
 
   bool _isHoldPeeking = false;
   bool _isTapPeeking = false;
-  bool _usePhysicalKeyboardNotation = false;
   _DocButtonFocus _buttonFocus = _DocButtonFocus.none;
 
   bool get _isPeeking => _isHoldPeeking || _isTapPeeking;
@@ -156,14 +154,6 @@ class _MarkdownDocViewerDialogState extends State<MarkdownDocViewerDialog> {
     _searchFocusNode.onKeyEvent = _handleSearchKeyEvent;
     _itemPositionsListener.itemPositions.addListener(_onItemPositionsChanged);
     _load();
-    AppPrefs.getInstance().then((prefs) {
-      if (mounted) {
-        setState(() {
-          _usePhysicalKeyboardNotation =
-              prefs.getBool('use_physical_keyboard_notation') ?? false;
-        });
-      }
-    }).catchError((_) {});
   }
 
   @override
@@ -722,7 +712,7 @@ class _MarkdownDocViewerDialogState extends State<MarkdownDocViewerDialog> {
 
     if (key == LogicalKeyboardKey.f1 ||
         (isAlt && key == LogicalKeyboardKey.keyH)) {
-      if (isDown && _usePhysicalKeyboardNotation) {
+      if (isDown) {
         KeyboardHelpDialog.show(
           context,
           helpContext: KeyboardHelpContext.guidebook,

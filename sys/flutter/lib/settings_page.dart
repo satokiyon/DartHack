@@ -4173,12 +4173,12 @@ class _SettingsPageState extends State<SettingsPage> {
       return KeyEventResult.handled;
     }
 
-    // F1 / Alt-h: 操作ヘルプの表示（物理キーボード表記が有効な場合のみ）
+    // F1 / Alt-h: 操作ヘルプの表示（設定のON/OFFに関わらず常時有効）
     final isAlt = HardwareKeyboard.instance.isAltPressed;
     final isHelpKey = key == LogicalKeyboardKey.f1 ||
         (isAlt && key == LogicalKeyboardKey.keyH);
     if (isHelpKey) {
-      if (isDown && _usePhysicalKeyboardNotation) {
+      if (isDown) {
         KeyboardHelpDialog.show(
           context,
           helpContext: KeyboardHelpContext.settings,

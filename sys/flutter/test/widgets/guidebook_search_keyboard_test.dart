@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:darthack/utils/app_prefs.dart';
 import 'package:darthack/widgets/guidebook_dialog.dart';
+import 'package:darthack/widgets/keyboard_help_dialog.dart';
 import 'package:darthack/widgets/spoiler_dialog.dart';
 import 'package:darthack/l10n/app_localizations.dart';
 
@@ -195,6 +196,70 @@ void main() {
       await tester.sendKeyUpEvent(LogicalKeyboardKey.shiftLeft);
       await tester.pumpAndSettle();
       expect(find.text('1/3'), findsOneWidget);
+    });
+  });
+
+  group('F1 / Alt+h 操作ヘルプの常時有効化テスト', () {
+    testWidgets('use_physical_keyboard_notation が false でも GuidebookDialog で F1 / Alt+h により操作ヘルプが開くこと', (tester) async {
+      await AppPrefs.setMockInitialValues({
+        'selected_language': 'ja',
+        'use_physical_keyboard_notation': false,
+      });
+
+      await tester.pumpWidget(
+        buildTestApp(
+          const GuidebookDialog(
+            initialContent: sampleMarkdown,
+            initialIsJp: true,
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      await tester.sendKeyEvent(LogicalKeyboardKey.f1);
+      await tester.pumpAndSettle();
+      expect(find.byType(KeyboardHelpDialog), findsOneWidget);
+
+      await tester.sendKeyEvent(LogicalKeyboardKey.escape);
+      await tester.pumpAndSettle();
+      expect(find.byType(KeyboardHelpDialog), findsNothing);
+
+      await tester.sendKeyDownEvent(LogicalKeyboardKey.altLeft);
+      await tester.sendKeyEvent(LogicalKeyboardKey.keyH);
+      await tester.sendKeyUpEvent(LogicalKeyboardKey.altLeft);
+      await tester.pumpAndSettle();
+      expect(find.byType(KeyboardHelpDialog), findsOneWidget);
+    });
+
+    testWidgets('use_physical_keyboard_notation が false でも SpoilerDialog で F1 / Alt+h により操作ヘルプが開くこと', (tester) async {
+      await AppPrefs.setMockInitialValues({
+        'selected_language': 'ja',
+        'use_physical_keyboard_notation': false,
+      });
+
+      await tester.pumpWidget(
+        buildTestApp(
+          SpoilerDialog(
+            initialMarkdown: sampleMarkdown,
+            initialIsJp: true,
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      await tester.sendKeyEvent(LogicalKeyboardKey.f1);
+      await tester.pumpAndSettle();
+      expect(find.byType(KeyboardHelpDialog), findsOneWidget);
+
+      await tester.sendKeyEvent(LogicalKeyboardKey.escape);
+      await tester.pumpAndSettle();
+      expect(find.byType(KeyboardHelpDialog), findsNothing);
+
+      await tester.sendKeyDownEvent(LogicalKeyboardKey.altLeft);
+      await tester.sendKeyEvent(LogicalKeyboardKey.keyH);
+      await tester.sendKeyUpEvent(LogicalKeyboardKey.altLeft);
+      await tester.pumpAndSettle();
+      expect(find.byType(KeyboardHelpDialog), findsOneWidget);
     });
   });
 }
