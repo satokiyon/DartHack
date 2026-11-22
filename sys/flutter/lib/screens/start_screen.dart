@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../l10n/app_localizations.dart';
+import '../utils/image_cache_helper.dart';
 import '../widgets/guidebook_dialog.dart';
 import '../widgets/spoiler_dialog.dart';
 import '../widgets/darthack_help_dialog.dart';
@@ -300,173 +301,139 @@ class StartScreen extends StatelessWidget {
     );
   }
 
-  @override
-  Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context)!;
-    final mediaQuery = MediaQuery.of(context);
-    final isPortrait = mediaQuery.orientation == Orientation.portrait;
-    final screenHeight = mediaQuery.size.height;
-    final screenWidth = mediaQuery.size.width;
-
-    Widget startScreenContent;
-
-    if (isPortrait) {
-      startScreenContent = Stack(
+  Widget _buildTopToolbar(BuildContext context, AppLocalizations l10n) {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(24, 16, 24, 8),
+      child: Row(
         children: [
-          Positioned(
-            top: 16,
-            left: 24,
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                _buildGuidebookButton(context, l10n),
-                const SizedBox(width: 10),
-                _buildSpoilerButton(context, l10n),
-                const SizedBox(width: 10),
-                _buildDartHackHelpButton(context, l10n),
-              ],
-            ),
-          ),
-          Positioned(
-            top: 16,
-            right: 24,
-            child: _buildSettingsButton(context, l10n),
-          ),
-          Positioned(
-            top: screenHeight * 0.15,
-            left: 24,
-            right: 24,
-            child: Center(
-              child: Image.asset(
-                'assets/images/darthack_logo.webp',
-                width: screenWidth * 0.75,
-                cacheWidth: (screenWidth * 0.75 * MediaQuery.of(context).devicePixelRatio).round(),
-                fit: BoxFit.contain,
-              ),
-            ),
-          ),
-          Positioned(
-            bottom: 36,
-            left: 24,
-            right: 24,
-            child: !assetsReady
-                ? Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      const CircularProgressIndicator(
-                        valueColor: AlwaysStoppedAnimation<Color>(Colors.amber),
-                      ),
-                      const SizedBox(height: 12),
-                      Text(
-                        l10n.preparingAssets,
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                          shadows: [
-                            Shadow(blurRadius: 4, color: Colors.black, offset: Offset(1, 1)),
-                          ],
-                        ),
-                      ),
-                    ],
-                  )
-                : Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      _buildLanguageSelector(context),
-                      const SizedBox(height: 16),
-                      _buildStartGameButton(context, l10n),
-                    ],
-                  ),
-          ),
+          _buildGuidebookButton(context, l10n),
+          const SizedBox(width: 10),
+          _buildSpoilerButton(context, l10n),
+          const SizedBox(width: 10),
+          _buildDartHackHelpButton(context, l10n),
+          const Spacer(),
+          _buildSettingsButton(context, l10n),
         ],
-      );
-    } else {
-      startScreenContent = Stack(
+      ),
+    );
+  }
+
+  Widget _buildActionSection(BuildContext context, AppLocalizations l10n) {
+    if (!assetsReady) {
+      return Column(
+        mainAxisSize: MainAxisSize.min,
         children: [
-          Positioned(
-            top: 16,
-            left: 24,
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                _buildGuidebookButton(context, l10n),
-                const SizedBox(width: 10),
-                _buildSpoilerButton(context, l10n),
-                const SizedBox(width: 10),
-                _buildDartHackHelpButton(context, l10n),
+          const CircularProgressIndicator(
+            valueColor: AlwaysStoppedAnimation<Color>(Colors.amber),
+          ),
+          const SizedBox(height: 12),
+          Text(
+            l10n.preparingAssets,
+            style: const TextStyle(
+              color: Colors.white,
+              fontSize: 16,
+              fontWeight: FontWeight.bold,
+              shadows: [
+                Shadow(blurRadius: 4, color: Colors.black, offset: Offset(1, 1)),
               ],
-            ),
-          ),
-          Positioned(
-            top: 16,
-            right: 24,
-            child: _buildSettingsButton(context, l10n),
-          ),
-          Positioned.fill(
-            child: Padding(
-              padding: const EdgeInsets.fromLTRB(40.0, 60.0, 40.0, 16.0),
-              child: Row(
-                children: [
-                  Expanded(
-                    flex: 5,
-                    child: Center(
-                      child: Image.asset(
-                        'assets/images/darthack_logo.webp',
-                        cacheWidth: (screenWidth * 0.4 * MediaQuery.of(context).devicePixelRatio).round(),
-                        fit: BoxFit.contain,
-                      ),
-                    ),
-                  ),
-                  const SizedBox(width: 40),
-                  Expanded(
-                    flex: 5,
-                    child: Center(
-                      child: !assetsReady
-                          ? Column(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                const CircularProgressIndicator(
-                                  valueColor: AlwaysStoppedAnimation<Color>(Colors.amber),
-                                ),
-                                const SizedBox(height: 12),
-                                Text(
-                                  l10n.preparingAssets,
-                                  style: const TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.bold,
-                                    shadows: [
-                                      Shadow(blurRadius: 4, color: Colors.black, offset: Offset(1, 1)),
-                                    ],
-                                  ),
-                                ),
-                              ],
-                            )
-                          : Column(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                _buildLanguageSelector(context),
-                                const SizedBox(height: 16),
-                                _buildStartGameButton(context, l10n),
-                              ],
-                            ),
-                    ),
-                  ),
-                ],
-              ),
             ),
           ),
         ],
       );
     }
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        FittedBox(
+          fit: BoxFit.scaleDown,
+          child: _buildLanguageSelector(context),
+        ),
+        const SizedBox(height: 16),
+        ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 420),
+          child: _buildStartGameButton(context, l10n),
+        ),
+      ],
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    final mediaQuery = MediaQuery.of(context);
+    final isPortrait = mediaQuery.orientation == Orientation.portrait;
+    final bgCacheWidth = computeStableCacheWidth(context, maxWidth: 1920);
+    final logoCacheWidth = computeStableCacheWidth(
+      context,
+      widthFactor: 0.75,
+      maxWidth: 1024,
+    );
+
+    final Widget startScreenContent = isPortrait
+        ? Column(
+            children: [
+              _buildTopToolbar(context, l10n),
+              Expanded(
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                  child: Center(
+                    child: Image.asset(
+                      'assets/images/darthack_logo.webp',
+                      cacheWidth: logoCacheWidth,
+                      gaplessPlayback: true,
+                      fit: BoxFit.contain,
+                    ),
+                  ),
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.fromLTRB(24, 8, 24, 32),
+                child: _buildActionSection(context, l10n),
+              ),
+            ],
+          )
+        : Column(
+            children: [
+              _buildTopToolbar(context, l10n),
+              Expanded(
+                child: Padding(
+                  padding: const EdgeInsets.fromLTRB(40.0, 8.0, 40.0, 16.0),
+                  child: Row(
+                    children: [
+                      Expanded(
+                        flex: 5,
+                        child: Center(
+                          child: Image.asset(
+                            'assets/images/darthack_logo.webp',
+                            cacheWidth: logoCacheWidth,
+                            gaplessPlayback: true,
+                            fit: BoxFit.contain,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 24),
+                      Expanded(
+                        flex: 5,
+                        child: Center(
+                          child: SingleChildScrollView(
+                            child: _buildActionSection(context, l10n),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          );
 
     return Stack(
       children: [
         Positioned.fill(
           child: Image.asset(
             isPortrait ? 'assets/images/darthack_title.webp' : 'assets/images/darthack_title_yoko.webp',
-            cacheWidth: (screenWidth * MediaQuery.of(context).devicePixelRatio).round(),
+            cacheWidth: bgCacheWidth,
+            gaplessPlayback: true,
             fit: BoxFit.cover,
           ),
         ),
