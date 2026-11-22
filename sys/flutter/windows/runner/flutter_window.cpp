@@ -1,6 +1,9 @@
 #include "flutter_window.h"
 
+#include <flutter/standard_method_codec.h>
+
 #include <optional>
+#include <variant>
 
 #include "flutter/generated_plugin_registrant.h"
 
@@ -25,6 +28,36 @@ bool FlutterWindow::OnCreate() {
     return false;
   }
   RegisterPlugins(flutter_controller_->engine());
+
+  // 画面表示モード（通常 / ボーダレスフルスクリーン）切替チャンネルを登録
+  screen_mode_channel_ =
+      std::make_unique<flutter::MethodChannel<flutter::EncodableValue>>(
+          flutter_controller_->engine()->messenger(),
+          "jp.satokiyo.darthack/screen_mode",
+          &flutter::StandardMethodCodec::GetInstance());
+  screen_mode_channel_->SetMethodCallHandler(
+      [this](const flutter::MethodCall<flutter::EncodableValue>& call,
+             std::unique_ptr<flutter::MethodResult<flutter::EncodableValue>>
+                 result) {
+        if (call.method_name() == "setScreenMode") {
+          const auto* args =
+              std::get_if<flutter::EncodableMap>(call.arguments());
+          if (args != nullptr) {
+            auto it = args->find(flutter::EncodableValue("mode"));
+            if (it != args->end()) {
+              if (const auto* mode = std::get_if<int>(&it->second)) {
+                SetFullscreen(*mode == 1);
+                result->Success();
+                return;
+              }
+            }
+          }
+          result->Error("INVALID_ARGS", "Expected integer 'mode' argument");
+          return;
+        }
+        result->NotImplemented();
+      });
+
   SetChildContent(flutter_controller_->view()->GetNativeWindow());
 
   flutter_controller_->engine()->SetNextFrameCallback([&]() {
@@ -40,6 +73,7 @@ bool FlutterWindow::OnCreate() {
 }
 
 void FlutterWindow::OnDestroy() {
+  screen_mode_channel_.reset();
   if (flutter_controller_) {
     flutter_controller_ = nullptr;
   }

@@ -2,6 +2,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:darthack/config/ad_config.dart';
 import 'package:darthack/l10n/app_localizations.dart';
 import 'package:darthack/utils/app_prefs.dart';
 import 'package:darthack/settings_page.dart';
@@ -32,6 +33,8 @@ void main() {
   });
 
   tearDown(() async {
+    AdConfig.isAndroidOverride = null;
+    AdConfig.isIOSOverride = null;
     try {
       if (await tempDir.exists()) {
         await tempDir.delete(recursive: true);
@@ -54,6 +57,9 @@ void main() {
   }
 
   testWidgets('「その他の設定」に墓表示モードアイコンおよび広告付き機能設定が表示され、トグル操作できること', (tester) async {
+    AdConfig.isAndroidOverride = true;
+    AdConfig.isIOSOverride = false;
+
     tester.view.physicalSize = const Size(800, 3000);
     tester.view.devicePixelRatio = 1.0;
     addTearDown(() => tester.view.resetPhysicalSize());
@@ -105,5 +111,32 @@ void main() {
     // 親がOFFのとき、子スイッチのonChangedがnull（無効化）であること
     expect(tester.widget<SwitchListTile>(find.widgetWithText(SwitchListTile, '新階層到達時のHP/Pw回復確認')).onChanged, isNull);
     expect(tester.widget<SwitchListTile>(find.widgetWithText(SwitchListTile, 'ゲーム終了時のハイライト表示')).onChanged, isNull);
+  });
+
+  testWidgets('Windows等の非モバイル環境では広告付き機能設定が表示されないこと', (tester) async {
+    AdConfig.isAndroidOverride = false;
+    AdConfig.isIOSOverride = false;
+
+    tester.view.physicalSize = const Size(800, 3000);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(() => tester.view.resetPhysicalSize());
+
+    await tester.pumpWidget(buildTestableWidget(locale: const Locale('ja')));
+    await tester.pumpAndSettle();
+
+    // 「その他の設定」アコーディオンを展開
+    final otherTile = find.widgetWithText(ExpansionTile, 'その他の設定');
+    expect(otherTile, findsOneWidget);
+    await tester.ensureVisible(otherTile);
+    await tester.tap(otherTile);
+    await tester.pumpAndSettle();
+
+    // 墓表示モードは引き続き表示されること
+    expect(find.text('死亡時の墓表示モード'), findsOneWidget);
+
+    // 広告関連の3項目はすべて非表示であること（Steam配信ポリシー準拠）
+    expect(find.text('広告付き機能の利用'), findsNothing);
+    expect(find.text('新階層到達時のHP/Pw回復確認'), findsNothing);
+    expect(find.text('ゲーム終了時のハイライト表示'), findsNothing);
   });
 }

@@ -211,11 +211,11 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
   // タイルセット用変数
   ui.Image? _tileImage;
   bool _useTiles = true; // デフォルトでタイル表示を有効化
-  bool _usePhysicalKeyboardNotation = false; // 物理キーボード用の表記を使用
+  bool _usePhysicalKeyboardNotation = Platform.isWindows; // Windows初回は物理キーボード表記をデフォルト有効化
   int _tileWidth = 32;
   int _tileHeight = 32;
   String _selectedTileset = 'pixelhack_32x32';
-  bool _isKeyboardVisible = true; // デフォルトで仮想キーボードを表示
+  bool _isKeyboardVisible = !Platform.isWindows; // Windows初回はタッチ用仮想コントローラをデフォルト非表示
 
   // 主人公追従・スクロール用変数
   final GlobalKey _mapViewportKey = GlobalKey();
@@ -397,9 +397,11 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
     final tilesetChanged = newTileset != _selectedTileset;
     setState(() {
       _useTiles = prefs.getBool('use_tiles') ?? true;
-      _usePhysicalKeyboardNotation = prefs.getBool('use_physical_keyboard_notation') ?? false;
+      _usePhysicalKeyboardNotation =
+          prefs.getBool('use_physical_keyboard_notation') ?? Platform.isWindows;
       _selectedTileset = newTileset;
-      _isKeyboardVisible = prefs.getBool('keyboard_visible') ?? true;
+      _isKeyboardVisible =
+          prefs.getBool('keyboard_visible') ?? !Platform.isWindows;
       final controllerModeStr = prefs.getString('controller_mode') ?? 'pad';
       _controllerMode = controllerModeStr == 'keyboard' ? ControllerMode.keyboard : ControllerMode.pad;
       _padOpacity = prefs.getDouble('pad_opacity') ?? 0.8;
@@ -537,7 +539,7 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
   }
 
   void _applyScreenMode(ScreenMode mode) {
-    if (Platform.isAndroid) {
+    if (Platform.isAndroid || Platform.isWindows) {
       const MethodChannel('jp.satokiyo.darthack/screen_mode')
           .invokeMethod('setScreenMode', <String, int>{'mode': mode.index});
     } else {
@@ -546,6 +548,24 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
           : <SystemUiOverlay>[SystemUiOverlay.bottom];
       SystemChrome.setEnabledSystemUIMode(SystemUiMode.manual, overlays: overlays);
     }
+  }
+
+  /// Windows デスクトップ向け：通常表示とボーダレスフルスクリーンを切り替え設定を永続化する
+  Future<void> _toggleFullscreen() async {
+    if (!Platform.isWindows) return;
+    final nextMode = (_screenMode == ScreenMode.immersive)
+        ? ScreenMode.normal
+        : ScreenMode.immersive;
+    if (mounted) {
+      setState(() {
+        _screenMode = nextMode;
+      });
+    } else {
+      _screenMode = nextMode;
+    }
+    _applyScreenMode(nextMode);
+    final prefs = await AppPrefs.getInstance();
+    await prefs.setInt('screen_mode', nextMode.index);
   }
 
   String _moveModeName(DPadMoveMode mode) {
@@ -1843,6 +1863,13 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
       case ShowKeyboardHelp():
         _showKeyboardHelp();
         return KeyEventResult.handled;
+
+      case ToggleFullscreen():
+        if (Platform.isWindows) {
+          unawaited(_toggleFullscreen());
+          return KeyEventResult.handled;
+        }
+        return KeyEventResult.ignored;
 
       case IgnoreKey():
         return KeyEventResult.ignored;

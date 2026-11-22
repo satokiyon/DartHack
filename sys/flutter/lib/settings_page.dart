@@ -24,6 +24,7 @@ import 'services/font_manager.dart';
 import 'services/tileset_manager.dart';
 import 'widgets/keyboard_help_dialog.dart';
 import 'widgets/status_bar_view.dart';
+import 'config/ad_config.dart';
 
 
 /// 設定画面内の操作モード（物理キーボード操作中か、画面タップ操作中か）を子孫へ伝播する InheritedNotifier
@@ -403,7 +404,8 @@ class _SettingsPageState extends State<SettingsPage> {
       _adFeaturesEnabled = prefs.getBool('ad_features_enabled') ?? true;
       _adFeatureNewLevelRest = prefs.getBool('ad_feature_new_level_rest') ?? true;
       _adFeatureExitHighlight = prefs.getBool('ad_feature_exit_highlight') ?? true;
-      _usePhysicalKeyboardNotation = prefs.getBool('use_physical_keyboard_notation') ?? false;
+      _usePhysicalKeyboardNotation =
+          prefs.getBool('use_physical_keyboard_notation') ?? Platform.isWindows;
       final screenModeRaw = prefs.getInt('screen_mode');
       _screenMode = (screenModeRaw == 1) ? 1 : 0;
       _cameraFollowMode = prefs.getString('camera_follow_mode') ?? 'center';
@@ -3129,66 +3131,68 @@ class _SettingsPageState extends State<SettingsPage> {
               }
             },
           ),
-          _SettingsSwitchTile(
-            secondary: const Icon(Icons.campaign_outlined, color: Colors.amberAccent),
-            title: Text(l10n.optAdFeaturesTitle),
-            subtitle: Text(l10n.optAdFeaturesSub),
-            value: _adFeaturesEnabled,
-            onChanged: (val) {
-              setState(() => _adFeaturesEnabled = val);
-              _saveSetting('ad_features_enabled', val);
-            },
-          ),
-          Padding(
-            padding: const EdgeInsets.only(left: 24.0),
-            child: _SettingsSwitchTile(
-              title: Text(
-                l10n.optAdFeatureNewLevelRestTitle,
-                style: TextStyle(
-                  color: _adFeaturesEnabled ? null : Colors.white38,
-                ),
-              ),
-              subtitle: Text(
-                l10n.optAdFeatureNewLevelRestSub,
-                style: TextStyle(
-                  fontSize: 12,
-                  color: _adFeaturesEnabled ? Colors.white60 : Colors.white38,
-                ),
-              ),
-              value: _adFeatureNewLevelRest,
-              onChanged: _adFeaturesEnabled
-                  ? (val) {
-                      setState(() => _adFeatureNewLevelRest = val);
-                      _saveSetting('ad_feature_new_level_rest', val);
-                    }
-                  : null,
+          if (AdConfig.isMobilePlatform) ...[
+            _SettingsSwitchTile(
+              secondary: const Icon(Icons.campaign_outlined, color: Colors.amberAccent),
+              title: Text(l10n.optAdFeaturesTitle),
+              subtitle: Text(l10n.optAdFeaturesSub),
+              value: _adFeaturesEnabled,
+              onChanged: (val) {
+                setState(() => _adFeaturesEnabled = val);
+                _saveSetting('ad_features_enabled', val);
+              },
             ),
-          ),
-          Padding(
-            padding: const EdgeInsets.only(left: 24.0),
-            child: _SettingsSwitchTile(
-              title: Text(
-                l10n.optAdFeatureExitHighlightTitle,
-                style: TextStyle(
-                  color: _adFeaturesEnabled ? null : Colors.white38,
+            Padding(
+              padding: const EdgeInsets.only(left: 24.0),
+              child: _SettingsSwitchTile(
+                title: Text(
+                  l10n.optAdFeatureNewLevelRestTitle,
+                  style: TextStyle(
+                    color: _adFeaturesEnabled ? null : Colors.white38,
+                  ),
                 ),
-              ),
-              subtitle: Text(
-                l10n.optAdFeatureExitHighlightSub,
-                style: TextStyle(
-                  fontSize: 12,
-                  color: _adFeaturesEnabled ? Colors.white60 : Colors.white38,
+                subtitle: Text(
+                  l10n.optAdFeatureNewLevelRestSub,
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: _adFeaturesEnabled ? Colors.white60 : Colors.white38,
+                  ),
                 ),
+                value: _adFeatureNewLevelRest,
+                onChanged: _adFeaturesEnabled
+                    ? (val) {
+                        setState(() => _adFeatureNewLevelRest = val);
+                        _saveSetting('ad_feature_new_level_rest', val);
+                      }
+                    : null,
               ),
-              value: _adFeatureExitHighlight,
-              onChanged: _adFeaturesEnabled
-                  ? (val) {
-                      setState(() => _adFeatureExitHighlight = val);
-                      _saveSetting('ad_feature_exit_highlight', val);
-                    }
-                  : null,
             ),
-          ),
+            Padding(
+              padding: const EdgeInsets.only(left: 24.0),
+              child: _SettingsSwitchTile(
+                title: Text(
+                  l10n.optAdFeatureExitHighlightTitle,
+                  style: TextStyle(
+                    color: _adFeaturesEnabled ? null : Colors.white38,
+                  ),
+                ),
+                subtitle: Text(
+                  l10n.optAdFeatureExitHighlightSub,
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: _adFeaturesEnabled ? Colors.white60 : Colors.white38,
+                  ),
+                ),
+                value: _adFeatureExitHighlight,
+                onChanged: _adFeaturesEnabled
+                    ? (val) {
+                        setState(() => _adFeatureExitHighlight = val);
+                        _saveSetting('ad_feature_exit_highlight', val);
+                      }
+                    : null,
+              ),
+            ),
+          ],
 
           ListTile(
             leading: const Icon(Icons.restore, color: Colors.orangeAccent),

@@ -273,6 +273,47 @@ void Win32Window::SetQuitOnClose(bool quit_on_close) {
   quit_on_close_ = quit_on_close;
 }
 
+void Win32Window::SetFullscreen(bool fullscreen) {
+  if (!window_handle_ || is_fullscreen_ == fullscreen) {
+    return;
+  }
+
+  if (fullscreen) {
+    // 現在のウィンドウスタイルと配置（通常サイズ・最大化状態等）を退避
+    saved_style_ = GetWindowLongPtr(window_handle_, GWL_STYLE);
+    saved_placement_.length = sizeof(WINDOWPLACEMENT);
+    GetWindowPlacement(window_handle_, &saved_placement_);
+
+    MONITORINFO monitor_info = {};
+    monitor_info.cbSize = sizeof(MONITORINFO);
+    HMONITOR monitor =
+        MonitorFromWindow(window_handle_, MONITOR_DEFAULTTOPRIMARY);
+    if (GetMonitorInfo(monitor, &monitor_info)) {
+      SetWindowLongPtr(window_handle_, GWL_STYLE,
+                       saved_style_ & ~WS_OVERLAPPEDWINDOW);
+      SetWindowPos(
+          window_handle_, HWND_TOP, monitor_info.rcMonitor.left,
+          monitor_info.rcMonitor.top,
+          monitor_info.rcMonitor.right - monitor_info.rcMonitor.left,
+          monitor_info.rcMonitor.bottom - monitor_info.rcMonitor.top,
+          SWP_NOOWNERZORDER | SWP_FRAMECHANGED);
+      is_fullscreen_ = true;
+    }
+  } else {
+    // 退避していたスタイルと配置へ復元
+    SetWindowLongPtr(window_handle_, GWL_STYLE, saved_style_);
+    SetWindowPlacement(window_handle_, &saved_placement_);
+    SetWindowPos(window_handle_, nullptr, 0, 0, 0, 0,
+                 SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER | SWP_NOOWNERZORDER |
+                     SWP_FRAMECHANGED);
+    is_fullscreen_ = false;
+  }
+}
+
+bool Win32Window::IsFullscreen() const {
+  return is_fullscreen_;
+}
+
 bool Win32Window::OnCreate() {
   // No-op; provided for subclasses.
   return true;

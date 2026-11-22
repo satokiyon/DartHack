@@ -239,6 +239,21 @@ class ShowKeyboardHelp extends KeyAction {
   int get hashCode => runtimeType.hashCode;
 }
 
+/// F11 / Alt+Enter によるフルスクリーン表示の切り替え（デスクトップ向け）
+class ToggleFullscreen extends KeyAction {
+  const ToggleFullscreen();
+
+  @override
+  String toString() => 'ToggleFullscreen()';
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) || other is ToggleFullscreen;
+
+  @override
+  int get hashCode => runtimeType.hashCode;
+}
+
 /// メニューのページ送り（1: 次、-1: 前）
 class MenuPage extends KeyAction {
   final int direction;
@@ -1083,6 +1098,17 @@ class HardwareKeyRouter {
     if (isHelpKey && !isTextFieldFocused) {
       return (event is KeyDownEvent)
           ? const ShowKeyboardHelp()
+          : const SwallowKey();
+    }
+
+    // F11 / Alt+Enter キー: フルスクリーン切替（デスクトップ向け、最優先で判定）
+    final isFullscreenKey = (event.logicalKey == LogicalKeyboardKey.f11) ||
+        (isAltPressed &&
+            (event.logicalKey == LogicalKeyboardKey.enter ||
+                event.logicalKey == LogicalKeyboardKey.numpadEnter));
+    if (isFullscreenKey) {
+      return (event is KeyDownEvent)
+          ? const ToggleFullscreen()
           : const SwallowKey();
     }
 

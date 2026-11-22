@@ -55,6 +55,12 @@ class Win32Window {
   // Return a RECT representing the bounds of the current client area.
   RECT GetClientArea();
 
+  // ボーダレスフルスクリーン表示の切り替えを行う。
+  void SetFullscreen(bool fullscreen);
+
+  // 現在フルスクリーン表示中かを返す。
+  bool IsFullscreen() const;
+
  protected:
   // Processes and route salient window messages for mouse handling,
   // size change and DPI. Delegates handling of these to member overloads that
@@ -97,6 +103,11 @@ class Win32Window {
 
   // window handle for hosted content.
   HWND child_content_ = nullptr;
+
+  // フルスクリーン切り替え前のウィンドウ状態退避用
+  bool is_fullscreen_ = false;
+  LONG_PTR saved_style_ = 0;
+  WINDOWPLACEMENT saved_placement_{sizeof(WINDOWPLACEMENT)};
 };
 
 #endif  // RUNNER_WIN32_WINDOW_H_

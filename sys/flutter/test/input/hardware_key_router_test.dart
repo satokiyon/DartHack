@@ -1662,5 +1662,70 @@ void main() {
         GameFocusStop.none,
       );
     });
+
+    test('F11 and Alt+Enter should trigger ToggleFullscreen across contexts', () {
+      const f11Down = KeyDownEvent(
+        physicalKey: PhysicalKeyboardKey.f11,
+        logicalKey: LogicalKeyboardKey.f11,
+        timeStamp: Duration.zero,
+      );
+      const f11Repeat = KeyRepeatEvent(
+        physicalKey: PhysicalKeyboardKey.f11,
+        logicalKey: LogicalKeyboardKey.f11,
+        timeStamp: Duration.zero,
+      );
+      const enterDown = KeyDownEvent(
+        physicalKey: PhysicalKeyboardKey.enter,
+        logicalKey: LogicalKeyboardKey.enter,
+        timeStamp: Duration.zero,
+      );
+      const numpadEnterDown = KeyDownEvent(
+        physicalKey: PhysicalKeyboardKey.numpadEnter,
+        logicalKey: LogicalKeyboardKey.numpadEnter,
+        timeStamp: Duration.zero,
+      );
+
+      // F11 でフルスクリーン切替（ゲーム画面・タイトル画面・テキスト入力中でも有効）
+      expect(
+        HardwareKeyRouter.route(event: f11Down, context: KeyInputContext.game),
+        equals(const ToggleFullscreen()),
+      );
+      expect(
+        HardwareKeyRouter.route(event: f11Down, context: KeyInputContext.titleScreen),
+        equals(const ToggleFullscreen()),
+      );
+      expect(
+        HardwareKeyRouter.route(
+          event: f11Down,
+          context: KeyInputContext.textInputOverlay,
+          isTextFieldFocused: true,
+        ),
+        equals(const ToggleFullscreen()),
+      );
+
+      // F11 の長押しリピートは SwallowKey で二重トグルを防止
+      expect(
+        HardwareKeyRouter.route(event: f11Repeat, context: KeyInputContext.game),
+        equals(const SwallowKey()),
+      );
+
+      // Alt+Enter / Alt+NumpadEnter でもフルスクリーン切替
+      expect(
+        HardwareKeyRouter.route(
+          event: enterDown,
+          context: KeyInputContext.game,
+          isAltPressed: true,
+        ),
+        equals(const ToggleFullscreen()),
+      );
+      expect(
+        HardwareKeyRouter.route(
+          event: numpadEnterDown,
+          context: KeyInputContext.titleScreen,
+          isAltPressed: true,
+        ),
+        equals(const ToggleFullscreen()),
+      );
+    });
   });
 }
