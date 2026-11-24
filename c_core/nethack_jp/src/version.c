@@ -203,11 +203,19 @@ doextversion(void)
         *--p = ' ';
         putstr(win, 0, p);
     }
+    /* DartHack: append DartHack edition info on Flutter builds */
+#if defined(WINFLUTTER) || defined(ANDROID)
+    putstr(win, 0, "");
+    putstr(win, 0, "DartHack (非公式日本語対応移植版) by " NETHACKJP_AUTHOR);
+    putstr(win, 0, "  公式サイト: " DEVTEAM_URL);
+    putstr(win, 0, "  GitHub:     " DARTHACK_REPO_URL);
+#else
     /* NetHackJP: append derivative edition info */
     putstr(win, 0, "");
     putstr(win, 0, "NetHackJP (非公式日本語化版) by " NETHACKJP_AUTHOR);
     putstr(win, 0, "  公式サイト: " DEVTEAM_URL);
     putstr(win, 0, "  GitHub:     " NETHACKJP_REPO_URL);
+#endif
 
     if (use_dlb) {
         f = dlb_fopen(OPTIONS_USED, "r");

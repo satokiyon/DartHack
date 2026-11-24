@@ -3314,6 +3314,23 @@ docontact(void)
         putstr(cwin, 0, buf);
         putstr(cwin, 0, "");
     }
+    /* DartHack: show DartHack support info on Flutter builds */
+#if defined(WINFLUTTER) || defined(ANDROID)
+    putstr(cwin, 0,
+           "このソフトは NetHack の非公式日本語対応移植版「DartHack」(by "
+           NETHACKJP_AUTHOR ") です。");
+    putstr(cwin, 0, "");
+    putstr(cwin, 0, "DartHack のバグ報告・お問い合わせ:");
+    Sprintf(buf, "  公式サイト: %s", DEVTEAM_URL);
+    putstr(cwin, 0, buf);
+    Sprintf(buf, "  GitHub:     %s", DARTHACK_REPO_URL);
+    putstr(cwin, 0, buf);
+    Sprintf(buf, "  メール:     <%s>", DEVTEAM_EMAIL);
+    putstr(cwin, 0, buf);
+    putstr(cwin, 0, "");
+    putstr(cwin, 0,
+           "※ DartHack 固有の不具合は本家 NetHack 開発チームではなく、上記の DartHack 窓口へご連絡ください。");
+#else
     putstr(cwin, 0,
            "このソフトは NetHack の非公式日本語化派生版「NetHackJP」(by "
            NETHACKJP_AUTHOR ") です。");
@@ -3328,6 +3345,7 @@ docontact(void)
     putstr(cwin, 0, "");
     putstr(cwin, 0,
            "※ NetHackJP 固有の不具合は本家 NetHack 開発チームではなく、上記の NetHackJP 窓口へご連絡ください。");
+#endif
     putstr(cwin, 0, "");
     putstr(cwin, 0, "オリジナル NetHack 公式サイト (NetHack DevTeam):");
     Sprintf(buf, "  %s", UPSTREAM_NETHACK_URL);

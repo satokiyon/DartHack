@@ -835,5 +835,45 @@ void main() {
         'コカトリスによる石化（マジックベインを装備中）',
       );
     });
+
+    test('NetHack 5.0.1 / NetHackJP 同期分の死因マッピングテスト', () {
+      // apply.c: むち自爆の新旧フォーマット
+      expect(translateDeathReason('killed himself with his bullwhip', isJp: true), 'むちで自分を打って死んだ');
+      expect(translateDeathReason('killed herself with her bullwhip', isJp: true), 'むちで自分を打って死んだ');
+      expect(translateDeathReason('killed itself with its bullwhip', isJp: true), 'むちで自分を打って死んだ');
+      expect(translateDeathReason('killed by killed himself with his bullwhip', isJp: true), 'むちで自分を打って死んだ');
+      expect(translateDeathReason('whipping himself', isJp: true), 'むちで自分を打って死んだ');
+
+      // dothrow.c / topten.c: hurtle_step() 衝突系死因 8件（単体形・killed by 形）
+      expect(translateDeathReason('bumping into a tree', isJp: true), '木にぶつかったこと');
+      expect(translateDeathReason('killed by bumping into a tree', isJp: true), '木にぶつかって倒された');
+      expect(translateDeathReason('bumping into a wall', isJp: true), '壁にぶつかったこと');
+      expect(translateDeathReason('killed by bumping into a wall', isJp: true), '壁にぶつかって倒された');
+      expect(translateDeathReason('bumping into a door frame', isJp: true), '扉の枠にぶつかったこと');
+      expect(translateDeathReason('killed by bumping into a door frame', isJp: true), '扉の枠にぶつかって倒された');
+      expect(translateDeathReason('bumping into a closed door', isJp: true), '閉まった扉にぶつかったこと');
+      expect(translateDeathReason('killed by bumping into a closed door', isJp: true), '閉まった扉にぶつかって倒された');
+      expect(translateDeathReason('crashing into iron bars', isJp: true), '鉄格子に激突したこと');
+      expect(translateDeathReason('killed by crashing into iron bars', isJp: true), '鉄格子に激突して倒された');
+      expect(translateDeathReason('bumping into a boulder', isJp: true), '岩にぶつかったこと');
+      expect(translateDeathReason('killed by bumping into a boulder', isJp: true), '岩にぶつかって倒された');
+      expect(translateDeathReason('touching the edge of the universe', isJp: true), '世界の果てに触れたこと');
+      expect(translateDeathReason('killed by touching the edge of the universe', isJp: true), '世界の果てに触れて倒された');
+      expect(translateDeathReason('wedging into a narrow crevice', isJp: true), '狭い裂け目にはまったこと');
+      expect(translateDeathReason('killed by wedging into a narrow crevice', isJp: true), '狭い裂け目にはまって倒された');
+
+      // read.c: scroll of earth (KILLED_BY_AN 化)
+      expect(translateDeathReason('killed by a scroll of earth', isJp: true), '大地の巻物に倒された');
+
+      // 既存の石化フォールバック（bumping into / touching）が影響を受けないこと
+      expect(
+        translateDeathReason('bumping into a cockatrice corpse', isJp: true),
+        'コカトリスの死体への衝突で石化した',
+      );
+      expect(
+        translateDeathReason('touching a cockatrice corpse', isJp: true),
+        'コカトリスの死体に触れたことで石化した',
+      );
+    });
   });
 }

@@ -2553,6 +2553,16 @@ String _translateDrownedIn(String rest) {
   return '$placeJpで溺死した';
 }
 
+/// むちによる自爆死因（旧 `whipping <him>self` / 新 `killed <him>self with <his> bullwhip`）判定
+bool _isBullwhipSelfKill(String lower) {
+  if (lower == 'whipping' || lower.startsWith('whipping ')) {
+    return true;
+  }
+  return lower.startsWith('killed ') &&
+      lower.contains('self with ') &&
+      lower.contains(' bullwhip');
+}
+
 String _translateDeathTextInternal(String death, bool isJp) {
   const exactMap = {
     'quit': '中断した',
@@ -2677,6 +2687,14 @@ String _translateDeathTextInternal(String death, bool isJp) {
     'its own player': 'プレイヤー自身の手で倒された',
     'sitting on an iron spike': '鉄の刺の上に座ったこと',
     'riding accident': '落馬事故',
+    'bumping into a tree': '木にぶつかったこと',
+    'bumping into a wall': '壁にぶつかったこと',
+    'bumping into a door frame': '扉の枠にぶつかったこと',
+    'bumping into a closed door': '閉まった扉にぶつかったこと',
+    'crashing into iron bars': '鉄格子に激突したこと',
+    'bumping into a boulder': '岩にぶつかったこと',
+    'touching the edge of the universe': '世界の果てに触れたこと',
+    'wedging into a narrow crevice': '狭い裂け目にはまったこと',
     'gazing into a Magic 8-Ball (tm)': 'マジック8ボールをのぞき込んで倒された',
     'gazing into a crystal ball': '水晶玉をのぞき込んで倒された',
     'dragged downstairs by an iron ball': '鉄球に引きずられて階段から落ちて倒された',
@@ -2870,7 +2888,19 @@ String _translateDeathTextInternal(String death, bool isJp) {
       if (rawLow.startsWith('chopping off ')) {
         return '自分の足を切り落として倒された';
       }
-      if (rawLow == 'whipping' || rawLow.startsWith('whipping ')) {
+      if (rawLow == 'bumping into a tree') return '木にぶつかって倒された';
+      if (rawLow == 'bumping into a wall') return '壁にぶつかって倒された';
+      if (rawLow == 'bumping into a door frame') return '扉の枠にぶつかって倒された';
+      if (rawLow == 'bumping into a closed door') return '閉まった扉にぶつかって倒された';
+      if (rawLow == 'crashing into iron bars') return '鉄格子に激突して倒された';
+      if (rawLow == 'bumping into a boulder') return '岩にぶつかって倒された';
+      if (rawLow == 'touching the edge of the universe') {
+        return '世界の果てに触れて倒された';
+      }
+      if (rawLow == 'wedging into a narrow crevice') {
+        return '狭い裂け目にはまって倒された';
+      }
+      if (_isBullwhipSelfKill(rawLow)) {
         return 'むちで自分を打って死んだ';
       }
       final petrifyAction = _translatePetrificationAction(raw);
@@ -3089,7 +3119,7 @@ String _translateDeathTextInternal(String death, bool isJp) {
     return '$trの爆発に巻き込まれた';
   }
 
-  if (death == 'whipping' || death.startsWith('whipping ')) {
+  if (_isBullwhipSelfKill(lowerDeath)) {
     return 'むちで自分を打って死んだ';
   }
   final petrifyAction = _translatePetrificationAction(death);
