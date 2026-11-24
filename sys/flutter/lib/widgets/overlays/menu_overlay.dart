@@ -8,6 +8,7 @@ import '../menu_item_tile_painter.dart';
 import '../../services/font_manager.dart';
 import '../../input/hardware_key_router.dart';
 import '../../utils/item_count_parser.dart';
+import '../../utils/menu_tab_layout.dart';
 
 /// メニュー画面での Tab キーフォーカス対象
 enum MenuFocusTarget {
@@ -765,6 +766,7 @@ class MenuOverlayState extends State<MenuOverlay> {
     bool isHeader = false,
     String accLabel = "",
     String suffixLabel = "",
+    MenuTabColumnLayout? tabLayout,
   }) {
     final parts = text.split('\t');
     if (parts.length < 2) {
@@ -775,46 +777,8 @@ class MenuOverlayState extends State<MenuOverlay> {
     }
 
     final children = <Widget>[];
-
-    final List<double> colWidths;
-    final List<TextAlign> colAligns;
-
-    if (parts.length == 6) {
-      colWidths = [0, 50, 75, 60, 85, 70];
-      colAligns = [
-        TextAlign.left,
-        TextAlign.right,
-        TextAlign.left,
-        TextAlign.right,
-        TextAlign.right,
-        TextAlign.right,
-      ];
-    } else if (parts.length == 5) {
-      colWidths = [0, 50, 75, 60, 85];
-      colAligns = [
-        TextAlign.left,
-        TextAlign.right,
-        TextAlign.left,
-        TextAlign.right,
-        TextAlign.right,
-      ];
-    } else if (parts.length == 3) {
-      colWidths = [0, 60, 120];
-      colAligns = [
-        TextAlign.left,
-        TextAlign.right,
-        TextAlign.left,
-      ];
-    } else if (parts.length == 2) {
-      colWidths = [0, 100];
-      colAligns = [
-        TextAlign.left,
-        TextAlign.right,
-      ];
-    } else {
-      colWidths = List.generate(parts.length, (index) => index == 0 ? 0.0 : 80.0);
-      colAligns = List.generate(parts.length, (index) => index == 0 ? TextAlign.left : TextAlign.right);
-    }
+    final colAligns = MenuTabColumnLayout.alignmentsForColumnCount(parts.length);
+    final colSpacing = tabLayout?.columnSpacing ?? 12.0;
 
     for (int i = 0; i < parts.length; i++) {
       final partText = parts[i].trim();
@@ -837,27 +801,30 @@ class MenuOverlayState extends State<MenuOverlay> {
         colText,
         style: displayStyle,
         textAlign: colAligns[i],
+        maxLines: 1,
+        softWrap: false,
         overflow: TextOverflow.ellipsis,
       );
 
-      if (colWidths[i] == 0) {
+      if (i == 0) {
         children.add(Expanded(child: textWidget));
       } else {
+        final colWidth = tabLayout?.widthForColumn(i) ?? 80.0;
         children.add(SizedBox(
-          width: colWidths[i],
+          width: colWidth,
           child: textWidget,
         ));
       }
 
       if (i < parts.length - 1) {
-        children.add(const SizedBox(width: 8));
+        children.add(SizedBox(width: colSpacing));
       }
     }
 
     return Row(children: children);
   }
 
-  Widget _buildMenuCategoryRow(String text) {
+  Widget _buildMenuCategoryRow(String text, {MenuTabColumnLayout? tabLayout}) {
     final hasTab = text.contains('\t');
     if (!hasTab) {
       return DialogHeaderHelper.buildTitleHeaderBadge(text);
@@ -885,6 +852,7 @@ class MenuOverlayState extends State<MenuOverlay> {
                 fontWeight: FontWeight.w700,
               ),
               isHeader: true,
+              tabLayout: tabLayout,
             ),
           ),
         ],
@@ -935,25 +903,63 @@ class MenuOverlayState extends State<MenuOverlay> {
     }
     if (minLeadingSpaces == 999) minLeadingSpaces = 0;
 
-    final hasTabMenu = filteredItems.any((item) => item.text.contains('\t'));
-    int maxTabParts = 0;
+    final menuTextScaler = TextScaler.linear(FontManager.instance.menuFontSize / 14.0);
+    final menuFontFamily = FontManager.instance.getSelectedFont(FontTarget.menu).fontFamily;
+    final hasTabMenu = !isExtCmdMenu && filteredItems.any((item) => item.text.contains('\t'));
+
+    MenuTabColumnLayout? tabLayout;
     if (hasTabMenu) {
+      final rowSpecs = <MenuTabRowSpec>[];
       for (final item in filteredItems) {
-        if (item.text.contains('\t')) {
-          final count = item.text.split('\t').length;
-          if (count > maxTabParts) maxTabParts = count;
+        final commandText = _adjustMenuIndent(item.text, minLeadingSpaces);
+        if (!commandText.contains('\t')) continue;
+        final parts = commandText.split('\t').map((p) => p.trim()).toList();
+        if (parts.length < 2) continue;
+
+        final isCategory = _isMenuCategoryItem(item);
+        final isSelectable =
+            widget.menuHow > 0 && item.ident != 0 && item.ident != 4294967294 && !isCategory;
+        final isPrintableAccel = item.accelerator >= 0x21 && item.accelerator <= 0x7E;
+        final accLabel = (!isCategory && !(isEnhanceMenu && isSelectable) && isPrintableAccel)
+            ? "${String.fromCharCode(item.accelerator)} - "
+            : "";
+
+        if (accLabel.isNotEmpty) {
+          parts[0] = "$accLabel${parts[0]}";
         }
+
+        if (isMultiSelectMenu && isSelectable && _selectedCounts.containsKey(item.ident)) {
+          final selectedCount = _selectedCounts[item.ident] ?? 0;
+          final maxCount = _parseMaxCount(item.text);
+          final countLabel =
+              l10n?.selectedCountLabel(selectedCount, maxCount) ?? " ($selectedCount個選択中 / $maxCount)";
+          parts[parts.length - 1] = "${parts[parts.length - 1]}$countLabel";
+        }
+
+        rowSpecs.add(MenuTabRowSpec(cells: parts, isHeader: isCategory));
       }
-    }
-    final double targetMinWidth;
-    if (maxTabParts >= 6) {
-      targetMinWidth = 700.0;
-    } else if (maxTabParts == 5) {
-      targetMinWidth = 600.0;
-    } else if (maxTabParts >= 3) {
-      targetMinWidth = 500.0;
-    } else {
-      targetMinWidth = 480.0;
+
+      final horizontalChromeWidth = isEnhanceMenu
+          ? 128.0
+          : (isMultiSelectMenu ? 92.0 : 64.0);
+
+      tabLayout = MenuTabColumnLayout.measure(
+        rows: rowSpecs,
+        bodyStyle: TextStyle(
+          fontFamily: menuFontFamily,
+          fontFamilyFallback: FontManager.defaultJapaneseFallbacks,
+          fontSize: 14,
+          fontWeight: FontWeight.w700,
+        ),
+        headerStyle: TextStyle(
+          fontFamily: menuFontFamily,
+          fontFamilyFallback: FontManager.defaultJapaneseFallbacks,
+          fontSize: 13,
+          fontWeight: FontWeight.bold,
+        ),
+        textScaler: menuTextScaler,
+        horizontalChromeWidth: horizontalChromeWidth,
+      );
     }
 
     return Positioned.fill(
@@ -1097,7 +1103,7 @@ class MenuOverlayState extends State<MenuOverlay> {
                             }
 
                             if (isCategory) {
-                              return _buildMenuCategoryRow(commandText);
+                              return _buildMenuCategoryRow(commandText, tabLayout: tabLayout);
                             }
                             if (isDivider) {
                               return Padding(
@@ -1141,6 +1147,7 @@ class MenuOverlayState extends State<MenuOverlay> {
                                                 fontWeight: plainFontWeight,
                                               ),
                                               accLabel: accLabel,
+                                              tabLayout: tabLayout,
                                             )
                                           : Text(
                                               "$accLabel$commandText",
@@ -1201,6 +1208,7 @@ class MenuOverlayState extends State<MenuOverlay> {
                                           ),
                                           accLabel: accLabel,
                                           suffixLabel: countLabel,
+                                          tabLayout: tabLayout,
                                         )
                                       : Text(
                                           "$accLabel$commandText$countLabel",
@@ -1332,6 +1340,7 @@ class MenuOverlayState extends State<MenuOverlay> {
                                                     fontSize: 14,
                                                     fontWeight: FontWeight.w700,
                                                   ),
+                                                  tabLayout: tabLayout,
                                                 )
                                               : Text(
                                                   commandText,
@@ -1385,6 +1394,7 @@ class MenuOverlayState extends State<MenuOverlay> {
                                               fontWeight: FontWeight.w700,
                                             ),
                                             accLabel: accLabel,
+                                            tabLayout: tabLayout,
                                           )
                                         : Text(
                                             "$accLabel$commandText",
@@ -1404,7 +1414,9 @@ class MenuOverlayState extends State<MenuOverlay> {
                             );
                           },
                         );
-                        return hasTabMenu
+                        final needsHorizontalScroll =
+                            tabLayout != null && tabLayout.minTotalWidth > constraints.maxWidth;
+                        return needsHorizontalScroll
                             ? Scrollbar(
                                 controller: _horizontalScrollController,
                                 thumbVisibility: true,
@@ -1412,9 +1424,7 @@ class MenuOverlayState extends State<MenuOverlay> {
                                   controller: _horizontalScrollController,
                                   scrollDirection: Axis.horizontal,
                                   child: SizedBox(
-                                    width: constraints.maxWidth > targetMinWidth
-                                        ? constraints.maxWidth
-                                        : targetMinWidth,
+                                    width: tabLayout.minTotalWidth,
                                     child: listView,
                                   ),
                                 ),
