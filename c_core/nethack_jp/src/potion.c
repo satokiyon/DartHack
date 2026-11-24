@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-19. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-24. */
 /* $NHDT-Header: NetHack 5.0 potion.c 2026/06/20_22:26:43 NetHack-5.0:1.290 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2013. */
@@ -741,7 +741,8 @@ peffect_water(struct obj *otmp)
                     you_unwere(FALSE);
                 set_ulycn(NON_PM); /* cure lycanthropy */
             }
-            losehp(Maybe_Half_Phys(d(2, 6)), "potion of holy water",
+            losehp(Maybe_Adjust_Phys(d(2, 6), STRANGE_OBJECT),
+                   "potion of holy water",
                    KILLED_BY_AN);
         } else if (otmp->cursed) {
             You_feel("かなり誇らしい気分になった.");
@@ -762,7 +763,8 @@ peffect_water(struct obj *otmp)
         } else {
             if (u.ualign.type == A_LAWFUL) {
                 pline("これは%sのように焼けつく!", hliquid("acid"));
-                losehp(Maybe_Half_Phys(d(2, 6)), "potion of unholy water",
+                losehp(Maybe_Adjust_Phys(d(2, 6), STRANGE_OBJECT),
+                       "potion of unholy water",
                        KILLED_BY_AN);
             } else
                 You_feel("恐怖に満たされた.");
@@ -1207,7 +1209,9 @@ peffect_levitation(struct obj *otmp)
 
             You("%sを%sにぶつけた.", jp_body_part(HEAD),
                 ceiling(u.ux, u.uy));
-            losehp(Maybe_Half_Phys(dmg), "colliding with the ceiling", KILLED_BY);
+            losehp(Maybe_Adjust_Phys(dmg, STRANGE_OBJECT),
+                   "colliding with the ceiling",
+                   KILLED_BY);
             gp.potion_nothing = 0; /* not nothing after all */
         }
     } else if (otmp->blessed) {
@@ -1311,7 +1315,8 @@ peffect_acid(struct obj *otmp)
               otmp->blessed ? "少し" : otmp->cursed ? "かなり"
                                                     : "焼けるように");
         dmg = d(otmp->cursed ? 2 : 1, otmp->blessed ? 4 : 8);
-        losehp(Maybe_Half_Phys(dmg), "potion of acid", KILLED_BY_AN);
+        losehp(Maybe_Adjust_Phys(dmg, STRANGE_OBJECT), "potion of acid",
+               KILLED_BY_AN);
         exercise(A_CON, FALSE);
     }
     if (Stoned)
@@ -1640,7 +1645,7 @@ potionhit(struct monst *mon, struct obj *obj, int how)
         distance = 0;
         pline_The("%sが%sに当たり、砕け散った.", botlnam,
               jp_body_part(HEAD));
-        losehp(Maybe_Half_Phys(rnd(2)),
+        losehp(Maybe_Adjust_Phys(rnd(2), STRANGE_OBJECT),
                (how == POTHIT_OTHER_THROW) ? "propelled potion" /* scatter */
                                            : "thrown potion",
                KILLED_BY_AN);
@@ -1704,7 +1709,8 @@ potionhit(struct monst *mon, struct obj *obj, int how)
                       obj->blessed ? "少し"
                                    : obj->cursed ? "かなり" : "");
                 dmg = d(obj->cursed ? 2 : 1, obj->blessed ? 4 : 8);
-                losehp(Maybe_Half_Phys(dmg), "potion of acid", KILLED_BY_AN);
+                losehp(Maybe_Adjust_Phys(dmg, STRANGE_OBJECT),
+                       "potion of acid", KILLED_BY_AN);
             }
             break;
         }

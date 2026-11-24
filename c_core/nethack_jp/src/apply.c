@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-19. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-24. */
 /* $NHDT-Header: NetHack 5.0 apply.c 2026/06/20_16:30:40 NetHack-5.0:1.486 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
@@ -2060,7 +2060,8 @@ jump(int magic) /* 0=Physical, otherwise skill level */
             case TT_BEARTRAP:
                 side = rn2(3) ? LEFT_SIDE : RIGHT_SIDE;
                 You("トラバサミを引き裂いて脱出した!  痛い!");
-                losehp(Maybe_Half_Phys(rnd(10)), "jumping out of a bear trap",
+                losehp(Maybe_Adjust_Phys(rnd(10), BEARTRAP),
+                       "jumping out of a bear trap",
                        KILLED_BY);
                 set_wounded_legs(side, rn1(1000, 500));
                 break;
@@ -3053,8 +3054,8 @@ use_whip(struct obj *obj)
         if (dam <= 0)
             dam = 1;
         You("むちで自分の%sを叩いてしまった.", jp_body_part(FOOT));
-        Sprintf(buf, "whipping %sself", uhim());
-        losehp(Maybe_Half_Phys(dam), buf, NO_KILLER_PREFIX);
+        Sprintf(buf, "killed %sself with %s bullwhip", uhim(), uhis());
+        losehp(Maybe_Adjust_Phys(dam, BULLWHIP), buf, NO_KILLER_PREFIX);
         return ECMD_TIME;
 
     } else if ((Fumbling || Glib) && !rn2(5)) {
@@ -3186,7 +3187,7 @@ use_whip(struct obj *obj)
 
                         dam = dmgval(otmp, &gy.youmonst);
                         hitvalu = 8 + otmp->spe;
-                        hitu = thitu(hitvalu, Maybe_Half_Phys(dam),
+                        hitu = thitu(hitvalu, Maybe_Adjust_Phys(dam, otmp->otyp),
                                      &otmp, (char *) 0);
                         if (hitu) {
                             pline_The("%sが、ひったくろうとしたあなたに当たった!",
@@ -3858,7 +3859,8 @@ use_grapple(struct obj *obj)
     default: /* Yourself (oops!) */
         if (P_SKILL(typ) <= P_BASIC) {
             You("自分にフックを引っかけた!");
-            losehp(Maybe_Half_Phys(rn1(10, 10)), "a grappling hook",
+            losehp(Maybe_Adjust_Phys(rn1(10, 10), obj->otyp),
+                   "a grappling hook",
                    KILLED_BY);
             return ECMD_TIME;
         }
@@ -4118,7 +4120,8 @@ do_break_wand(struct obj *obj)
             damage = zapyourself(obj, FALSE);
             if (damage) {
                 Sprintf(buf, "killed %sself by breaking a wand", uhim());
-                losehp(Maybe_Half_Phys(damage), buf, NO_KILLER_PREFIX);
+                losehp(Maybe_Adjust_Phys(damage, STRANGE_OBJECT), buf,
+                       NO_KILLER_PREFIX);
             }
             if (disp.botl)
                 bot(); /* blindness */

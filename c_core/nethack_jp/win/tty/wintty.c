@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-19. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-22. */
 /* $NHDT-Header: NetHack 5.0 wintty.c 2026/11/02_21:05:17 NetHack-5.0:1.444 $ */
 /* Copyright (c) David Cohrs, 1991                                */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -615,7 +615,8 @@ tty_init_nhwindows(int *argcp UNUSED, char **argv UNUSED)
      * row 3, out of the way. */
 
     tty_curs(BASE_WINDOW, 1, 4);
-    for (i = 1; i <= 4; ++i)
+    /* NetHackJP: display 5th copyright banner line */
+    for (i = 1; i <= 5; ++i)
         tty_putstr(BASE_WINDOW, 0, copyright_banner_line(i));
     tty_putstr(BASE_WINDOW, 0, "");
     tty_display_nhwindow(BASE_WINDOW, FALSE);
@@ -2651,15 +2652,20 @@ tty_putstr(winid window, int attr, const char *str)
     case NHW_BASE:
         tty_curs(window, cw->curx + 1, cw->cury);
         term_start_attr(attr);
-        while (*str) {
-            if ((int) ttyDisplay->curx >= (int) ttyDisplay->cols - 1) {
-                cw->curx = 0;
-                cw->cury++;
-                tty_curs(window, cw->curx + 1, cw->cury);
+        /* NetHackJP: output UTF-8 sequences properly in NHW_BASE */
+        {
+            char *p = (char *) str;
+            while (*p) {
+                int w = (*((const unsigned char *) p) < 0x80U)
+                            ? 1
+                            : utf8_char_display_width((const unsigned char *) p);
+                if ((int) ttyDisplay->curx + w > (int) ttyDisplay->cols - 1) {
+                    cw->curx = 0;
+                    cw->cury++;
+                    tty_curs(window, cw->curx + 1, cw->cury);
+                }
+                tty_put_utf8_sequence(&p);
             }
-            g_putch((int) (unsigned char) *str);
-            str++;
-            ttyDisplay->curx++;
         }
         cw->curx = 0;
         cw->cury++;

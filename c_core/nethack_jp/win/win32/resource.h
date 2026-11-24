@@ -1,3 +1,4 @@
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-22. */
 //{{NO_DEPENDENCIES}}
 // Microsoft Visual C++ generated include file.
 // Used by NetHackW.rc
@@ -148,6 +149,7 @@
 #define IDM_SETTING_SCREEN_TO_CLIPBOARD 32798
 #define IDM_SETTING_SCREEN_TO_FILE      32799
 #define IDM_FUZZ                        32800
+#define IDM_HELP_SUPPORT                32801
 #define IDC_STATIC                      -1
 
 // Next default values for new objects
@@ -155,7 +157,7 @@
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        146
-#define _APS_NEXT_COMMAND_VALUE         32801
+#define _APS_NEXT_COMMAND_VALUE         32802
 #define _APS_NEXT_CONTROL_VALUE         1341
 #define _APS_NEXT_SYMED_VALUE           110
 #endif

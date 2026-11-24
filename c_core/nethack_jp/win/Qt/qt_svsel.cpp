@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-09. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-22. */
 // $NHDT-Header: NetHack 5.0 qt_svsel.cpp 2026/04/26_16:42:38 NetHack-5.0:1.17 $
 // Copyright (c) Warwick Allison, 1999.
 // Qt4 conversion copyright (c) Ray Chason, 2012-2014.
@@ -77,6 +77,10 @@ NetHackQtSavedGameSelector::NetHackQtSavedGameSelector(const char** saved) :
     QLabel *attr = new QLabel("by the NetHack DevTeam", this);
     attr->setAlignment(Qt::AlignCenter);
     vbl->addWidget(attr);
+    /* NetHackJP: append derivative edition credit */
+    QLabel *jp_attr = new QLabel("NetHackJP (非公式日本語化版) by satokiyon", this);
+    jp_attr->setAlignment(Qt::AlignCenter);
+    vbl->addWidget(jp_attr);
     vbl->addStretch(2);
 
     /* With Qt5, this next line triggers a complaint to stderr:

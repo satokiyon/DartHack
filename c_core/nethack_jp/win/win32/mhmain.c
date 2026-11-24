@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-04. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-22. */
 /* $NHDT-Header: NetHack 5.0 mhmain.c 2026/06/20_22:26:43 NetHack-5.0:1.103 $ */
 /* Copyright (C) 2001 by Alex Kompel  */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1139,6 +1139,11 @@ onWMCommand(HWND hWnd, WPARAM wParam, LPARAM lParam)
         display_file(LICENSE, TRUE);
         break;
 
+    /* NetHackJP: add Support Information item to Win32 Help menu */
+    case IDM_HELP_SUPPORT:
+        docontact();
+        break;
+
     case IDM_HELP_PORTHELP:
         display_file(PORT_HELP, TRUE);
         break;
@@ -1167,9 +1172,11 @@ About(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
         SetDlgItemText(hDlg, IDC_ABOUT_VERSION,
                        NH_A2W(buf, wbuf, sizeof(wbuf)));
 
-        Sprintf(buf, "%s\n%s\n%s\n%s",
+        /* NetHackJP: include 5th copyright banner line in About dialog */
+        Sprintf(buf, "%s\n%s\n%s\n%s\n%s",
                 COPYRIGHT_BANNER_A, COPYRIGHT_BANNER_B,
-                nomakedefs.copyright_banner_c, COPYRIGHT_BANNER_D);
+                nomakedefs.copyright_banner_c, COPYRIGHT_BANNER_D,
+                COPYRIGHT_BANNER_JP);
         SetDlgItemText(hDlg, IDC_ABOUT_COPYRIGHT,
                        NH_A2W(buf, wbuf, sizeof(wbuf)));
 

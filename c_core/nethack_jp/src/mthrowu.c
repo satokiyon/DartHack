@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-19. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-24. */
 /* $NHDT-Header: NetHack 5.0 mthrowu.c 2026/08/07_12:46:53 NetHack-5.0:1.195 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Pasi Kallinen, 2016. */
@@ -752,7 +752,7 @@ m_throw(
                     if (dam < 1)
                         dam = 1;
                     if (singleobj->otyp != ACID_VENOM)
-                        dam = Maybe_Half_Phys(dam);
+                        dam = Maybe_Adjust_Phys(dam, singleobj->otyp);
                     hitu = thitu(hitv, dam, &singleobj, (char *) 0);
                 }
             }
@@ -1249,7 +1249,7 @@ thrwmu(struct monst *mtmp)
         if (dam < 1)
             dam = 1;
 
-        (void) thitu(hitv, Maybe_Half_Phys(dam), &otmp, (char *) 0);
+        (void) thitu(hitv, Maybe_Adjust_Phys(dam, otmp->otyp), &otmp, (char *) 0);
         stop_occupation();
         return;
     } else if ((arw = autoreturn_weapon(otmp)) != 0 && !mwelded(otmp)) {

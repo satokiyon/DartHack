@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-09. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-22. */
 /* vim:set cin ft=c sw=4 sts=4 ts=8 et ai cino=Ls\:0t0(0 : -*- mode:c;fill-column:80;tab-width:8;c-basic-offset:4;indent-tabs-mode:nil;c-file-style:"k&r" -*-*/
 /* $NHDT-Header: NetHack 5.0 cursinit.c 2026/11/07_00:29:29 NetHack-5.0:1.58 $ */
 /* Copyright (c) Karl Garrison, 2010. */
@@ -842,7 +842,8 @@ curses_display_splash_window(void)
     if (iflags.wc2_guicolor)
          curses_toggle_color_attr(stdscr, CLR_WHITE, A_NORMAL, OFF);
 
-    for (i = 1; i <= 4; ++i) {
+    /* NetHackJP: display 5th copyright banner line */
+    for (i = 1; i <= 5; ++i) {
          mvaddstr(y_start, x_start, copyright_banner_line(i));
          y_start++;
     }

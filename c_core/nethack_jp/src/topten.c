@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-14. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-24. */
 /* $NHDT-Header: NetHack 5.0 topten.c 2026/06/20_22:26:43 NetHack-5.0:1.113 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
@@ -1124,6 +1124,14 @@ static const struct jp_killer_reason_entry {
     { "its own player", "プレイヤー自身の手で倒された", 0 },
     { "sitting on an iron spike", "鉄の刺の上に座ったことで倒された", "鉄の刺の上に座ったこと" },
     { "riding accident", "落馬事故で倒された", "落馬事故" },
+    { "bumping into a tree", "木にぶつかって倒された", "木にぶつかったこと" },
+    { "bumping into a wall", "壁にぶつかって倒された", "壁にぶつかったこと" },
+    { "bumping into a door frame", "扉の枠にぶつかって倒された", "扉の枠にぶつかったこと" },
+    { "bumping into a closed door", "閉まった扉にぶつかって倒された", "閉まった扉にぶつかったこと" },
+    { "crashing into iron bars", "鉄格子に激突して倒された", "鉄格子に激突したこと" },
+    { "bumping into a boulder", "岩にぶつかって倒された", "岩にぶつかったこと" },
+    { "touching the edge of the universe", "世界の果てに触れて倒された", "世界の果てに触れたこと" },
+    { "wedging into a narrow crevice", "狭い裂け目にはまって倒された", "狭い裂け目にはまったこと" },
 };
 
 #define JPKB_FORM_KILLEDBY 0 /* "killed by <X>" 文形 */
@@ -1599,7 +1607,10 @@ jp_translate_killer_text_for_display(
         char mbuf[BUFSZ];
         jp_translate_killer_name_or_monster(core + 23, mbuf, sizeof mbuf);
         Snprintf(outmain, sizeof outmain, "%sに乗ろうとして滑って倒された", mbuf);
-    } else if (!strncmpi(core, "whipping ", 9)) {
+    } else if (!strncmpi(core, "whipping ", 9)
+               || (!strncmpi(core, "killed ", 7)
+                   && strstr(core, "self with ")
+                   && strstr(core, " bullwhip"))) {
         Snprintf(outmain, sizeof outmain, "むちで自分を打って死んだ");
     } else if (!strncmpi(core, "choked on ", 10)) {
         const char *what = skip_english_article(core + 10);

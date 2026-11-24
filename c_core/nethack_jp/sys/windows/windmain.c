@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-12. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-22. */
 /* $NHDT-Header: NetHack 5.0 windmain.c 2026/07/31_12:59:20 NetHack-5.0:1.236 $ */
 /* Copyright (c) Derek S. Ray, 2015. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -342,9 +342,9 @@ _CrtSetReportFile(_CRT_ASSERT, _CRTDBG_FILE_STDERR);*/
 #endif
 #ifdef DLB
     if (!dlb_init()) {
-        pline("%s\n%s\n%s\n%s\n\n", copyright_banner_line(1),
+        pline("%s\n%s\n%s\n%s\n%s\n\n", copyright_banner_line(1),
               copyright_banner_line(2), copyright_banner_line(3),
-              copyright_banner_line(4));
+              copyright_banner_line(4), copyright_banner_line(5));
         pline("NetHack は必要ファイル \"%s\" を開けませんでした", DLBFILE);
         if (file_exists(DLBFILE))
             pline("\n圧縮ファイルの中から NetHack を実行していませんか?");

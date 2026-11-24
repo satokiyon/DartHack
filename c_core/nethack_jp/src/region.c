@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-19. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-24. */
 /* $NHDT-Header: NetHack 5.0 region.c 2026/06/20_22:26:43 NetHack-5.0:1.114 $ */
 /* Copyright (c) 1996 by Jean-Christophe Collet  */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1120,7 +1120,7 @@ inside_gas_cloud(genericptr_t p1, genericptr_t p2)
                   jp_body_part_plural(LUNG));
             You("せき込み、血を吐いた!");
             wake_nearto(u.ux, u.uy, 2);
-            dam = Maybe_Half_Phys(rnd(dam) + 5);
+            dam = Maybe_Adjust_Phys(rnd(dam) + 5, STRANGE_OBJECT);
             if (Half_gas_damage) /* worn towel */
                 dam = (dam + 1) / 2;
             losehp(dam, "gas cloud", KILLED_BY_AN);

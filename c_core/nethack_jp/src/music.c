@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-14. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-24. */
 /* $NHDT-Header: NetHack 5.0 music.c 2026/06/20_22:26:43 NetHack-5.0:1.128 $ */
 /*      Copyright (c) 1989 by Jean-Christophe Collet */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -311,7 +311,7 @@ do_pit(coordxy x, coordxy y, unsigned tu_pit)
                not in it even if there was */
             You("裂け目に落ちた!");
             set_utrap(rn1(6, 2), TT_PIT);
-            losehp(Maybe_Half_Phys(rnd(6)),
+            losehp(Maybe_Adjust_Phys(rnd(6), STRANGE_OBJECT),
                    "fell into a chasm", NO_KILLER_PREFIX);
             selftouch("落下しながら、あなたは");
         } else if (u.utrap && u.utraptype == TT_PIT) {
@@ -322,7 +322,8 @@ do_pit(coordxy x, coordxy y, unsigned tu_pit)
 
             You("激しく揺さぶられた!");
             set_utrap(rn1(6, 2), TT_PIT);
-            losehp(Maybe_Half_Phys(rnd(keepfooting ? 2 : 4)),
+            losehp(
+                Maybe_Adjust_Phys(rnd(keepfooting ? 2 : 4), STRANGE_OBJECT),
                    "hurt in a chasm", NO_KILLER_PREFIX);
             if (keepfooting)
                 exercise(A_DEX, TRUE);

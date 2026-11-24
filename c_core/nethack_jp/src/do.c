@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-19. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-24. */
 /* $NHDT-Header: NetHack 5.0 do.c 2026/10/17_14:49:13 NetHack-5.0:1.416 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Derek S. Ray, 2015. */
@@ -136,7 +136,8 @@ boulder_hits_pool(
                     hliquid("lava"), Fire_resistance ? "。" : "!");
                 burn_away_slime();
                 dmg = d((Fire_resistance ? 1 : 3), 6);
-                losehp(Maybe_Half_Phys(dmg), /* lava damage */
+                losehp(
+                    Maybe_Adjust_Phys(dmg, STRANGE_OBJECT), /* lava damage */
                        "molten lava", KILLED_BY);
             } else if (!fills_up && flags.verbose
                        && (pushing ? !Blind : cansee(rx, ry))) {
@@ -227,7 +228,7 @@ flooreffects(
                 mtmp->mtrapped = 0;
             } else {
                 if (!Passes_walls && !throws_rocks(gy.youmonst.data)) {
-                    losehp(Maybe_Half_Phys(rnd(15)),
+                    losehp(Maybe_Adjust_Phys(rnd(15), BOULDER),
                            "squished under a boulder", NO_KILLER_PREFIX);
                     goto deletedwithboulder;
                 } else
@@ -1271,7 +1272,7 @@ dodown(void)
             if (y_n(qbuf) == 'y') {
                 if (!rn2(3)) {
                     squeezed = TRUE;
-                    losehp(Maybe_Half_Phys(rnd(4)),
+                    losehp(Maybe_Adjust_Phys(rnd(4), STRANGE_OBJECT),
                            "contusion from a small passage", KILLED_BY);
                 } else {
                     You("そこへは収まりきらなかった.");
@@ -1810,7 +1811,7 @@ goto_level(
                 if (u.usteed)
                     dismount_steed(DISMOUNT_FELL);
                 else
-                    losehp(Maybe_Half_Phys(rnd(3)),
+                    losehp(Maybe_Adjust_Phys(rnd(3), STRANGE_OBJECT),
                            ga.at_ladder ? "falling off a ladder"
                                      : "tumbling down a flight of stairs",
                            KILLED_BY);
@@ -2013,7 +2014,7 @@ goto_level(
     if (do_fall_dmg) {
         int dmg = d(max(dist, 1), 6);
 
-        dmg = Maybe_Half_Phys(dmg);
+        dmg = Maybe_Adjust_Phys(dmg, 0);
         losehp(dmg, "falling down a mine shaft", KILLED_BY);
     }
 

@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-19. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-22. */
 /* $NHDT-Header: NetHack 5.0 extern.h 2026/10/17_14:49:13 NetHack-5.0:1.1583 $ */
 /* Copyright (c) Steve Creps, 1988.                               */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -2443,6 +2443,8 @@ extern void dowhatdoes_key(char);
 extern char *dowhatdoes_core(char, char *) NONNULLARG2; /*might return NULL*/
 extern int dohelp(void);
 extern int dohistory(void);
+/* NetHackJP: expose docontact for GUI menu support item */
+extern void docontact(void);
 void allopt_array_init(void);
 
 /* ### xxmain.c ### */

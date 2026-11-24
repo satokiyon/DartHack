@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-19. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-24. */
 /* $NHDT-Header: NetHack 5.0 mhitu.c 2026/06/20_22:26:43 NetHack-5.0:1.349 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
@@ -1361,6 +1361,8 @@ gulpmu(struct monst *mtmp, struct attack *mattk)
     struct obj *otmp2, *nextobj;
     int i;
     boolean physical_damage = FALSE;
+    enum gulpsituations { gulp_neither, gulp_engulfed, gulp_being_digested };
+    enum gulpsituations gulpsituation = gulp_engulfed;
 
     nh_sound_mon_attack(mtmp, &gy.youmonst, mattk, TRUE);
 
@@ -1485,6 +1487,7 @@ gulpmu(struct monst *mtmp, struct attack *mattk)
     switch (mattk->adtyp) {
     case AD_DGST:
         physical_damage = TRUE;
+        gulpsituation = gulp_being_digested;
         if (Slow_digestion) {
             /* Messages are handled below */
             u.uswldtim = 0;
@@ -1614,13 +1617,16 @@ gulpmu(struct monst *mtmp, struct attack *mattk)
     }
 
     if (physical_damage) {
-        /* same damage reduction for AC as in hitmu */
-        if (u.uac < 0)
-            tmp -= rnd(-u.uac);
-        if (tmp < 0)
-            tmp = 1;
-
-        tmp = Maybe_Half_Phys(tmp);
+        /* don't undo the settings above related to
+         * slow digestion and total digestion */
+        if (gulpsituation != gulp_being_digested) {
+            /* same damage reduction for AC as in hitmu */
+            if (u.uac < 0)
+                tmp -= rnd(-u.uac);
+            if (tmp < 0)
+                tmp = 1;
+        }
+        tmp = Maybe_Adjust_Phys(tmp, STRANGE_OBJECT);
     }
 
     gm.mswallower = mtmp; /* match gulpmm() */
@@ -2284,7 +2290,8 @@ doseduce(struct monst *mon)
             You_feel("へとへとになった.");
             exercise(A_STR, FALSE);
             tmp = rn1(10, 6);
-            losehp(Maybe_Half_Phys(tmp), "exhaustion", KILLED_BY);
+            losehp(Maybe_Adjust_Phys(tmp, STRANGE_OBJECT), "exhaustion",
+                   KILLED_BY);
             break;
         } /* case 4 */
         } /* switch */

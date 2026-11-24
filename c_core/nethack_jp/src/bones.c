@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-04. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-24. */
 /* $NHDT-Header: NetHack 5.0 bones.c 2026/06/20_22:26:43 NetHack-5.0:1.161 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985,1993. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
@@ -58,6 +58,10 @@ resetobjs(struct obj *ochain, boolean restore)
         if (otmp->cobj)
             resetobjs(otmp->cobj, restore);
         if (otmp->in_use) {
+            /* a bag of holding that was blowing up when the hero died
+               takes what it still holds with it */
+            if (Has_contents(otmp))
+                delete_contents(otmp);
             obj_extract_self(otmp);
             dealloc_obj(otmp);
             continue;

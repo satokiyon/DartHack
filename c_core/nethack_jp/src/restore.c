@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-08. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-22. */
 /* $NHDT-Header: NetHack 5.0 restore.c 2026/09/26_15:47:20 NetHack-5.0:1.274 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2009. */
@@ -1702,8 +1702,8 @@ restore_menu(
         if (bannerwin != WIN_ERR) {
             /* for tty; erase copyright notice and redo it in the menu */
             clear_nhwindow(bannerwin);
-            /* COPYRIGHT_BANNER_[ABCD] */
-            for (k = 1; k <= 4; ++k)
+            /* COPYRIGHT_BANNER_[ABCD] + NetHackJP */
+            for (k = 1; k <= 5; ++k)
                 add_menu_str(tmpwin, copyright_banner_line(k));
             add_menu_str(tmpwin, "");
         }

@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-04. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-22. */
 /* $NHDT-Header: NetHack 5.0 version.c 2026/06/20_22:26:43 NetHack-5.0:1.120 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2018. */
@@ -203,6 +203,11 @@ doextversion(void)
         *--p = ' ';
         putstr(win, 0, p);
     }
+    /* NetHackJP: append derivative edition info */
+    putstr(win, 0, "");
+    putstr(win, 0, "NetHackJP (非公式日本語化版) by " NETHACKJP_AUTHOR);
+    putstr(win, 0, "  公式サイト: " DEVTEAM_URL);
+    putstr(win, 0, "  GitHub:     " NETHACKJP_REPO_URL);
 
     if (use_dlb) {
         f = dlb_fopen(OPTIONS_USED, "r");
@@ -486,6 +491,11 @@ copyright_banner_line(int indx)
 #ifdef COPYRIGHT_BANNER_D
     if (indx == 4)
         return COPYRIGHT_BANNER_D;
+#endif
+/* NetHackJP: derivative edition notice on banner line 5 */
+#ifdef COPYRIGHT_BANNER_JP
+    if (indx == 5)
+        return COPYRIGHT_BANNER_JP;
 #endif
     return "";
 }
