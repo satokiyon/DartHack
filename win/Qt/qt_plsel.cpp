@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-09. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-22. */
 // $NHDT-Header: NetHack 5.0 qt_plsel.cpp 2026/11/06_21:44:16 NetHack-5.0:1.31 $
 // Copyright (c) Warwick Allison, 1999.
 // Qt4 conversion copyright (c) Ray Chason, 2012-2014.
@@ -76,8 +76,10 @@ void centerOnMain( QWidget* w );
 
 // hack: padded with blank lines by inserting breaks above and below in
 // order to force window to be tall enough to show all the roles at once
+/* NetHackJP: append derivative edition credit */
 static const char nh_attribution[] = "<br><center><big>NetHack %1</big>"
-        "<br><small>by the NetHack DevTeam</small></center><br>";
+        "<br><small>by the NetHack DevTeam</small>"
+        "<br><small>NetHackJP (非公式日本語化版) by satokiyon</small></center><br>";
 
 //
 // None of these extra classes seem to be used except for NhPSListView. [pr]

@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-09. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-22. */
 // $NHDT-Header: NetHack 5.0 qt_main.cpp 2026/11/06_21:44:16 NetHack-5.0:1.69 $
 // Copyright (c) Warwick Allison, 1999.
 // Qt4 conversion copyright (c) Ray Chason, 2012-2014.
@@ -490,7 +490,11 @@ aboutMsg()
         "Qt:\n     http://www.troll.no/\n"      // obsolete
 #endif
         "Lua:\n     https://lua.org/\n"
-        "NetHack:\n     %s\n", // DEVTEAM_URL
+        /* NetHackJP: list both upstream NetHack and NetHackJP links */
+        "NetHack:\n     " UPSTREAM_NETHACK_URL "\n"
+        "NetHackJP (非公式日本語化版 by " NETHACKJP_AUTHOR "):\n"
+        "     %s\n"
+        "     " NETHACKJP_REPO_URL "\n", // DEVTEAM_URL
         // arguments
 #ifdef QT_VERSION_MAJOR
         QT_VERSION_MAJOR,

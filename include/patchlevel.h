@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-04. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-22. */
 /* $NHDT-Header: NetHack 5.0 patchlevel.h 2026/10/27_00:19:44 NetHack-5.0:1.314 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2012. */
@@ -45,6 +45,9 @@
 /* nomakedefs.copyright_banner_c is generated at runtime */
 #define COPYRIGHT_BANNER_C nomakedefs.copyright_banner_c
 #define COPYRIGHT_BANNER_D "         See license for details."
+/* NetHackJP: derivative edition notice on banner line 5 */
+#define COPYRIGHT_BANNER_JP \
+    "NetHackJP (非公式日本語化版) by satokiyon"
 
 /*
  * SAVEFILE_REVISION_LEVEL

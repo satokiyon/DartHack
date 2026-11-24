@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-21. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-24. */
 /* $NHDT-Header: NetHack 5.0 pickup.c 2026/06/27_15:18:44 NetHack-5.0:1.405 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
@@ -996,6 +996,9 @@ autopick_testobj(struct obj *otmp, boolean calc_costly)
 
     /* first check: reject if an unpaid item in a shop */
     if (costly && !otmp->no_charge)
+        return FALSE;
+    /* or if it's in use, such as a bag of holding blowing up */
+    if (otmp->in_use)
         return FALSE;
 
     /* pickup_thrown/pickup_stolen/nopick_dropped override pickup_types and
@@ -2233,7 +2236,8 @@ do_loot_cont(
         You("慎重に%sを開けた...", xname(cobj));
         pline("それは巨大な歯を生やしてあなたを噛んだ!");
         tmp = rnd(10);
-        losehp(Maybe_Half_Phys(tmp), "carnivorous bag", KILLED_BY_AN);
+        losehp(Maybe_Adjust_Phys(tmp, STRANGE_OBJECT), "carnivorous bag",
+               KILLED_BY_AN);
         makeknown(BAG_OF_TRICKS);
         ga.abort_looting = TRUE;
         return ECMD_TIME;
@@ -2743,6 +2747,10 @@ in_container(struct obj *obj)
         /* did not actually insert obj yet */
         if (was_unpaid)
             addtobill(obj, FALSE, FALSE, TRUE);
+        /* keep the bag where it is until it's used up below; things
+           landing at the hero's feet can knock it down a hole, and a
+           change of form can drop it if it's wielded */
+        gc.current_container->in_use = 1;
         if (obj->otyp == BAG_OF_HOLDING) /* one bag of holding into another */
             do_boh_explosion(obj, (boolean) (obj->where == OBJ_FLOOR));
         obfree(obj, (struct obj *) 0);
@@ -2761,9 +2769,10 @@ in_container(struct obj *obj)
         }
         do_boh_explosion(gc.current_container, floor_container);
 
+        /* the blast may have moved the hero off the bag's spot */
         if (!floor_container)
             useup(gc.current_container);
-        else if (obj_here(gc.current_container, u.ux, u.uy))
+        else if (gc.current_container->where == OBJ_FLOOR)
             useupf(gc.current_container, gc.current_container->quan);
         else
             panic("in_container:  bag not found.");
@@ -3895,6 +3904,8 @@ tipcontainer(struct obj *box) /* or bag */
                    "%sが中へ転がり込んだ瞬間、魔法の爆発に巻き込まれた!",
                                  doname(otmp));
 
+                    /* keep the bag until it's used up below */
+                    targetbox->in_use = 1;
                     /* if putting one bag of holding into another, first
                        blow up the one going in, then (below) blow up the
                        one it's going into */

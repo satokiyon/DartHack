@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-08. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-22. */
 /* $NHDT-Header: NetHack 5.0 winX.c 2026/06/20_16:31:50 NetHack-5.0:1.174 $ */
 /* Copyright (c) Dean Luick, 1992                                 */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1766,7 +1766,8 @@ X11_init_nhwindows(int *argcp, char **argv)
     release_default_resources();
 
     /* Display the startup banner in the message window. */
-    for (i = 1; i <= 4 + 2; ++i) /* (values beyond 4 yield blank lines) */
+    /* NetHackJP: display 5th copyright banner line */
+    for (i = 1; i <= 5 + 2; ++i) /* (values beyond 5 yield blank lines) */
         X11_putstr(WIN_MESSAGE, 0, copyright_banner_line(i));
 }
 

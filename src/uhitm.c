@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-19. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-24. */
 /* $NHDT-Header: NetHack 5.0 uhitm.c 2026/06/20_22:26:43 NetHack-5.0:1.505 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
@@ -3758,7 +3758,8 @@ mhitm_ad_poly(
     } else if (mdef == &gy.youmonst) {
         /* mhitu */
         hitmsg(magr, mattk);
-        if (Maybe_Half_Phys(mhm->damage) < (Upolyd ? u.mh : u.uhp)) {
+        if (Maybe_Adjust_Phys(mhm->damage, STRANGE_OBJECT)
+            < (Upolyd ? u.mh : u.uhp)) {
             if (negated) {
                 if (magr->mcan)
                     You("変身しなかった.");

@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-19. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-24. */
 /* $NHDT-Header: NetHack 5.0 hack.c 2026/06/20_16:30:50 NetHack-5.0:1.512 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Derek S. Ray, 2015. */
@@ -849,13 +849,15 @@ dosinkfall(void)
         ELevitation = HLevitation = 0L;
         You("床に撃突した!");
         dmg = rn1(8, 25 - (int) ACURR(A_CON));
-        losehp(Maybe_Half_Phys(dmg), fell_on_sink, NO_KILLER_PREFIX);
+        losehp(Maybe_Adjust_Phys(dmg, STRANGE_OBJECT), fell_on_sink,
+               NO_KILLER_PREFIX);
         exercise(A_DEX, FALSE);
         selftouch("落下しながら、あなたは");
         for (obj = svl.level.objects[u.ux][u.uy]; obj; obj = obj->nexthere)
             if (obj->oclass == WEAPON_CLASS || is_weptool(obj)) {
                 You("%sの上に倒れ込んだ.", doname(obj));
-                losehp(Maybe_Half_Phys(rnd(3)), fell_on_sink,
+                losehp(Maybe_Adjust_Phys(rnd(3), STRANGE_OBJECT),
+                       fell_on_sink,
                        NO_KILLER_PREFIX);
                 exercise(A_CON, FALSE);
             }

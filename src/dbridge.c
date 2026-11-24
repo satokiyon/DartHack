@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-04. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-24. */
 /* $NHDT-Header: NetHack 5.0 dbridge.c 2026/06/20_22:26:43 NetHack-5.0:1.76 $ */
 /*      Copyright (c) 1989 by Jean-Christophe Collet              */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -689,15 +689,27 @@ do_entity(struct entity *etmp)
     if (relocates && !e_at(newx, newy)) { /* if e_at() entity = worm tail */
         debugpline1("Moving %s", e_nam(etmp));
         if (!is_u(etmp)) {
-            remove_monster(etmp->ex, etmp->ey);
-            place_monster(etmp->emon, newx, newy);
-            update_monster_region(etmp->emon);
+            if (etmp->edata == &mons[PM_LONG_WORM_TAIL]) {
+                /* a tail segment can't be moved on its own (emon is the
+                   worm's head, elsewhere); it stays put and the survival
+                   check below decides what happens to the worm */
+                ;
+            } else if (etmp->emon->wormno) {
+                /* rloc_to() moves a worm's head and brings the tail */
+                rloc_to(etmp->emon, newx, newy);
+            } else {
+                remove_monster(etmp->ex, etmp->ey);
+                place_monster(etmp->emon, newx, newy);
+                update_monster_region(etmp->emon);
+            }
         } else {
             u.ux = newx;
             u.uy = newy;
         }
-        etmp->ex = newx;
-        etmp->ey = newy;
+        if (etmp->edata != &mons[PM_LONG_WORM_TAIL]) {
+            etmp->ex = newx;
+            etmp->ey = newy;
+        }
         e_inview = e_canseemon(etmp);
     }
     debugpline1("Final disposition of %s", e_nam(etmp));

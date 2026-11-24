@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-19. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-24. */
 /* $NHDT-Header: NetHack 5.0 dokick.c 2026/06/20_22:26:43 NetHack-5.0:1.239 $ */
 /* Copyright (c) Izchak Miller, Mike Stephenson, Steve Linhart, 1989. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -899,7 +899,8 @@ kick_ouch(coordxy x, coordxy y, const char *kickobjnam)
     if (!rn2(3))
         set_wounded_legs(RIGHT_SIDE, 5 + rnd(5));
     dmg = rnd(ACURR(A_CON) > 15 ? 3 : 5);
-    losehp(Maybe_Half_Phys(dmg), kickstr(buf, kickobjnam), KILLED_BY);
+    losehp(Maybe_Adjust_Phys(dmg, STRANGE_OBJECT), kickstr(buf, kickobjnam),
+           KILLED_BY);
     if (Is_airlevel(&u.uz) || Levitation)
         hurtle(-u.dx, -u.dy, rn1(2, 4), TRUE); /* assume it's heavy */
 }
@@ -1564,6 +1565,9 @@ impact_drop(
         /* number of objects in the pile */
         oct += obj->quan;
         if (obj == uball || obj == uchain)
+            continue;
+        /* an object in use, such as a bag of holding blowing up, stays */
+        if (obj->in_use)
             continue;
         /* boulders can fall too, but rarely & never due to rocks */
         if ((isrock && obj->otyp == BOULDER)

@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-19. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-24. */
 /* $NHDT-Header: NetHack 5.0 mon.c 2026/11/02_21:05:17 NetHack-5.0:1.643 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Derek S. Ray, 2015. */
@@ -3227,7 +3227,8 @@ corpse_chance(
                     There("%sの中で爆発が起きた!", jp_body_part(STOMACH));
                     Sprintf(svk.killer.name, "%s explosion",
                             s_suffix(pmname(mdat, Mgender(mon))));
-                    losehp(Maybe_Half_Phys(tmp), svk.killer.name,
+                    losehp(Maybe_Adjust_Phys(tmp, STRANGE_OBJECT),
+                           svk.killer.name,
                            KILLED_BY_AN);
                 } else {
                     You_hear("爆発音が聞こえた.");

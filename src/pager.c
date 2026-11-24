@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-08. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-24. */
 /* $NHDT-Header: NetHack 5.0 pager.c 2026/06/20_22:26:43 NetHack-5.0:1.304 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2018. */
@@ -2065,8 +2065,17 @@ do_screen_description(
             if (look_buf[0] != '\0')
                 *firstmatch = look_buf;
             if (*(*firstmatch)) {
-                Sprintf(temp_buf, " (%s", *firstmatch);
+                Snprintf(temp_buf, sizeof temp_buf, " (%s", *firstmatch);
                 (void) add_quoted_engraving(cc.x, cc.y, temp_buf, FALSE);
+                {
+                    /* a long engraving can fill temp_buf; leave room for
+                       ')' within what out_str can still take */
+                    int room = BUFSZ - 2 - (int) strlen(out_str);
+
+                    /* NetHackJP: avoid splitting a UTF-8 sequence on truncation */
+                    if ((int) strlen(temp_buf) > room)
+                        utf8_truncate(temp_buf, (size_t) max(room, 0));
+                }
                 Strcat(temp_buf, ")");
                 (void) strncat(out_str, temp_buf,
                                BUFSZ - strlen(out_str) - 1);
@@ -3248,7 +3257,8 @@ dowhatdoes(void)
     return ECMD_OK;
 }
 
-staticfn void
+/* NetHackJP: expose docontact for GUI menu and clarify NetHackJP vs upstream support */
+void
 docontact(void)
 {
     winid cwin = create_nhwindow(NHW_TEXT);
@@ -3265,14 +3275,23 @@ docontact(void)
         putstr(cwin, 0, buf);
         putstr(cwin, 0, "");
     }
-    putstr(cwin, 0, "NetHack 開発チームへ直接連絡するには,");
-    /*XXX overflow possibilities*/
-        Sprintf(buf, "公式サイトの 'Contact' フォームか <%s> へ連絡してほしい.",
-            DEVTEAM_EMAIL);
+    putstr(cwin, 0,
+           "このソフトは NetHack の非公式日本語化派生版「NetHackJP」(by "
+           NETHACKJP_AUTHOR ") です。");
+    putstr(cwin, 0, "");
+    putstr(cwin, 0, "NetHackJP のバグ報告・お問い合わせ:");
+    Sprintf(buf, "  公式サイト: %s", DEVTEAM_URL);
+    putstr(cwin, 0, buf);
+    Sprintf(buf, "  GitHub:     %s", NETHACKJP_REPO_URL);
+    putstr(cwin, 0, buf);
+    Sprintf(buf, "  メール:     <%s>", DEVTEAM_EMAIL);
     putstr(cwin, 0, buf);
     putstr(cwin, 0, "");
-        putstr(cwin, 0, "NetHack の詳細情報やバグ報告は,");
-        Sprintf(buf, "公式サイト \"%s\" を参照してほしい.", DEVTEAM_URL);
+    putstr(cwin, 0,
+           "※ NetHackJP 固有の不具合は本家 NetHack 開発チームではなく、上記の NetHackJP 窓口へご連絡ください。");
+    putstr(cwin, 0, "");
+    putstr(cwin, 0, "オリジナル NetHack 公式サイト (NetHack DevTeam):");
+    Sprintf(buf, "  %s", UPSTREAM_NETHACK_URL);
     putstr(cwin, 0, buf);
     display_nhwindow(cwin, FALSE);
     destroy_nhwindow(cwin);

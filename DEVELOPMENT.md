@@ -1,4 +1,4 @@
-<!-- Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-21. -->
+<!-- Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-24. -->
 <!--
   IMPORTANT POLICY FOR NetHackJP-ONLY MODIFICATIONS
   =================================================
@@ -859,6 +859,42 @@ Xaw AsciiText の `XtNinternational=True` は WSLg/XWayland + fcitx5 構成で I
      - `GetModuleFileName()` を明示的に `GetModuleFileNameA()` に変更し、C4133 警告を排除。
 * **アップストリーム追従手順**:
   - 上流でコンソール構造体や API 呼び出しの型安全性がさらに整理された場合は、差分を確認して追従する。char* バッファを渡す Win32 API 呼び出しには ANSI 版 (`...A`) を維持する。
+
+### 33. クレジット・サポート情報への NetHackJP（非公式日本語化版）表記の追記
+
+オリジナルの NetHack 5.0 表記を保持したまま、本バイナリが非公式日本語化派生版「NetHackJP」(by satokiyon) であることをユーザーに明示するための拡張です。
+
+* **マーカータグ**:
+  - `/* NetHackJP: credit and support metadata */`
+  - `/* NetHackJP: derivative edition notice on banner line 5 */`
+  - `/* NetHackJP: append derivative edition info */`
+  - `/* NetHackJP: expose docontact for GUI menu ... */`
+  - `/* NetHackJP: display 5th copyright banner line */`
+  - `/* NetHackJP: add Support Information item to Win32 Help menu */`
+  - `/* NetHackJP: include 5th copyright banner line in ... */`
+  - `/* NetHackJP: list both upstream NetHack and NetHackJP links */`
+  - `/* NetHackJP: append derivative edition credit */`
+* **対象ファイル**:
+  1. **`include/hack.h` / `include/patchlevel.h` / `include/extern.h`**: `NETHACKJP_REPO_URL` / `NETHACKJP_AUTHOR` / `UPSTREAM_NETHACK_URL` / `COPYRIGHT_BANNER_JP` を定義し、`docontact()` を外部公開（`DEVTEAM_EMAIL` / `DEVTEAM_URL` は NetHackJP 窓口のまま維持し、本家 DevTeam への誤送信を防止）。
+  2. **`src/version.c`**: `copyright_banner_line(5)` で `COPYRIGHT_BANNER_JP` を返すよう拡張し、`doextversion()` (`#version`) に NetHackJP 情報ブロックを別行で追記（`version_id_string()` の 1 行目形式は維持）。
+  3. **`src/pager.c`**: `docontact()` を外部公開し、NetHackJP サポート窓口（公式サイト・GitHub・メール）と本家 NetHack 公式サイト（参考）を明確に区別して表示。
+  4. **`win/tty/wintty.c` / `win/curses/cursinit.c` / `win/X11/winX.c` / `src/restore.c` / `sys/windows/windmain.c`**: 起動時・セーブ選択時の著作権バナー表示を 5 行対応に拡張（`win/tty/wintty.c` の `NHW_BASE` 出力を `tty_put_utf8_sequence()` 経由の UTF-8 対応へ修正）。
+  5. **`win/win32/resource.h` / `win/win32/NetHackW.rc` / `win/win32/mhmain.c` / `win/win32/mhsplash.c` / `win/win32/nethack.rc` / `sys/windows/console.rc`**: Win32 GUI ヘルプメニューに「サポート情報(&S)」を追加し、About ダイアログ・スプラッシュ画面・ウィンドウタイトル・EXE バージョンリソースに NetHackJP 表記を追記。
+  6. **`win/Qt/qt_main.cpp` / `win/Qt/qt_plsel.cpp` / `win/Qt/qt_svsel.cpp`**: Qt About メッセージに本家と NetHackJP の両リンクを併記し、キャラ選択・セーブ選択画面に NetHackJP クレジット行を追記。
+  7. **`dat/history_jp` / `dat/help_jp`**: 歴史ファイル末尾およびヘルプ冒頭に NetHackJP の説明・クレジットを追記。
+* **アップストリーム追従手順**:
+  - 本件は NetHackJP 独自の派生版明示仕様であるため、アップストリームの著作権・バージョン表示・リソース変更との競合時はオリジナル表記を取り込みつつ NetHackJP 追記部分を維持する。
+
+### 34. 遠見（farlook）の長い刻印切り詰めにおける UTF-8 境界保護
+
+遠見（`;` コマンド等）の `do_screen_description()` で長い刻印を `BUFSZ` 内に切り詰める際、単純なバイト位置での NUL 終端（`temp_buf[max(room, 0)] = '\0'`）を行うと UTF-8 マルチバイト文字の途中で切断されて文字化けする問題を防止するための拡張です。
+
+* **マーカータグ**:
+  - `/* NetHackJP: avoid splitting a UTF-8 sequence on truncation */`
+* **対象ファイル**:
+  - **`src/pager.c`**: `do_screen_description()` 内の長い刻印切り詰め処理を `utf8_truncate(temp_buf, (size_t) max(room, 0))` に置換。
+* **アップストリーム追従手順**:
+  - 上流で `do_screen_description()` が UTF-8 境界を考慮した切り詰めに対応した場合は本独自拡張を取り消して追従する。
 ---
 
 ## 5. ライセンスと NetHack License 2(a) への対応方針

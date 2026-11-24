@@ -1,4 +1,4 @@
-// Modified by NetHackJP contributor @satokiyon; latest change date: 2026-10-01.
+// Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-22.
 // Microsoft Visual C++ generated resource script.
 //
 #include "nhresource.h"
@@ -77,12 +77,12 @@ BEGIN
     BEGIN
         BLOCK "040904b0"
         BEGIN
-            VALUE "FileDescription", "NetHack for Windows - TTY Interface"
+            VALUE "FileDescription", "NetHack for Windows (NetHackJP) - TTY Interface"
             VALUE "FileVersion", "5.0.1"
             VALUE "InternalName", "NetHack"
-            VALUE "LegalCopyright", "Copyright (C) 1985 - 2026.  By Stichting Mathematisch Centrum and M. Stephenson.  See license for details."
+            VALUE "LegalCopyright", "Copyright (C) 1985 - 2026.  By Stichting Mathematisch Centrum and M. Stephenson.  NetHackJP Japanese edition by satokiyon.  See license for details."
             VALUE "OriginalFilename", "NetHack.exe"
-            VALUE "ProductName", "NetHack"
+            VALUE "ProductName", "NetHack (NetHackJP)"
             VALUE "ProductVersion", "5.0.1"
         END
     END

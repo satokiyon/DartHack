@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-19. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-24. */
 /* $NHDT-Header: NetHack 5.0 spell.c 2026/06/20_22:26:43 NetHack-5.0:1.191 $ */
 /*      Copyright (c) M. Stephenson 1988                          */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -175,7 +175,8 @@ cursed_book(struct obj *bp)
         } else {
             pline("本を読んでいると、顔の前で爆発した!");
             dmg = 2 * rnd(10) + 5;
-            losehp(Maybe_Half_Phys(dmg), "exploding rune", KILLED_BY_AN);
+            losehp(Maybe_Adjust_Phys(dmg, STRANGE_OBJECT), "exploding rune",
+                   KILLED_BY_AN);
         }
         return TRUE;
     default:
@@ -1512,7 +1513,7 @@ spelleffects(int spell_otyp, boolean atme, boolean force)
 
                     Sprintf(buf, "zapped %sself with a spell", uhim());
                     if (physical_damage)
-                        damage = Maybe_Half_Phys(damage);
+                        damage = Maybe_Adjust_Phys(damage, STRANGE_OBJECT);
                     losehp(damage, buf, NO_KILLER_PREFIX);
                 }
             } else

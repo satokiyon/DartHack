@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-04. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-22. */
 /* $NHDT-Header: NetHack 5.0 mhsplash.c 2026/06/20_22:26:43 NetHack-5.0:1.47 $ */
 /* Copyright (C) 2001 by Alex Kompel */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -147,8 +147,10 @@ mswin_display_splash_window(BOOL show_ver)
 
     /* Fill the text control */
     strbuf_reserve(&strbuf, BUFSIZ);
-    Sprintf(strbuf.str, "%s\n%s\n%s\n%s\n\n", COPYRIGHT_BANNER_A,
-            COPYRIGHT_BANNER_B, nomakedefs.copyright_banner_c, COPYRIGHT_BANNER_D);
+    /* NetHackJP: include 5th copyright banner line in Splash window */
+    Sprintf(strbuf.str, "%s\n%s\n%s\n%s\n%s\n\n", COPYRIGHT_BANNER_A,
+            COPYRIGHT_BANNER_B, nomakedefs.copyright_banner_c,
+            COPYRIGHT_BANNER_D, COPYRIGHT_BANNER_JP);
 
     if (show_ver) {
         /* Show complete version information */

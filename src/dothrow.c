@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-19. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-24. */
 /* $NHDT-Header: NetHack 5.0 dothrow.c 2026/06/20_16:30:46 NetHack-5.0:1.321 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2013. */
@@ -784,7 +784,7 @@ hurtle_step(genericptr_t arg, coordxy x, coordxy y)
     boolean may_pass = TRUE, via_jumping, stopping_short;
     struct trap *ttmp;
     struct rm *lev;
-    int ltyp, dmg = 0;
+    int ltyp, dmg = 0, otyp = 0;
 
     if (!isok(x, y)) {
         You_feel("霊たちに引き留められている気がした.");
@@ -794,6 +794,7 @@ hurtle_step(genericptr_t arg, coordxy x, coordxy y)
     } else if (*range == 0) {
         return FALSE; /* previous step wants to stop now */
     }
+    nhUse(otyp);
     via_jumping = (EWwalking & I_SPECIAL) != 0L;
     stopping_short = (via_jumping && *range < 2);
     lev = &levl[x][y];
@@ -807,22 +808,24 @@ hurtle_step(genericptr_t arg, coordxy x, coordxy y)
 
         if (IS_OBSTRUCTED(levl[x][y].typ)
             || closed_door(x, y) || odoor_diag) {
-            why = IS_TREE(ltyp) ? "木にぶつかったこと"
-                  : IS_OBSTRUCTED(ltyp) ? "壁にぶつかったこと"
-                    : odoor_diag ? "扉の枠にぶつかったこと"
-                      : "閉まった扉にぶつかったこと";
+            why = IS_TREE(ltyp) ? "bumping into a tree"
+                  : IS_OBSTRUCTED(ltyp) ? "bumping into a wall"
+                    : odoor_diag ? "bumping into a door frame"
+                      : "bumping into a closed door";
             if (odoor_diag)
                 You("扉の枠にぶつかった!");
             pline("いてっ!");
         } else if (ltyp == IRONBARS) {
-            why = "鉄格子に激突したこと";
+            otyp = IRON;
+            why = "crashing into iron bars";
             You("鉄格子に激突した.  いてっ!");
         } else if ((obj = sobj_at(BOULDER, x, y)) != 0) {
-            why = "岩にぶつかったこと";
+            otyp = MINERAL;
+            why = "bumping into a boulder";
             You("%sにぶつかった.  いてっ!", xname(obj));
         }  else if (!may_pass) {
             /* did we hit a no-dig non-wall position? */
-            why = "世界の果てに触れたこと";
+            why = "touching the edge of the universe";
             You("何かにぶつかった!");
         } else if (diagonal
                    && bad_rock(gy.youmonst.data, u.ux, y)
@@ -831,14 +834,14 @@ hurtle_step(genericptr_t arg, coordxy x, coordxy y)
                        && (inv_weight() + weight_cap() > WT_TOOMUCH_DIAGONAL));
 
             if (bigmonst(gy.youmonst.data) || too_much) {
-                why = "狭い裂け目にはまったこと";
+                why = "wedging into a narrow crevice";
                 You("%s強く押し込まれて裂け目にはまった.",
                     too_much ? "荷物ごと" : "");
             }
         }
         if (why) {
             dmg = rnd(2 + *range);
-            losehp(Maybe_Half_Phys(dmg), why, KILLED_BY);
+            losehp(Maybe_Adjust_Phys(dmg, otyp), why, KILLED_BY);
             wake_nearto(x, y, 10);
             return FALSE;
         }
@@ -1384,7 +1387,7 @@ toss_up(struct obj *obj, boolean hitsroof)
             dmg += u.udaminc;
         if (dmg < 0)
             dmg = 0; /* beware negative rings of increase damage */
-        dmg = Maybe_Half_Phys(dmg);
+        dmg = Maybe_Adjust_Phys(dmg, otyp);
 
         if (uarmh) {
             /* note: 'harmless' and 'petrifier' are mutually exclusive */
@@ -1830,7 +1833,7 @@ throwit(
                         if (obj->oartifact)
                             (void) artifact_hit((struct monst *) 0,
                                                 &gy.youmonst, obj, &dmg, 0);
-                        losehp(Maybe_Half_Phys(dmg), killer_xname(obj),
+                        losehp(Maybe_Adjust_Phys(dmg, obj->otyp), killer_xname(obj),
                                KILLED_BY);
                     }
                     if (!tethered_weapon) {

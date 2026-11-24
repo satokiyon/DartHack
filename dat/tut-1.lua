@@ -1,4 +1,4 @@
--- Modified by NetHackJP contributor @satokiyon; latest change date: 2026-10-27.
+-- Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-24.
 
 local tut_ctrl_key = nil;
 local tut_alt_key = nil;
@@ -33,10 +33,10 @@ des.level_flags("mazelevel", "noflip",
 
 des.map([[
 ---------------------------------------------------------------------------
-|-.--|.......|......|..S....|.F.......|.............|.......|.............|
+|-.--|.......|......|..S....|.F.......|.............|........|............|
 |.-..........|......|--|....|.F.....|.|S-------.....|.....................|
-||.--|.......|..T......|....|.F.....|.|.......|.....|.......|.............|
-||.|.|.......|......|-.|....|.F.....|.|.......|.....|--------.............|
+||.--|.......|..T......|....|.F.....|.|.......|.....|........|............|
+||.|.|.......|......|-.|....|.F.....|.|.......|.....|---------............|
 ||.|.|.......|......||.|-.-----------.-.......|-S----.....................|
 |-+-S---------..---.||........................|...|.......................|
 |......|          |.-------------------.......|...|....--S----............|
@@ -320,17 +320,19 @@ des.trap({ type = "trap door", coord = { 73,15 } });
 
 --
 
-des.engraving({ coord = { 60,2 }, type = "engrave", text = "呪文の詠唱", degrade = false });
+des.engraving({ coord = { 61,2 }, type = "engrave", text = "呪文の詠唱", degrade = false });
 if (u.uenmax < 5) then
    -- TODO: make sure hero has enough Pw to cast the spell (5 pw) instead?
+   -- TODO: this test is done at level creation. hero may have gained a level since then.
    -- TODO: ensure the first cast of this spell succeeds?
-   des.engraving({ coord = { 59,2 }, type = "engrave", text = "残念ながら呪文を唱えるだけの魔力がない.", degrade = false });
+   des.engraving({ coord = { 60,2 }, type = "engrave", text = "残念ながら呪文を唱えるだけの魔力がない.", degrade = false });
 end
+des.engraving({ coord = { 59,2 }, type = "engrave", text = "覚えている呪文を確認するには '" .. tut_key("showspells") .. "' を使う", degrade = false });
 des.engraving({ coord = { 57,2 }, type = "engrave", text = "呪文書を拾うには '" .. tut_key("pickup") .. "' を使う", degrade = false });
 des.object({ coord = { 57,2 }, id = "spellbook of light", buc = "blessed" });
 des.engraving({ coord = { 55,2 }, type = "engrave", text = "呪文書を読むには '" .. tut_key("read") .. "' を使う", degrade = false });
 des.engraving({ coord = { 53,2 }, type = "engrave", text = "呪文を唱えるには '" .. tut_key("cast") .. "' を使う", degrade = false });
-des.region(selection.area(53,01, 59, 3), "unlit");
+des.region(selection.area(53,01, 60, 3), "unlit");
 
 --
 

@@ -1,4 +1,4 @@
-// Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-04.
+// Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-22.
 /* $NHDT-Header: NetHack 5.0 console.rc 2026/09/25_13:07:53 NetHack-5.0:1.26 $ */
 /* Copyright (c) Yitzhak Sapir, 2002. 					*/
 /* NetHack may be freely redistributed.  See license for details. 	*/
@@ -29,13 +29,13 @@ BEGIN
     BEGIN
         BLOCK "040904b0"
         BEGIN
-            VALUE "FileDescription", "NetHack for Windows - TTY Interface\0"
+            VALUE "FileDescription", "NetHack for Windows (NetHackJP) - TTY Interface\0"
             VALUE "FileVersion", "5.0.1\0"
             VALUE "InternalName", "NetHack\0"
-            VALUE "LegalCopyright", "Copyright (C) 1985 - 2026.  By Stichting Mathematisch Centrum and M. Stephenson.  See license for details.\0"
+            VALUE "LegalCopyright", "Copyright (C) 1985 - 2026.  By Stichting Mathematisch Centrum and M. Stephenson.  NetHackJP Japanese edition by satokiyon.  See license for details.\0"
             VALUE "OriginalFilename", "NetHack.exe\0"
             VALUE "PrivateBuild", "050107\0"
-            VALUE "ProductName", "NetHack\0"
+            VALUE "ProductName", "NetHack (NetHackJP)\0"
             VALUE "ProductVersion", "5.0.1\0"
         END
     END

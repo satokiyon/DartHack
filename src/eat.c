@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-19. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-24. */
 /* $NHDT-Header: NetHack 5.0 eat.c 2026/07/31_10:25:58 NetHack-5.0:1.358 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
@@ -2166,6 +2166,10 @@ consume_tin(const char *mesg)
         You("喜んで目玉をつついた.");
     } else if (tp) {
         ; /* we've already delivered a message; don't add "it tastes okay" */
+    } else if (noncorporeal(&mons[mnum])) {
+        /* wraith should be the only noncorporeal corpse (traditional);
+           avoid "stringy","fatty",&c for it */
+        pline("これは%s", Hallucination ? "妙な味だ." : "格別な味だ!");
     } else {
         /* yummy is always False for omnivores, palatable always True */
         boolean yummy = (vegan(&mons[mnum])
