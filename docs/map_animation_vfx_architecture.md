@@ -47,7 +47,7 @@
 ### DartHack 独自の最適化・拡張
 - **`MaskFilter.blur` の完全排除**: モバイル GPU での負荷スパイクを避けるため、光リングや発光粒は同心円の半透明アルファ重ね塗りで表現しています。
 - **画面シェイクの `ValueNotifier<Offset>` 分離**: 爆発・大被弾・扉蹴破りの `110ms` 間だけ `Transform.translate` を更新し、平常時の `InteractiveViewer` 再ビルドをゼロに抑えています。
-- **非透過タイルセットでの床ズレ保護**: 透過タイル・テキストモードでは浮遊時にキャラを上浮き（`-0.11 * cellH`）＋移動追従ドロップシャドウを描画しますが、床が焼き込まれた非透過タイルではタイル位置を動かさずセル下部に淡い水色の浮遊弧のみを描画して視覚破綻を防いでいます。
+- **全モード対応の浮遊表現と非透過タイル視認性補完**: テキスト・透過・非透過タイルの全モードで浮遊時にキャラを上浮き（`floatLiftDy`、既定 `-0.11 * cellH`）＋移動追従ドロップシャドウを描画し、非透過タイル時はさらにセル下部へ水色の浮遊弧を重ねて視認性を補っています。
 - **開発者専用スタンドアロン調整環境（VFX Studio）**: 本番配布パッケージに一切混入しない `tools/vfx_studio/` 上で実物レンダラーを用いたプレビュー・調整を行い、開発中の JSON ホットリロードと本番用 `const` Dart 定数コード自動生成を両立しています。
 
 ---
@@ -92,11 +92,11 @@ flowchart LR
 ### オーバーレイペインタの描画順（[nethack_animation_overlay_painter.dart](../sys/flutter/lib/widgets/nethack_animation_overlay_painter.dart)）
 
 1. **背景マスク上書き** (`_drawBackgroundMask`): `animatedCellKeys`（移動・バンプ・被弾・浮遊上浮きセル）の静止前面グリフを背景地形で消去。
-2. **浮遊ドロップシャドウ＆前面エンティティ** (`_drawForegroundGlyph`): 浮遊時（テキスト／透過タイル）は移動補間座標 `(x + moveDx, y + moveDy)` の足元に楕円影を描き、その上に `(x + dx, y + dy)` でキャラを描画。`printGlyph` 未到着の 1 フレーム目はイベント付属のフォールバックグリフで補完。
+2. **浮遊ドロップシャドウ＆前面エンティティ** (`_drawForegroundGlyph`): 浮遊時は全モードで移動補間座標 `(x + moveDx, y + moveDy)` の足元に楕円影を描き、その上に `(x + dx, y + dy)` でキャラを描画。`printGlyph` 未到着の 1 フレーム目はイベント付属のフォールバックグリフで補完。
 3. **消滅岩押し** (`activeVanishingObjectMoves`): 穴埋め・落とし穴・水没・テレポ罠時は移動先をマスクせず、滑り込みながら終盤（既定 `t=0.65..1.0`）で縮小＆フェードアウト。
 4. **死亡フェードアウト** (`activeDeathFades`): 縮小しながらフェードアウト。
 5. **飛び道具・光線** (`activeProjectiles`): 連結されたウェイポイント経路を滑らかに補間描画。
-6. **持続的な状態マイクロ演出** (`activeAmbientStatuses`): 4 スロット優先度排他（外枠＆粒子・非透過タイル用浮遊弧・混乱の手・頭上バッジ）。
+6. **持続的な状態マイクロ演出** (`activeAmbientStatuses`): 4 スロット優先度排他（外枠＆粒子・非透過タイル用補助浮遊弧・混乱の手・頭上バッジ〔睡眠 `Zzz` / 麻痺黄色ギザギザ縦棒2本 / 混乱 `?` / 朦朧 `★` / 敵逃走水色汗マーク〕）。
 7. **同心円光リング VFX** (`activeRings`): 外側ハロー線＋内側コア線（非 blur）。
 8. **ドット粒・発光粒パーティクル VFX** (`activeParticles`): ピクセル調正方形ドット粒、および 2 層半透明円の発光粒。
 9. **フローティングテキスト** (`activeFloatingTexts`): 最前面に 4 方向 1px 黒縁取り付きで描画。
@@ -240,12 +240,12 @@ typedef void (*DartAnimEventCallback)(
 - **起動スクリプト・エントリーポイント**: [run_vfx_studio.ps1](../sys/flutter/tools/run_vfx_studio.ps1), [main.dart](../sys/flutter/tools/vfx_studio/main.dart)
 - **スタジオ UI・タイル検出・設定 JSON**: [vfx_studio_page.dart](../sys/flutter/tools/vfx_studio/vfx_studio_page.dart), [studio_tile_loader.dart](../sys/flutter/tools/vfx_studio/studio_tile_loader.dart), [vfx_tuning.json](../sys/flutter/tools/vfx_studio/vfx_tuning.json)
 
-### ユニット・ウィジェットテスト（計 50 ケース）
+### ユニット・ウィジェットテスト（関連 7 ファイル）
 - [map_animation_controller_test.dart](../sys/flutter/test/utils/map_animation_controller_test.dart): 移動・攻撃・多段命中・死亡・飛び道具連結・通常/消滅岩押し・VFX 上限・シェイク復帰・フローティングテキスト独立＆スタガー・持続状態 Ticker 停止とクリアを検証。
 - [map_camera_test.dart](../sys/flutter/test/utils/map_camera_test.dart): マップ固定スクロール計算、カメラ補間判定、縮小倍率での `buildTransform` / `extractScale` / 連続フレーム補間の回帰テストを検証。
 - [vfx_tuning_config_test.dart](../sys/flutter/test/models/vfx_tuning_config_test.dart): `kDefaultVfxTuning` と JSON ラウンドトリップ一致、欠損キー安全フォールバック、`toDartConstSource()` 生成、テレポート発着 2 リング・召喚 3 種色・9 カテゴリ状態色の反映を検証。
 - [vfx_studio_page_test.dart](../sys/flutter/test/tools/vfx_studio_page_test.dart): VFX Studio の 6 タブ切替・演出発火・持続状態トグル・プリセット＆A/B 比較・`pumpAndSettle()` 完了安全性を検証。
-- [nethack_animation_overlay_painter_test.dart](../sys/flutter/test/widgets/nethack_animation_overlay_painter_test.dart): テキスト／透過タイル／非透過タイルの全モードで全演出要素がエラーなく描画されることを検証。
+- [nethack_animation_overlay_painter_test.dart](../sys/flutter/test/widgets/nethack_animation_overlay_painter_test.dart): テキスト／透過タイル／非透過タイルの全モードで、移動・戦闘・麻痺（黄色ギザギザ縦棒 2 本）・浮遊・敵逃走（水色汗マーク）を含む全演出要素がエラーなく描画されることを検証。
 - [animation_settings_test.dart](../sys/flutter/test/widgets/animation_settings_test.dart): 日英両ロケールでの設定表示、アニメーション OFF 時の速度無効化、フローティングテキストの独立切替・永続化を検証。
 - [nethack_worker_startup_test.dart](../sys/flutter/test/nethack_worker_startup_test.dart): `start` 前のガード、初期設定適用順序、`set_animation_settings` / `set_floating_text_enabled` の転送を検証。
 
@@ -258,15 +258,16 @@ typedef void (*DartAnimEventCallback)(
 ### 8.1 起動方法と試行錯誤ワークフロー
 
 ```powershell
-# 1. VFX Studio を起動
+# 1. VFX Studio を起動（実行中のみ DartHack_private から Windows ビルド構成を一時注入し終了時に自動削除）
 powershell -ExecutionPolicy Bypass -File sys\flutter\tools\run_vfx_studio.ps1
+# （ビルド確認のみ行う場合は -BuildOnly を付与）
 
 # 2. (任意) 実プレイ確認用に別ターミナルで DartHack 本体をデバッグ起動
 Set-Location sys\flutter; flutter run -d windows
 ```
 
 1. **VFX Studio 上でプレビュー＆微調整**:
-   - 左ペインで表示モード（テキスト／`DartHack_private` の透過タイル 3 種／公開側の非透過タイル 4 種）・ズーム（`0.5x〜3.0x`）・言語（`JP/EN`）・速度（`速/標/遅`）を切り替え、下部ボタンで任意の演出を発火します。
+   - 左ペインで表示モード（テキスト／`DartHack_private` の透過タイル 3 種／公開側の非透過タイル 4 種／テスト用合成タイル）・ズーム（`0.5x〜3.0x`）・言語（`JP/EN`）・速度（`速/標/遅`）を切り替え、下部ボタンで任意の演出を発火します。疑似ダンジョンと演出トリガーのタイル番号は `c_core/nethack_jp/src/tile.c` 準拠の `StudioTileIds`（床 `1291`・壁 `1273..1278`・扉 `1287`・大岩 `1266`・主人公 `698` 等）で統一されています。
    - **「リピート」** を ON にすると直近の演出が周期再生され、右ペインのスライダーや数値直打ち・Hex カラー変更をリアルタイムに見比べられます。
    - ヘッダーの **「A/B比較 (標準値で見る)」** をトグルすると、編集中の値を保持したままワンクリックで初期標準値と比較できます。変更済みの項目にはオレンジのドットと個別リセットボタン（`↺`）が表示されます。
 2. **保存と実プレイへの即時ホットリロード**:
