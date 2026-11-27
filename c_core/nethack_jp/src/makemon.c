@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-04. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-27. */
 /* $NHDT-Header: NetHack 5.0 makemon.c 2026/06/26_16:30:36 NetHack-5.0:1.282 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
@@ -1000,7 +1000,7 @@ monhp_per_lvl(struct monst *mon)
         /* adult dragons; newmonhp() uses In_endgame(&u.uz) ? 8 : 4 + rnd(4)
          */
         hp = 4 + rn2(5); /* 4..8 */
-    } else if (!mon->m_lev) {
+    } else if (mon == &gy.youmonst ? !ptr->mlevel : !mon->m_lev) {
         /* level 0 monsters use 1d4 instead of Nd8 */
         hp = rnd(4);
     }

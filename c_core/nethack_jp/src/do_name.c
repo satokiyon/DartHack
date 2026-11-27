@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-19. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-27. */
 /* $NHDT-Header: NetHack 5.0 do_name.c 2026/08/16_14:31:31 NetHack-5.0:1.342 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Pasi Kallinen, 2018. */
@@ -305,9 +305,12 @@ do_oname(struct obj *obj)
         return;
     }
 
-    Snprintf(qbuf, sizeof qbuf, "%s%sを何と名付けますか?",
-             is_plural(obj) ? "これらの" : "この",
-             simpleonames(obj));
+    (void) safe_qbuf(
+        qbuf,
+        (obj->oartifact && !undiscovered_artifact(obj->oartifact))
+            ? ""
+            : is_plural(obj) ? "これらの" : "この",
+        "を何と名付けますか?", obj, xname, simpleonames, "アイテム");
     /* use getlin() to get a name string from the player */
     if (!name_from_player(buf, qbuf, safe_oname(obj)))
         return;
@@ -323,12 +326,20 @@ do_oname(struct obj *obj)
      */
 
     if (obj->oartifact) {
+        const char *jpart = jp_artiname(obj->oartifact);
+
         /* this used to give "The artifact seems to resist the attempt."
            but resisting is definite, no "seems to" about it */
-          pline("%sは名付けを拒んだ.",
+        pline("%sは名付けを拒んだ.",
               /* any artifact should always pass the has_oname() test
                  but be careful just in case */
-                  has_oname(obj) ? ONAME(obj) : "アーティファクト");
+              (jpart && *jpart)
+                  ? jpart
+                  : has_oname(obj) ? ONAME(obj) : "アーティファクト");
+        if (undiscovered_artifact(obj->oartifact)) {
+            fully_identify_obj(obj);
+            update_inventory();
+        }
         return;
     }
 
@@ -477,7 +488,9 @@ name_ok(struct obj *obj)
     if (!obj || obj->oclass == COIN_CLASS)
         return GETOBJ_EXCLUDE;
 
-    if (!obj->dknown || obj->oartifact || obj->otyp == SPE_NOVEL)
+    if (!obj->dknown
+        || (obj->oartifact && !undiscovered_artifact(obj->oartifact))
+        || obj->otyp == SPE_NOVEL)
         return GETOBJ_DOWNPLAY;
 
     return GETOBJ_SUGGEST;

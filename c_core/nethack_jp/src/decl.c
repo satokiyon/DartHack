@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-19. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-27. */
 /* $NHDT-Header: NetHack 5.0 decl.c 2026/10/18_12:54:26 NetHack-5.0:1.374 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2009. */
@@ -615,10 +615,8 @@ static const struct instance_globals_n g_init_n = {
     /* sp_lev.c */
     0, /* num_lregions */
     /* u_init.c */
-    STRANGE_OBJECT, /* nocreate */
-    STRANGE_OBJECT, /* nocreate2 */
-    STRANGE_OBJECT, /* nocreate3 */
-    STRANGE_OBJECT, /* nocreate4 */
+    { STRANGE_OBJECT, STRANGE_OBJECT, STRANGE_OBJECT, STRANGE_OBJECT,
+      STRANGE_OBJECT }, /* nocreate[5] array */
 #ifdef NO_TERMS
     TRUE,
 #else

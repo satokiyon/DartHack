@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-19. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-27. */
 /* $NHDT-Header: NetHack 5.0 decl.h 2026/10/18_12:54:26 NetHack-5.0:1.415 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2007. */
@@ -697,10 +697,7 @@ struct instance_globals_n {
     int num_lregions;
 
     /* u_init.c */
-    short nocreate;
-    short nocreate2;
-    short nocreate3;
-    short nocreate4;
+    short nocreate[5];
 
     /* new */
     boolean no_terms; /* runtime differentiation of NO_TERMS */
