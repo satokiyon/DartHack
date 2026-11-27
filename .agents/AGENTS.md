@@ -1,8 +1,8 @@
-<!-- Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-18. -->
+<!-- Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-27. -->
 # DartHack ビルド・環境設定・開発ツール運用ルール
 
-本ファイルは **ビルド手順、環境設定、Git/Subtree・アセット同期、および開発ツール・テスト運用** に関するルールを定めます。
-アーキテクチャや設計仕様・実装原則についてはルートの [AGENTS.md](file:///c:/Users/satok/DartHack/AGENTS.md) を参照してください。
+本ファイルは **ビルド手順、環境設定、Git/Subtree・アセット同期、開発ツール・テスト運用、および音響・設定・課金連携** に関するルールを定めます。
+アーキテクチャや設計仕様・実装原則についてはルートの [AGENTS.md](../AGENTS.md) を参照してください。
 
 ---
 
@@ -26,6 +26,11 @@
 ### Git 履歴書き換え・ロールバックの原則
 - **`git filter-repo` / `git filter-branch` 時の退避**: 実行後に履歴除去対象ファイルが作業ツリーからも削除されるため、実行前に必ず管理外の一時ディレクトリ（例: `<appDataDir>\brain\<conversation-id>\scratch\`）へ退避し、完了後に復元する。
 - **コミット切り戻し時の部分適用**: ビルドインフラ構成変更と論理コード変更が混在するコミットを一括 `git revert` せず、ビルド設定を維持したまま不要な論理コードのみを手動で切り戻す。
+
+### 公開リポジトリのパス表記・ドキュメント追跡・非配布ツール隔離
+- **ローカル PC パス記載禁止**: Git 管理下の全ファイル（`docs/*.md`, `README.md`, `AGENTS.md`, ソースコメント、テスト等）にローカル PC の絶対パスや OS ユーザー名（`C:\Users\...`, `file:///c:/Users/...` 等）を記載してはならない。リポジトリ内のファイル参照には必ず相対パス（例: `../sys/flutter/...`）を使用する（`file:///` スキームはチャット返信および `<appDataDir>\brain\` 内アーティファクト専用）。
+- **`docs/` のホワイトリスト管理**: ルート `.gitignore` は `/docs/**` をデフォルト除外しているため、`docs/` に新規ドキュメントを追加して追跡させる際は `!/docs/<filename>.md` を `.gitignore` に明示追加する。
+- **開発者専用（非配布）ツールの隔離**: エンドユーザーに配布しない開発・調整用 Flutter ツール（例: `vfx_studio`）は本番パッケージ `sys/flutter/lib/` に入れず、`sys/flutter/tools/<tool_name>/` に隔離配置する（`flutter run -t tools/<tool_name>/main.dart` で起動）。`pubspec.yaml` の `assets:` にも開発専用 JSON 等を同梱せず、開発時ホットリロード処理は `kDebugMode` でガードし、本番 Release ビルドには自動生成した `const` 定数コード等で組み込む。
 
 ---
 
@@ -98,3 +103,26 @@
   - `ExpansionTile` やスクロール領域内の要素をタップする前に `await tester.ensureVisible(finder); await tester.pumpAndSettle();` を実行する。
   - メニューテストのモック `MenuItemData.ident` には `include/objclass.h` 準拠のアイテムクラス番号（`1..18`）とメタ項目 ASCII コード（`'A'`=65 等）を正確に割り当てる。
   - 物理キーボード操作テストでは `tap` 後に `touch` モードが残るのを防ぐため、`await tester.sendKeyEvent(LogicalKeyboardKey.select);` 等で明示的にキーボード入力を発生させて検証する。
+
+---
+
+## 5. 音響（BGM・効果音）・設定・課金連携仕様
+
+- **特別部屋 BGM・環境音**:
+  - `sp_lev` のサブルームは `u.urooms` で無視されるため、特別部屋判定は親部屋に設定し、初回クリアされない `orig_rtype` を参照する。
+  - 部屋タイプ→環境音ID変換は `sounds.c: room_type_to_ambience(int rtype)` に集約する。`In_V_tower` 等の独立分岐は `In_hell` にネストせず独立 `else if` とする。
+  - 特別部屋退出は `check_special_room` の `u.urooms0` / `u.urooms` 差分で検知し、`ambience_end` を発行する（ロード時 `welcome()` でも復元し、BGM 状態はセーブにシリアライズしない）。
+- **プレイヤー制御・`audioplayers` 制約**:
+  - フロア BGM 用・ルーム BGM 用の 2プレイヤー構成とし、ルーム音源欠落時はフロア BGM を止めない。フェード競合は世代カウンタで破棄制御し、本編開始前のフロア BGM は `_pendingFloorBgm` に保留する。
+  - 全プレイヤーで `AndroidAudioFocus.none` を二重適用（global＋個別）し、SE による BGM 停止を防ぐ。iOS `AVAudioSessionCategory.ambient` 時は `options: const {}`（`mixWithOthers` 禁止）。
+  - `audioplayers` v6 では `resume()` を完全排除し、`play(AssetSource(...))` で再開する。
+  - プレビュー試聴中（`_currentPreviewBgm != null`）のバックグラウンド復帰は本編 BGM を再開せずプレビューのみ再開し、ダイアログ内停止は `stopPreviewBgm(restorePrevious: false)`、本編復帰は `dispose()` 時の `restorePrevious: true` に一元化する。設定再ON/ミュート解除時は `_lastFloorBgm` / `_lastAmbience` を自動復元し、バックグラウンド復帰時は `!_muted && _bgmEnabled` 等を再検証する。
+- **効果音・BGM 加工**:
+  - 短音効果音に `loudnorm` を単独適用せず、無音除去（`silenceremove`）＋ピーク正規化（`-1.0 〜 -1.5 dBFS`）を行う。音階・不良音源は同セット近隣音から `asetrate`/`aresample` ピッチシフトで補完する。
+  - BGM・環境音ループは末尾 3.0秒をイコールパワーカーブで頭へ重ねるシームレス・クロスフェードループとする。
+  - トラップ等の新規効果音追加時は日英コアの `seffects.h` / `trap.c`、`sys/flutter/doc/sound_macros_list.md`、`sound_curator`（`sound_definitions.json`, `sound_database.json`, `attributions.txt`）を全同期する。
+- **設定 (`AppPrefs` / `SettingsPage`)・リワード広告**:
+  - `AppPrefs`（`sys/flutter/lib/utils/app_prefs.dart`、詳細 [datastore_migration_architecture.md](../docs/datastore_migration_architecture.md)）の `proguard-rules.pro` 保護（`shared_preferences_android` / `package:jni` Kotlin コルーチンメンバー）と `__datastore_migration_v1_completed__` システムキー保護（`AppPrefs.isSystemKey`）を維持する。
+  - Release AOT（`gen_snapshot.exe`）クラッシュ防止のため、本番 `getInstance()` に `InMemorySharedPreferencesAsync` 等のテスト用フォールバックを混入させない。
+  - JSON インポート時は `doubleKeys` に一致する `num` 値を `.toDouble()` で型昇格する。スライダーは `onChanged`（メモリ/音量更新）と `onChangeEnd`（永続化）を分離し、空コレクションでの `reduce` をガードする。
+  - `RewardedAdManager.showRewardedAd` は 1回の表示要求につき報酬通知または `onAdClosed(false)` が**合計ちょうど1回**のみ発火する契約（重複要求は無視、ロード監視タイムアウト必須）を厳守する。

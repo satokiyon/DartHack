@@ -1,4 +1,4 @@
-<!-- Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-18. -->
+<!-- Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-27. -->
 <!-- agent-ninja-START -->
 ## Agent Skills
 
@@ -8,39 +8,30 @@
 <!-- agent-ninja-END -->
 
 本ファイルは **DartHack の設計・実装仕様・アーキテクチャ全般** を定めます。
-ビルド手順・環境設定・Git/Subtree・アセット同期・テスト運用については [.agents/AGENTS.md](file:///c:/Users/satok/DartHack/.agents/AGENTS.md) を参照してください。
+ビルド手順・環境設定・Git/Subtree・アセット同期・テスト・音響/設定運用については [.agents/AGENTS.md](.agents/AGENTS.md) を参照してください。
 
 ---
 
 ## 1. Cコア設計・共有コード規約
 
 ### 日英2コア分離と `g_language_is_jp` 方針
-- DartHack は日本語モードで `c_core/nethack_jp`、英語モードで `c_core/nethack_en` を別々にビルド・切替する構成です。
-- **`g_language_is_jp` による新規分岐の禁止**: `c_core/nethack_jp` の C ソース内で新たに `g_language_is_jp` による多言語分岐や英語フォールバックを追加してはなりません（直接自然な日本語処理を記述すること）。
-- **移植層での実体宣言（ビルド整合性）**: `c_core/nethack_jp/src/decl.c` は `#ifndef ANDROID` で定義され、`nethack_en` には存在しないため、`winflutter.c` では以下を維持して未定義・二重定義を防止します：
-  ```c
-  #if defined(FLUTTER_WIN32) && defined(NETHACK_JP)
-  extern int g_language_is_jp;
-  #elif defined(NETHACK_JP)
-  int g_language_is_jp = 1;
-  #else
-  int g_language_is_jp = 0;
-  #endif
-  ```
+- 日本語モードは `c_core/nethack_jp`、英語モードは `c_core/nethack_en` を個別ビルド・切替する。
+- **`g_language_is_jp` 新規分岐の禁止**: `c_core/nethack_jp` 内で新たな `g_language_is_jp` 分岐・英語フォールバックを追加せず、直接日本語処理を記述する。
+- **移植層での実体宣言**: `nethack_jp/src/decl.c` は `#ifndef ANDROID` 定義かつ `nethack_en` に不在のため、`winflutter.c` で `FLUTTER_WIN32 && NETHACK_JP` 時は `extern`、それ以外は `NETHACK_JP ? 1 : 0` 実体を定義し未定義・二重定義を防ぐ。
 
 ### 共有コード保護・マーカー規約・移植層スタブ
-- **マーカー命名統一**: `src/`, `include/` 等の共有ディレクトリを変更・追記する際は、必ず `/* DartHack: ... */` マーカーを付与する（`/* NetHackJP: ... */` は使わない）。`c_core/nethack_en` に日本語コア互換の独自ロジックを導入する際は `/* DartHack (日本語コア NetHackJP に合わせた独自実装): ... */` と明記する。
-- **Cコア非侵襲原則**: バグ修正や型変換・例外吸収は極力 C コア (`src/`) を改変せず、移植層（`sys/flutter/` 配下の C FFI や Dart UI）で吸収する。
-- **Flutter 固有 C 関数の宣言とスタブ**: `set_flutter_plain_text_dialog` や `flutter_putmixed_with_tile` 等を共有コアから呼ぶ場合は、日英両コアの `include/extern.h` にプロトタイプ宣言を追加し、`src/windows.c` に非GUI用空スタブ、`winflutter.c` に実体を配置し、呼び出し側を `#ifdef AND_GUI` でガードする。
-- **Android 補完シンボル**: `#ifdef ANDROID` が参照する `and_procs`, `and_get_dumplog_dir`, `and_you_die`, `load_usersound`, `androidsound_procs`, `quit_possible`, `lock_mouse_cursor`, `set_username`, `debuglog` 等は `sys/flutter` 側で `extern.h` と厳密に一致するシグネチャで定義する（`debuglog` は `#define error debuglog` のため実態関数 `void debuglog(const char *fmt, ...)` として定義）。
+- **マーカー命名統一**: `src/`, `include/` 等を変更・追記する際は必ず `/* DartHack: ... */` を付与する（`/* NetHackJP: ... */` 禁止）。`nethack_en` への日本語コア互換独自実装には `/* DartHack (日本語コア NetHackJP に合わせた独自実装): ... */` と明記する。
+- **Cコア非侵襲原則**: バグ修正・型変換・例外吸収は極力 `src/` を改変せず移植層（`sys/flutter/` の C FFI / Dart UI）で吸収する。
+- **Flutter 固有 C 関数の宣言とスタブ**: `set_flutter_plain_text_dialog`, `flutter_putmixed_with_tile` 等を共有コアから呼ぶ際は両コアの `include/extern.h` に宣言、`src/windows.c` に空スタブ、`winflutter.c` に実体を置き、`#ifdef AND_GUI` でガードする。
+- **Android 補完シンボル**: `#ifdef ANDROID` が参照する `and_procs`, `and_get_dumplog_dir`, `and_you_die`, `load_usersound`, `androidsound_procs`, `quit_possible`, `lock_mouse_cursor`, `set_username`, `debuglog`（`#define error debuglog` のため `void debuglog(const char *fmt, ...)`）等は `extern.h` と厳密一致させる。
 
 ### セーブデータ互換性・オートセーブ・UID管理
-- **`critical_sizes` と 4段階マイグレーション**: `version.c` の `critical_sizes` 登録構造体やバッファサイズ（例: `PL_FSIZ = 64`、日英両コアで必ず同一値に統一）を変更する場合は、`nh_file` への旧サイズ保持 → `compare_critical_bytes` の旧サイズ検知 → `restore.c` での旧サイズ消費 → 次回セーブ時自動昇格の4段階マイグレーションを実装する。なお `struct mapseen` の `custom` のような可変長フィールド（Pascal文字列方式）は対象外。
-- **オートセーブ (`do_autosave`) の状態保護**: `dosave0()` と異なりメモリ解放しないため、完了時に `vision_recalc(0); see_monsters(); newsym(u.ux, u.uy);` で視界を復元し、`u.uz` / `u.usteed` / `u.ustuck` ポインタを破壊しない。`savegamestate()` では `FREEING` や `in_checkpoint` に限定せず、存在すれば `u.usteed_mid` / `u.ustuck_mid` / `svc.context.polearm.m_id` を常に書き出す。
+- **`critical_sizes` と 4段階マイグレーション**: `version.c` の `critical_sizes` 登録構造体やバッファサイズ（例: `PL_FSIZ = 64`、日英両コア同一値必須）を変更する際は、`nh_file` 旧サイズ保持 → `compare_critical_bytes` 検知 → `restore.c` 旧サイズ消費 → 次回セーブ時自動昇格の4段階を実装する（`struct mapseen.custom` 等の Pascal 文字列可変長フィールドは対象外）。
+- **オートセーブ (`do_autosave`) の状態保護**: メモリ解放しないため完了時に `vision_recalc(0); see_monsters(); newsym(u.ux, u.uy);` で視界を復元し、`u.uz` / `u.usteed` / `u.ustuck` を破壊しない。`savegamestate()` では `FREEING` / `in_checkpoint` に限定せず `u.usteed_mid` / `u.ustuck_mid` / `svc.context.polearm.m_id` を常に書き出す。
 - **UID 管理とセーブ一覧**:
-  - `#define getuid() 1` 等の固定値ダミーマクロは禁止（OS の実 UID を使用し、日英間の `uid mismatch` を防ぐ）。旧 UID=1 セーブ救済の `_migrateLegacySaveFiles`（`nethack_assets.dart`）は維持する。
-  - `restore_saved_game()` 直前に非圧縮パスで `file_exists()` 判定を行わず（`.gz` 圧縮セーブを見落とすため）、`restore_saved_game()` の戻り値で直接判定する。
-  - `get_saved_games()` (`src/files.c`) ではクラッシュ救済用 `.bak` ファイルを必ず除外する。
+  - `#define getuid() 1` 等の固定値マクロは禁止（OS の実 UID を使用し日英間の `uid mismatch` を防ぐ）。旧 UID=1 救済の `_migrateLegacySaveFiles`（`nethack_assets.dart`）は維持する。
+  - `restore_saved_game()` 前に非圧縮パスで `file_exists()` 判定せず（`.gz` セーブ見落とし防止）、`restore_saved_game()` の戻り値で判定する。
+  - `get_saved_games()` (`src/files.c`) では `.bak` ファイルを必ず除外する。
 
 ### 同一プロセス安全性（`abort()` / `umask`）と NetHack 5.0 仕様追従
 - **`abort()` / コアダンプ抑止**: C コアと Flutter が同一プロセスで動作するため、`end.c` 等の `abort()` / `NH_abort()` / コアダンプ問合せは `!defined(ANDROID) && !defined(WINFLUTTER)` で抑止し、安全な終了処理へ遷移させる。
@@ -57,7 +48,7 @@
 ## 2. 日本語化・翻訳・テキスト処理仕様
 
 ### 死因・固有名詞・動的メッセージ
-- **死因の英語キー保持と動的翻訳**: `svk.killer.name` 等は英語キーのまま保持し、表示時に `src/topten.c` の `jp_translate_killer_text_for_display()` 等で動的に日本語化する（詳細は [death_reasons_architecture.md](file:///c:/Users/satok/DartHack/docs/death_reasons_architecture.md)）。
+- **死因の英語キー保持と動的翻訳**: `svk.killer.name` 等は英語キーのまま保持し、表示時に `src/topten.c` の `jp_translate_killer_text_for_display()` 等で動的に日本語化する（詳細は [death_reasons_architecture.md](docs/death_reasons_architecture.md)）。
   - 墓石は生成時（`src/end.c`）に `jp_formatkiller_for_display` で日本語刻印し、読取（`engrave.c`）・遠見（`pager.c`）時にも `jp_headstone_text_for_display` で二重保護する。
 - **英語文法関数の排除と動的名前解決**: 日本語メッセージ構築で `makeplural()`, `an()`, `the()`, `s_suffix()`, `uhis()`, `uhim()`, `noit_mhe()` 等を使用しない。モンスター・神名・職業・肩書・種族は `jp_pmname`, `jp_pmname_from_idx`, `jp_align_gname_for_display`, `jp_gname_for_display`, `jp_role_name_for_display`, `jp_rank_of_for_display`, `jp_race_noun_for_display` 等を経由する。
 - **訳語・表現統一**:
@@ -104,7 +95,8 @@
 
 ## 4. タイル・画像・マップ描画仕様
 
-- **透過タイルセット2層描画**: 背景地形の算出には `back_to_glyph(x, y)` を使用する（詳細は [transparent_tiles_architecture.md](file:///c:/Users/satok/DartHack/docs/transparent_tiles_architecture.md)）。未探索マス（`MG_UNEXPL`）および視界外探知モンスター（`(special & MG_DETECT) && !cansee(x, y) && levl[x][y].seenv == 0`）は `bktile = -1` として暗闇を維持する。
+- **透過タイルセット2層描画**: 背景地形の算出には `back_to_glyph(x, y)` を使用する（詳細は [transparent_tiles_architecture.md](docs/transparent_tiles_architecture.md)）。未探索マス（`MG_UNEXPL`）および視界外探知モンスター（`(special & MG_DETECT) && !cansee(x, y) && levl[x][y].seenv == 0`）は `bktile = -1` として暗闇を維持する。
+- **マップアニメーション・VFX**: 非ブロッキング2層描画・独立フローティングテキスト・持続状態マイクロ演出の仕様は [map_animation_vfx_architecture.md](docs/map_animation_vfx_architecture.md) に準拠する。`MaskFilter.blur` は使用禁止とし、短期アニメ完了時（持続状態のみ表示中を含む）は必ず `Ticker` を完全停止させる（`pumpAndSettle()` 保護）。
 - **スプライトシート仕様と非正方形タイル**:
   - 標準スプライトシートは **横40列 (`width % 40 == 0`)**・20〜85行で検証する。
   - `Geoduck (15x25)` 等の非正方形タイルに対応するため、`tileWidth` と `tileHeight` を独立管理し、マップセルサイズは固定 `32.0x32.0` ではなく `TilesetManager` / `FontManager` の `getMapCellSize` でアスペクト比連動させる。
@@ -129,7 +121,7 @@
   - オーバーレイ空白部のタッチ透過のため `Container(color: Colors.transparent)` を避け `Padding` や色なし `Container` を使う。テキスト領域も文字行ごとに個別に `GestureDetector` を配置する。
   - `onLongPress` を持つボタンは `onTapDown` ではなく `onTap` を使う。
   - `InteractiveViewer` 上のタップは `onTapUp` ではなく `onTapDown` で座標保存＋ `onTap` で確定実行する。
-- **マップビューポートとカメラ**: `InteractiveViewer` の子は巨大キャンバス（例: `4000x3000`）とし、`_currentScale` を状態保持してズームリセットを防ぎ、下部コントローラ回避のため Y 軸目標を画面上 35% に補正する。`camera_follow_mode: 'fixed'` では X/Y 軸別に実効ビューポート判定と `scroll_margin`/`scroll_amount` 端スクロールを行い、固定モード時のみ `minScale` 下限を拡張する。
+- **マップビューポートとカメラ**: `InteractiveViewer` の子は巨大キャンバス（例: `4000x3000`）とし、`_currentScale` を状態保持してズームリセットを防ぎ、下部コントローラ回避のため Y 軸目標を画面上 35% に補正する。`camera_follow_mode: 'fixed'` では X/Y 軸別に実効ビューポート判定と `scroll_margin`/`scroll_amount` 端スクロールを行い、固定モード時のみ `minScale` 下限を拡張する。2D マップ（`InteractiveViewer`）の `Matrix4` 操作では `getMaxScaleOnAxis()` を直接呼ばず（Z 軸 `1.0` により縮小倍率が `1.0` に化けて左上へ大幅ズレするため）、必ず `MapCamera.extractScale()` と 3 軸等方スケールの `MapCamera.buildTransform()` を使用する。
 - **独立スケール・干渉防止**: D-Pad / ShortcutPad / CmdPanel は端点起点 `Transform.scale` ＋ `sys/flutter/lib/utils/scale_clamp.dart` の `calculatePadClamp()` で衝突回避クランプする（設定画面で乖離時に警告表示）。半透明ボタンはコントローラ表示状態に応じて `bottom` を動的シフトし、ステータス長文は Fit / Wrap モードおよびリアルタイム計測オフセットで干渉を防ぐ。
 - **ExpansionTile・テーマ配色・スライダー**: `ExpansionTile` には `PageStorageKey` を使わず `ValueKey<String>`＋`Column` を使う（`ScrollPosition` の型キャスト灰色クラッシュ防止）。音声クレジットはサービス単位に集約する。UI テーマ `primary`（例: `#CE93D8`）とアクションボタン背景（`0xFF004D40` 等）はコントラスト比 4.5:1 以上を保ち、全決定ボタンで横断統一する。個数選択スライダーは `MenuOverlay.didUpdateWidget` で同期し、持ち物一覧からの後続アクションは `set_itemactions_count` 経由で `cmdq_add_int` へ引き継ぐ。
 
@@ -155,26 +147,3 @@
   - Android 実機での IME 経由対策として `FocusManager.instance.addEarlyKeyEventHandler` で物理キー押下を検知し、`GestureBinding.instance.pointerRouter.addGlobalRoute` で `Overlay` 含む全画面タップ時にタッチモードへ即復帰させる。
   - `ExpansionTile` は 3段階ハイライト＋内部無名ヘッダーをスキップするフォーカス補正を行う。
   - ヘルプ `Table` は代表キーのみ厳選記載し、列0 に `MinColumnWidth(IntrinsicColumnWidth(), FixedColumnWidth(maxWidth * 0.45))` を適用する。数量指定（`0〜9`）の案内は `menuHow >= 1` のみ表示する。
-
----
-
-## 7. 音響（BGM・効果音）・設定・課金連携仕様
-
-- **特別部屋 BGM・環境音**:
-  - `sp_lev` のサブルームは `u.urooms` で無視されるため、特別部屋判定は親部屋に設定し、初回クリアされない `orig_rtype` を参照する。
-  - 部屋タイプ→環境音ID変換は `sounds.c: room_type_to_ambience(int rtype)` に集約する。`In_V_tower` 等の独立分岐は `In_hell` にネストせず独立 `else if` とする。
-  - 特別部屋退出は `check_special_room` の `u.urooms0` / `u.urooms` 差分で検知し、`ambience_end` を発行する（ロード時 `welcome()` でも復元し、BGM 状態はセーブにシリアライズしない）。
-- **プレイヤー制御・`audioplayers` 制約**:
-  - フロア BGM 用・ルーム BGM 用の 2プレイヤー構成とし、ルーム音源欠落時はフロア BGM を止めない。フェード競合は世代カウンタで破棄制御し、本編開始前のフロア BGM は `_pendingFloorBgm` に保留する。
-  - 全プレイヤーで `AndroidAudioFocus.none` を二重適用（global＋個別）し、SE による BGM 停止を防ぐ。iOS `AVAudioSessionCategory.ambient` 時は `options: const {}`（`mixWithOthers` 禁止）。
-  - `audioplayers` v6 では `resume()` を完全排除し、`play(AssetSource(...))` で再開する。
-  - プレビュー試聴中（`_currentPreviewBgm != null`）のバックグラウンド復帰は本編 BGM を再開せずプレビューのみ再開し、ダイアログ内停止は `stopPreviewBgm(restorePrevious: false)`、本編復帰は `dispose()` 時の `restorePrevious: true` に一元化する。設定再ON/ミュート解除時は `_lastFloorBgm` / `_lastAmbience` を自動復元し、バックグラウンド復帰時は `!_muted && _bgmEnabled` 等を再検証する。
-- **効果音・BGM 加工**:
-  - 短音効果音に `loudnorm` を単独適用せず、無音除去（`silenceremove`）＋ピーク正規化（`-1.0 〜 -1.5 dBFS`）を行う。音階・不良音源は同セット近隣音から `asetrate`/`aresample` ピッチシフトで補完する。
-  - BGM・環境音ループは末尾 3.0秒をイコールパワーカーブで頭へ重ねるシームレス・クロスフェードループとする。
-  - トラップ等の新規効果音追加時は日英コアの `seffects.h` / `trap.c`、`sys/flutter/doc/sound_macros_list.md`、`sound_curator`（`sound_definitions.json`, `sound_database.json`, `attributions.txt`）を全同期する。
-- **設定 (`AppPrefs` / `SettingsPage`)・リワード広告**:
-  - `AppPrefs`（`sys/flutter/lib/utils/app_prefs.dart`、詳細 [datastore_migration_architecture.md](file:///c:/Users/satok/DartHack/docs/datastore_migration_architecture.md)）の `proguard-rules.pro` 保護（`shared_preferences_android` / `package:jni` Kotlin コルーチンメンバー）と `__datastore_migration_v1_completed__` システムキー保護（`AppPrefs.isSystemKey`）を維持する。
-  - Release AOT（`gen_snapshot.exe`）クラッシュ防止のため、本番 `getInstance()` に `InMemorySharedPreferencesAsync` 等のテスト用フォールバックを混入させない。
-  - JSON インポート時は `doubleKeys` に一致する `num` 値を `.toDouble()` で型昇格する。スライダーは `onChanged`（メモリ/音量更新）と `onChangeEnd`（永続化）を分離し、空コレクションでの `reduce` をガードする。
-  - `RewardedAdManager.showRewardedAd` は 1回の表示要求につき報酬通知または `onAdClosed(false)` が**合計ちょうど1回**のみ発火する契約（重複要求は無視、ロード監視タイムアウト必須）を厳守する。
