@@ -315,7 +315,62 @@ void main() {
       (useTiles: true, transparent: false),
     ];
     for (final mode in modes) {
-      animCtrl.canLiftFloatingGlyph = !mode.useTiles || mode.transparent;
+      animCtrl.canLiftFloatingGlyph = true;
+      final painter = NetHackAnimationOverlayPainter(
+        screen: screen,
+        animationController: animCtrl,
+        tileImage: mode.useTiles ? dummyImg : null,
+        tileWidth: 32,
+        tileHeight: 32,
+        useTiles: mode.useTiles,
+        isTransparentTileset: mode.transparent,
+      );
+      final recorder = ui.PictureRecorder();
+      final canvas = Canvas(recorder);
+      expect(() => painter.paint(canvas, const Size(800, 600)), returnsNormally);
+      recorder.endRecording().dispose();
+    }
+  });
+
+  test('麻痺（黄色ギザギザ縦棒2本）・浮遊・敵逃走（汗マーク）が全モードでエラーなく描画される', () async {
+    final screen = NetHackScreen();
+    screen.printGlyph(3, 10, 10, 698, '@'.codeUnitAt(0), 0xFFFFFFFF, 0, 1291, '.'.codeUnitAt(0), 0xFF888888);
+    screen.printGlyph(3, 12, 10, 148, 'o'.codeUnitAt(0), 0xFF00FF00, 0, 1291, '.'.codeUnitAt(0), 0xFF888888);
+
+    final recorderImg = ui.PictureRecorder();
+    final canvasImg = Canvas(recorderImg);
+    canvasImg.drawRect(const Rect.fromLTWH(0, 0, 1280, 1088), Paint()..color = Colors.indigo);
+    final dummyImg = await recorderImg.endRecording().toImage(1280, 1088);
+    addTearDown(dummyImg.dispose);
+
+    final animCtrl = MapAnimationController(canLiftFloatingGlyph: true);
+    addTearDown(animCtrl.dispose);
+
+    animCtrl.handleEvent(const MapAnimEvent(
+      turnId: 1,
+      eventType: MapAnimEventType.ambientStatus,
+      entityId: AmbientStatusBits.paralyzed | AmbientStatusBits.levitating,
+      fromX: 10,
+      fromY: 10,
+      toX: 10,
+      toY: 10,
+    ));
+    animCtrl.handleEvent(const MapAnimEvent(
+      turnId: 1,
+      eventType: MapAnimEventType.ambientStatus,
+      entityId: AmbientStatusBits.fleeing,
+      fromX: 12,
+      fromY: 10,
+      toX: 12,
+      toY: 10,
+    ));
+
+    final modes = [
+      (useTiles: false, transparent: false),
+      (useTiles: true, transparent: true),
+      (useTiles: true, transparent: false),
+    ];
+    for (final mode in modes) {
       final painter = NetHackAnimationOverlayPainter(
         screen: screen,
         animationController: animCtrl,

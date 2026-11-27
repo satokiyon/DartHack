@@ -164,24 +164,92 @@ class _VfxStudioPageState extends State<VfxStudioPage> with SingleTickerProvider
     // 中央付近 (x=32..47, y=6..14) に疑似ダンジョン部屋を構築
     for (int y = 6; y <= 14; y++) {
       for (int x = 32; x <= 47; x++) {
-        final isWall = y == 6 || y == 14 || x == 32 || x == 47;
-        if (isWall) {
-          _screen.printGlyph(3, x, y, 1, '-'.codeUnitAt(0), 0xFF90A4AE, 0, 1, '-'.codeUnitAt(0), 0xFF90A4AE);
+        final isTop = y == 6;
+        final isBottom = y == 14;
+        final isLeft = x == 32;
+        final isRight = x == 47;
+        if (isTop || isBottom || isLeft || isRight) {
+          final int wallTile;
+          final String wallChar;
+          if (isTop && isLeft) {
+            wallTile = StudioTileIds.wallTopLeft;
+            wallChar = '-';
+          } else if (isTop && isRight) {
+            wallTile = StudioTileIds.wallTopRight;
+            wallChar = '-';
+          } else if (isBottom && isLeft) {
+            wallTile = StudioTileIds.wallBottomLeft;
+            wallChar = '-';
+          } else if (isBottom && isRight) {
+            wallTile = StudioTileIds.wallBottomRight;
+            wallChar = '-';
+          } else if (isTop || isBottom) {
+            wallTile = StudioTileIds.wallHorizontal;
+            wallChar = '-';
+          } else {
+            wallTile = StudioTileIds.wallVertical;
+            wallChar = '|';
+          }
+          _screen.printGlyph(
+            3, x, y,
+            wallTile, wallChar.codeUnitAt(0), 0xFF90A4AE, 0,
+            wallTile, wallChar.codeUnitAt(0), 0xFF90A4AE,
+          );
         } else {
-          _screen.printGlyph(3, x, y, 0, '.'.codeUnitAt(0), 0xFF78909C, 0, 0, '.'.codeUnitAt(0), 0xFF78909C);
+          _screen.printGlyph(
+            3, x, y,
+            StudioTileIds.roomFloor, '.'.codeUnitAt(0), 0xFF78909C, 0,
+            StudioTileIds.roomFloor, '.'.codeUnitAt(0), 0xFF78909C,
+          );
         }
       }
     }
     // 扉・水・溶岩・落とし穴・大岩・主人公・モンスター配置
-    _screen.printGlyph(3, 47, 10, 2, '+'.codeUnitAt(0), 0xFFA1887F, 0, 0, '.'.codeUnitAt(0), 0xFF78909C);
-    _screen.printGlyph(3, 35, 12, 3, '}'.codeUnitAt(0), 0xFF1E88E5, 0, 3, '}'.codeUnitAt(0), 0xFF1E88E5);
-    _screen.printGlyph(3, 36, 12, 4, '}'.codeUnitAt(0), 0xFFF4511E, 0, 4, '}'.codeUnitAt(0), 0xFFF4511E);
-    _screen.printGlyph(3, _pitX, _pitY, 5, '^'.codeUnitAt(0), 0xFFBA68C8, 0, 0, '.'.codeUnitAt(0), 0xFF78909C);
-    _screen.printGlyph(3, _boulderX, _boulderY, 6, '`'.codeUnitAt(0), 0xFFCFD8DC, 0, 0, '.'.codeUnitAt(0), 0xFF78909C);
-    _screen.printGlyph(3, _heroX, _heroY, 10, '@'.codeUnitAt(0), 0xFFFFFFFF, 0, 0, '.'.codeUnitAt(0), 0xFF78909C);
-    _screen.printGlyph(3, _orcX, _orcY, 11, 'o'.codeUnitAt(0), 0xFF66BB6A, 0, 0, '.'.codeUnitAt(0), 0xFF78909C);
-    _screen.printGlyph(3, _dragonX, _dragonY, 12, 'D'.codeUnitAt(0), 0xFFEF5350, 0, 0, '.'.codeUnitAt(0), 0xFF78909C);
-    _screen.printGlyph(3, 39, 8, 13, 'g'.codeUnitAt(0), 0xFF42A5F5, 0x10 /* MG_PET */, 0, '.'.codeUnitAt(0), 0xFF78909C);
+    _screen.printGlyph(
+      3, 47, 10,
+      StudioTileIds.closedDoor, '+'.codeUnitAt(0), 0xFFA1887F, 0,
+      StudioTileIds.roomFloor, '.'.codeUnitAt(0), 0xFF78909C,
+    );
+    _screen.printGlyph(
+      3, 35, 12,
+      StudioTileIds.water, '}'.codeUnitAt(0), 0xFF1E88E5, 0,
+      StudioTileIds.water, '}'.codeUnitAt(0), 0xFF1E88E5,
+    );
+    _screen.printGlyph(
+      3, 36, 12,
+      StudioTileIds.lava, '}'.codeUnitAt(0), 0xFFF4511E, 0,
+      StudioTileIds.lava, '}'.codeUnitAt(0), 0xFFF4511E,
+    );
+    _screen.printGlyph(
+      3, _pitX, _pitY,
+      StudioTileIds.pit, '^'.codeUnitAt(0), 0xFFBA68C8, 0,
+      StudioTileIds.roomFloor, '.'.codeUnitAt(0), 0xFF78909C,
+    );
+    _screen.printGlyph(
+      3, _boulderX, _boulderY,
+      StudioTileIds.boulder, '`'.codeUnitAt(0), 0xFFCFD8DC, 0,
+      StudioTileIds.roomFloor, '.'.codeUnitAt(0), 0xFF78909C,
+    );
+    _screen.printGlyph(
+      3, _heroX, _heroY,
+      StudioTileIds.heroValkyrie, '@'.codeUnitAt(0), 0xFFFFFFFF, 0,
+      StudioTileIds.roomFloor, '.'.codeUnitAt(0), 0xFF78909C,
+    );
+    _screen.printGlyph(
+      3, _orcX, _orcY,
+      StudioTileIds.orc, 'o'.codeUnitAt(0), 0xFF66BB6A, 0,
+      StudioTileIds.roomFloor, '.'.codeUnitAt(0), 0xFF78909C,
+    );
+    _screen.printGlyph(
+      3, _dragonX, _dragonY,
+      StudioTileIds.redDragon, 'D'.codeUnitAt(0), 0xFFEF5350, 0,
+      StudioTileIds.roomFloor, '.'.codeUnitAt(0), 0xFF78909C,
+    );
+    _screen.printGlyph(
+      3, 39, 8,
+      StudioTileIds.littleDog, 'd'.codeUnitAt(0), 0xFF42A5F5, 0x10 /* MG_PET */,
+      StudioTileIds.roomFloor, '.'.codeUnitAt(0), 0xFF78909C,
+    );
   }
 
   Directory? _findFlutterRootDir() {
@@ -334,7 +402,7 @@ class _VfxStudioPageState extends State<VfxStudioPage> with SingleTickerProvider
     setState(() {
       _selectedTileOption = option;
       _tileImage = img;
-      _animController.canLiftFloatingGlyph = option.isTransparent;
+      _animController.canLiftFloatingGlyph = true;
     });
     old?.dispose();
   }
@@ -763,7 +831,7 @@ class _VfxStudioPageState extends State<VfxStudioPage> with SingleTickerProvider
                         fromY: _heroY,
                         toX: _heroX,
                         toY: _heroY,
-                        param1: 10,
+                        param1: StudioTileIds.heroValkyrie,
                         param2: '@'.codeUnitAt(0),
                         param3: 0xFFFFFFFF,
                       ));
@@ -778,7 +846,7 @@ class _VfxStudioPageState extends State<VfxStudioPage> with SingleTickerProvider
                         fromY: _boulderY,
                         toX: _boulderX,
                         toY: _boulderY,
-                        param1: 6,
+                        param1: StudioTileIds.boulder,
                         param2: '`'.codeUnitAt(0),
                         param3: 0xFFCFD8DC,
                       ));
@@ -801,7 +869,7 @@ class _VfxStudioPageState extends State<VfxStudioPage> with SingleTickerProvider
                         fromY: _boulderY,
                         toX: _pitX,
                         toY: _pitY,
-                        param1: 6,
+                        param1: StudioTileIds.boulder,
                         param2: '`'.codeUnitAt(0),
                         param3: 0xFFCFD8DC,
                       ));
@@ -836,7 +904,7 @@ class _VfxStudioPageState extends State<VfxStudioPage> with SingleTickerProvider
                           fromY: _heroY,
                           toX: x + 1,
                           toY: _heroY,
-                          param1: 7,
+                          param1: StudioTileIds.arrow,
                           param2: ')'.codeUnitAt(0),
                           param3: 0xFFFFEE58,
                         ));
@@ -896,7 +964,7 @@ class _VfxStudioPageState extends State<VfxStudioPage> with SingleTickerProvider
                         fromY: _dragonY,
                         toX: _dragonX,
                         toY: _dragonY,
-                        param1: 12,
+                        param1: StudioTileIds.redDragon,
                         param2: 'D'.codeUnitAt(0),
                         param3: 0xFFEF5350,
                       ));

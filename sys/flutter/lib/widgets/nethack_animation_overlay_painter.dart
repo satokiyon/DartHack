@@ -57,7 +57,6 @@ class NetHackAnimationOverlayPainter extends CustomPainter {
     final int sheetCols = (useTiles && tileImage != null && tileWidth > 0)
         ? tileImage!.width ~/ tileWidth
         : 0;
-    final bool canLiftFloat = !useTiles || isTransparentTileset;
     final tuning = animationController.tuning;
 
     // 1. アニメーション・浮遊対象セルの静止グリフを背景地形でマスク上書き
@@ -87,7 +86,7 @@ class NetHackAnimationOverlayPainter extends CustomPainter {
       final transform = animationController.getCellTransform(x, y);
       if (transform == null) continue;
 
-      if (transform.isFloating && canLiftFloat) {
+      if (transform.isFloating) {
         final shadowCenterX = offsetX + (x + transform.moveDx + 0.5) * cellW;
         final shadowCenterY = offsetY + (y + transform.moveDy + 0.86) * cellH;
         canvas.drawOval(
@@ -222,7 +221,6 @@ class NetHackAnimationOverlayPainter extends CustomPainter {
         offsetY,
         cellW,
         cellH,
-        canLiftFloat: canLiftFloat,
       );
     }
 
@@ -302,9 +300,8 @@ class NetHackAnimationOverlayPainter extends CustomPainter {
     double offsetX,
     double offsetY,
     double cellW,
-    double cellH, {
-    required bool canLiftFloat,
-  }) {
+    double cellH,
+  ) {
     final mask = status.mask;
     final amb = animationController.tuning.ambient;
     final cellLeft = offsetX + (status.x + status.moveDx) * cellW;
@@ -358,8 +355,8 @@ class NetHackAnimationOverlayPainter extends CustomPainter {
       _drawCornerDots(canvas, rect, const Color(0xFFEA80FC), status.phase, cellW);
     }
 
-    // スロットB: 足元（非透過タイル時の浮遊弧のみ。透過・テキスト時はステップ2で影＋上浮き描画済み）
-    if (!canLiftFloat && (mask & AmbientStatusBits.levitating) != 0) {
+    // スロットB: 足元（全モードでステップ2の影＋上浮きを適用。非透過タイル時は浮遊弧も重ねて視認性を補う）
+    if (useTiles && !isTransparentTileset && (mask & AmbientStatusBits.levitating) != 0) {
       final arcRect = Rect.fromLTWH(
         cellLeft + cellW * 0.14,
         cellTop + cellH * 0.78,
@@ -410,16 +407,7 @@ class NetHackAnimationOverlayPainter extends CustomPainter {
         fontWeight: FontWeight.w700,
       );
     } else if ((mask & AmbientStatusBits.paralyzed) != 0) {
-      _drawOutlinedText(
-        canvas,
-        '||',
-        const Color(0xFF80DEEA),
-        const Color(0xE6000000),
-        badgeCenterX,
-        badgeCenterY,
-        badgeFontSize,
-        fontWeight: FontWeight.w800,
-      );
+      _drawParalyzedZigzag(canvas, badgeCenterX, badgeCenterY, cellW, cellH);
     } else if ((mask & AmbientStatusBits.confused) != 0) {
       _drawOutlinedText(
         canvas,
@@ -443,12 +431,124 @@ class NetHackAnimationOverlayPainter extends CustomPainter {
         fontWeight: FontWeight.w700,
       );
     } else if ((mask & AmbientStatusBits.fleeing) != 0) {
-      // 敵逃走の汗粒（頭上右寄り）
-      final dropCenter = Offset(cellLeft + cellW * 0.78, cellTop + cellH * 0.14 + bobY);
-      final dropR = math.max(1.8, cellW * 0.09);
-      canvas.drawCircle(dropCenter, dropR * 1.3, Paint()..color = const Color(0xCC000000));
-      canvas.drawCircle(dropCenter, dropR, Paint()..color = const Color(0xFF80D8FF));
+      _drawSweatDrop(canvas, cellLeft, cellTop, bobY, cellW, cellH);
     }
+  }
+
+  /// 麻痺・失神時の「痺れてビリビリしている黄色のギザギザ縦棒 2 本」を描画する
+  void _drawParalyzedZigzag(
+    Canvas canvas,
+    double centerX,
+    double centerY,
+    double cellW,
+    double cellH,
+  ) {
+    final totalH = math.max(9.0, cellH * 0.34);
+    final zigW = math.max(1.8, cellW * 0.055);
+    final halfGap = math.max(2.2, cellW * 0.085);
+    final coreStroke = math.max(1.4, cellW * 0.05);
+    final topY = centerY - totalH * 0.5;
+
+    Path buildBolt(double baseX) {
+      final p = Path()..moveTo(baseX - zigW * 0.4, topY);
+      p.lineTo(baseX + zigW * 0.8, topY + totalH * 0.25);
+      p.lineTo(baseX - zigW * 0.8, topY + totalH * 0.50);
+      p.lineTo(baseX + zigW * 0.8, topY + totalH * 0.75);
+      p.lineTo(baseX - zigW * 0.4, topY + totalH);
+      return p;
+    }
+
+    final leftBolt = buildBolt(centerX - halfGap);
+    final rightBolt = buildBolt(centerX + halfGap);
+
+    final outlinePaint = Paint()
+      ..style = PaintingStyle.stroke
+      ..strokeCap = StrokeCap.round
+      ..strokeJoin = StrokeJoin.round
+      ..strokeWidth = coreStroke + 2.2
+      ..color = const Color(0xE6000000);
+    final corePaint = Paint()
+      ..style = PaintingStyle.stroke
+      ..strokeCap = StrokeCap.round
+      ..strokeJoin = StrokeJoin.round
+      ..strokeWidth = coreStroke
+      ..color = const Color(0xFFFFEA00);
+
+    canvas.drawPath(leftBolt, outlinePaint);
+    canvas.drawPath(rightBolt, outlinePaint);
+    canvas.drawPath(leftBolt, corePaint);
+    canvas.drawPath(rightBolt, corePaint);
+  }
+
+  /// 敵逃走時の「水色の汗マーク（水滴シルエット）」を描画する
+  void _drawSweatDrop(
+    Canvas canvas,
+    double cellLeft,
+    double cellTop,
+    double bobY,
+    double cellW,
+    double cellH,
+  ) {
+    final tipX = cellLeft + cellW * 0.79;
+    final tipY = cellTop + cellH * 0.02 + bobY;
+    final dropH = math.max(7.5, cellH * 0.30);
+    final dropW = dropH * 0.74;
+
+    final path = Path()
+      ..moveTo(tipX, tipY)
+      ..cubicTo(
+        tipX + dropW * 0.18,
+        tipY + dropH * 0.32,
+        tipX + dropW * 0.55,
+        tipY + dropH * 0.58,
+        tipX + dropW * 0.50,
+        tipY + dropH * 0.76,
+      )
+      ..cubicTo(
+        tipX + dropW * 0.45,
+        tipY + dropH * 0.94,
+        tipX + dropW * 0.22,
+        tipY + dropH,
+        tipX,
+        tipY + dropH,
+      )
+      ..cubicTo(
+        tipX - dropW * 0.22,
+        tipY + dropH,
+        tipX - dropW * 0.45,
+        tipY + dropH * 0.94,
+        tipX - dropW * 0.50,
+        tipY + dropH * 0.76,
+      )
+      ..cubicTo(
+        tipX - dropW * 0.55,
+        tipY + dropH * 0.58,
+        tipX - dropW * 0.18,
+        tipY + dropH * 0.32,
+        tipX,
+        tipY,
+      )
+      ..close();
+
+    canvas.drawPath(
+      path,
+      Paint()
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = math.max(1.5, cellW * 0.06)
+        ..strokeJoin = StrokeJoin.round
+        ..color = const Color(0xE6000000),
+    );
+    canvas.drawPath(
+      path,
+      Paint()
+        ..style = PaintingStyle.fill
+        ..color = const Color(0xFF40C4FF),
+    );
+    canvas.drawCircle(
+      Offset(tipX - dropW * 0.14, tipY + dropH * 0.66),
+      math.max(0.9, dropW * 0.13),
+      Paint()..color = const Color(0xD9FFFFFF),
+    );
   }
 
   void _drawStatusFrame(

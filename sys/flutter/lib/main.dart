@@ -522,8 +522,7 @@ class _MyHomePageState extends State<MyHomePage>
       // 言語設定のロード
       _selectedLanguage = prefs.getString('selected_language') ?? 'ja';
       _mapAnimController.isJapanese = (_selectedLanguage == 'ja');
-      _mapAnimController.canLiftFloatingGlyph = !_useTiles ||
-          TilesetManager.instance.getTilesetById(_selectedTileset).isTransparent;
+      _mapAnimController.canLiftFloatingGlyph = true;
 
       // コントロールのバージョンを更新
       _controlsVersion++;

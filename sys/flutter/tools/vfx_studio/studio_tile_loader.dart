@@ -3,6 +3,32 @@ import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
 import 'package:darthack/models/tileset_info.dart';
 
+/// NetHack 標準スプライトシート（横40列・c_core/nethack_jp/src/tile.c 準拠）のタイル番号
+abstract final class StudioTileIds {
+  // モンスター (monsters.txt)
+  static const int littleDog = 32;
+  static const int orc = 148;
+  static const int redDragon = 300;
+  static const int heroValkyrie = 698;
+
+  // オブジェクト (objects.txt)
+  static const int arrow = 807;
+  static const int boulder = 1266;
+
+  // 地形・ダンジョン (other.txt)
+  static const int wallVertical = 1273;
+  static const int wallHorizontal = 1274;
+  static const int wallTopLeft = 1275;
+  static const int wallTopRight = 1276;
+  static const int wallBottomLeft = 1277;
+  static const int wallBottomRight = 1278;
+  static const int closedDoor = 1287;
+  static const int roomFloor = 1291;
+  static const int water = 1314;
+  static const int lava = 1316;
+  static const int pit = 1335;
+}
+
 /// VFX Studio 用のタイルセットエントリ
 class StudioTilesetOption {
   final String id;
@@ -124,17 +150,14 @@ class StudioTileLoader {
     );
   }
 
-  /// 40列×10行の軽量テスト用スプライトシートを合成する
-  /// タイル番号の目安:
-  /// 0: 床, 1: 壁, 2: 扉, 3: 水, 4: 溶岩, 5: 落とし穴, 6: 大岩, 7: 武器/矢,
-  /// 10: 主人公(@), 11: オーク(o), 12: ドラゴン(D), 13: ゴブリン(g)
+  /// 40列×34行の軽量テスト用スプライトシートを合成する（StudioTileIds 準拠）
   static Future<ui.Image> _buildSyntheticSheet({
     required int tileW,
     required int tileH,
     required bool transparent,
   }) async {
     const cols = 40;
-    const rows = 10;
+    const rows = 34;
     final recorder = ui.PictureRecorder();
     final canvas = Canvas(recorder);
     final w = (cols * tileW).toDouble();
@@ -155,53 +178,60 @@ class StudioTileLoader {
       );
     }
 
-    // 0: 床
-    final r0 = cellRect(0);
-    canvas.drawRect(r0, Paint()..color = const Color(0xFF262B36));
-    canvas.drawCircle(r0.center, 1.5, Paint()..color = const Color(0xFF4B5568));
+    // 床
+    final rFloor = cellRect(StudioTileIds.roomFloor);
+    canvas.drawRect(rFloor, Paint()..color = const Color(0xFF262B36));
+    canvas.drawCircle(rFloor.center, 1.5, Paint()..color = const Color(0xFF4B5568));
 
-    // 1: 石壁
-    final r1 = cellRect(1);
-    canvas.drawRect(r1, Paint()..color = const Color(0xFF546E7A));
-    canvas.drawRect(
-      r1.deflate(2),
-      Paint()
-        ..style = PaintingStyle.stroke
-        ..strokeWidth = 1.5
-        ..color = const Color(0xFF90A4AE),
-    );
-
-    // 2: 閉じた木扉
-    final r2 = cellRect(2);
-    if (!transparent) {
-      canvas.drawRect(r2, Paint()..color = const Color(0xFF262B36));
+    // 壁（縦横・四隅）
+    for (final wallIdx in [
+      StudioTileIds.wallVertical,
+      StudioTileIds.wallHorizontal,
+      StudioTileIds.wallTopLeft,
+      StudioTileIds.wallTopRight,
+      StudioTileIds.wallBottomLeft,
+      StudioTileIds.wallBottomRight,
+    ]) {
+      final rw = cellRect(wallIdx);
+      canvas.drawRect(rw, Paint()..color = const Color(0xFF546E7A));
+      canvas.drawRect(
+        rw.deflate(2),
+        Paint()
+          ..style = PaintingStyle.stroke
+          ..strokeWidth = 1.5
+          ..color = const Color(0xFF90A4AE),
+      );
     }
-    canvas.drawRect(r2.deflate(4), Paint()..color = const Color(0xFF8D6E63));
 
-    // 3: 水たまり
-    canvas.drawRect(cellRect(3), Paint()..color = const Color(0xFF1565C0));
-    // 4: 溶岩
-    canvas.drawRect(cellRect(4), Paint()..color = const Color(0xFFD84315));
-    // 5: 落とし穴
-    final r5 = cellRect(5);
-    canvas.drawRect(r5, Paint()..color = const Color(0xFF262B36));
-    canvas.drawOval(r5.deflate(5), Paint()..color = const Color(0xFF090A0D));
+    // 閉じた木扉
+    final rDoor = cellRect(StudioTileIds.closedDoor);
+    if (!transparent) {
+      canvas.drawRect(rDoor, Paint()..color = const Color(0xFF262B36));
+    }
+    canvas.drawRect(rDoor.deflate(4), Paint()..color = const Color(0xFF8D6E63));
 
-    // 6: 大岩
-    final r6 = cellRect(6);
-    canvas.drawCircle(r6.center, tileW * 0.36, Paint()..color = const Color(0xFFB0BEC5));
+    // 水たまり・溶岩・落とし穴
+    canvas.drawRect(cellRect(StudioTileIds.water), Paint()..color = const Color(0xFF1565C0));
+    canvas.drawRect(cellRect(StudioTileIds.lava), Paint()..color = const Color(0xFFD84315));
+    final rPit = cellRect(StudioTileIds.pit);
+    canvas.drawRect(rPit, Paint()..color = const Color(0xFF262B36));
+    canvas.drawOval(rPit.deflate(5), Paint()..color = const Color(0xFF090A0D));
 
-    // 7: 飛び道具/アイテム
-    final r7 = cellRect(7);
+    // 大岩
+    final rBoulder = cellRect(StudioTileIds.boulder);
+    canvas.drawCircle(rBoulder.center, tileW * 0.36, Paint()..color = const Color(0xFFB0BEC5));
+
+    // 飛び道具（矢）
+    final rArrow = cellRect(StudioTileIds.arrow);
     canvas.drawLine(
-      Offset(r7.left + 6, r7.bottom - 6),
-      Offset(r7.right - 6, r7.top + 6),
+      Offset(rArrow.left + 6, rArrow.bottom - 6),
+      Offset(rArrow.right - 6, rArrow.top + 6),
       Paint()
         ..strokeWidth = 3.0
         ..color = const Color(0xFFFFEE58),
     );
 
-    // 10..13: キャラクター・モンスター
+    // キャラクター・モンスター
     void drawActor(int idx, Color bodyColor) {
       final rc = cellRect(idx);
       canvas.drawCircle(
@@ -222,10 +252,10 @@ class StudioTileLoader {
       );
     }
 
-    drawActor(10, const Color(0xFFFFFFFF)); // @
-    drawActor(11, const Color(0xFF66BB6A)); // o
-    drawActor(12, const Color(0xFFEF5350)); // D
-    drawActor(13, const Color(0xFF42A5F5)); // g
+    drawActor(StudioTileIds.heroValkyrie, const Color(0xFFFFFFFF));
+    drawActor(StudioTileIds.orc, const Color(0xFF66BB6A));
+    drawActor(StudioTileIds.redDragon, const Color(0xFFEF5350));
+    drawActor(StudioTileIds.littleDog, const Color(0xFF42A5F5));
 
     final picture = recorder.endRecording();
     return picture.toImage(cols * tileW, rows * tileH);
