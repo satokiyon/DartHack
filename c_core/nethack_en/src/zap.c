@@ -532,7 +532,7 @@ bhitm(struct monst *mtmp, struct obj *otmp)
             shieldeff_mon(mtmp);
         } else if (!resist(mtmp, otmp->oclass, dmg, NOTELL)
                    && !DEADMONSTER(mtmp)) {
-            mtmp->mhp -= dmg;
+            deduct_monster_hp(mtmp, dmg); /* DartHack */
             mtmp->mhpmax -= dmg;
             /* die if already level 0, regardless of hit points */
             if (DEADMONSTER(mtmp) || mtmp->mhpmax <= 0 || mtmp->m_lev < 1) {
@@ -3907,8 +3907,17 @@ bhit(
         tethered_weapon = TRUE;
         weapon = THROWN_WEAPON; /* simplify 'if's that follow below */
         tmp_at(DISP_TETHER, obj_to_glyph(obj, rn2_on_display_rng));
-    } else if (weapon != ZAPPED_WAND && weapon != INVIS_BEAM)
-        tmp_at(DISP_FLASH, obj_to_glyph(obj, rn2_on_display_rng));
+    } else if (weapon != ZAPPED_WAND && weapon != INVIS_BEAM) {
+        int fg = obj_to_glyph(obj, rn2_on_display_rng);
+        tmp_at(DISP_FLASH, fg);
+#if defined(ANDROID) || defined(FLUTTER_PORT)
+        /* DartHack: 蹴り・投擲の起点座標をシード登録して1マス目から滑らかに連結 */
+        if (program_state.in_moveloop
+            && (weapon == KICKED_WEAPON || weapon == THROWN_WEAPON)) {
+            flutter_anim_projectile_seed((int) gb.bhitpos.x, (int) gb.bhitpos.y, fg);
+        }
+#endif
+    }
 
     while (range-- > 0) {
         coordxy x, y;
@@ -4063,6 +4072,11 @@ bhit(
                 }
             } else if (weapon != ZAPPED_WAND) {
                 /* THROWN_WEAPON, KICKED_WEAPON */
+#if defined(ANDROID) || defined(FLUTTER_PORT)
+                /* DartHack: 直撃時の終点ウェイポイントを確実に送出 */
+                if (program_state.in_moveloop && flutter_anim_is_enabled())
+                    tmp_at(x, y);
+#endif
                 if (!tethered_weapon)
                     tmp_at(DISP_END, 0);
 
@@ -4098,6 +4112,11 @@ bhit(
             if (weapon == KICKED_WEAPON
                 && ((obj->oclass == COIN_CLASS && OBJ_AT(x, y))
                     || ship_object(obj, x, y, costly_spot(x, y)))) {
+#if defined(ANDROID) || defined(FLUTTER_PORT)
+                /* DartHack: 蹴りアイテムのコイン合流・穴落下時の終点ウェイポイント送出 */
+                if (program_state.in_moveloop && flutter_anim_is_enabled())
+                    tmp_at(x, y);
+#endif
                 tmp_at(DISP_END, 0);
                 goto bhit_done; /* result == (struct monst *) 0 */
             }
@@ -4442,7 +4461,7 @@ zhitm(
         tmp = 0; /* don't allow negative damage */
     debugpline3("zapped monster hp = %d (= %d - %d)", mon->mhp - tmp,
                 mon->mhp, tmp);
-    mon->mhp -= tmp;
+    deduct_monster_hp(mon, tmp); /* DartHack */
     return tmp;
 }
 
@@ -6195,7 +6214,7 @@ resist(struct monst *mtmp, char oclass, int damage, int tell)
     }
 
     if (damage) {
-        mtmp->mhp -= damage;
+        deduct_monster_hp(mtmp, damage); /* DartHack */
         if (DEADMONSTER(mtmp)) {
             if (gm.m_using)
                 monkilled(mtmp, "", AD_RBRE);

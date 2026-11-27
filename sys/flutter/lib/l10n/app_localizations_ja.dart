@@ -1778,4 +1778,36 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get permInventFontSizeDesc => '横長画面の常時表示インベントリパネルの文字サイズを調整します。';
+
+  @override
+  String get mapAnimationEnabled => 'アニメーション';
+
+  @override
+  String get mapAnimationEnabledDesc =>
+      '主人公やモンスターの移動・戦闘・カメラ追従を滑らかに表示します（操作を待たずに即応します）';
+
+  @override
+  String get mapAnimationSpeed => 'アニメーション速度';
+
+  @override
+  String get mapAnimationSpeedDesc => '移動や戦闘アニメーションの再生速度を選択します';
+
+  @override
+  String get mapAnimationSpeedOnlyEnabled => '※「アニメーション」がONのときのみ設定可能です';
+
+  @override
+  String get mapAnimationSpeedFast => '速い';
+
+  @override
+  String get mapAnimationSpeedNormal => '標準';
+
+  @override
+  String get mapAnimationSpeedSlow => '遅い';
+
+  @override
+  String get floatingTextEnabled => 'フローティングテキスト';
+
+  @override
+  String get floatingTextEnabledDesc =>
+      'ダメージ・ミス・回復・状態変化などをマップ上にポップアップ表示します（「アニメーション」設定とは独立して切替可能）';
 }

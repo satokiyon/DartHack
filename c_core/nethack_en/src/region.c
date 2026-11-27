@@ -1149,7 +1149,7 @@ inside_gas_cloud(genericptr_t p1, genericptr_t p2)
             }
             if (resists_poison(mtmp))
                 return FALSE;
-            mtmp->mhp -= rnd(dam) + 5;
+            deduct_monster_hp(mtmp, rnd(dam) + 5); /* DartHack */
             if (DEADMONSTER(mtmp)) {
                 if (heros_fault(reg))
                     killed(mtmp);

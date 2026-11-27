@@ -411,6 +411,12 @@ static void androidsound_sound_achievement(schar arg1, schar arg2, int32_t avals
         strcpy(fname, "sa2_newgame_nosplash.ogg");
     } else if (arg2 == sa2_xplevelup) {
         strcpy(fname, "sa2_xplevelup.ogg");
+        if (program_state.in_moveloop && !program_state.gameover && isok(u.ux, u.uy)) {
+            flutter_anim_vfx(7 /* LEVEL_UP */, (int) u.ux, (int) u.uy,
+                             (int) u.ux, (int) u.uy, 0, 1);
+            flutter_anim_float_text(6 /* LEVEL_UP */, (int) u.ux, (int) u.uy,
+                                    (int) u.ulevel, 0);
+        }
     } else if (arg2 == sa2_xpleveldown) {
         strcpy(fname, "sa2_xpleveldown.ogg");
     } else if (arg1 > 0) {
@@ -634,7 +640,7 @@ typedef void (*DartDisplayWindowCallback)(int winId, int blocking, int isPlain);
 typedef void (*DartDestroyWindowCallback)(int winId);
 typedef void (*DartCursCallback)(int winId, int x, int y);
 typedef void (*DartPutStrCallback)(int winId, int attr, const char* str);
-typedef void (*DartPrintGlyphCallback)(int winId, int x, int y, int tile, int ch, int color, int special, int bktile);
+typedef void (*DartPrintGlyphCallback)(int winId, int x, int y, int tile, int ch, int color, int special, int bktile, int bkchar, int bkcolor);
 typedef void (*DartNotifyInputCallback)(int requestId, int inputState);
 typedef void (*DartStartMenuCallback)(int winId);
 typedef void (*DartAddMenuCallback)(int winId, intptr_t ident, int accelerator, int groupacc, int attr, const char* str, int preselected, int color, int tile);
@@ -649,9 +655,48 @@ typedef void (*DartCliparoundCallback)(int x, int y, int playerX, int playerY);
 typedef void (*DartPutMixedWithTileCallback)(int winId, int attr, int tile, const char* str);
 typedef void (*DartNewLevelRestCallback)(void);
 typedef void (*DartPermInventEventCallback)(int eventType, const char* payload);
+typedef void (*DartAnimEventCallback)(int32_t turnId, int32_t eventType, int32_t entityId, int32_t fromX, int32_t fromY, int32_t toX, int32_t toY, int32_t param1, int32_t param2, int32_t param3);
 
 static DartNewLevelRestCallback g_new_level_rest_cb = NULL;
 static DartPermInventEventCallback g_perm_invent_cb = NULL;
+static DartAnimEventCallback g_anim_event_cb = NULL;
+
+/* アニメーション設定・世代・座標追跡 */
+static volatile int g_anim_enabled = 1;
+static volatile int g_anim_speed_mode = 1; /* 0:fast, 1:normal, 2:slow */
+static volatile int g_floating_text_enabled = 1;
+static volatile int g_anim_turn_id = 0;
+static volatile int g_projectile_anim_active = 0;
+static int g_proj_has_seed = 0;
+static int g_proj_seed_x = -1;
+static int g_proj_seed_y = -1;
+static int g_last_hero_x = -1;
+static int g_last_hero_y = -1;
+
+/* 全状態変化・持続マイクロ演出トラッカー（Cコア改変ゼロ・ロード時誤発火防止付き） */
+static int g_status_baseline_ready = 0;
+static uint32_t g_prev_hero_status_mask = 0;
+static int g_prev_hero_hunger = NOT_HUNGRY;
+static int g_prev_hero_cap = UNENCUMBERED;
+static uint16_t g_prev_ambient_status[COLNO][ROWNO];
+
+#define FLUTTER_MAX_TRACKED_MONS 512
+typedef struct {
+    unsigned int m_id;
+    uint16_t mask;
+    uint32_t seen_gen;
+} MonStatusTrackEntry;
+static MonStatusTrackEntry g_mon_status_tracks[FLUTTER_MAX_TRACKED_MONS];
+static int g_mon_status_track_count = 0;
+static uint32_t g_mon_status_gen = 0;
+
+static void reset_status_trackers(int send_clear_event);
+static void sync_statuses_at_turn_boundary(void);
+
+NH_EXPORT void SetFloatingTextEnabledFlutter(int32_t enabled) {
+    g_floating_text_enabled = enabled ? 1 : 0;
+    debuglog("SetFloatingTextEnabledFlutter: enabled=%d", g_floating_text_enabled);
+}
 
 /* 常時表示インベントリ (perm_invent) 専用スナップショットバッファ (4面×16KB) */
 #define PERMINV_EVT_CLEAR 0
@@ -874,6 +919,7 @@ typedef struct {
     DartNewLevelRestCallback newlevel_rest_cb;
     DartSoundEventCallback sound_event_cb;
     DartPermInventEventCallback perm_invent_cb;
+    DartAnimEventCallback anim_event_cb;
 } FlutterCallbacksStruct;
 
 NH_EXPORT void RegisterFlutterCallbacksStruct(const FlutterCallbacksStruct *cbs) {
@@ -900,6 +946,7 @@ NH_EXPORT void RegisterFlutterCallbacksStruct(const FlutterCallbacksStruct *cbs)
     g_new_level_rest_cb = cbs->newlevel_rest_cb;
     g_sound_event_cb = cbs->sound_event_cb;
     g_perm_invent_cb = cbs->perm_invent_cb;
+    g_anim_event_cb = cbs->anim_event_cb;
     LOGD("All Flutter callbacks registered successfully via struct!");
 }
 
@@ -945,6 +992,10 @@ NH_EXPORT void RegisterFlutterCallbacks(
     cbs.number_pad_cb = number_pad_cb;
     cbs.cliparound_cb = cliparound_cb;
     cbs.putmixed_cb = putmixed_cb;
+    cbs.newlevel_rest_cb = NULL;
+    cbs.sound_event_cb = NULL;
+    cbs.perm_invent_cb = NULL;
+    cbs.anim_event_cb = NULL;
     RegisterFlutterCallbacksStruct(&cbs);
 }
 
@@ -1121,6 +1172,7 @@ NH_EXPORT const char* GetExtCmdsFlutter(void) {
 // Dart 側からキー入力を受け取る関数
 NH_EXPORT void SendKeyToFlutter(int key) {
     g_last_received_key = key;
+    g_anim_turn_id = g_input_request_id;
     g_key_available = 1;
     debuglog("C core received key: %d", key);
 }
@@ -1310,6 +1362,7 @@ static void flutter_init_nhwindows(int* argc, char** argv) {
     gc.chosen_soundlib = soundlib_androidsound;
     sysopt.check_save_uid = 0;
     bind_mousebtn(2, "mouseaction");
+    reset_status_trackers(0);
 }
 
 static void flutter_player_selection(void) {
@@ -1559,6 +1612,7 @@ static void flutter_askname(void) {
 
 static void flutter_exit_nhwindows(const char* str) {
     debuglog("flutter_exit_nhwindows: %s", str ? str : "NULL");
+    reset_status_trackers(1);
     iflags.window_inited = FALSE;
     if (g_exit_cb && !g_exit_notified) {
         g_exit_notified = 1;
@@ -1588,6 +1642,11 @@ static winid flutter_create_nhwindow(int type) {
 
 static void flutter_clear_nhwindow(winid window) {
     debuglog("flutter_clear_nhwindow win=%d", window);
+    if (window == WIN_MAP) {
+        g_projectile_anim_active = 0;
+        g_proj_has_seed = 0;
+        reset_status_trackers(1);
+    }
     if (g_clear_window_cb) {
         g_clear_window_cb((int)window);
     }
@@ -1685,6 +1744,10 @@ static void flutter_curs(winid window, int x, int y) {
 // プレイヤー位置 (u.ux, u.uy) を Dart 側に通知する cliparound 実装。
 // マップ上の主人公タップ検出 (#herecmdmenu 連動) のために必要。
 static void flutter_cliparound(int x, int y) {
+    if (g_last_hero_x < 0 && isok(u.ux, u.uy)) {
+        g_last_hero_x = (int) u.ux;
+        g_last_hero_y = (int) u.uy;
+    }
     if (g_cliparound_cb) {
         // (x, y) はフォーカス座標、続いてプレイヤー位置 (u.ux, u.uy) を渡す。
         // Dart 側の _mapGrid およびタップ座標 (_mapLocalToTile) は flutter_print_glyph と同じく
@@ -1839,6 +1902,11 @@ static void flutter_number_pad(int state) {
 }
 
 static void flutter_delay_output(void) {
+    /* アニメーション再生中の飛び道具待機や、入力キューに次の操作が到着している場合は即スキップ */
+    if ((g_anim_enabled && g_projectile_anim_active)
+        || g_key_count > 0 || g_poscmd_count > 0) {
+        return;
+    }
     usleep(50000);
 }
 
@@ -2123,6 +2191,7 @@ static int flutter_nhgetch(void) {
         g_pending_poscmd = 1;
         g_key_available = 1;
         g_last_received_key = 0;
+        g_anim_turn_id = g_input_request_id;
         debuglog("flutter_nhgetch: forwarded PosCmd to pending x=%d y=%d mod=%d (remaining=%d)",
                  cmd.x, cmd.y, cmd.mod, g_poscmd_count);
         return 0;
@@ -2136,6 +2205,7 @@ static int flutter_nhgetch(void) {
                 g_key_count--;
                 g_key_available = 1;
                 g_last_received_key = 32;
+                g_anim_turn_id = g_input_request_id;
                 debuglog("flutter_nhgetch: converting key %d to Space (32) during display blocking", key);
                 return 32;
             }
@@ -2153,12 +2223,14 @@ static int flutter_nhgetch(void) {
             g_pending_extcmd_mode = 0;
             g_key_available = 1;
             g_last_received_key = 32;
+            g_anim_turn_id = g_input_request_id;
             return 32;
         } else {
             g_key_head = (g_key_head + 1) % FLUTTER_MAX_KEYS;
             g_key_count--;
             g_key_available = 1;
             g_last_received_key = key;
+            g_anim_turn_id = g_input_request_id;
             debuglog("flutter_nhgetch: dispatched from key queue: %d (remaining=%d)", key, g_key_count);
             return key;
         }
@@ -2166,6 +2238,12 @@ static int flutter_nhgetch(void) {
 
     g_input_request_id++;
     g_key_available = 0;
+
+    /* 正規の入力待ち直前で全状態変化テキストと持続マイクロ演出を1回だけ同期 */
+    if (program_state.in_moveloop && !program_state.gameover
+        && !g_in_display_blocking && !gv.vision_full_recalc) {
+        sync_statuses_at_turn_boundary();
+    }
 
     if (g_dart_notify_input_cb) {
         g_dart_notify_input_cb(g_input_request_id, (int)program_state.input_state);
@@ -2191,6 +2269,7 @@ static int flutter_nhgetch(void) {
             g_pending_poscmd = 1;
             g_key_available = 1;
             g_last_received_key = 0;
+            g_anim_turn_id = g_input_request_id;
             debuglog("flutter_nhgetch: forwarded PosCmd from wait loop x=%d y=%d mod=%d (remaining=%d)",
                      cmd.x, cmd.y, cmd.mod, g_poscmd_count);
             return 0;
@@ -2206,6 +2285,7 @@ static int flutter_nhgetch(void) {
                 g_pending_extcmd_mode = 0;
                 g_key_available = 1;
                 g_last_received_key = 32;
+                g_anim_turn_id = g_input_request_id;
                 return 32;
             }
             if (g_in_display_blocking && key != 32 && key != 27 && key != 10 && key != 13) {
@@ -2213,6 +2293,7 @@ static int flutter_nhgetch(void) {
                 g_key_count--;
                 g_key_available = 1;
                 g_last_received_key = 32;
+                g_anim_turn_id = g_input_request_id;
                 debuglog("flutter_nhgetch (wait loop): converting key %d to Space (32) during display blocking", key);
                 return 32;
             }
@@ -2220,6 +2301,7 @@ static int flutter_nhgetch(void) {
             g_key_count--;
             g_key_available = 1;
             g_last_received_key = key;
+            g_anim_turn_id = g_input_request_id;
             if (key == 27) {
                 g_poscmd_count = 0;
                 g_poscmd_head = 0;
@@ -2238,7 +2320,8 @@ static int flutter_nhgetch(void) {
         g_poscmd_tail = 0;
         g_pending_poscmd = 0;
     }
-    debuglog("flutter_nhgetch returning key: %d", g_last_received_key);
+    g_anim_turn_id = g_input_request_id;
+    debuglog("flutter_nhgetch returning key: %d (turnId=%d)", g_last_received_key, g_anim_turn_id);
     return g_last_received_key;
 }
 
@@ -2311,6 +2394,7 @@ static int flutter_nh_poskey(coordxy* x, coordxy* y, int* event) {
         PosCmdEntry cmd = g_poscmd_queue[g_poscmd_head];
         g_poscmd_head = (g_poscmd_head + 1) % FLUTTER_MAX_POSCMD;
         g_poscmd_count--;
+        g_anim_turn_id = g_input_request_id;
         *x = (coordxy) cmd.x;
         *y = (coordxy) cmd.y;
         if (program_state.input_state == getposInp) {
@@ -2487,19 +2571,15 @@ static const unsigned short decgraphics_to_unicode[128] = {
     0x2502, 0x2264, 0x2265, 0x03C0, 0x2260, 0x00A3, 0x00B7, 0x007F
 };
 
-static void flutter_print_glyph(winid wid, coordxy x, coordxy y, const glyph_info* glyphinfo, const glyph_info* bkglyphinfo) {
-    (void)bkglyphinfo;
-    int tile = glyphinfo->gm.tileidx;
-    unsigned int special = glyphinfo->gm.glyphflags;
-    int bktile = -1;
-
-    /* defaults.nh および #options の hilite_pet / hilite_pile 設定に連動 */
-    if (!iflags.hilite_pet) {
-        special &= ~(MG_PET | MG_RIDDEN);
+/* glyph_info からタイルID・Unicode文字・ARGB色を一括解決する共通ヘルパー */
+static void resolve_glyph_visual(const glyph_info *glyphinfo, int *out_tile, int *out_ch, int *out_color) {
+    if (!glyphinfo) {
+        *out_tile = -1;
+        *out_ch = ' ';
+        *out_color = 0;
+        return;
     }
-    if (!iflags.hilite_pile) {
-        special &= ~MG_OBJPILE;
-    }
+    *out_tile = glyphinfo->gm.tileidx;
 
     int color;
     if (glyphinfo->gm.customcolor != 0) {
@@ -2513,6 +2593,7 @@ static void flutter_print_glyph(winid wid, coordxy x, coordxy y, const glyph_inf
     } else {
         color = nhcolor_to_RGB(glyphinfo->gm.sym.color);
     }
+    *out_color = color;
 
     int ch = glyphinfo->ttychar;
 #ifdef ENHANCED_SYMBOLS
@@ -2529,9 +2610,31 @@ static void flutter_print_glyph(winid wid, coordxy x, coordxy y, const glyph_inf
     } else if (ch >= 0 && ch < 256) {
         ch = cp437_to_unicode[ch];
     }
+    *out_ch = ch;
+}
+
+static void flutter_print_glyph(winid wid, coordxy x, coordxy y, const glyph_info* glyphinfo, const glyph_info* bkglyphinfo) {
+    (void)bkglyphinfo;
+    int tile = -1;
+    int ch = ' ';
+    int color = 0;
+    unsigned int special = glyphinfo->gm.glyphflags;
+    int bktile = -1;
+    int bkchar = ' ';
+    int bkcolor = 0;
+
+    /* defaults.nh および #options の hilite_pet / hilite_pile 設定に連動 */
+    if (!iflags.hilite_pet) {
+        special &= ~(MG_PET | MG_RIDDEN);
+    }
+    if (!iflags.hilite_pile) {
+        special &= ~MG_OBJPILE;
+    }
+
+    resolve_glyph_visual(glyphinfo, &tile, &ch, &color);
 
     /* 
-     * back_to_glyph(x, y) による純粋な背景地形タイルの算出
+     * back_to_glyph(x, y) による純粋な背景地形タイル・背景文字の算出
      * 暗闇/未探索（MG_UNEXPL または 視界外探知）でない場合、正確な背景地形グリフを取得する。
      */
     if (isok(x, y)) {
@@ -2542,15 +2645,551 @@ static void flutter_print_glyph(winid wid, coordxy x, coordxy y, const glyph_inf
             int bkglyph = back_to_glyph(x, y);
             if (bkglyph != NO_GLYPH && bkglyph != GLYPH_UNEXPLORED) {
                 glyph_info bk_gi;
+                int tmp_bk_tile = -1;
                 map_glyphinfo(x, y, bkglyph, 0, &bk_gi);
-                bktile = bk_gi.gm.tileidx;
+                resolve_glyph_visual(&bk_gi, &tmp_bk_tile, &bkchar, &bkcolor);
+                bktile = tmp_bk_tile;
             }
         }
     }
 
     if (g_print_glyph_cb) {
-        g_print_glyph_cb((int)wid, (int)x, (int)y, tile, ch, color, (int)special, bktile);
+        g_print_glyph_cb((int)wid, (int)x, (int)y, tile, ch, color, (int)special, bktile, bkchar, bkcolor);
     }
+}
+
+/* ----------------------------------------------------
+ * アニメーション通知フック実装 (視界フィルタ & ラン抑止付き)
+ * ---------------------------------------------------- */
+int flutter_anim_is_enabled(void) {
+    return (g_anim_enabled && g_anim_event_cb != NULL) ? 1 : 0;
+}
+
+void flutter_anim_move(int entity_kind, unsigned int entity_id,
+                       int from_x, int from_y, int to_x, int to_y) {
+    if (entity_kind == 1) {
+        if (from_x < 0 && from_y < 0) {
+            /* 階層切替・初回配置: 座標同期のみ行いアニメーションは発火しない */
+            g_last_hero_x = to_x;
+            g_last_hero_y = to_y;
+            return;
+        }
+        int prev_x = g_last_hero_x;
+        int prev_y = g_last_hero_y;
+        g_last_hero_x = to_x;
+        g_last_hero_y = to_y;
+        if (prev_x < 0 || prev_y < 0) {
+            if (isok(from_x, from_y) && (from_x != to_x || from_y != to_y)) {
+                prev_x = from_x;
+                prev_y = from_y;
+            } else {
+                return;
+            }
+        } else if (prev_x == to_x && prev_y == to_y) {
+            return;
+        }
+        from_x = prev_x;
+        from_y = prev_y;
+    }
+
+    if (!g_anim_enabled || !g_anim_event_cb) return;
+    if (svc.context.run > 0 || svc.context.travel || gm.multi > 0) return;
+    if (!isok(from_x, from_y) || !isok(to_x, to_y)) return;
+
+    /* チェビシェフ距離 3 以上（テレポート等の大移動）は即時ワープ */
+    int dx = to_x - from_x;
+    int dy = to_y - from_y;
+    if (dx < 0) dx = -dx;
+    if (dy < 0) dy = -dy;
+    if (dx > 2 || dy > 2) return;
+
+    int tile = -1;
+    int ch = (entity_kind == 1) ? '@' : ' ';
+    int color = 0;
+
+    if (entity_kind == 1) {
+        int glyph = levl[from_x][from_y].glyph;
+        if (glyph == NO_GLYPH || glyph == GLYPH_UNEXPLORED) {
+            glyph = monnum_to_glyph(u.umonnum, flags.female ? FEMALE : MALE);
+        }
+        glyph_info gi;
+        map_glyphinfo(to_x, to_y, glyph, 0, &gi);
+        resolve_glyph_visual(&gi, &tile, &ch, &color);
+    } else if (entity_kind == 2) {
+        struct monst *mtmp = m_at(to_x, to_y);
+        if (!mtmp || mtmp->m_id != entity_id || mtmp->mundetected || !canseemon(mtmp)) {
+            return;
+        }
+        if (!cansee(from_x, from_y) && !cansee(to_x, to_y)) {
+            return;
+        }
+        int glyph = glyph_is_monster(levl[from_x][from_y].glyph)
+            ? levl[from_x][from_y].glyph
+            : mon_to_glyph(mtmp, newsym_rn2);
+        glyph_info gi;
+        map_glyphinfo(to_x, to_y, glyph, 0, &gi);
+        resolve_glyph_visual(&gi, &tile, &ch, &color);
+    }
+
+    g_anim_event_cb((int32_t)g_anim_turn_id, 1, (int32_t)entity_id,
+                    (int32_t)from_x, (int32_t)from_y, (int32_t)to_x, (int32_t)to_y,
+                    (int32_t)tile, (int32_t)ch, (int32_t)color);
+}
+
+void flutter_anim_attack(int attacker_kind, unsigned int attacker_id,
+                         int from_x, int from_y, int to_x, int to_y, int hit) {
+    if (!g_anim_enabled || !g_anim_event_cb) return;
+    if (!isok(from_x, from_y) || !isok(to_x, to_y)) return;
+    if (from_x == to_x && from_y == to_y) return;
+
+    /* 主人公が関与しない戦闘は視界内のみ通知 */
+    int hero_involved = (attacker_kind == 1) || (to_x == (int)u.ux && to_y == (int)u.uy);
+    if (!hero_involved && !cansee(from_x, from_y) && !cansee(to_x, to_y)) {
+        return;
+    }
+    if (attacker_kind == 2) {
+        struct monst *magr = m_at(from_x, from_y);
+        if (magr && magr->m_id == attacker_id && (!canseemon(magr) || magr->mundetected)) {
+            if (!hero_involved) return;
+        }
+    }
+
+    g_anim_event_cb((int32_t)g_anim_turn_id, 2, (int32_t)attacker_id,
+                    (int32_t)from_x, (int32_t)from_y, (int32_t)to_x, (int32_t)to_y,
+                    hit ? 1 : 0, (int32_t)attacker_kind, 0);
+}
+
+void flutter_anim_death(unsigned int entity_id, int x, int y, int glyph) {
+    if (!g_anim_enabled || !g_anim_event_cb) return;
+    if (!isok(x, y) || !cansee(x, y)) return;
+
+    struct monst *m = m_at(x, y);
+    if (m && m->m_id == entity_id && (m->mundetected || !canseemon(m))) {
+        return;
+    }
+
+    /* 幻覚中など画面上に見えている表示グリフと食い違わないよう、見えているグリフを優先 */
+    int use_glyph = glyph;
+    if (glyph_is_monster(levl[x][y].glyph)) {
+        use_glyph = levl[x][y].glyph;
+    }
+
+    glyph_info gi;
+    int tile = -1, ch = ' ', color = 0;
+    map_glyphinfo(x, y, use_glyph, 0, &gi);
+    resolve_glyph_visual(&gi, &tile, &ch, &color);
+
+    g_anim_event_cb((int32_t)g_anim_turn_id, 3, (int32_t)entity_id,
+                    (int32_t)x, (int32_t)y, (int32_t)x, (int32_t)y,
+                    (int32_t)tile, (int32_t)ch, (int32_t)color);
+}
+
+void flutter_anim_projectile_seed(int start_x, int start_y, int glyph) {
+    (void)glyph;
+    if (!g_anim_enabled || !g_anim_event_cb) {
+        g_proj_has_seed = 0;
+        return;
+    }
+    if (isok(start_x, start_y)) {
+        g_proj_has_seed = 1;
+        g_proj_seed_x = start_x;
+        g_proj_seed_y = start_y;
+    } else {
+        g_proj_has_seed = 0;
+    }
+}
+
+int flutter_anim_projectile(int style, int from_x, int from_y,
+                            int to_x, int to_y, int glyph) {
+    if (from_x == -1 && from_y == -1) {
+        /* 飛び道具・光線シーケンス開始 */
+        g_projectile_anim_active++;
+        g_proj_has_seed = 0;
+        return (g_anim_enabled && g_anim_event_cb) ? 1 : 0;
+    }
+    if (from_x == -2 && from_y == -2) {
+        /* 飛び道具・光線シーケンス終了 */
+        if (g_projectile_anim_active > 0) {
+            g_projectile_anim_active--;
+        }
+        g_proj_has_seed = 0;
+        return (g_anim_enabled && g_anim_event_cb) ? 1 : 0;
+    }
+
+    if (!g_anim_enabled || !g_anim_event_cb) {
+        return 0;
+    }
+
+    if (!isok(to_x, to_y)) {
+        return 1;
+    }
+
+    int fx = isok(from_x, from_y) ? from_x : to_x;
+    int fy = isok(from_x, from_y) ? from_y : to_y;
+    if (g_proj_has_seed) {
+        if (fx == to_x && fy == to_y && isok(g_proj_seed_x, g_proj_seed_y)) {
+            fx = g_proj_seed_x;
+            fy = g_proj_seed_y;
+        }
+        g_proj_has_seed = 0;
+    }
+
+    boolean can_see_to = cansee(to_x, to_y);
+    boolean can_see_from = isok(fx, fy) && cansee(fx, fy);
+    if (!can_see_to && !can_see_from) {
+        return 1; /* 視界外: 通知せず C 側一時描画も抑止 */
+    }
+
+    glyph_info gi;
+    int tile = -1, ch = '*', color = 0;
+    map_glyphinfo(to_x, to_y, glyph, 0, &gi);
+    resolve_glyph_visual(&gi, &tile, &ch, &color);
+
+    (void)style;
+    g_anim_event_cb((int32_t)g_anim_turn_id, 4, 0,
+                    (int32_t)fx, (int32_t)fy, (int32_t)to_x, (int32_t)to_y,
+                    (int32_t)tile, (int32_t)ch, (int32_t)color);
+    return 1;
+}
+
+static int resolve_explosion_argb(int expltype) {
+    if (Hallucination) {
+        return nhcolor_to_RGB(rn2(CLR_MAX));
+    }
+    switch (expltype) {
+        case EXPL_FIERY:   return 0xFFFF6D00;
+        case EXPL_FROSTY:  return 0xFF80D8FF;
+        case EXPL_MAGICAL: return 0xFFCE93D8;
+        case EXPL_NOXIOUS: return 0xFF69F0AE;
+        case EXPL_WET:     return 0xFF42A5F5;
+        case EXPL_MUDDY:   return 0xFFBA7C59;
+        case EXPL_DARK:    return 0xFF7E57C2;
+        default:           return 0xFFFFA726;
+    }
+}
+
+void flutter_anim_obj_move(int obj_kind, int from_x, int from_y,
+                           int to_x, int to_y, int glyph) {
+    if (!g_anim_enabled || !g_anim_event_cb) return;
+    if (svc.context.run > 0 || svc.context.travel || gm.multi > 0) return;
+    if (!isok(from_x, from_y) || !isok(to_x, to_y)) return;
+    if (from_x == to_x && from_y == to_y) return;
+    if (Blind || (!cansee(from_x, from_y) && !cansee(to_x, to_y))) return;
+
+    glyph_info gi;
+    int tile = -1, ch = '`', color = 0;
+    map_glyphinfo(to_x, to_y, glyph, 0, &gi);
+    resolve_glyph_visual(&gi, &tile, &ch, &color);
+
+    g_anim_event_cb((int32_t)g_anim_turn_id, 5, (int32_t)obj_kind,
+                    (int32_t)from_x, (int32_t)from_y, (int32_t)to_x, (int32_t)to_y,
+                    (int32_t)tile, (int32_t)ch, (int32_t)color);
+}
+
+void flutter_anim_vfx(int vfx_kind, int from_x, int from_y,
+                      int to_x, int to_y, int color_or_elem, int intensity) {
+    if (!g_anim_enabled || !g_anim_event_cb) return;
+    if (!isok(to_x, to_y)) return;
+    if (!isok(from_x, from_y)) {
+        from_x = to_x;
+        from_y = to_y;
+    }
+
+    /* 盲目中は自己感覚系(レベルアップ・大被ダメシェイク)以外の視覚VFXを抑止 */
+    int is_self_nonvisual = (vfx_kind == 7 /* LEVEL_UP */ || vfx_kind == 10 /* BIG_HIT_SHAKE */);
+    if (Blind && !is_self_nonvisual) return;
+
+    /* 爆発は呼び出し側で3x3視界判定済み。それ以外は視界チェック */
+    if (vfx_kind != 5 /* EXPLOSION */ && !is_self_nonvisual) {
+        if (!cansee(from_x, from_y) && !cansee(to_x, to_y)) return;
+    }
+
+    int argb = 0;
+    if (vfx_kind == 4 /* POTION_SPLASH */) {
+        argb = Hallucination ? nhcolor_to_RGB(rn2(CLR_MAX)) : nhcolor_to_RGB(color_or_elem);
+    } else if (vfx_kind == 5 /* EXPLOSION */) {
+        argb = resolve_explosion_argb(color_or_elem);
+    } else if (vfx_kind == 8 /* SUMMON */) {
+        if (Hallucination) {
+            argb = nhcolor_to_RGB(rn2(CLR_MAX));
+        } else {
+            /* 非幻覚時は param1=0 (Dart側 tuning 色を使用) とし、param2 に召喚種別(0:通常, 1:悪魔, 2:天使)を渡す */
+            argb = 0;
+            intensity = color_or_elem;
+        }
+    } else {
+        argb = color_or_elem;
+    }
+
+    g_anim_event_cb((int32_t)g_anim_turn_id, 6, (int32_t)vfx_kind,
+                    (int32_t)from_x, (int32_t)from_y, (int32_t)to_x, (int32_t)to_y,
+                    (int32_t)argb, (int32_t)intensity, 0);
+}
+
+void flutter_anim_float_text(int text_kind, int x, int y,
+                             int value, int color_or_elem) {
+    if (!g_anim_event_cb || !isok(x, y)) return;
+
+    /* 主人公の大被ダメ（最大HPの20%以上）時はアニメーションONなら控えめシェイクも同時発火 */
+    if (text_kind == 1 /* DMG_HERO */ && value > 0 && g_anim_enabled) {
+        int max_hp = Upolyd ? u.mhmax : u.uhpmax;
+        if (max_hp > 0 && value * 5 >= max_hp) {
+            flutter_anim_vfx(10 /* BIG_HIT_SHAKE */, x, y, x, y, 0, 2);
+        }
+    }
+
+    if (!g_floating_text_enabled) return;
+
+    /* ラン・トラベル中は主人公被ダメ以外のテキスト過剰発火を抑止 */
+    if (text_kind != 1 && (svc.context.run > 0 || svc.context.travel)) return;
+
+    g_anim_event_cb((int32_t)g_anim_turn_id, 7, (int32_t)text_kind,
+                    (int32_t)x, (int32_t)y, (int32_t)x, (int32_t)y,
+                    (int32_t)value, (int32_t)color_or_elem, 0);
+}
+
+void flutter_anim_mon_damage(struct monst *mon, int dmg) {
+    if (!g_floating_text_enabled || !g_anim_event_cb || !mon || dmg <= 0) return;
+
+    int tx = (int) mon->mx;
+    int ty = (int) mon->my;
+    /* ロングワームの胴体・尻尾被弾時は実際の被弾セグメント座標を使用 */
+    if (mon->wormno && gn.notonhead && isok(gb.bhitpos.x, gb.bhitpos.y)) {
+        tx = (int) gb.bhitpos.x;
+        ty = (int) gb.bhitpos.y;
+    }
+    if (!isok(tx, ty)) return;
+
+    /* オブジェクト・家具擬態中の未露見ミミック保護（主人公ターンの視界内直接攻撃のみ許可） */
+    int is_disguised_mimic =
+        (M_AP_TYPE(mon) == M_AP_OBJECT || M_AP_TYPE(mon) == M_AP_FURNITURE)
+        && !glyph_is_monster(levl[tx][ty].glyph);
+    if (is_disguised_mimic) {
+        if (svc.context.mon_moving || !cansee(tx, ty)) {
+            return;
+        }
+    }
+
+    /* 視界内・赤外線・テレパシー・感知・警告・組み合い・視界内'I'または主人公直接命中の検知可能判定 */
+    int perceivable =
+        canspotmon(mon)
+        || mon_warning(mon)
+        || (mon == u.ustuck)
+        || (cansee(tx, ty) && (glyph_is_invisible(levl[tx][ty].glyph) || !svc.context.mon_moving));
+    if (!perceivable) return;
+
+    flutter_anim_float_text(2 /* DMG_MON */, tx, ty, dmg, 0);
+}
+
+/* 主人公の30種状態マスク（実在マクロのみ使用）を算出 */
+static uint32_t compute_hero_status_mask(void) {
+    uint32_t m = 0;
+    if (Stoned)                                                       m |= (1u << 0);  /* 石化 */
+    if (Slimed)                                                       m |= (1u << 1);  /* 粘液化 */
+    if (Strangled)                                                    m |= (1u << 2);  /* 窒息 */
+    if (Sick && (u.usick_type & SICK_VOMITABLE))                      m |= (1u << 3);  /* 食中毒 */
+    if (Sick && (u.usick_type & SICK_NONVOMITABLE))                   m |= (1u << 4);  /* 病気 */
+    if (u.ustuck && !u.uswallow
+        && !(Upolyd && sticks(gy.youmonst.data))
+        && u.ustuck->data->mlet == S_EEL)                             m |= (1u << 5);  /* 捕縛(溺水危機) */
+    if (u.utrap && u.utraptype == TT_LAVA)                            m |= (1u << 6);  /* 溶岩 */
+    if (Blind)                                                        m |= (1u << 7);  /* 盲目 */
+    if (Deaf)                                                         m |= (1u << 8);  /* 難聴 */
+    if (Confusion)                                                    m |= (1u << 9);  /* 混乱 */
+    if (Stunned)                                                      m |= (1u << 10); /* 朦朧 */
+    if (Hallucination)                                                m |= (1u << 11); /* 幻覚 */
+    if (gm.multi < 0 && gm.multi_reason
+        && (!strncmp(gm.multi_reason, "paralyzed", 9)
+            || !strncmp(gm.multi_reason, "frozen", 6)))               m |= (1u << 12); /* 麻痺 */
+    if (u.usleep || (gm.multi < 0 && gm.multi_reason
+        && !strncmp(gm.multi_reason, "sleeping", 8)))                 m |= (1u << 13); /* 睡眠 */
+    if (gm.multi < 0 && !u.usleep && unconscious())                   m |= (1u << 14); /* 失神 */
+    if (u.ustuck && u.uswallow)                                       m |= (1u << 15); /* 丸呑み */
+    if (u.ustuck && !u.uswallow
+        && !(Upolyd && sticks(gy.youmonst.data))
+        && u.ustuck->data->mlet != S_EEL)                             m |= (1u << 16); /* 拘束 */
+    if (u.utrap && u.utraptype != TT_LAVA
+        && u.utraptype != TT_BURIEDBALL)                              m |= (1u << 17); /* 罠拘束 */
+    if (Punished || (u.utrap && u.utraptype == TT_BURIEDBALL))        m |= (1u << 18); /* 懲罰 */
+    if (Glib)                                                         m |= (1u << 19); /* 滑手 */
+    if (Wounded_legs)                                                 m |= (1u << 20); /* 脚傷 */
+    if (Underwater)                                                   m |= (1u << 21); /* 水没 */
+    if (condtests[bl_elf_iron].test)                                  m |= (1u << 22); /* 鉄過敏 */
+    if (Levitation)                                                   m |= (1u << 23); /* 浮遊 */
+    if (Flying)                                                       m |= (1u << 24); /* 飛行 */
+    if (u.usteed != 0)                                                m |= (1u << 25); /* 騎乗 */
+    if (u.umconf != 0)                                                m |= (1u << 26); /* 発光(混乱の手) */
+    if (Fast)                                                         m |= (1u << 27); /* 加速 */
+    if (Invis)                                                        m |= (1u << 28); /* 透明 */
+    if (u.ustuck && !u.uswallow
+        && Upolyd && sticks(gy.youmonst.data))                        m |= (1u << 29); /* 保持 */
+    return m;
+}
+
+/* モンスターのネタバレなし9状態マスク（m->mcan除外・!mcanmove・mblinded>0）を算出 */
+static uint16_t compute_mon_status_mask(const struct monst *mon) {
+    uint16_t m = 0;
+    if (mon->msleeping)           m |= (1u << 0); /* 睡眠 */
+    if (!mon->mcanmove)           m |= (1u << 1); /* 麻痺（防具着脱中のmfrozenは除外） */
+    if (mon->mconf)               m |= (1u << 2); /* 混乱 */
+    if (mon->mstun)               m |= (1u << 3); /* 朦朧 */
+    if (mon->mblinded > 0)        m |= (1u << 4); /* 後天的盲目（生来目なし除外） */
+    if (mon->mflee)               m |= (1u << 5); /* 逃走 */
+    if (mon->mtrapped)            m |= (1u << 6); /* 罠拘束 */
+    if (mon->mspeed == MSLOW)     m |= (1u << 7); /* 減速 */
+    if (mon->mspeed == MFAST)     m |= (1u << 8); /* 加速 */
+    return m;
+}
+
+static void reset_status_trackers(int send_clear_event) {
+    g_status_baseline_ready = 0;
+    g_prev_hero_status_mask = 0;
+    g_prev_hero_hunger = NOT_HUNGRY;
+    g_prev_hero_cap = UNENCUMBERED;
+    g_mon_status_track_count = 0;
+    memset(g_prev_ambient_status, 0, sizeof(g_prev_ambient_status));
+    if (send_clear_event && g_anim_event_cb) {
+        g_anim_event_cb((int32_t)g_anim_turn_id, 8, 0, -1, -1, 0, 0, 0, 0, 0);
+    }
+}
+
+static void sync_statuses_at_turn_boundary(void) {
+    if (!g_anim_event_cb) return;
+
+    /* 1. 主人公の状態変化評価（floatingText OFF中もベースライン常時更新） */
+    uint32_t cur_hero_mask = compute_hero_status_mask();
+    int cur_hunger = (int) u.uhs;
+    int cur_cap = near_capacity();
+
+    if (g_status_baseline_ready && isok(u.ux, u.uy)) {
+        static const int hero_bit_to_code[30] = {
+            1, 2, 3, 4, 5, 6, 7,
+            10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25,
+            50, 51, 52, 53, 54, 55, 56
+        };
+        uint32_t gained = cur_hero_mask & ~g_prev_hero_status_mask;
+        if (gained && g_floating_text_enabled) {
+            for (int b = 0; b < 30; b++) {
+                if (gained & (1u << b)) {
+                    flutter_anim_float_text(7 /* STATUS_GAIN */, (int) u.ux, (int) u.uy,
+                                            hero_bit_to_code[b], 0);
+                }
+            }
+        }
+        /* 空腹段階（満腹への遷移 または 空腹悪化時のみ） */
+        if (g_floating_text_enabled) {
+            if (cur_hunger == SATIATED && g_prev_hero_hunger != SATIATED) {
+                flutter_anim_float_text(7, (int) u.ux, (int) u.uy, 30, 0);
+            } else if (cur_hunger > g_prev_hero_hunger && cur_hunger >= HUNGRY && cur_hunger <= STARVED) {
+                flutter_anim_float_text(7, (int) u.ux, (int) u.uy, 30 + (cur_hunger - 1), 0);
+            }
+            /* 荷重段階（悪化時のみ） */
+            if (cur_cap > g_prev_hero_cap && cur_cap >= SLT_ENCUMBER && cur_cap <= OVERLOADED) {
+                flutter_anim_float_text(7, (int) u.ux, (int) u.uy, 40 + (cur_cap - 1), 0);
+            }
+        }
+    }
+    g_prev_hero_status_mask = cur_hero_mask;
+    g_prev_hero_hunger = cur_hunger;
+    g_prev_hero_cap = cur_cap;
+
+    /* 2. モンスターの状態付与評価（512スロット追跡、未露見ミミック・新規出現誤爆を防止） */
+    g_mon_status_gen++;
+    static const int mon_bit_to_code[9] = { 16, 15, 12, 13, 10, 60, 20, 61, 54 };
+    for (struct monst *mtmp = fmon; mtmp; mtmp = mtmp->nmon) {
+        if (DEADMONSTER(mtmp) || !isok(mtmp->mx, mtmp->my)) continue;
+        uint16_t cur_m = compute_mon_status_mask(mtmp);
+        int found = -1;
+        for (int i = 0; i < g_mon_status_track_count; i++) {
+            if (g_mon_status_tracks[i].m_id == mtmp->m_id) {
+                found = i;
+                break;
+            }
+        }
+        if (found >= 0) {
+            uint16_t gained_m = cur_m & ~g_mon_status_tracks[found].mask;
+            g_mon_status_tracks[found].mask = cur_m;
+            g_mon_status_tracks[found].seen_gen = g_mon_status_gen;
+            if (g_status_baseline_ready && gained_m && g_floating_text_enabled) {
+                int disguised_mimic =
+                    (M_AP_TYPE(mtmp) == M_AP_OBJECT || M_AP_TYPE(mtmp) == M_AP_FURNITURE)
+                    && !glyph_is_monster(levl[mtmp->mx][mtmp->my].glyph);
+                if (!disguised_mimic && canseemon(mtmp) && !mtmp->mundetected && cansee(mtmp->mx, mtmp->my)) {
+                    for (int b = 0; b < 9; b++) {
+                        if (gained_m & (1u << b)) {
+                            flutter_anim_float_text(7, (int) mtmp->mx, (int) mtmp->my,
+                                                    mon_bit_to_code[b], 0);
+                        }
+                    }
+                }
+            }
+        } else if (g_mon_status_track_count < FLUTTER_MAX_TRACKED_MONS) {
+            g_mon_status_tracks[g_mon_status_track_count].m_id = mtmp->m_id;
+            g_mon_status_tracks[g_mon_status_track_count].mask = cur_m;
+            g_mon_status_tracks[g_mon_status_track_count].seen_gen = g_mon_status_gen;
+            g_mon_status_track_count++;
+        }
+    }
+    /* 死亡・離脱したモンスターのエントリを圧縮解放 */
+    int write_idx = 0;
+    for (int i = 0; i < g_mon_status_track_count; i++) {
+        if (g_mon_status_tracks[i].seen_gen == g_mon_status_gen) {
+            if (write_idx != i) g_mon_status_tracks[write_idx] = g_mon_status_tracks[i];
+            write_idx++;
+        }
+    }
+    g_mon_status_track_count = write_idx;
+
+    /* 3. 持続状態マイクロ演出（5カテゴリ・11ビット）の差分スキャン送信 */
+    uint16_t cur_amb[COLNO][ROWNO];
+    memset(cur_amb, 0, sizeof(cur_amb));
+
+    if (isok(u.ux, u.uy)) {
+        uint16_t ha = 0;
+        if (cur_hero_mask & (1u << 13))                                       ha |= 0x0001; /* 睡眠 */
+        if (cur_hero_mask & ((1u << 12) | (1u << 14)))                        ha |= 0x0002; /* 麻痺・失神 */
+        if (cur_hero_mask & (1u << 9))                                        ha |= 0x0004; /* 混乱 */
+        if (cur_hero_mask & (1u << 10))                                       ha |= 0x0008; /* 朦朧 */
+        if (cur_hero_mask & ((1u << 23) | (1u << 24)))                        ha |= 0x0010; /* 浮遊・飛行 */
+        if (cur_hero_mask & (1u << 0))                                        ha |= 0x0020; /* 石化 */
+        if (cur_hero_mask & (1u << 1))                                        ha |= 0x0040; /* 粘液化 */
+        if (cur_hero_mask & ((1u << 3) | (1u << 4)))                          ha |= 0x0080; /* 食中毒・病気 */
+        if (cur_hero_mask & ((1u << 2) | (1u << 5) | (1u << 6)))              ha |= 0x0100; /* 窒息・溺水・溶岩 */
+        if (cur_hero_mask & (1u << 26))                                       ha |= 0x0200; /* 混乱の手 */
+        cur_amb[u.ux][u.uy] = ha;
+    }
+
+    if (!Blind) {
+        for (struct monst *mtmp = fmon; mtmp; mtmp = mtmp->nmon) {
+            if (DEADMONSTER(mtmp) || !isok(mtmp->mx, mtmp->my)) continue;
+            if (mtmp->mx == u.ux && mtmp->my == u.uy) continue;
+            int disguised_mimic =
+                (M_AP_TYPE(mtmp) == M_AP_OBJECT || M_AP_TYPE(mtmp) == M_AP_FURNITURE)
+                && !glyph_is_monster(levl[mtmp->mx][mtmp->my].glyph);
+            if (disguised_mimic || mtmp->mundetected || !canseemon(mtmp) || !cansee(mtmp->mx, mtmp->my)) {
+                continue;
+            }
+            uint16_t ma = 0;
+            if (mtmp->msleeping)   ma |= 0x0001; /* 睡眠 */
+            if (!mtmp->mcanmove)   ma |= 0x0002; /* 麻痺 */
+            if (mtmp->mconf)       ma |= 0x0004; /* 混乱 */
+            if (mtmp->mstun)       ma |= 0x0008; /* 朦朧 */
+            if (mtmp->mflee)       ma |= 0x0400; /* 恐怖逃走 */
+            cur_amb[mtmp->mx][mtmp->my] = ma;
+        }
+    }
+
+    for (int x = 1; x < COLNO; x++) {
+        for (int y = 0; y < ROWNO; y++) {
+            if (cur_amb[x][y] != g_prev_ambient_status[x][y]) {
+                g_prev_ambient_status[x][y] = cur_amb[x][y];
+                g_anim_event_cb((int32_t)g_anim_turn_id, 8, (int32_t)cur_amb[x][y],
+                                (int32_t)x, (int32_t)y, (int32_t)x, (int32_t)y, 0, 0, 0);
+            }
+        }
+    }
+
+    g_status_baseline_ready = 1;
 }
 
 // ----------------------------------------------------
@@ -3623,6 +4262,10 @@ NH_EXPORT void StartNetHackFlutter(const char* path, const char* username) {
     LOGD("StartNetHackFlutter: path=%s, user=%s", path, username);
 
     g_exit_notified = 0;
+    g_last_hero_x = -1;
+    g_last_hero_y = -1;
+    g_anim_turn_id = 0;
+    g_projectile_anim_active = 0;
 
     struct StartArgs* args = malloc(sizeof(struct StartArgs));
     if (!args) {
@@ -3708,6 +4351,12 @@ NH_EXPORT void flutter_set_autosave_settings(int enabled, int interval_turns) {
 
 NH_EXPORT void flutter_lookup_key_description(int code) {
     dowhatdoes_key((char)code);
+}
+
+NH_EXPORT void SetAnimationSettingsFlutter(int32_t enabled, int32_t speed_mode) {
+    g_anim_enabled = enabled ? 1 : 0;
+    g_anim_speed_mode = speed_mode;
+    debuglog("SetAnimationSettingsFlutter: enabled=%d, speed_mode=%d", g_anim_enabled, g_anim_speed_mode);
 }
 
 

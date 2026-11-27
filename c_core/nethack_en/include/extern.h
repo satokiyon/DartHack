@@ -3892,6 +3892,18 @@ extern void genl_putmixed(winid, int, const char *) NONNULLARG3;
 extern void flutter_putmixed_with_tile(winid, int, int, const char *);
 /* DartHack: Flutter dumplog GC helper */
 extern void flutter_sync_dumplogs_with_xlogfile(const char *);
+/* DartHack: Flutter ポート向けアニメーション通知フックおよびモンスターHP減算ヘルパー */
+extern void deduct_monster_hp(struct monst *, int);
+extern void flutter_anim_move(int, unsigned int, int, int, int, int);
+extern void flutter_anim_attack(int, unsigned int, int, int, int, int, int);
+extern void flutter_anim_death(unsigned int, int, int, int);
+extern int flutter_anim_projectile(int, int, int, int, int, int);
+extern void flutter_anim_projectile_seed(int, int, int);
+extern void flutter_anim_obj_move(int, int, int, int, int, int);
+extern void flutter_anim_vfx(int, int, int, int, int, int, int);
+extern void flutter_anim_float_text(int, int, int, int, int);
+extern void flutter_anim_mon_damage(struct monst *, int);
+extern int flutter_anim_is_enabled(void);
 extern void genl_display_file(const char *, boolean) NONNULLARG1;
 extern boolean menuitem_invert_test(int, unsigned, boolean);
 extern const char *mixed_to_glyphinfo(const char *str,

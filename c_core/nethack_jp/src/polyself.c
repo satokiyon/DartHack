@@ -1800,7 +1800,7 @@ dogaze(void)
                         ignite_items(mtmp->minvent);
                     }
                     if (dmg)
-                        mtmp->mhp -= dmg;
+                        deduct_monster_hp(mtmp, dmg); /* DartHack */
                     if (DEADMONSTER(mtmp))
                         killed(mtmp);
                 }
@@ -2006,7 +2006,7 @@ domindblast(void)
                 u_sen ? "テレパシー"
                 : telepathic(mtmp->data) ? "潜在テレパシー"
                     : "精神");
-            mtmp->mhp -= dmg;
+            deduct_monster_hp(mtmp, dmg); /* DartHack */
             if (DEADMONSTER(mtmp))
                 killed(mtmp);
         }

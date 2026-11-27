@@ -174,6 +174,9 @@ class _SettingsPageState extends State<SettingsPage> {
   bool _optPermInvent = false;
   String _permInventPosition = 'right';
   double _permInventWidthRatio = 0.28;
+  bool _mapAnimationEnabled = true;
+  String _mapAnimationSpeed = 'normal';
+  bool _floatingTextEnabled = true;
   bool _autosaveEnabled = true;
   int _autosaveInterval = 50;
 
@@ -413,6 +416,12 @@ class _SettingsPageState extends State<SettingsPage> {
       _scrollAmount = prefs.getInt('scroll_amount') ?? 3;
       _mapFixedMsgInsetMode = prefs.getString('map_fixed_msg_inset_mode') ?? 'auto';
       _mapFixedMsgAvoidFlip = prefs.getBool('map_fixed_msg_avoid_flip') ?? true;
+      _mapAnimationEnabled = prefs.getBool('map_animation_enabled') ?? true;
+      final rawAnimSpeed = prefs.getString('map_animation_speed') ?? 'normal';
+      _mapAnimationSpeed = const ['fast', 'normal', 'slow'].contains(rawAnimSpeed)
+          ? rawAnimSpeed
+          : 'normal';
+      _floatingTextEnabled = prefs.getBool('floating_text_enabled') ?? true;
       _optPermInvent = prefs.getBool('nh_opt_perm_invent') ?? false;
       final rawPermPos = prefs.getString('perm_invent_position') ?? 'right';
       _permInventPosition = (rawPermPos == 'left') ? 'left' : 'right';
@@ -889,7 +898,7 @@ class _SettingsPageState extends State<SettingsPage> {
     Widget? leading,
     required T? value,
     required List<DropdownMenuItem<T>> items,
-    required ValueChanged<T?> onChanged,
+    required ValueChanged<T?>? onChanged,
     String? hintText,
   }) {
     return _SettingsDropdownTile<T>(
@@ -1060,6 +1069,44 @@ class _SettingsPageState extends State<SettingsPage> {
                     _saveSetting('map_fixed_msg_avoid_flip', val);
                   }
                 : null,
+          ),
+          _SettingsSwitchTile(
+            title: Text(l10n.mapAnimationEnabled),
+            subtitle: Text(l10n.mapAnimationEnabledDesc),
+            value: _mapAnimationEnabled,
+            onChanged: (val) {
+              setState(() => _mapAnimationEnabled = val);
+              _saveSetting('map_animation_enabled', val);
+            },
+          ),
+          _buildDropdownSettingTile<String>(
+            title: l10n.mapAnimationSpeed,
+            description: _mapAnimationEnabled
+                ? l10n.mapAnimationSpeedDesc
+                : l10n.mapAnimationSpeedOnlyEnabled,
+            value: _mapAnimationSpeed,
+            items: [
+              DropdownMenuItem(value: 'fast', child: Text(l10n.mapAnimationSpeedFast)),
+              DropdownMenuItem(value: 'normal', child: Text(l10n.mapAnimationSpeedNormal)),
+              DropdownMenuItem(value: 'slow', child: Text(l10n.mapAnimationSpeedSlow)),
+            ],
+            onChanged: _mapAnimationEnabled
+                ? (val) {
+                    if (val != null) {
+                      setState(() => _mapAnimationSpeed = val);
+                      _saveSetting('map_animation_speed', val);
+                    }
+                  }
+                : null,
+          ),
+          _SettingsSwitchTile(
+            title: Text(l10n.floatingTextEnabled),
+            subtitle: Text(l10n.floatingTextEnabledDesc),
+            value: _floatingTextEnabled,
+            onChanged: (val) {
+              setState(() => _floatingTextEnabled = val);
+              _saveSetting('floating_text_enabled', val);
+            },
           ),
           _SettingsSwitchTile(
             title: Text(l10n.optPermInvent),
@@ -4929,7 +4976,7 @@ class _SettingsDropdownTile<T> extends StatefulWidget {
   final Widget? leading;
   final T? value;
   final List<DropdownMenuItem<T>> items;
-  final ValueChanged<T?> onChanged;
+  final ValueChanged<T?>? onChanged;
   final String? hintText;
 
   const _SettingsDropdownTile({
@@ -4970,7 +5017,8 @@ class _SettingsDropdownTileState<T> extends State<_SettingsDropdownTile<T>> {
   }
 
   void _stepValue(int step) {
-    if (widget.items.isEmpty) return;
+    final onChanged = widget.onChanged;
+    if (onChanged == null || widget.items.isEmpty) return;
     final currentIndex = widget.items.indexWhere((item) => item.value == widget.value);
     int newIndex;
     if (currentIndex == -1) {
@@ -4979,12 +5027,13 @@ class _SettingsDropdownTileState<T> extends State<_SettingsDropdownTile<T>> {
       newIndex = (currentIndex + step).clamp(0, widget.items.length - 1);
     }
     if (newIndex != currentIndex) {
-      widget.onChanged(widget.items[newIndex].value);
+      onChanged(widget.items[newIndex].value);
     }
   }
 
   Future<void> _openSelectionDialog() async {
-    if (widget.items.isEmpty) return;
+    final onChanged = widget.onChanged;
+    if (onChanged == null || widget.items.isEmpty) return;
 
     final selected = await showDialog<T>(
       context: context,
@@ -5034,7 +5083,7 @@ class _SettingsDropdownTileState<T> extends State<_SettingsDropdownTile<T>> {
       },
     );
     if (selected != null && selected != widget.value) {
-      widget.onChanged(selected);
+      onChanged(selected);
     }
     if (mounted) {
       if (_SettingsInteractionMode.isKeyboard(context)) {
@@ -5083,15 +5132,18 @@ class _SettingsDropdownTileState<T> extends State<_SettingsDropdownTile<T>> {
   Widget build(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
     final isNarrow = screenWidth < 600;
+    final bool isEnabled = widget.onChanged != null;
     final bool showHighlight = _hasFocus && _SettingsInteractionMode.isKeyboard(context);
 
     final dropdownWidget = Container(
       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 3),
       decoration: BoxDecoration(
-        color: const Color(0xFF262638),
+        color: isEnabled ? const Color(0xFF262638) : const Color(0xFF1D1D29),
         borderRadius: BorderRadius.circular(8),
         border: Border.all(
-          color: showHighlight ? Colors.amberAccent : Colors.white24,
+          color: showHighlight
+              ? Colors.amberAccent
+              : (isEnabled ? Colors.white24 : Colors.white12),
           width: showHighlight ? 1.5 : 1.0,
         ),
       ),
@@ -5103,18 +5155,25 @@ class _SettingsDropdownTileState<T> extends State<_SettingsDropdownTile<T>> {
               ? Text(widget.hintText!, style: const TextStyle(fontSize: 13, color: Colors.white70))
               : null,
           dropdownColor: const Color(0xFF1E1E2C),
-          style: const TextStyle(fontSize: 13, color: Colors.white),
+          style: TextStyle(
+            fontSize: 13,
+            color: isEnabled ? Colors.white : Colors.white38,
+          ),
           icon: Icon(
             Icons.arrow_drop_down,
-            color: showHighlight ? Colors.amberAccent : Colors.white70,
+            color: !isEnabled
+                ? Colors.white24
+                : (showHighlight ? Colors.amberAccent : Colors.white70),
           ),
           items: widget.items,
-          onChanged: (val) {
-            widget.onChanged(val);
-            if (!_SettingsInteractionMode.isKeyboard(context)) {
-              FocusManager.instance.primaryFocus?.unfocus();
-            }
-          },
+          onChanged: isEnabled
+              ? (val) {
+                  widget.onChanged!(val);
+                  if (!_SettingsInteractionMode.isKeyboard(context)) {
+                    FocusManager.instance.primaryFocus?.unfocus();
+                  }
+                }
+              : null,
         ),
       ),
     );

@@ -996,7 +996,7 @@ minliquid_core(struct monst *mtmp)
 
         if (cansee(mtmp->mx, mtmp->my))
             pline_mon(mtmp, "%sは錆びた.", l_monnam(mtmp));
-        mtmp->mhp -= dam;
+        deduct_monster_hp(mtmp, dam); /* DartHack */
         if (mtmp->mhpmax > dam)
             mtmp->mhpmax -= dam;
         if (DEADMONSTER(mtmp)) {
@@ -1040,7 +1040,7 @@ minliquid_core(struct monst *mtmp)
                 else
                     xkilled(mtmp, XKILL_NOMSG);
             } else {
-                mtmp->mhp -= 1;
+                deduct_monster_hp(mtmp, 1); /* DartHack */
                 if (DEADMONSTER(mtmp)) {
                     if (cansee(mtmp->mx, mtmp->my))
                         pline_mon(mtmp, "%sは炎に屈した.",
@@ -3092,6 +3092,19 @@ anger_quest_guardians(struct monst *mtmp)
 
 /* monster 'mtmp' has died; maybe life-save, otherwise unshapeshift and
    update vanquished stats and update map */
+/* DartHack: モンスター実ダメージ減算とフローティングテキスト通知を一元化する共通ヘルパー */
+void
+deduct_monster_hp(struct monst *mon, int dmg)
+{
+    if (!mon)
+        return;
+#if defined(ANDROID) || defined(FLUTTER_PORT)
+    if (program_state.in_moveloop && dmg > 0 && mon->mhp > 0)
+        flutter_anim_mon_damage(mon, dmg);
+#endif
+    mon->mhp -= dmg;
+}
+
 void
 mondead(struct monst *mtmp)
 {
@@ -3123,6 +3136,14 @@ mondead(struct monst *mtmp)
        need to do this after life-saving and before m_detach() */
     if (mtmp->isgd && !grddead(mtmp))
         return;
+
+#if defined(ANDROID) || defined(FLUTTER_PORT)
+    /* DartHack: モンスター死亡フェードアニメーション通知（姿戻し前の表示グリフを使用） */
+    if (program_state.in_moveloop && isok(mtmp->mx, mtmp->my)) {
+        flutter_anim_death(mtmp->m_id, (int) mtmp->mx, (int) mtmp->my,
+                           mon_to_glyph(mtmp, newsym_rn2));
+    }
+#endif
 
     mptr = mtmp->data; /* save this for m_detach() */
     /* restore chameleon, lycanthropes to true form at death */
@@ -3233,7 +3254,7 @@ corpse_chance(
                            KILLED_BY_AN);
                 } else {
                     You_hear("爆発音が聞こえた.");
-                    magr->mhp -= tmp;
+                    deduct_monster_hp(magr, tmp); /* DartHack */
                     if (DEADMONSTER(magr))
                         mondied(magr);
                     if (DEADMONSTER(magr)) { /* maybe lifesaved */

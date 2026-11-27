@@ -5,6 +5,8 @@ class GlyphData {
   final int color;
   final int tile;
   final int bktile;
+  final String bkchar;
+  final int bkcolor;
   final int special;
 
   GlyphData({
@@ -12,10 +14,20 @@ class GlyphData {
     required this.color,
     required this.tile,
     this.bktile = -1,
+    this.bkchar = ' ',
+    this.bkcolor = 0,
     required this.special,
   });
 
-  factory GlyphData.empty() => GlyphData(char: ' ', color: 0, tile: -1, bktile: -1, special: 0);
+  factory GlyphData.empty() => GlyphData(
+        char: ' ',
+        color: 0,
+        tile: -1,
+        bktile: -1,
+        bkchar: ' ',
+        bkcolor: 0,
+        special: 0,
+      );
 }
 
 class MenuItemData {
@@ -459,15 +471,29 @@ class NetHackScreen extends ChangeNotifier {
     }
   }
 
-  void printGlyph(int winId, int x, int y, int tile, int ch, int color, int special, [int bktile = -1]) {
+  void printGlyph(
+    int winId,
+    int x,
+    int y,
+    int tile,
+    int ch,
+    int color,
+    int special, [
+    int bktile = -1,
+    int bkch = 32,
+    int bkcolor = 0,
+  ]) {
     final type = _winTypes[winId];
     if ((type == nhwMap || winId == 3 /* WIN_MAP */) && x >= 0 && x < mapCols && y >= 0 && y < mapRows) {
       final charStr = String.fromCharCode(ch);
+      final bkCharStr = bkch > 0 ? String.fromCharCode(bkch) : ' ';
       _mapGrid[y][x] = GlyphData(
         char: charStr.isNotEmpty ? charStr : ' ',
         color: color,
         tile: tile,
         bktile: bktile,
+        bkchar: bkCharStr.isNotEmpty ? bkCharStr : ' ',
+        bkcolor: bkcolor,
         special: special,
       );
       notifyListeners();

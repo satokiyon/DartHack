@@ -1826,4 +1826,38 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get permInventFontSizeDesc =>
       'Adjusts the font size of the persistent inventory panel in landscape mode.';
+
+  @override
+  String get mapAnimationEnabled => 'Smooth Animations';
+
+  @override
+  String get mapAnimationEnabledDesc =>
+      'Smoothly animate movement, combat, and camera tracking without blocking input';
+
+  @override
+  String get mapAnimationSpeed => 'Animation Speed';
+
+  @override
+  String get mapAnimationSpeedDesc =>
+      'Select the playback speed of movement and combat animations';
+
+  @override
+  String get mapAnimationSpeedOnlyEnabled =>
+      '* Available only when Smooth Animations is enabled';
+
+  @override
+  String get mapAnimationSpeedFast => 'Fast';
+
+  @override
+  String get mapAnimationSpeedNormal => 'Normal';
+
+  @override
+  String get mapAnimationSpeedSlow => 'Slow';
+
+  @override
+  String get floatingTextEnabled => 'Floating Text';
+
+  @override
+  String get floatingTextEnabledDesc =>
+      'Show damage, misses, healing, and status changes as pop-up text on the map (independent of Smooth Animations)';
 }

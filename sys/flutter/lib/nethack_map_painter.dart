@@ -123,10 +123,10 @@ class NetHackMapPainter extends CustomPainter {
 
             if (isPet) {
               // ペットはタイルの右上に赤色ハートマーク
-              final heartStartX = cellLeft + cellW - (_heartPattern[0].length * dotSize) - 1.5;
-              _drawPixelPattern(
+              final heartStartX = cellLeft + cellW - (heartPattern[0].length * dotSize) - 1.5;
+              drawPixelPattern(
                 canvas,
-                _heartPattern,
+                heartPattern,
                 heartStartX,
                 cellTop + 1.5,
                 dotSize,
@@ -136,9 +136,9 @@ class NetHackMapPainter extends CustomPainter {
 
             if (isPile) {
               // アイテム山はタイルの左上に緑色プラスマーク（ペットと重なっても干渉しない）
-              _drawPixelPattern(
+              drawPixelPattern(
                 canvas,
-                _pilePattern,
+                pilePattern,
                 cellLeft + 1.5,
                 cellTop + 1.5,
                 dotSize,
@@ -173,12 +173,15 @@ class NetHackMapPainter extends CustomPainter {
   }
 
   // 特殊グリフフラグ定数
-  static const int _mgPet = 0x00010;
-  static const int _mgRidden = 0x00020;
-  static const int _mgObjPile = 0x00080;
+  static const int mgPet = 0x00010;
+  static const int mgRidden = 0x00020;
+  static const int mgObjPile = 0x00080;
+  static const int _mgPet = mgPet;
+  static const int _mgRidden = mgRidden;
+  static const int _mgObjPile = mgObjPile;
 
   // 本家NetHack Qt準拠のペットマーカー（ハートマーク）ドットパターン（7x7）
-  static const List<List<int>> _heartPattern = [
+  static const List<List<int>> heartPattern = [
     [0, 1, 1, 0, 1, 1, 0],
     [1, 1, 1, 1, 1, 1, 1],
     [1, 1, 1, 1, 1, 1, 1],
@@ -189,7 +192,7 @@ class NetHackMapPainter extends CustomPainter {
   ];
 
   // 本家NetHack Qt準拠のアイテム山マーカー（プラスマーク）ドットパターン（5x5）
-  static const List<List<int>> _pilePattern = [
+  static const List<List<int>> pilePattern = [
     [0, 0, 1, 0, 0],
     [0, 0, 1, 0, 0],
     [1, 1, 1, 1, 1],
@@ -198,7 +201,7 @@ class NetHackMapPainter extends CustomPainter {
   ];
 
   // ピクセルアートパターンの描画ヘルパー（黒の輪郭シャドウ付きで高視認性）
-  static void _drawPixelPattern(
+  static void drawPixelPattern(
     Canvas canvas,
     List<List<int>> pattern,
     double startX,

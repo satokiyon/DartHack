@@ -539,6 +539,14 @@ teleds(coordxy nux, coordxy nuy, int teleds_flags)
     nomul(0);
     notice_mon_off();
     vision_recalc(0); /* vision before effects */
+#if defined(ANDROID) || defined(FLUTTER_PORT)
+    /* DartHack: 同階層テレポートの収束・拡散リングVFX通知 */
+    if (program_state.in_moveloop && is_teleport) {
+        int fx = was_swallowed ? (int) u.ux : (int) u.ux0;
+        int fy = was_swallowed ? (int) u.uy : (int) u.uy0;
+        flutter_anim_vfx(6 /* TELEPORT */, fx, fy, (int) u.ux, (int) u.uy, 0, 1);
+    }
+#endif
 
     /* this used to take place sooner, but if a --More-- prompt was issued
        then the old map display was shown instead of the new one */

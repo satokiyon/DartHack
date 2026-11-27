@@ -402,6 +402,16 @@ explode(
         }
 
     if (visible) {
+#if defined(ANDROID) || defined(FLUTTER_PORT)
+        /* DartHack: 爆発VFX（光のリング＆発光粒＆控えめシェイク）通知 */
+        if (program_state.in_moveloop) {
+            flutter_anim_vfx(5 /* EXPLOSION */, (int) x, (int) y,
+                             (int) x, (int) y, expltype, 3);
+        }
+        if (flutter_anim_is_enabled()) {
+            /* アニメーション有効時はレガシーな3x3フラッシュと21回ウェイトを抑止 */
+        } else {
+#endif
         /* Start the explosion */
         for (i = 0; i < 3; i++)
             for (j = 0; j < 3; j++) {
@@ -452,6 +462,9 @@ explode(
         }
 
         tmp_at(DISP_END, 0); /* clear the explosion */
+#if defined(ANDROID) || defined(FLUTTER_PORT)
+        }
+#endif
     } else {
         if (olet == MON_EXPLODE || olet == TRAP_EXPLODE) {
             str = "explosion";
@@ -541,7 +554,7 @@ explode(
                      * this is imperfect and marginal (burning items only
                      * deal 1 damage), ignore it for golemeffects(). */
                     golemeffects(mtmp, (int) adtyp, dam);
-                    mtmp->mhp -= itemdmg; /* item destruction dmg */
+                    deduct_monster_hp(mtmp, itemdmg); /* DartHack: item destruction dmg */
                 } else {
                     /* Call resist with 0 and do damage manually so 1) we can
                      * get out the message before doing the damage, and 2) we
@@ -570,7 +583,7 @@ explode(
                         mdam *= 2;
                     else if (resists_fire(mtmp) && adtyp == AD_COLD)
                         mdam *= 2;
-                    mtmp->mhp -= mdam + itemdmg;
+                    deduct_monster_hp(mtmp, mdam + itemdmg); /* DartHack */
                 }
                 if (DEADMONSTER(mtmp)) {
                     int xkflg = ((adtyp == AD_FIRE

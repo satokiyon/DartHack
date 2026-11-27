@@ -79,6 +79,17 @@ class NetHackWorkerSession {
     required this.registerCallbacks,
   }) : ffiFactory = ffiFactory ?? ((langCode) => NetHackFfi(langCode));
 
+  static int _animSpeedToMode(String? speed) {
+    switch (speed) {
+      case 'fast':
+        return 0;
+      case 'slow':
+        return 2;
+      default:
+        return 1;
+    }
+  }
+
   /// UI Isolate から受信したメッセージを処理する
   void handleMessage(dynamic message) {
     try {
@@ -96,6 +107,9 @@ class NetHackWorkerSession {
         final initialLayout = message['status_line_layout'] as String? ?? 'standard';
         final initialAutosaveEnabled = (message['autosave_enabled'] as bool? ?? true) ? 1 : 0;
         final initialAutosaveInterval = message['autosave_interval'] as int? ?? 50;
+        final initialAnimEnabled = message['map_animation_enabled'] as bool? ?? true;
+        final initialAnimSpeed = _animSpeedToMode(message['map_animation_speed'] as String?);
+        final initialFloatingTextEnabled = message['floating_text_enabled'] as bool? ?? true;
 
         currentPhase = WorkerErrorPhase.coreLoad;
         onLog("Initializing NetHackFfi for langCode='$langCode' and registering callbacks via struct...");
@@ -114,6 +128,8 @@ class NetHackWorkerSession {
         );
         loadedFfi.setStatusLayout(initialLayout);
         loadedFfi.setAutosaveSettings(initialAutosaveEnabled, initialAutosaveInterval);
+        loadedFfi.setAnimationSettings(initialAnimEnabled, initialAnimSpeed);
+        loadedFfi.setFloatingTextEnabled(initialFloatingTextEnabled);
 
         final pathPtr = assetsPath.toNativeUtf8();
         final userPtr = "Player".toNativeUtf8();
@@ -282,6 +298,15 @@ class NetHackWorkerSession {
           onLog("trigger_item_action message received: invlet=$invlet");
           activeFfi.triggerItemAction(invlet);
         }
+      } else if (type == 'set_animation_settings') {
+        final enabled = message['enabled'] as bool? ?? true;
+        final speedMode = _animSpeedToMode(message['speed'] as String?);
+        onLog("set_animation_settings message received: enabled=$enabled, speedMode=$speedMode");
+        activeFfi.setAnimationSettings(enabled, speedMode);
+      } else if (type == 'set_floating_text_enabled') {
+        final enabled = message['enabled'] as bool? ?? true;
+        onLog("set_floating_text_enabled message received: enabled=$enabled");
+        activeFfi.setFloatingTextEnabled(enabled);
       }
     } catch (e, st) {
       if (!isCoreThreadStarted && currentPhase != WorkerErrorPhase.workerRuntime) {
@@ -363,6 +388,9 @@ class NetHackWorker {
     // 常時表示インベントリ (perm_invent) イベント用 NativeCallable
     late final NativeCallable<PermInventEventCallback> permInventCallable;
 
+    // マップアニメーションイベント用 NativeCallable
+    late final NativeCallable<DartAnimEventCallback> animEventCallable;
+
     void wlog(String text) {
       uiSendPort.send({'type': 'worker_log', 'text': text});
     }
@@ -425,7 +453,7 @@ class NetHackWorker {
       });
     });
 
-    glyphCallable = NativeCallable<PrintGlyphCallback>.listener((int winId, int x, int y, int tile, int ch, int color, int special, int bktile) {
+    glyphCallable = NativeCallable<PrintGlyphCallback>.listener((int winId, int x, int y, int tile, int ch, int color, int special, int bktile, int bkchar, int bkcolor) {
       uiSendPort.send({
         'type': 'printGlyph',
         'winId': winId,
@@ -436,6 +464,8 @@ class NetHackWorker {
         'color': color,
         'special': special,
         'bktile': bktile,
+        'bkchar': bkchar,
+        'bkcolor': bkcolor,
       });
     });
 
@@ -444,6 +474,7 @@ class NetHackWorker {
       wlog("inputCallable: requestId=$requestId, inputState=$inputState, gameover=$gameover");
       uiSendPort.send({
         'type': 'request_input',
+        'requestId': requestId,
         'gameover': gameover,
         'input_state': inputState,
       });
@@ -630,6 +661,33 @@ class NetHackWorker {
       });
     });
 
+    animEventCallable = NativeCallable<DartAnimEventCallback>.listener((
+      int turnId,
+      int eventType,
+      int entityId,
+      int fromX,
+      int fromY,
+      int toX,
+      int toY,
+      int param1,
+      int param2,
+      int param3,
+    ) {
+      uiSendPort.send({
+        'type': 'anim_event',
+        'turnId': turnId,
+        'eventType': eventType,
+        'entityId': entityId,
+        'fromX': fromX,
+        'fromY': fromY,
+        'toX': toX,
+        'toY': toY,
+        'param1': param1,
+        'param2': param2,
+        'param3': param3,
+      });
+    });
+
     final activeSession = NetHackWorkerSession(
       onLog: wlog,
       onSendToUi: uiSendPort.send,
@@ -660,6 +718,7 @@ class NetHackWorker {
           structPtr.ref.newLevelRestCb = newLevelRestCallable.nativeFunction;
           structPtr.ref.soundEventCb = soundEventCallable.nativeFunction;
           structPtr.ref.permInventCb = permInventCallable.nativeFunction;
+          structPtr.ref.animEventCb = animEventCallable.nativeFunction;
 
           wlog("Calling ffi.registerCallbacksStruct...");
           loadedFfi.registerCallbacksStruct(structPtr);

@@ -151,7 +151,7 @@ precheck(struct monst *mon, struct obj *obj)
                                 ? "すぐ近く" : "遠く");
         }
         m_useup(mon, obj);
-        mon->mhp -= dam;
+        deduct_monster_hp(mon, dam); /* DartHack */
         if (DEADMONSTER(mon)) {
             monkilled(mon, "", AD_RBRE);
             return 1;
@@ -1987,9 +1987,9 @@ use_offensive(struct monst *mtmp)
                 if (dist2(mtmp2->mx, mtmp2->my, mtmp->mx, mtmp->my) < 3) {
                     if (resists_fire(mtmp2))
                         continue;
-                    mtmp2->mhp -= num;
+                    deduct_monster_hp(mtmp2, num); /* DartHack */
                     if (resists_cold(mtmp2))
-                        mtmp2->mhp -= 3 * num;
+                        deduct_monster_hp(mtmp2, 3 * num); /* DartHack */
                     if (DEADMONSTER(mtmp2)) {
                         mondied(mtmp2);
                         break;
@@ -2928,7 +2928,7 @@ mon_consume_unstone(
     /* obj is now gone */
 
     if (acid && !tinned && !resists_acid(mon)) {
-        mon->mhp -= rnd(15);
+        deduct_monster_hp(mon, rnd(15)); /* DartHack */
         if (vis)
             pline_mon(mon, "%sはひどい胃酸過多のようだ.", Monnam(mon));
         if (DEADMONSTER(mon)) {

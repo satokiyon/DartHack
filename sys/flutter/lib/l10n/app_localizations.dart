@@ -3451,6 +3451,66 @@ abstract class AppLocalizations {
   /// In ja, this message translates to:
   /// **'横長画面の常時表示インベントリパネルの文字サイズを調整します。'**
   String get permInventFontSizeDesc;
+
+  /// No description provided for @mapAnimationEnabled.
+  ///
+  /// In ja, this message translates to:
+  /// **'アニメーション'**
+  String get mapAnimationEnabled;
+
+  /// No description provided for @mapAnimationEnabledDesc.
+  ///
+  /// In ja, this message translates to:
+  /// **'主人公やモンスターの移動・戦闘・カメラ追従を滑らかに表示します（操作を待たずに即応します）'**
+  String get mapAnimationEnabledDesc;
+
+  /// No description provided for @mapAnimationSpeed.
+  ///
+  /// In ja, this message translates to:
+  /// **'アニメーション速度'**
+  String get mapAnimationSpeed;
+
+  /// No description provided for @mapAnimationSpeedDesc.
+  ///
+  /// In ja, this message translates to:
+  /// **'移動や戦闘アニメーションの再生速度を選択します'**
+  String get mapAnimationSpeedDesc;
+
+  /// No description provided for @mapAnimationSpeedOnlyEnabled.
+  ///
+  /// In ja, this message translates to:
+  /// **'※「アニメーション」がONのときのみ設定可能です'**
+  String get mapAnimationSpeedOnlyEnabled;
+
+  /// No description provided for @mapAnimationSpeedFast.
+  ///
+  /// In ja, this message translates to:
+  /// **'速い'**
+  String get mapAnimationSpeedFast;
+
+  /// No description provided for @mapAnimationSpeedNormal.
+  ///
+  /// In ja, this message translates to:
+  /// **'標準'**
+  String get mapAnimationSpeedNormal;
+
+  /// No description provided for @mapAnimationSpeedSlow.
+  ///
+  /// In ja, this message translates to:
+  /// **'遅い'**
+  String get mapAnimationSpeedSlow;
+
+  /// No description provided for @floatingTextEnabled.
+  ///
+  /// In ja, this message translates to:
+  /// **'フローティングテキスト'**
+  String get floatingTextEnabled;
+
+  /// No description provided for @floatingTextEnabledDesc.
+  ///
+  /// In ja, this message translates to:
+  /// **'ダメージ・ミス・回復・状態変化などをマップ上にポップアップ表示します（「アニメーション」設定とは独立して切替可能）'**
+  String get floatingTextEnabledDesc;
 }
 
 class _AppLocalizationsDelegate

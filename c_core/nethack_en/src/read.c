@@ -1806,11 +1806,20 @@ seffect_charging(struct obj **sobjp)
             u.uen = 0;
         } else {
             You_feel("charged up!");
-            u.uen += d(sblessed ? 6 : 4, 4);
-            if (u.uen > u.uenmax) /* if current energy is already at   */
-                u.uenmax = u.uen; /* or near maximum, increase maximum */
-            else
-                u.uen = u.uenmax; /* otherwise restore current to max  */
+            {
+                int before_en = u.uen;
+                u.uen += d(sblessed ? 6 : 4, 4);
+                if (u.uen > u.uenmax) /* if current energy is already at   */
+                    u.uenmax = u.uen; /* or near maximum, increase maximum */
+                else
+                    u.uen = u.uenmax; /* otherwise restore current to max  */
+#if defined(ANDROID) || defined(FLUTTER_PORT)
+                if (program_state.in_moveloop && u.uen > before_en) {
+                    flutter_anim_float_text(5 /* HEAL_PW */, (int) u.ux, (int) u.uy,
+                                            u.uen - before_en, 0);
+                }
+#endif
+            }
         }
         disp.botl = TRUE;
         return;
@@ -2387,7 +2396,7 @@ drop_boulder_on_monster(coordxy x, coordxy y, boolean confused, boolean byu)
                           xname(helmet), mhim(mtmp));
             }
         }
-        mtmp->mhp -= mdmg;
+        deduct_monster_hp(mtmp, mdmg); /* DartHack */
         if (DEADMONSTER(mtmp)) {
             if (byu) {
                 killed(mtmp);

@@ -48,6 +48,16 @@ class _FakeNetHackFfi implements NetHackFfi {
   }
 
   @override
+  void setAnimationSettings(bool enabled, int speedMode) {
+    callLog.add('setAnimationSettings:${enabled ? 1 : 0}:$speedMode');
+  }
+
+  @override
+  void setFloatingTextEnabled(bool enabled) {
+    callLog.add('setFloatingTextEnabled:${enabled ? 1 : 0}');
+  }
+
+  @override
   void requestStatusOptionsChange({
     required bool hitpointbar,
     required bool hiliteStatus,
@@ -135,6 +145,9 @@ void main() {
         'status_line_layout': 'single_compact',
         'autosave_enabled': false,
         'autosave_interval': 25,
+        'map_animation_enabled': false,
+        'map_animation_speed': 'fast',
+        'floating_text_enabled': false,
       });
 
       expect(session.ffi, same(fakeFfi));
@@ -148,6 +161,8 @@ void main() {
         'setLanguageMode:0',
         'setStatusLayout:single_compact',
         'setAutosaveSettings:0:25',
+        'setAnimationSettings:0:0',
+        'setFloatingTextEnabled:0',
         'startNetHack:/data/test/nethackdir:Player',
       ]);
     });
@@ -164,6 +179,8 @@ void main() {
         'setLanguageMode:1',
         'setStatusLayout:standard',
         'setAutosaveSettings:1:50',
+        'setAnimationSettings:1:1',
+        'setFloatingTextEnabled:1',
         'startNetHack:/data/test/nethackdir:Player',
       ]);
     });
@@ -198,10 +215,21 @@ void main() {
         'type': 'set_status_layout',
         'status_line_layout': 'single_all',
       });
+      session.handleMessage({
+        'type': 'set_animation_settings',
+        'enabled': false,
+        'speed': 'slow',
+      });
+      session.handleMessage({
+        'type': 'set_floating_text_enabled',
+        'enabled': false,
+      });
       session.handleMessage({'type': 'key', 'key': 64});
 
       expect(callLog, [
         'setStatusLayout:single_all',
+        'setAnimationSettings:0:2',
+        'setFloatingTextEnabled:0',
         'sendKeyToC:64',
       ]);
     });

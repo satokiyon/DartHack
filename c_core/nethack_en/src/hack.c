@@ -332,6 +332,19 @@ moverock_done(coordxy sx, coordxy sy)
             otmp->next_boulder = 0; /* resume normal xname() for this obj */
 }
 
+#if defined(ANDROID) || defined(FLUTTER_PORT)
+/* DartHack: 岩押しアニメーション（残留=1 / 穴埋め・水没等の消滅=2）および砂埃VFX通知 */
+staticfn void
+notify_boulder_push_anim(coordxy sx, coordxy sy, coordxy rx, coordxy ry, int boulder_glyph)
+{
+    if (program_state.in_moveloop) {
+        int kind = sobj_at(BOULDER, rx, ry) ? 1 : 2;
+        flutter_anim_obj_move(kind, (int) sx, (int) sy, (int) rx, (int) ry, boulder_glyph);
+        flutter_anim_vfx(1 /* DUST */, (int) sx, (int) sy, (int) rx, (int) ry, 0, 1);
+    }
+}
+#endif
+
 staticfn int
 moverock(void)
 {
@@ -492,6 +505,9 @@ moverock_core(coordxy sx, coordxy sy)
 
             /* rumbling disturbs buried zombies */
             disturb_buried_zombies(sx, sy);
+#if defined(ANDROID) || defined(FLUTTER_PORT)
+            int boulder_glyph = obj_to_glyph(otmp, newsym_rn2);
+#endif
 
             if (ttmp) {
                 int newlev = 0; /* lint suppression */
@@ -524,6 +540,9 @@ moverock_core(coordxy sx, coordxy sy)
                         fill_pit(u.ux, u.uy);
                         if (cansee(rx, ry))
                             newsym(rx, ry);
+#if defined(ANDROID) || defined(FLUTTER_PORT)
+                        notify_boulder_push_anim(sx, sy, rx, ry, boulder_glyph);
+#endif
                         return sobj_at(BOULDER, sx, sy) ? -1 : 0;
                     }
                     break;
@@ -540,6 +559,9 @@ moverock_core(coordxy sx, coordxy sy)
                     }
                     if (mtmp && !Blind)
                         newsym(rx, ry);
+#if defined(ANDROID) || defined(FLUTTER_PORT)
+                    notify_boulder_push_anim(sx, sy, rx, ry, boulder_glyph);
+#endif
                     return sobj_at(BOULDER, sx, sy) ? -1 : 0;
                 case HOLE:
                 case TRAPDOOR:
@@ -563,6 +585,9 @@ moverock_core(coordxy sx, coordxy sy)
                     levl[rx][ry].candig = 1;
                     if (cansee(rx, ry))
                         newsym(rx, ry);
+#if defined(ANDROID) || defined(FLUTTER_PORT)
+                    notify_boulder_push_anim(sx, sy, rx, ry, boulder_glyph);
+#endif
                     return sobj_at(BOULDER, sx, sy) ? -1 : 0;
                 case LEVEL_TELEP:
                     /* 20% chance of picking current level; 100% chance for
@@ -571,6 +596,9 @@ moverock_core(coordxy sx, coordxy sy)
                     /* if trap doesn't work, skip "disappears" message */
                     if (newlev == depth(&u.uz)) {
                         dopush(sx, sy, rx, ry, otmp, costly);
+#if defined(ANDROID) || defined(FLUTTER_PORT)
+                        notify_boulder_push_anim(sx, sy, rx, ry, boulder_glyph);
+#endif
                         continue;
                     }
                     FALLTHROUGH;
@@ -591,6 +619,9 @@ moverock_core(coordxy sx, coordxy sy)
                         otmp->owornmask = (long) MIGR_RANDOM;
                     }
                     seetrap(ttmp);
+#if defined(ANDROID) || defined(FLUTTER_PORT)
+                    notify_boulder_push_anim(sx, sy, rx, ry, boulder_glyph);
+#endif
                     return sobj_at(BOULDER, sx, sy) ? -1 : 0;
                 case ROLLING_BOULDER_TRAP:
                 {
@@ -617,8 +648,12 @@ moverock_core(coordxy sx, coordxy sy)
                 }
             }
 
-            if (boulder_hits_pool(otmp, rx, ry, TRUE))
+            if (boulder_hits_pool(otmp, rx, ry, TRUE)) {
+#if defined(ANDROID) || defined(FLUTTER_PORT)
+                notify_boulder_push_anim(sx, sy, rx, ry, boulder_glyph);
+#endif
                 continue;
+            }
 
             /*
              * Re-link at top of fobj chain so that pile order is preserved
@@ -629,6 +664,9 @@ moverock_core(coordxy sx, coordxy sy)
                 place_object(otmp, otmp->ox, otmp->oy);
             }
             dopush(sx, sy, rx, ry, otmp, costly);
+#if defined(ANDROID) || defined(FLUTTER_PORT)
+            notify_boulder_push_anim(sx, sy, rx, ry, boulder_glyph);
+#endif
         } else {
             cannot_push_msg(otmp, sx, sy);
             return cannot_push(otmp, sx, sy);
@@ -4293,6 +4331,12 @@ losehp(int n, const char *knam, schar k_format)
 #endif
     disp.botl = TRUE; /* u.uhp or u.mh is changing */
     end_running(TRUE);
+#if defined(ANDROID) || defined(FLUTTER_PORT)
+    /* DartHack: 主人公被ダメージのフローティングテキスト（および大ダメージ時控えめシェイク）通知 */
+    if (program_state.in_moveloop && n > 0) {
+        flutter_anim_float_text(1 /* DMG_HERO */, (int) u.ux, (int) u.uy, n, 0);
+    }
+#endif
     if (Upolyd) {
         u.mh -= n;
         showdamage(n);

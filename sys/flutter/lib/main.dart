@@ -4,6 +4,7 @@ import 'dart:isolate';
 import 'dart:io';
 import 'dart:math' as math;
 import 'dart:ui' as ui;
+import 'package:flutter/foundation.dart' show kDebugMode;
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -21,6 +22,10 @@ import 'settings_page.dart';
 import 'utils/defaults_helper.dart';
 import 'utils/app_prefs.dart';
 import 'utils/map_camera.dart';
+import 'utils/map_animation_controller.dart';
+import 'models/map_animation_event.dart';
+import 'models/vfx_tuning_config.dart';
+import 'widgets/nethack_animation_overlay_painter.dart';
 import 'amount_selector_dialog.dart';
 import 'utils/scale_clamp.dart';
 import 'utils/item_count_parser.dart';
@@ -181,7 +186,8 @@ class MyHomePage extends StatefulWidget {
   State<MyHomePage> createState() => _MyHomePageState();
 }
 
-class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
+class _MyHomePageState extends State<MyHomePage>
+    with WidgetsBindingObserver, TickerProviderStateMixin {
   static const List<DPadMoveMode> _allDPadMoveModes = [
     DPadMoveMode.normal,
     DPadMoveMode.upper,
@@ -340,11 +346,37 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
   bool _isMapScrolledOrZoomed = false;
   int _currentInputState = 0; // Cコア program_state.input_state (0: otherInp, 1: commandInp, 2: getposInp, 3: getdirInp)
 
+  // マップ・カメラアニメーション用状態
+  late final MapAnimationController _mapAnimController;
+  late final AnimationController _cameraAnimController;
+  final DebugVfxTuningReloader _debugVfxReloader = DebugVfxTuningReloader();
+  bool _mapAnimationEnabled = true;
+  MapAnimationSpeed _mapAnimationSpeed = MapAnimationSpeed.normal;
+  bool _floatingTextEnabled = true;
+  int _lastInputRequestId = 0;
+  int _prevPlayerXForCam = -1;
+  int _prevPlayerYForCam = -1;
+  double _cameraStartTx = 0.0;
+  double _cameraStartTy = 0.0;
+  double _cameraTargetTx = 0.0;
+  double _cameraTargetTy = 0.0;
+
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
     _transformationController = TransformationController();
+    _mapAnimController = MapAnimationController(
+      vsync: this,
+      enabled: _mapAnimationEnabled,
+      floatingTextEnabled: _floatingTextEnabled,
+      isJapanese: _selectedLanguage == 'ja',
+      speed: _mapAnimationSpeed,
+    );
+    _cameraAnimController = AnimationController(
+      vsync: this,
+      duration: Duration(milliseconds: MapAnimDurations.cameraFollowMs),
+    )..addListener(_onCameraAnimTick);
     const MethodChannel('jp.satokiyo.darthack/key_interceptor')
         .setMethodCallHandler((call) async {
       if (call.method == 'onKeyEvent') {
@@ -462,6 +494,13 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
       _scrollAmount = prefs.getInt('scroll_amount') ?? 3;
       _mapFixedMsgInsetMode = prefs.getString('map_fixed_msg_inset_mode') ?? 'auto';
       _mapFixedMsgAvoidFlip = prefs.getBool('map_fixed_msg_avoid_flip') ?? true;
+      _mapAnimationEnabled = prefs.getBool('map_animation_enabled') ?? true;
+      _mapAnimationSpeed =
+          MapAnimationSpeed.fromPref(prefs.getString('map_animation_speed'));
+      _floatingTextEnabled = prefs.getBool('floating_text_enabled') ?? true;
+      _mapAnimController.enabled = _mapAnimationEnabled;
+      _mapAnimController.speed = _mapAnimationSpeed;
+      _mapAnimController.floatingTextEnabled = _floatingTextEnabled;
       final rawPermPos = prefs.getString('perm_invent_position') ?? 'right';
       _permInventPosition = (rawPermPos == 'left') ? 'left' : 'right';
       _permInventWidthRatio =
@@ -482,6 +521,9 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
 
       // 言語設定のロード
       _selectedLanguage = prefs.getString('selected_language') ?? 'ja';
+      _mapAnimController.isJapanese = (_selectedLanguage == 'ja');
+      _mapAnimController.canLiftFloatingGlyph = !_useTiles ||
+          TilesetManager.instance.getTilesetById(_selectedTileset).isTransparent;
 
       // コントロールのバージョンを更新
       _controlsVersion++;
@@ -491,7 +533,17 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
       unawaited(_loadTileset(newTileset));
     }
     _syncNativeKeySettings();
+    _sendAnimationSettingsToWorker();
+    unawaited(_reloadDebugVfxTuning());
     _triggerCenterOnPlayer();
+  }
+
+  Future<void> _reloadDebugVfxTuning() async {
+    if (!kDebugMode) return;
+    final updated = await _debugVfxReloader.reloadIfChanged();
+    if (updated != null && mounted) {
+      _mapAnimController.tuning = updated;
+    }
   }
 
   Future<void> _changeLanguage(String lang) async {
@@ -2187,6 +2239,8 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
   @override
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
+    _cameraAnimController.dispose();
+    _mapAnimController.dispose();
     _transformationController.dispose();
     _focusNode.dispose();
     _drawerFocusNode.dispose();
@@ -2208,7 +2262,93 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
       SoundManager.instance.pauseForBackground();
     } else if (state == AppLifecycleState.resumed) {
       SoundManager.instance.resumeFromBackground();
+      unawaited(_reloadDebugVfxTuning());
     }
+  }
+
+  void _sendAnimationSettingsToWorker() {
+    _workerSendPort?.send({
+      'type': 'set_animation_settings',
+      'enabled': _mapAnimationEnabled,
+      'speed': _mapAnimationSpeed.prefValue,
+    });
+    _workerSendPort?.send({
+      'type': 'set_floating_text_enabled',
+      'enabled': _floatingTextEnabled,
+    });
+  }
+
+  void _onCameraAnimTick() {
+    // 画面酔い防止のため、主人公の移動補間と同じ Curves.easeOutQuad で完全同期させる
+    final t = Curves.easeOutQuad.transform(_cameraAnimController.value);
+    final tx = ui.lerpDouble(_cameraStartTx, _cameraTargetTx, t) ?? _cameraTargetTx;
+    final ty = ui.lerpDouble(_cameraStartTy, _cameraTargetTy, t) ?? _cameraTargetTy;
+    // ズーム操作と競合しないよう、毎フレーム最新の2Dスケールを維持して平行移動のみ更新
+    final activeScale = MapCamera.extractScale(_transformationController.value);
+    final scale = activeScale > 0 ? activeScale : _currentScale;
+    _transformationController.value = MapCamera.buildTransform(
+      scale: scale,
+      tx: tx,
+      ty: ty,
+    );
+  }
+
+  void _applyCameraTranslation(double targetTx, double targetTy, {required bool animate}) {
+    // 同一目標へ向かって既に補間中なら中断せず完走させる（cliparound→curs→request_input 重複対策）
+    if (_cameraAnimController.isAnimating &&
+        animate &&
+        _mapAnimationEnabled &&
+        MapCamera.isSameTarget(_cameraTargetTx, _cameraTargetTy, targetTx, targetTy)) {
+      return;
+    }
+
+    _cameraAnimController.stop();
+    final currentMatrix = _transformationController.value;
+    final currentTx = currentMatrix.storage[12];
+    final currentTy = currentMatrix.storage[13];
+    final activeScale = MapCamera.extractScale(currentMatrix);
+    final scale = activeScale > 0 ? activeScale : _currentScale;
+    _currentScale = scale;
+
+    final dist = (targetTx - currentTx).abs() + (targetTy - currentTy).abs();
+    if (!animate || !_mapAnimationEnabled || dist < 1.0) {
+      _cameraTargetTx = targetTx;
+      _cameraTargetTy = targetTy;
+      _transformationController.value = MapCamera.buildTransform(
+        scale: scale,
+        tx: targetTx,
+        ty: targetTy,
+      );
+      return;
+    }
+
+    _cameraStartTx = currentTx;
+    _cameraStartTy = currentTy;
+    _cameraTargetTx = targetTx;
+    _cameraTargetTy = targetTy;
+    final motion = _mapAnimController.tuning.motion;
+    final ms = (motion.cameraFollowMs * motion.multiplierForMode(_mapAnimationSpeed.cMode))
+        .round()
+        .clamp(16, 1200);
+    _cameraAnimController.duration = Duration(milliseconds: ms);
+    _cameraAnimController.forward(from: 0.0);
+  }
+
+  /// 進行中の全マップ＆カメラアニメーションを即座に完了位置へスナップする（NethackModern 方式）。
+  void _snapAllAnimations({bool advanceTurn = false}) {
+    if (_cameraAnimController.isAnimating) {
+      _cameraAnimController.stop();
+      final activeScale = MapCamera.extractScale(_transformationController.value);
+      final scale = activeScale > 0 ? activeScale : _currentScale;
+      _transformationController.value = MapCamera.buildTransform(
+        scale: scale,
+        tx: _cameraTargetTx,
+        ty: _cameraTargetTy,
+      );
+    }
+    _mapAnimController.snapAll(
+      minAcceptedTurnId: advanceTurn ? _lastInputRequestId : null,
+    );
   }
 
   Future<void> _sendAutosaveSettingsToWorker() async {
@@ -2258,8 +2398,14 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
     final cellWidth = cellSize.width;
     final cellHeight = cellSize.height;
 
-    final cursorX = _screen.cursorX;
-    final cursorY = _screen.cursorY;
+    final isTargetingMode = _currentInputState == 2 /* getposInp */;
+    // 通常時は playerX/Y を基準に追従し、cliparound→curs の到着順序差による誤判定を防ぐ
+    final focusX = (!isTargetingMode && _screen.playerX >= 0)
+        ? _screen.playerX
+        : _screen.cursorX;
+    final focusY = (!isTargetingMode && _screen.playerY >= 0)
+        ? _screen.playerY
+        : _screen.cursorY;
 
     // 巨大キャンバス (4000x3000) 内でのマップ全体のサイズと余白オフセット
     final mapWidth = 80 * cellWidth;
@@ -2267,23 +2413,38 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
     final mapOffsetX = (4000.0 - mapWidth) / 2;
     final mapOffsetY = (3000.0 - mapHeight) / 2;
 
-    // キャンバス上のプレイヤー絶対ピクセル座標
-    final playerX = mapOffsetX + cursorX * cellWidth + (cellWidth / 2);
-    final playerY = mapOffsetY + cursorY * cellHeight + (cellHeight / 2);
+    // キャンバス上の追従対象絶対ピクセル座標
+    final playerX = mapOffsetX + focusX * cellWidth + (cellWidth / 2);
+    final playerY = mapOffsetY + focusY * cellHeight + (cellHeight / 2);
 
     // コントローラの遮りを考慮し、視覚的中心に主人公が来るよう調整
     // パターン1（下部コントローラ等）: 上から40% (0.40)
     // パターン2（上部コントローラ等）: 上から60% (0.60)
+    final activeScale = MapCamera.extractScale(_transformationController.value);
+    if (activeScale > 0) {
+      _currentScale = activeScale;
+    }
     final double yRatio = (_layoutPattern == 2 || _dpadPosition.startsWith('top')) ? 0.60 : 0.40;
     final tx = (viewportSize.width / 2) - (playerX * _currentScale);
     final ty = (viewportSize.height * yRatio) - (playerY * _currentScale);
 
-    _transformationController.value = Matrix4(
-      _currentScale, 0.0, 0.0, 0.0, // column 1
-      0.0, _currentScale, 0.0, 0.0, // column 2
-      0.0, 0.0, 1.0, 0.0,          // column 3
-      tx, ty, 0.0, 1.0,            // column 4
+    final shouldAnimate = MapCamera.shouldAnimateFollow(
+      force: _forceCameraReposition,
+      isTargetingMode: isTargetingMode,
+      prevX: _prevPlayerXForCam,
+      prevY: _prevPlayerYForCam,
+      nextX: _screen.playerX,
+      nextY: _screen.playerY,
     );
+
+    _applyCameraTranslation(tx, ty, animate: shouldAnimate);
+    if (_screen.playerX >= 0 &&
+        _screen.playerY >= 0 &&
+        (_prevPlayerXForCam != _screen.playerX || _prevPlayerYForCam != _screen.playerY)) {
+      _prevPlayerXForCam = _screen.playerX;
+      _prevPlayerYForCam = _screen.playerY;
+    }
+    _forceCameraReposition = false;
     _isMapScrolledOrZoomed = false;
   }
 
@@ -2559,6 +2720,10 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
     final effectiveViewport = _computeEffectiveMapViewport(viewportSize);
 
     final currentMatrix = _transformationController.value;
+    final activeScale = MapCamera.extractScale(currentMatrix);
+    if (activeScale > 0) {
+      _currentScale = activeScale;
+    }
     final currentTx = currentMatrix.storage[12];
     final currentTy = currentMatrix.storage[13];
 
@@ -2590,12 +2755,23 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
       force: _forceCameraReposition,
     );
 
-    _transformationController.value = Matrix4(
-      _currentScale, 0.0, 0.0, 0.0, // column 1
-      0.0, _currentScale, 0.0, 0.0, // column 2
-      0.0, 0.0, 1.0, 0.0,          // column 3
-      newTx, newTy, 0.0, 1.0,      // column 4
+    final isTargetingMode = _currentInputState == 2 /* getposInp */;
+    final shouldAnimate = MapCamera.shouldAnimateFollow(
+      force: _forceCameraReposition,
+      isTargetingMode: isTargetingMode,
+      prevX: _prevPlayerXForCam,
+      prevY: _prevPlayerYForCam,
+      nextX: _screen.playerX,
+      nextY: _screen.playerY,
     );
+
+    _applyCameraTranslation(newTx, newTy, animate: shouldAnimate);
+    if (_screen.playerX >= 0 &&
+        _screen.playerY >= 0 &&
+        (_prevPlayerXForCam != _screen.playerX || _prevPlayerYForCam != _screen.playerY)) {
+      _prevPlayerXForCam = _screen.playerX;
+      _prevPlayerYForCam = _screen.playerY;
+    }
 
     _isMapScrolledOrZoomed = false;
     _forceCameraReposition = false;
@@ -3002,6 +3178,9 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
             'status_line_layout': _statusLineLayout,
             'autosave_enabled': initialAutosaveEnabled,
             'autosave_interval': initialAutosaveInterval,
+            'map_animation_enabled': _mapAnimationEnabled,
+            'map_animation_speed': _mapAnimationSpeed.prefValue,
+            'floating_text_enabled': _floatingTextEnabled,
           });
         } else if (type == 'createWindow') {
           _screen.createWindow(message['winId'], message['winType']);
@@ -3015,6 +3194,10 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
           _screen.clearWindow(winId);
           if (winId == _mapWinId || winId == 3) {
             _forceCameraReposition = true;
+            _prevPlayerXForCam = -1;
+            _prevPlayerYForCam = -1;
+            _snapAllAnimations();
+            _mapAnimController.clearAll();
           }
         } else if (type == 'displayWindow') {
           final winId = message['winId'] as int;
@@ -3100,7 +3283,11 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
             message['color'],
             message['special'],
             (message['bktile'] as int?) ?? -1,
+            (message['bkchar'] as int?) ?? 32,
+            (message['bkcolor'] as int?) ?? 0,
           );
+        } else if (type == 'anim_event') {
+          _mapAnimController.handleEvent(MapAnimEvent.fromWorkerMap(message));
         } else if (type == 'cliparound') {
           // C 側からプレイヤー位置 (u.ux, u.uy) を受信。
           // マップの主人公タップ → #herecmdmenu 起動の判定に使用する。
@@ -3113,6 +3300,8 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
           _cameraFocusY = focusY;
           _triggerCameraUpdate();
         } else if (type == 'request_input') {
+          final reqId = (message['requestId'] as int?) ?? _lastInputRequestId;
+          _lastInputRequestId = reqId;
           final inputState = (message['input_state'] as int?) ?? 0;
           setState(() {
             _waitingForInput = true;
@@ -3241,6 +3430,7 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
         } else if (type == 'startMenu') {
           _screen.startMenu(message['winId']);
         } else if (type == 'game_exit') {
+          _snapAllAnimations();
           final exitMessage = (message['message'] as String?) ?? '';
           setState(() {
             _waitingForInput = false;
@@ -3801,6 +3991,7 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
       return; // メニュー表示中は他のキーは無視
     }
 
+    _snapAllAnimations(advanceTurn: true);
     setState(() {
       _waitingForInput = false;
     });
@@ -3815,6 +4006,7 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
     if (!_waitingForInput) return;
     if (_screen.isMenuWindowVisible) return;
 
+    _snapAllAnimations(advanceTurn: true);
     setState(() {
       _waitingForInput = false;
     });
@@ -3848,6 +4040,7 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
     if (keys.isEmpty) return;
 
     _addLog("> Send Keys: '$command' (${keys.length} keys)");
+    _snapAllAnimations(advanceTurn: true);
     setState(() {
       _waitingForInput = false;
     });
@@ -3874,6 +4067,7 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
     if (keys.isEmpty) return;
 
     _addLog("> Send Shortcut: '$command' (${keys.length} keys)");
+    _snapAllAnimations(advanceTurn: true);
     setState(() {
       _waitingForInput = false;
     });
@@ -4050,6 +4244,10 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
       if (resolvedEvent is! PointerScrollEvent) return;
 
       final currentMatrix = _transformationController.value;
+      final activeScale = MapCamera.extractScale(currentMatrix);
+      if (activeScale > 0) {
+        _currentScale = activeScale;
+      }
       final currentTx = currentMatrix.storage[12];
       final currentTy = currentMatrix.storage[13];
 
@@ -4073,11 +4271,10 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
       final double newTx = minTx <= maxTx ? rawTx.clamp(minTx, maxTx) : rawTx;
       final double newTy = minTy <= maxTy ? rawTy.clamp(minTy, maxTy) : rawTy;
 
-      _transformationController.value = Matrix4(
-        _currentScale, 0.0, 0.0, 0.0,
-        0.0, _currentScale, 0.0, 0.0,
-        0.0, 0.0, 1.0, 0.0,
-        newTx, newTy, 0.0, 1.0,
+      _transformationController.value = MapCamera.buildTransform(
+        scale: _currentScale,
+        tx: newTx,
+        ty: newTy,
       );
       _isMapScrolledOrZoomed = true;
     });
@@ -4087,6 +4284,7 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
   // C コアの flutter_nh_poskey が PosCmd キューを消費し、click_to_cmd 経由で
   // #therecmdmenu (および主人公タイル時は #herecmdmenu) を起動する。
   void sendPosCmd(int x, int y, int mod) {
+    _snapAllAnimations(advanceTurn: true);
     _workerSendPort?.send({
       'type': 'pos_cmd',
       'x': x,
@@ -4393,17 +4591,27 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
             return Container(
               key: _mapViewportKey,
               color: Colors.black,
-              child: InteractiveViewer(
+              child: ValueListenableBuilder<Offset>(
+                valueListenable: _mapAnimController.screenShakeNotifier,
+                builder: (context, shakeOffset, child) {
+                  if (shakeOffset == Offset.zero) return child!;
+                  return Transform.translate(offset: shakeOffset, child: child);
+                },
+                child: InteractiveViewer(
                 transformationController: _transformationController,
                 boundaryMargin: const EdgeInsets.all(2000.0),
                 constrained: false,
                 maxScale: 6.0,
                 minScale: effectiveMinScale,
                 onInteractionStart: (details) {
+                  _cameraAnimController.stop();
                   _isMapScrolledOrZoomed = true;
                 },
                 onInteractionUpdate: (details) {
-                  _currentScale = _transformationController.value.getMaxScaleOnAxis();
+                  final activeScale = MapCamera.extractScale(_transformationController.value);
+                  if (activeScale > 0) {
+                    _currentScale = activeScale;
+                  }
                   _isMapScrolledOrZoomed = true;
                 },
                 child: Center(
@@ -4448,22 +4656,47 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
                             _handleMapTap(_lastMapTapDownDetails!);
                           }
                         },
-                        child: CustomPaint(
-                          painter: NetHackMapPainter(
-                            screen: _screen,
-                            tileImage: _tileImage,
-                            tileWidth: _tileWidth,
-                            tileHeight: _tileHeight,
-                            useTiles: _useTiles,
-                            isTransparentTileset:
-                                TilesetManager.instance.getTilesetById(_selectedTileset).isTransparent,
-                            fontId: FontManager.instance.getSelectedFont(FontTarget.map).id,
-                          ),
+                        child: Stack(
+                          fit: StackFit.expand,
+                          children: [
+                            RepaintBoundary(
+                              child: CustomPaint(
+                                painter: NetHackMapPainter(
+                                  screen: _screen,
+                                  tileImage: _tileImage,
+                                  tileWidth: _tileWidth,
+                                  tileHeight: _tileHeight,
+                                  useTiles: _useTiles,
+                                  isTransparentTileset: TilesetManager.instance
+                                      .getTilesetById(_selectedTileset)
+                                      .isTransparent,
+                                  fontId: FontManager.instance.getSelectedFont(FontTarget.map).id,
+                                ),
+                              ),
+                            ),
+                            IgnorePointer(
+                              child: CustomPaint(
+                                painter: NetHackAnimationOverlayPainter(
+                                  screen: _screen,
+                                  animationController: _mapAnimController,
+                                  tileImage: _tileImage,
+                                  tileWidth: _tileWidth,
+                                  tileHeight: _tileHeight,
+                                  useTiles: _useTiles,
+                                  isTransparentTileset: TilesetManager.instance
+                                      .getTilesetById(_selectedTileset)
+                                      .isTransparent,
+                                  fontId: FontManager.instance.getSelectedFont(FontTarget.map).id,
+                                ),
+                              ),
+                            ),
+                          ],
                         ),
                       ),
                     ),
                   ),
                 ),
+              ),
               ),
             );
           },

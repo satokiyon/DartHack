@@ -273,7 +273,7 @@ do_pit(coordxy x, coordxy y, unsigned tu_pit)
                within a pit from jostling too */
             mselftouch(mtmp, "Falling, ", TRUE);
             if (!DEADMONSTER(mtmp)) {
-                mtmp->mhp -= rnd(m_already_trapped ? 4 : 6);
+                deduct_monster_hp(mtmp, rnd(m_already_trapped ? 4 : 6)); /* DartHack */
                 if (DEADMONSTER(mtmp)) {
                     if (!cansee(x, y)) {
                         pline("It is destroyed!");

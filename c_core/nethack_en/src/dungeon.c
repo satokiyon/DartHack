@@ -1626,11 +1626,23 @@ u_on_newpos(coordxy x, coordxy y)
            somewhere back up the call chain */
         map_location(u.ux, u.uy, FALSE);
         iflags.terrain_typ = MAX_TYPE; /* "none of the above" value */
+#if defined(ANDROID) || defined(FLUTTER_PORT)
+        /* DartHack: 階層切替時はアニメーションせず前回座標のみ同期 */
+        flutter_anim_move(1, 0, -1, -1, u.ux, u.uy);
+#endif
     } else {
         /* still on same level; might have come close enough to
            generic object(s) to redisplay them as specific objects */
         if (!Blind && !Hallucination && !u.uswallow)
             see_nearby_objects();
+#if defined(ANDROID) || defined(FLUTTER_PORT)
+        /* DartHack: 主人公移動アニメーション通知（初回配置時は座標同期のみ） */
+        if (program_state.in_moveloop) {
+            flutter_anim_move(1, 0, u.ux0, u.uy0, u.ux, u.uy);
+        } else {
+            flutter_anim_move(1, 0, -1, -1, u.ux, u.uy);
+        }
+#endif
     }
     earth_sense();
 }

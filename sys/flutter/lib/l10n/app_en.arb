@@ -674,5 +674,15 @@
   "permInventEmpty": "Not carrying anything",
   "fontPermInventLabel": "Permanent Inventory",
   "permInventFontSizeTitle": "Permanent Inventory Font Size",
-  "permInventFontSizeDesc": "Adjusts the font size of the persistent inventory panel in landscape mode."
+  "permInventFontSizeDesc": "Adjusts the font size of the persistent inventory panel in landscape mode.",
+  "mapAnimationEnabled": "Smooth Animations",
+  "mapAnimationEnabledDesc": "Smoothly animate movement, combat, and camera tracking without blocking input",
+  "mapAnimationSpeed": "Animation Speed",
+  "mapAnimationSpeedDesc": "Select the playback speed of movement and combat animations",
+  "mapAnimationSpeedOnlyEnabled": "* Available only when Smooth Animations is enabled",
+  "mapAnimationSpeedFast": "Fast",
+  "mapAnimationSpeedNormal": "Normal",
+  "mapAnimationSpeedSlow": "Slow",
+  "floatingTextEnabled": "Floating Text",
+  "floatingTextEnabledDesc": "Show damage, misses, healing, and status changes as pop-up text on the map (independent of Smooth Animations)"
 }

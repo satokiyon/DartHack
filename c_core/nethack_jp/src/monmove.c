@@ -62,7 +62,7 @@ mb_trapped(struct monst *mtmp, boolean canseeit)
     }
     wake_nearto(mtmp->mx, mtmp->my, 7 * 7);
     mtmp->mstun = 1;
-    mtmp->mhp -= rnd(15);
+    deduct_monster_hp(mtmp, rnd(15)); /* DartHack */
     if (DEADMONSTER(mtmp)) {
         mondied(mtmp);
         if (DEADMONSTER(mtmp))
@@ -635,7 +635,7 @@ mind_blast(struct monst *mtmp)
             wakeup(m2, FALSE);
             if (cansee(m2->mx, m2->my))
                 pline("それは%sを目標に定めた。", l_monnam(m2));
-            m2->mhp -= rnd(15);
+            deduct_monster_hp(m2, rnd(15)); /* DartHack */
             if (DEADMONSTER(m2))
                 monkilled(m2, "", AD_DRIN);
         }

@@ -85,6 +85,14 @@ staticfn void
 missmu(struct monst *mtmp, boolean nearmiss, struct attack *mattk)
 {
     nh_sound_melee_miss(mtmp, &gy.youmonst, mattk);
+#if defined(ANDROID) || defined(FLUTTER_PORT)
+    /* DartHack: モンスター→主人公の近接攻撃ミスアニメーション＆MISSテキスト通知 */
+    if (program_state.in_moveloop && mtmp) {
+        flutter_anim_attack(2, mtmp->m_id, (int) mtmp->mx, (int) mtmp->my,
+                            (int) u.ux, (int) u.uy, 0);
+        flutter_anim_float_text(3 /* MISS */, (int) u.ux, (int) u.uy, 0, 0);
+    }
+#endif
 
     gh.hitmsg_mid = 0;
     gh.hitmsg_prev = NULL;
@@ -181,6 +189,14 @@ wildmiss(struct monst *mtmp, struct attack *mattk)
     const char *Monst_name; /* Monnam(), deferred until after early returns */
 
     nh_sound_melee_miss(mtmp, &gy.youmonst, mattk);
+#if defined(ANDROID) || defined(FLUTTER_PORT)
+    /* DartHack: wildmiss時は未検知敵の位置漏洩を防ぐためcanspotmon時のみ通知 */
+    if (program_state.in_moveloop && mtmp && canspotmon(mtmp)) {
+        flutter_anim_attack(2, mtmp->m_id, (int) mtmp->mx, (int) mtmp->my,
+                            (int) u.ux, (int) u.uy, 0);
+        flutter_anim_float_text(3 /* MISS */, (int) u.ux, (int) u.uy, 0, 0);
+    }
+#endif
     /* expected reasons for wildmiss() */
     boolean unotseen = (!mtmp->mcansee || (Invis && !perceives(mtmp->data))),
             unotthere = (Displaced != 0), usubmerged = (Underwater != 0);
@@ -608,7 +624,8 @@ mattacku(struct monst *mtmp)
                 if (3 + find_mac(mtmp) <= rnd(20)) {
                     pline("%s is hit by a falling piercer (you)!",
                           Monnam(mtmp));
-                    if ((mtmp->mhp -= d(3, 6)) < 1)
+                    deduct_monster_hp(mtmp, d(3, 6)); /* DartHack */
+                    if (mtmp->mhp < 1)
                         killed(mtmp);
                 } else
                     pline("%s is almost hit by a falling piercer (you)!",
@@ -1170,6 +1187,13 @@ hitmu(struct monst *mtmp, struct attack *mattk)
     } else {
         nh_sound_mon_attack(mtmp, &gy.youmonst, mattk, TRUE);
     }
+#if defined(ANDROID) || defined(FLUTTER_PORT)
+    /* DartHack: モンスター→主人公の近接攻撃命中アニメーション通知 */
+    if (program_state.in_moveloop) {
+        flutter_anim_attack(2, mtmp->m_id, (int) mtmp->mx, (int) mtmp->my,
+                            (int) u.ux, (int) u.uy, 1);
+    }
+#endif
 
     /*  If the monster is undetected & hits you, you should know where
      *  the attack came from.
@@ -2253,9 +2277,18 @@ doseduce(struct monst *mon)
         case 0:
             You_feel("raised to your full potential.");
             exercise(A_CON, TRUE);
-            u.uen = (u.uenmax += rnd(5));
-            if (u.uenmax > u.uenpeak)
-                u.uenpeak = u.uenmax;
+            {
+                int before_en = u.uen;
+                u.uen = (u.uenmax += rnd(5));
+                if (u.uenmax > u.uenpeak)
+                    u.uenpeak = u.uenmax;
+#if defined(ANDROID) || defined(FLUTTER_PORT)
+                if (program_state.in_moveloop && u.uen > before_en) {
+                    flutter_anim_float_text(5 /* HEAL_PW */, (int) u.ux, (int) u.uy,
+                                            u.uen - before_en, 0);
+                }
+#endif
+            }
             break;
         case 1:
             You_feel("good enough to do it again.");
@@ -2379,7 +2412,8 @@ mayberem(struct monst *mon,
 staticfn int
 assess_dmg(struct monst *mtmp, int tmp)
 {
-    if ((mtmp->mhp -= tmp) <= 0) {
+    deduct_monster_hp(mtmp, tmp); /* DartHack */
+    if (mtmp->mhp <= 0) {
         pline_mon(mtmp, "%s dies!", Monnam(mtmp));
         xkilled(mtmp, XKILL_NOMSG);
         if (!DEADMONSTER(mtmp))

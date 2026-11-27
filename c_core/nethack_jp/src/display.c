@@ -1194,6 +1194,13 @@ tmp_at(coordxy x, coordxy y)
         tglyph->sidx = 0;
         tglyph->style = x;
         tglyph->glyph = y;
+#if defined(ANDROID) || defined(FLUTTER_PORT)
+        /* DartHack: 飛び道具・光線アニメーション開始通知（爆発 3x3 グリフは除外） */
+        if (program_state.in_moveloop && !glyph_is_explosion(y)
+            && (x == DISP_BEAM || x == DISP_TETHER || x == DISP_FLASH)) {
+            (void) flutter_anim_projectile(x, -1, -1, 0, 0, 0);
+        }
+#endif
         flush_screen(0); /* flush buffered glyphs */
         return;
 
@@ -1204,6 +1211,10 @@ tmp_at(coordxy x, coordxy y)
                 free((genericptr_t) tglyph);
             tglyph = tmp;
         }
+#if defined(ANDROID) || defined(FLUTTER_PORT)
+        /* DartHack: 飛び道具・光線アニメーション強制終了通知 */
+        (void) flutter_anim_projectile(0, -2, -2, 0, 0, 0);
+#endif
         return;
 
     default:
@@ -1233,6 +1244,19 @@ tmp_at(coordxy x, coordxy y)
                 if (y == BACKTRACK && tglyph->sidx > 1) {
                     /* backtrack */
                     for (i = tglyph->sidx - 1; i > 0; i--) {
+#if defined(ANDROID) || defined(FLUTTER_PORT)
+                        /* DartHack: ブーメラン等の戻り経路通知（アニメーションON時は一時描画をスキップ） */
+                        if (program_state.in_moveloop
+                            && flutter_anim_projectile(DISP_TETHER,
+                                                       tglyph->saved[i].x,
+                                                       tglyph->saved[i].y,
+                                                       tglyph->saved[i - 1].x,
+                                                       tglyph->saved[i - 1].y,
+                                                       tglyph->glyph)) {
+                            tglyph->shown_on_map[i] = FALSE;
+                            continue;
+                        }
+#endif
                         if (tglyph->shown_on_map[i]) {
                             newsym(tglyph->saved[i].x, tglyph->saved[i].y);
                             tglyph->shown_on_map[i] = FALSE;
@@ -1260,6 +1284,14 @@ tmp_at(coordxy x, coordxy y)
                     }
                 }
             }
+#if defined(ANDROID) || defined(FLUTTER_PORT)
+            /* DartHack: 飛び道具・光線アニメーション終了通知（爆発 3x3 グリフは除外） */
+            if (program_state.in_moveloop && !glyph_is_explosion(tglyph->glyph)
+                && (tglyph->style == DISP_BEAM || tglyph->style == DISP_TETHER
+                    || tglyph->style == DISP_FLASH)) {
+                (void) flutter_anim_projectile(tglyph->style, -2, -2, 0, 0, 0);
+            }
+#endif
             /* tglyph->sidx = 0; -- about to be freed, so not necessary */
             tmp = tglyph->prev;
             if (tglyph != &tgfirst)
@@ -1271,6 +1303,8 @@ tmp_at(coordxy x, coordxy y)
             if (!isok(x, y))
                 break;
             if (tglyph->style == DISP_BEAM || tglyph->style == DISP_ALL) {
+                int anim_px = (tglyph->sidx > 0) ? tglyph->saved[tglyph->sidx - 1].x : x;
+                int anim_py = (tglyph->sidx > 0) ? tglyph->saved[tglyph->sidx - 1].y : y;
                 if (tglyph->sidx >= TMP_AT_MAX_GLYPHS)
                     break; /* too many locations */
                 if (tglyph->style != DISP_ALL && !cansee(x, y)) {
@@ -1282,7 +1316,19 @@ tmp_at(coordxy x, coordxy y)
                 tglyph->saved[tglyph->sidx].x = x;
                 tglyph->saved[tglyph->sidx].y = y;
                 tglyph->sidx += 1;
+#if defined(ANDROID) || defined(FLUTTER_PORT)
+                /* DartHack: 光線ステップ通知（爆発 3x3 グリフは除外） */
+                if (tglyph->style == DISP_BEAM && program_state.in_moveloop
+                    && !glyph_is_explosion(tglyph->glyph)
+                    && flutter_anim_projectile(tglyph->style, anim_px, anim_py,
+                                               x, y, tglyph->glyph)) {
+                    tglyph->shown_on_map[tglyph->sidx - 1] = FALSE;
+                    suppress_show = TRUE;
+                }
+#endif
             } else if (tglyph->style == DISP_TETHER) {
+                int anim_px = (tglyph->sidx > 0) ? tglyph->saved[tglyph->sidx - 1].x : x;
+                int anim_py = (tglyph->sidx > 0) ? tglyph->saved[tglyph->sidx - 1].y : y;
                 if (tglyph->sidx >= TMP_AT_MAX_GLYPHS)
                     break; /* too many locations */
                 if (tglyph->sidx) {
@@ -1290,7 +1336,11 @@ tmp_at(coordxy x, coordxy y)
 
                     px = tglyph->saved[tglyph->sidx - 1].x;
                     py = tglyph->saved[tglyph->sidx - 1].y;
-                    if (cansee(px, py)) {
+                    if (cansee(px, py)
+#if defined(ANDROID) || defined(FLUTTER_PORT)
+                        && !flutter_anim_is_enabled()
+#endif
+                    ) {
                         tglyph->shown_on_map[tglyph->sidx - 1] = TRUE;
                         show_glyph(px, py, tether_glyph(px, py));
                     } else {
@@ -1309,9 +1359,22 @@ tmp_at(coordxy x, coordxy y)
                     tglyph->shown_on_map[tglyph->sidx] = TRUE;
                 }
                 tglyph->sidx += 1;
+#if defined(ANDROID) || defined(FLUTTER_PORT)
+                /* DartHack: テザー飛び道具ステップ通知（アニメーションON時は一時描画をスキップ） */
+                if (program_state.in_moveloop
+                    && flutter_anim_projectile(tglyph->style, anim_px, anim_py,
+                                               x, y, tglyph->glyph)) {
+                    tglyph->shown_on_map[tglyph->sidx - 1] = FALSE;
+                    suppress_show = TRUE;
+                }
+#endif
             } else { /* DISP_FLASH/ALWAYS */
+                int anim_px = tglyph->sidx ? tglyph->saved[0].x : x;
+                int anim_py = tglyph->sidx ? tglyph->saved[0].y : y;
                 if (tglyph->sidx) { /* not first call, so reset previous pos */
-                    newsym(tglyph->saved[0].x, tglyph->saved[0].y);
+                    if (tglyph->shown_on_map[0]) {
+                        newsym(tglyph->saved[0].x, tglyph->saved[0].y);
+                    }
                     tglyph->shown_on_map[0] = FALSE;
                     tglyph->sidx = 0; /* display is presently up to date */
                 }
@@ -1326,6 +1389,15 @@ tmp_at(coordxy x, coordxy y)
                 tglyph->saved[0].x = x;
                 tglyph->saved[0].y = y;
                 tglyph->sidx = 1;
+#if defined(ANDROID) || defined(FLUTTER_PORT)
+                /* DartHack: 飛び道具ステップ通知（アニメーションON時は一時描画をスキップ） */
+                if (tglyph->style == DISP_FLASH && program_state.in_moveloop
+                    && flutter_anim_projectile(tglyph->style, anim_px, anim_py,
+                                               x, y, tglyph->glyph)) {
+                    tglyph->shown_on_map[0] = FALSE;
+                    suppress_show = TRUE;
+                }
+#endif
             }
 
             if (!suppress_show)

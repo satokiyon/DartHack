@@ -231,6 +231,15 @@ msummon(struct monst *mon)
                 pline("%sが%sの中に現れた!", Amonnam(mtmp),
                       jp_summon_phrase(cloud, what));
             }
+#if defined(ANDROID) || defined(FLUTTER_PORT)
+            /* DartHack: モンスター召喚リングVFX通知（悪魔=1/天使=2/通常=0） */
+            if (program_state.in_moveloop && !Blind && canseemon(mtmp)) {
+                int skind = (mtmp->data->mlet == S_ANGEL) ? 2
+                            : is_demon(mtmp->data) ? 1 : 0;
+                flutter_anim_vfx(8 /* SUMMON */, (int) mtmp->mx, (int) mtmp->my,
+                                 (int) mtmp->mx, (int) mtmp->my, skind, 1);
+            }
+#endif
         }
         cnt--;
     }
@@ -308,6 +317,15 @@ summon_minion(aligntyp alignment, boolean talk)
         }
         mon->mpeaceful = FALSE;
         /* don't call set_malign(); player was naughty */
+#if defined(ANDROID) || defined(FLUTTER_PORT)
+        /* DartHack: 召喚リングVFX通知（悪魔=1/天使=2/通常=0） */
+        if (program_state.in_moveloop && !Blind && canseemon(mon)) {
+            int skind = (mon->data->mlet == S_ANGEL) ? 2
+                        : is_demon(mon->data) ? 1 : 0;
+            flutter_anim_vfx(8 /* SUMMON */, (int) mon->mx, (int) mon->my,
+                             (int) mon->mx, (int) mon->my, skind, 1);
+        }
+#endif
     }
 }
 

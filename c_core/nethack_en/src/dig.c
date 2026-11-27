@@ -521,6 +521,13 @@ dig(void)
         if (!does_block(dpx, dpy, &levl[dpx][dpy]))
             unblock_point(dpx, dpy); /* vision:  can see through */
         feel_newsym(dpx, dpy);
+#if defined(ANDROID) || defined(FLUTTER_PORT)
+        /* DartHack: 壁・岩・像・扉の掘削完了VFX通知 */
+        if (program_state.in_moveloop) {
+            flutter_anim_vfx(3 /* ROCK_DEBRIS */, (int) u.ux, (int) u.uy,
+                             (int) dpx, (int) dpy, 0, 1);
+        }
+#endif
         if (digtxt && !svc.context.digging.quiet)
             pline1(digtxt); /* after newsym */
         if (dmgtxt)
@@ -1574,7 +1581,7 @@ zap_dig(void)
                 You("pierce %s %s wall!", s_suffix(mon_nam(mtmp)),
                     mbodypart(mtmp, STOMACH));
             if (unique_corpstat(mtmp->data))
-                mtmp->mhp = (mtmp->mhp + 1) / 2;
+                deduct_monster_hp(mtmp, mtmp->mhp / 2); /* DartHack */
             else
                 mtmp->mhp = 1; /* almost dead */
             expels(mtmp, mtmp->data, !digests(mtmp->data));

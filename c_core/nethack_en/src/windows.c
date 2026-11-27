@@ -1947,6 +1947,111 @@ flutter_sync_dumplogs_with_xlogfile(const char *xlog_path)
 {
     (void) xlog_path; /* unused for non-Flutter ports */
 }
+
+/* DartHack: Flutter ポート向けアニメーション通知フックの空スタブ */
+void
+flutter_anim_move(int entity_kind, unsigned int entity_id,
+                  int from_x, int from_y, int to_x, int to_y)
+{
+    (void) entity_kind;
+    (void) entity_id;
+    (void) from_x;
+    (void) from_y;
+    (void) to_x;
+    (void) to_y;
+}
+
+void
+flutter_anim_attack(int attacker_kind, unsigned int attacker_id,
+                    int from_x, int from_y, int to_x, int to_y, int hit)
+{
+    (void) attacker_kind;
+    (void) attacker_id;
+    (void) from_x;
+    (void) from_y;
+    (void) to_x;
+    (void) to_y;
+    (void) hit;
+}
+
+void
+flutter_anim_death(unsigned int entity_id, int x, int y, int glyph)
+{
+    (void) entity_id;
+    (void) x;
+    (void) y;
+    (void) glyph;
+}
+
+int
+flutter_anim_projectile(int style, int from_x, int from_y,
+                        int to_x, int to_y, int glyph)
+{
+    (void) style;
+    (void) from_x;
+    (void) from_y;
+    (void) to_x;
+    (void) to_y;
+    (void) glyph;
+    return 0;
+}
+
+int
+flutter_anim_is_enabled(void)
+{
+    return 0;
+}
+
+void
+flutter_anim_projectile_seed(int start_x, int start_y, int glyph)
+{
+    (void) start_x;
+    (void) start_y;
+    (void) glyph;
+}
+
+void
+flutter_anim_obj_move(int obj_kind, int from_x, int from_y,
+                      int to_x, int to_y, int glyph)
+{
+    (void) obj_kind;
+    (void) from_x;
+    (void) from_y;
+    (void) to_x;
+    (void) to_y;
+    (void) glyph;
+}
+
+void
+flutter_anim_vfx(int vfx_kind, int from_x, int from_y,
+                 int to_x, int to_y, int color_or_elem, int intensity)
+{
+    (void) vfx_kind;
+    (void) from_x;
+    (void) from_y;
+    (void) to_x;
+    (void) to_y;
+    (void) color_or_elem;
+    (void) intensity;
+}
+
+void
+flutter_anim_float_text(int text_kind, int x, int y,
+                        int value, int color_or_elem)
+{
+    (void) text_kind;
+    (void) x;
+    (void) y;
+    (void) value;
+    (void) color_or_elem;
+}
+
+void
+flutter_anim_mon_damage(struct monst *mon, int dmg)
+{
+    (void) mon;
+    (void) dmg;
+}
 #endif
 
 /*windows.c*/

@@ -1120,6 +1120,12 @@ eye_of_newt_buzz(void)
             }
             u.uen = u.uenmax;
         }
+#if defined(ANDROID) || defined(FLUTTER_PORT)
+        if (program_state.in_moveloop && u.uen > old_uen) {
+            flutter_anim_float_text(5 /* HEAL_PW */, (int) u.ux, (int) u.uy,
+                                    u.uen - old_uen, 0);
+        }
+#endif
         if (old_uen != u.uen) {
             You_feel("a mild buzz.");
             disp.botl = TRUE;

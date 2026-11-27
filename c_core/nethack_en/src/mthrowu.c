@@ -457,7 +457,7 @@ ohitmon(
 
         /* might already be dead (if petrified) */
         if (!harmless && !DEADMONSTER(mtmp)) {
-            mtmp->mhp -= damage;
+            deduct_monster_hp(mtmp, damage); /* DartHack */
             if (DEADMONSTER(mtmp)) {
                 if (vis || (verbose && !gm.mtarget))
                     pline("%s is %s!", Monnam(mtmp),
@@ -941,7 +941,7 @@ return_from_mtoss(
         if (hits_thrower) {
             if (otmp->oartifact)
                 (void) artifact_hit((struct monst *) 0, magr, otmp, &dmg, 0);
-            magr->mhp -= dmg;
+            deduct_monster_hp(magr, dmg); /* DartHack */
             if (DEADMONSTER(magr))
                 monkilled(magr, canspotmon(magr) ? "" : (char *) 0, AD_PHYS);
         }

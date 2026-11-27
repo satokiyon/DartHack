@@ -631,6 +631,14 @@ int
 dopotion(struct obj *otmp)
 {
     int retval;
+#if defined(ANDROID) || defined(FLUTTER_PORT)
+    /* DartHack: ポーション使用時の飛沫VFX通知 */
+    if (program_state.in_moveloop && otmp) {
+        flutter_anim_vfx(4 /* POTION_SPLASH */, (int) u.ux, (int) u.uy,
+                         (int) u.ux, (int) u.uy,
+                         (int) objects[otmp->otyp].oc_color, 1);
+    }
+#endif
 
     otmp->in_use = TRUE;
     gp.potion_nothing = gp.potion_unkn = 0;
@@ -1263,11 +1271,21 @@ peffect_gain_energy(struct obj *otmp)
         u.uenpeak = u.uenmax;
     else if (u.uenmax <= 0)
         u.uenmax = 0;
-    u.uen += 3 * num;
-    if (u.uen > u.uenmax)
-        u.uen = u.uenmax;
-    else if (u.uen <= 0)
-        u.uen = 0;
+    {
+        int before_en = u.uen;
+        u.uen += 3 * num;
+        if (u.uen > u.uenmax)
+            u.uen = u.uenmax;
+        else if (u.uen <= 0)
+            u.uen = 0;
+#if defined(ANDROID) || defined(FLUTTER_PORT)
+        /* DartHack: 実効Pw回復量のフローティングテキスト通知 */
+        if (program_state.in_moveloop && u.uen > before_en) {
+            flutter_anim_float_text(5 /* HEAL_PW */, (int) u.ux, (int) u.uy,
+                                    u.uen - before_en, 0);
+        }
+#endif
+    }
     disp.botl = TRUE;
     exercise(A_WIS, TRUE);
 }
@@ -1445,10 +1463,13 @@ void
 healup(int nhp, int nxtra, boolean curesick, boolean cureblind)
 {
     if (nhp) {
+        int before_hp = Upolyd ? u.mh : u.uhp;
+        int after_hp;
         if (Upolyd) {
             u.mh += nhp;
             if (u.mh > u.mhmax)
                 u.mh = (u.mhmax += nxtra);
+            after_hp = u.mh;
         } else {
             u.uhp += nhp;
             if (u.uhp > u.uhpmax) {
@@ -1456,7 +1477,15 @@ healup(int nhp, int nxtra, boolean curesick, boolean cureblind)
                 if (u.uhpmax > u.uhppeak)
                     u.uhppeak = u.uhpmax;
             }
+            after_hp = u.uhp;
         }
+#if defined(ANDROID) || defined(FLUTTER_PORT)
+        /* DartHack: 実効HP回復量のフローティングテキスト通知（満タン時0回復は除外） */
+        if (program_state.in_moveloop && after_hp > before_hp) {
+            flutter_anim_float_text(4 /* HEAL_HP */, (int) u.ux, (int) u.uy,
+                                    after_hp - before_hp, 0);
+        }
+#endif
     }
     if (cureblind) {
         /* 3.6.1: it's debatable whether healing magic should clean off
@@ -1650,6 +1679,13 @@ potionhit(struct monst *mon, struct obj *obj, int how)
     if (isyou) {
         tx = u.ux, ty = u.uy;
         distance = 0;
+#if defined(ANDROID) || defined(FLUTTER_PORT)
+        if (program_state.in_moveloop && obj) {
+            flutter_anim_vfx(4 /* POTION_SPLASH */, (int) tx, (int) ty,
+                             (int) tx, (int) ty,
+                             (int) objects[obj->otyp].oc_color, 1);
+        }
+#endif
         pline_The("%s crashes on your %s and breaks into shards.", botlnam,
                   body_part(HEAD));
         losehp(Maybe_Adjust_Phys(rnd(2), STRANGE_OBJECT),
@@ -1658,6 +1694,13 @@ potionhit(struct monst *mon, struct obj *obj, int how)
                KILLED_BY_AN);
     } else {
         tx = mon->mx, ty = mon->my;
+#if defined(ANDROID) || defined(FLUTTER_PORT)
+        if (program_state.in_moveloop && obj) {
+            flutter_anim_vfx(4 /* POTION_SPLASH */, (int) tx, (int) ty,
+                             (int) tx, (int) ty,
+                             (int) objects[obj->otyp].oc_color, 1);
+        }
+#endif
         /* sometimes it hits the saddle */
         if (((mon->misc_worn_check & W_SADDLE)
              && (saddle = which_armor(mon, W_SADDLE)))
@@ -1854,7 +1897,7 @@ potionhit(struct monst *mon, struct obj *obj, int how)
                           is_silent(mon->data) ? "writhes" : "shrieks");
                     if (!is_silent(mon->data))
                         wake_nearto(tx, ty, mon->data->mlevel * 10);
-                    mon->mhp -= d(2, 6);
+                    deduct_monster_hp(mon, d(2, 6)); /* DartHack */
                     /* should only be by you */
                     if (DEADMONSTER(mon))
                         killed(mon);
@@ -1875,7 +1918,7 @@ potionhit(struct monst *mon, struct obj *obj, int how)
             } else if (mon->data == &mons[PM_IRON_GOLEM]) {
                 if (canseemon(mon))
                     pline("%s rusts.", Monnam(mon));
-                mon->mhp -= d(1, 6);
+                deduct_monster_hp(mon, d(1, 6)); /* DartHack */
                 /* should only be by you */
                 if (DEADMONSTER(mon))
                     killed(mon);
@@ -1891,7 +1934,7 @@ potionhit(struct monst *mon, struct obj *obj, int how)
                       is_silent(mon->data) ? "writhes" : "shrieks");
                 if (!is_silent(mon->data))
                     wake_nearto(tx, ty, mon->data->mlevel * 10);
-                mon->mhp -= d(obj->cursed ? 2 : 1, obj->blessed ? 4 : 8);
+                deduct_monster_hp(mon, d(obj->cursed ? 2 : 1, obj->blessed ? 4 : 8)); /* DartHack */
                 if (DEADMONSTER(mon)) {
                     if (your_fault)
                         killed(mon);

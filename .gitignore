@@ -127,6 +127,7 @@ scratch/
 !/docs/datastore_migration_architecture.md
 !/docs/spoiler_markdown_pipeline_guide.md
 !/docs/map_tap_targeting_detection_issue.md
+!/docs/map_animation_vfx_architecture.md
 
 
 #logfiles

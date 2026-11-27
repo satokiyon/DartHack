@@ -1870,7 +1870,7 @@ trapeffect_fire_trap(
             int xtradmg = destroy_items(mtmp, AD_FIRE, orig_dmg);
             ignite_items(mtmp->minvent);
             if (!DEADMONSTER(mtmp)) {
-                mtmp->mhp -= xtradmg;
+                deduct_monster_hp(mtmp, xtradmg); /* DartHack */
                 if (DEADMONSTER(mtmp)) { /* NOW it's dead */
                     monkilled(mtmp, "", AD_FIRE);
                     trapkilled = TRUE;
@@ -2388,9 +2388,18 @@ trapeffect_magic_trap(
             You("魔法の爆発に巻き込まれた!");
             losehp(rnd(10), "magical explosion", KILLED_BY_AN);
             Your("体が魔法エネルギーの一部を吸収した!");
-            u.uen = (u.uenmax += 2);
-            if (u.uenmax > u.uenpeak)
-                u.uenpeak = u.uenmax;
+            {
+                int before_en = u.uen;
+                u.uen = (u.uenmax += 2);
+                if (u.uenmax > u.uenpeak)
+                    u.uenpeak = u.uenmax;
+#if defined(ANDROID) || defined(FLUTTER_PORT)
+                if (program_state.in_moveloop && u.uen > before_en) {
+                    flutter_anim_float_text(5 /* HEAL_PW */, (int) u.ux, (int) u.uy,
+                                            u.uen - before_en, 0);
+                }
+#endif
+            }
             return Trap_Effect_Finished;
         } else {
             coordxy tx = trap->tx, ty = trap->ty;
@@ -2526,7 +2535,7 @@ trapeffect_anti_magic(
 
             if (in_sight)
                 seetrap(trap);
-            mtmp->mhp -= dmgval2;
+            deduct_monster_hp(mtmp, dmgval2); /* DartHack */
             if (DEADMONSTER(mtmp))
                 monkilled(mtmp,
                           in_sight
@@ -5590,7 +5599,7 @@ try_disarm(
                 if (ttype == BEAR_TRAP) {
                     if (mtmp->mtame)
                         abuse_dog(mtmp);
-                    mtmp->mhp -= rnd(4);
+                    deduct_monster_hp(mtmp, rnd(4)); /* DartHack */
                     if (DEADMONSTER(mtmp))
                         killed(mtmp);
                 } else if (ttype == WEB) {
@@ -6872,7 +6881,7 @@ thitm(
                 dam = 1;
         }
         if (!harmless) {
-            mon->mhp -= dam;
+            deduct_monster_hp(mon, dam); /* DartHack */
             if (mon->mhp <= 0) {
                 int xx = mon->mx, yy = mon->my;
 

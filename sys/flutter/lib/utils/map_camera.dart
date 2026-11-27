@@ -100,5 +100,64 @@ class MapCamera {
     final scaleY = viewportSize.height / mapHeight;
     return math.min(scaleX, scaleY);
   }
+
+  /// カメラ移動をアニメーション補間すべきか判定する純粋関数。
+  ///
+  /// 強制再配置（階層移動・設定変更・初回起動）、位置指定/Farlookモード（getposInp）、
+  /// またはチェビシェフ距離 3 以上の大移動（テレポート等）の場合は false（即時反映）を返す。
+  static bool shouldAnimateFollow({
+    required bool force,
+    required bool isTargetingMode,
+    required int prevX,
+    required int prevY,
+    required int nextX,
+    required int nextY,
+  }) {
+    if (force || isTargetingMode) return false;
+    if (prevX < 0 || prevY < 0 || nextX < 0 || nextY < 0) return false;
+    final dx = (nextX - prevX).abs();
+    final dy = (nextY - prevY).abs();
+    return dx <= 2 && dy <= 2;
+  }
+
+  /// 進行中のカメラアニメーションの目標座標と新規目標座標が実質同一かどうか判定する。
+  /// cliparound → curs → request_input の連続到着で進行中補間が中断されるのを防ぐ。
+  static bool isSameTarget(
+    double currentTargetTx,
+    double currentTargetTy,
+    double nextTargetTx,
+    double nextTargetTy, {
+    double epsilon = 0.5,
+  }) {
+    return (currentTargetTx - nextTargetTx).abs() < epsilon &&
+        (currentTargetTy - nextTargetTy).abs() < epsilon;
+  }
+
+  /// 2D 変換行列から Z 軸成分に左右されない実際の X/Y ズーム倍率を抽出する。
+  ///
+  /// `Matrix4.getMaxScaleOnAxis()` は Z 軸スケール（storage[10]）も含むため、
+  /// Z 軸が 1.0 の行列で縮小（scale < 1.0）していると 1.0 を返してしまう。
+  /// 本ヘルパーは X 軸の 2D 基底ベクトル長から安全にズーム倍率を取得する。
+  static double extractScale(Matrix4 matrix) {
+    final s = matrix.storage;
+    return math.sqrt(s[0] * s[0] + s[1] * s[1]);
+  }
+
+  /// `InteractiveViewer` と整合する等方スケール＋2D 平行移動の `Matrix4` を構築する。
+  ///
+  /// Z 軸（storage[10]）にも `scale` を設定することで、`InteractiveViewer` 内部の
+  /// `getMaxScaleOnAxis()` による縮小倍率の誤認を防止する。
+  static Matrix4 buildTransform({
+    required double scale,
+    required double tx,
+    required double ty,
+  }) {
+    return Matrix4(
+      scale, 0.0, 0.0, 0.0,
+      0.0, scale, 0.0, 0.0,
+      0.0, 0.0, scale, 0.0,
+      tx, ty, 0.0, 1.0,
+    );
+  }
 }
 

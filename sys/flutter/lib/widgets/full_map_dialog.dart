@@ -5,6 +5,7 @@ import '../l10n/app_localizations.dart';
 import '../nethack_screen.dart';
 import '../nethack_map_painter.dart';
 import '../services/font_manager.dart';
+import '../utils/map_camera.dart';
 import 'keyboard_help_dialog.dart';
 
 Future<void> showFullMapDialog({
@@ -108,7 +109,7 @@ class _FullMapDialogContentState extends State<_FullMapDialogContent>
     if (_animationController.isAnimating) return;
 
     final currentMatrix = _transformationController.value;
-    final currentScale = currentMatrix.getMaxScaleOnAxis();
+    final currentScale = MapCamera.extractScale(currentMatrix);
 
     final Matrix4 endMatrix;
     if (currentScale > 1.05) {
@@ -122,9 +123,7 @@ class _FullMapDialogContentState extends State<_FullMapDialogContent>
       final center = focalPoint ?? Offset(size.width / 2, size.height / 2);
       final x = -center.dx * (targetScale - 1);
       final y = -center.dy * (targetScale - 1);
-      endMatrix = Matrix4.identity()
-        ..translateByDouble(x, y, 0.0, 1.0)
-        ..scaleByDouble(targetScale, targetScale, 1.0, 1.0);
+      endMatrix = MapCamera.buildTransform(scale: targetScale, tx: x, ty: y);
     }
 
     _animation = Matrix4Tween(
@@ -159,7 +158,7 @@ class _FullMapDialogContentState extends State<_FullMapDialogContent>
     if (_animationController.isAnimating) return;
 
     final currentMatrix = _transformationController.value;
-    final currentScale = currentMatrix.getMaxScaleOnAxis();
+    final currentScale = MapCamera.extractScale(currentMatrix);
     final targetScale = (currentScale * factor).clamp(0.8, 30.0);
     if ((targetScale - currentScale).abs() < 0.001) return;
 
@@ -174,9 +173,7 @@ class _FullMapDialogContentState extends State<_FullMapDialogContent>
     final newTx = cx - effectiveFactor * (cx - tx);
     final newTy = cy - effectiveFactor * (cy - ty);
 
-    final newMatrix = Matrix4.identity()
-      ..translateByDouble(newTx, newTy, 0.0, 1.0)
-      ..scaleByDouble(targetScale, targetScale, 1.0, 1.0);
+    final newMatrix = MapCamera.buildTransform(scale: targetScale, tx: newTx, ty: newTy);
 
     _transformationController.value = newMatrix;
   }

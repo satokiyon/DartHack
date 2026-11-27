@@ -908,6 +908,10 @@ place_monster(struct monst *mon, coordxy x, coordxy y)
     struct monst *othermon;
     const char *monnm, *othnm;
     char buf[QBUFSZ];
+#if defined(ANDROID) || defined(FLUTTER_PORT)
+    /* DartHack: 移動元座標を退避 */
+    coordxy prev_mx = mon->mx, prev_my = mon->my;
+#endif
 
     buf[0] = '\0';
     /* normal map bounds are <1..COLNO-1,0..ROWNO-1> but sometimes
@@ -948,6 +952,13 @@ place_monster(struct monst *mon, coordxy x, coordxy y)
     /* We don't mess with these bits above:
        MON_OBLITERATE | MON_STILL_ARRIVING
      */
+#if defined(ANDROID) || defined(FLUTTER_PORT)
+    /* DartHack: モンスター移動アニメーション通知（通常・店番・僧侶・番兵・ペット交換を一括捕捉） */
+    if (program_state.in_moveloop && !mon->wormno && isok(prev_mx, prev_my) && isok(x, y)
+        && (prev_mx != x || prev_my != y)) {
+        flutter_anim_move(2, mon->m_id, (int) prev_mx, (int) prev_my, (int) x, (int) y);
+    }
+#endif
 }
 
 /*steed.c*/

@@ -211,7 +211,7 @@ flooreffects(
                         /* normally we'd use ohitmon() but it can call
                            drop_throw() which calls flooreffects() */
                         damage = dmgval(obj, mtmp);
-                        mtmp->mhp -= damage;
+                        deduct_monster_hp(mtmp, damage); /* DartHack */
                         if (DEADMONSTER(mtmp)) {
                             if (canspotmon(mtmp))
                                 pline("%s is %s!", Monnam(mtmp),

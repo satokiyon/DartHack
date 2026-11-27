@@ -675,5 +675,15 @@
   "permInventEmpty": "何も持っていない",
   "fontPermInventLabel": "常時表示インベントリ",
   "permInventFontSizeTitle": "常時表示インベントリフォントサイズ",
-  "permInventFontSizeDesc": "横長画面の常時表示インベントリパネルの文字サイズを調整します。"
+  "permInventFontSizeDesc": "横長画面の常時表示インベントリパネルの文字サイズを調整します。",
+  "mapAnimationEnabled": "アニメーション",
+  "mapAnimationEnabledDesc": "主人公やモンスターの移動・戦闘・カメラ追従を滑らかに表示します（操作を待たずに即応します）",
+  "mapAnimationSpeed": "アニメーション速度",
+  "mapAnimationSpeedDesc": "移動や戦闘アニメーションの再生速度を選択します",
+  "mapAnimationSpeedOnlyEnabled": "※「アニメーション」がONのときのみ設定可能です",
+  "mapAnimationSpeedFast": "速い",
+  "mapAnimationSpeedNormal": "標準",
+  "mapAnimationSpeedSlow": "遅い",
+  "floatingTextEnabled": "フローティングテキスト",
+  "floatingTextEnabledDesc": "ダメージ・ミス・回復・状態変化などをマップ上にポップアップ表示します（「アニメーション」設定とは独立して切替可能）"
 }

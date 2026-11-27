@@ -100,6 +100,16 @@ missmm(
     struct attack *mattk) /* attack and damage types */
 {
     nh_sound_melee_miss(magr, mdef, mattk);
+#if defined(ANDROID) || defined(FLUTTER_PORT)
+    /* DartHack: モンスター→モンスターの近接攻撃ミスアニメーション＆MISSテキスト通知 */
+    if (program_state.in_moveloop && magr && mdef) {
+        flutter_anim_attack(2, magr->m_id, (int) magr->mx, (int) magr->my,
+                            (int) mdef->mx, (int) mdef->my, 0);
+        if (canspotmon(mdef) && cansee(mdef->mx, mdef->my)) {
+            flutter_anim_float_text(3 /* MISS */, (int) mdef->mx, (int) mdef->my, 0, 0);
+        }
+    }
+#endif
 
     pre_mm_attack(magr, mdef);
 
@@ -693,6 +703,13 @@ hitmm(
     } else {
         nh_sound_mon_attack(magr, mdef, mattk, TRUE);
     }
+#if defined(ANDROID) || defined(FLUTTER_PORT)
+    /* DartHack: モンスター→モンスターの近接攻撃命中アニメーション通知 */
+    if (program_state.in_moveloop && magr && mdef) {
+        flutter_anim_attack(2, magr->m_id, (int) magr->mx, (int) magr->my,
+                            (int) mdef->mx, (int) mdef->my, 1);
+    }
+#endif
 
     compat = !magr->mcan ? could_seduce(magr, mdef, mattk) : 0;
     if (!compat && shade_miss(magr, mdef, mwep, FALSE, gv.vis))
@@ -1110,7 +1127,7 @@ mdamagem(
     if (!mhm.damage)
         return mhm.hitflags;
 
-    mdef->mhp -= mhm.damage;
+    deduct_monster_hp(mdef, mhm.damage); /* DartHack */
     if (mdef->mhp < 1) {
         if (m_at(mdef->mx, mdef->my) == magr) { /* see gulpmm() */
             remove_monster(mdef->mx, mdef->my);
@@ -1203,7 +1220,7 @@ mon_poly(struct monst *magr, struct monst *mdef, int dmg)
                 pline("%sは身震いした!", Before);
 
             dmg += (mdef->mhpmax + 1) / 2;
-            mdef->mhp -= dmg;
+            deduct_monster_hp(mdef, dmg); /* DartHack */
             dmg = 0;
             if (DEADMONSTER(mdef)) {
                 if (magr == &gy.youmonst)
@@ -1500,7 +1517,8 @@ passivemm(
         tmp = 0;
 
  assess_dmg:
-    if ((magr->mhp -= tmp) <= 0) {
+    deduct_monster_hp(magr, tmp); /* DartHack */
+    if (magr->mhp <= 0) {
         monkilled(magr, "", (int) mddat->mattk[i].adtyp);
         return (mdead | mhit | M_ATTK_AGR_DIED);
     }

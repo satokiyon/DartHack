@@ -93,7 +93,7 @@ kickdmg(struct monst *mon, boolean clumsy)
         dmg += uarmf->spe;
     dmg += u.udaminc; /* add ring(s) of increase damage */
     if (dmg > 0)
-        mon->mhp -= dmg;
+        deduct_monster_hp(mon, dmg); /* DartHack */
     if (!DEADMONSTER(mon) && martial() && !bigmonst(mon->data) && !rn2(3)
         && mon->mcanmove && mon != u.ustuck && !mon->mtrapped) {
         /* see if the monster has a place to move into */
@@ -744,6 +744,14 @@ really_kick_object(coordxy x, coordxy y)
     obj_extract_self(gk.kickedobj);
     (void) snuff_candle(gk.kickedobj);
     newsym(x, y);
+#if defined(ANDROID) || defined(FLUTTER_PORT)
+    /* DartHack: アイテム蹴りの踏み込みバンプ＆衝撃VFX通知（飛翔自体はbhitに一本化） */
+    if (program_state.in_moveloop) {
+        flutter_anim_attack(1, 0, (int) u.ux, (int) u.uy, (int) x, (int) y, 0);
+        flutter_anim_vfx(9 /* KICK_IMPACT */, (int) u.ux, (int) u.uy,
+                         (int) x, (int) y, 0, 1);
+    }
+#endif
     mon = bhit(u.dx, u.dy, range, KICKED_WEAPON,
                (int (*) (struct monst *, struct obj *)) 0,
                (int (*) (struct obj *, struct obj *)) 0, &gk.kickedobj);
@@ -963,6 +971,14 @@ kick_door(coordxy x, coordxy y, int avrg_attrib)
         }
         feel_newsym(x, y); /* we know we broke it */
         recalc_block_point(x, y); /* vision */
+#if defined(ANDROID) || defined(FLUTTER_PORT)
+        /* DartHack: 扉蹴破りの踏み込み＆木片VFX＆控えめシェイク通知 */
+        if (program_state.in_moveloop) {
+            flutter_anim_attack(1, 0, (int) u.ux, (int) u.uy, (int) x, (int) y, 1);
+            flutter_anim_vfx(2 /* WOOD_DEBRIS */, (int) u.ux, (int) u.uy,
+                             (int) x, (int) y, 0, 2);
+        }
+#endif
         if (shopdoor) {
             add_damage(x, y, SHOP_DOOR_COST);
             pay_for_damage("break", FALSE);
@@ -974,6 +990,14 @@ kick_door(coordxy x, coordxy y, int avrg_attrib)
             feel_location(x, y); /* we know we hit it */
         exercise(A_STR, TRUE);
         Soundeffect(se_kick, 50);
+#if defined(ANDROID) || defined(FLUTTER_PORT)
+        /* DartHack: 扉蹴り（開かなかった時）の踏み込み＆小木屑VFX通知 */
+        if (program_state.in_moveloop) {
+            flutter_anim_attack(1, 0, (int) u.ux, (int) u.uy, (int) x, (int) y, 0);
+            flutter_anim_vfx(2 /* WOOD_DEBRIS */, (int) u.ux, (int) u.uy,
+                             (int) x, (int) y, 0, 1);
+        }
+#endif
         /* note: this used to be unconditional "WHAMMM!!!" but that has a
            fairly strong connotation of noise that a deaf hero shouldn't
            hear; we've kept the extra 'm's and one of the extra '!'s */

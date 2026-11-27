@@ -214,5 +214,133 @@ void main() {
       expect(heroScreenY + cellH, lessThanOrEqualTo(viewStart + viewSize));
     });
   });
+
+  group('MapCamera animation sync helpers', () {
+    test('shouldAnimateFollow は通常 1〜2 マス移動のみ true、強制/ターゲット/大移動/未初期化は false', () {
+      expect(
+        MapCamera.shouldAnimateFollow(
+          force: false,
+          isTargetingMode: false,
+          prevX: 10,
+          prevY: 10,
+          nextX: 11,
+          nextY: 10,
+        ),
+        isTrue,
+      );
+      // 強制再配置
+      expect(
+        MapCamera.shouldAnimateFollow(
+          force: true,
+          isTargetingMode: false,
+          prevX: 10,
+          prevY: 10,
+          nextX: 11,
+          nextY: 10,
+        ),
+        isFalse,
+      );
+      // 位置指定 / Farlook モード (getposInp)
+      expect(
+        MapCamera.shouldAnimateFollow(
+          force: false,
+          isTargetingMode: true,
+          prevX: 10,
+          prevY: 10,
+          nextX: 11,
+          nextY: 10,
+        ),
+        isFalse,
+      );
+      // テレポート等の 3 マス以上移動
+      expect(
+        MapCamera.shouldAnimateFollow(
+          force: false,
+          isTargetingMode: false,
+          prevX: 10,
+          prevY: 10,
+          nextX: 15,
+          nextY: 10,
+        ),
+        isFalse,
+      );
+      // 初回未初期化
+      expect(
+        MapCamera.shouldAnimateFollow(
+          force: false,
+          isTargetingMode: false,
+          prevX: -1,
+          prevY: -1,
+          nextX: 10,
+          nextY: 10,
+        ),
+        isFalse,
+      );
+    });
+
+    test('isSameTarget は重複カメラ更新の同一目標座標を正しく判定する', () {
+      expect(MapCamera.isSameTarget(-500.0, -300.0, -500.2, -299.8), isTrue);
+      expect(MapCamera.isSameTarget(-500.0, -300.0, -532.0, -300.0), isFalse);
+    });
+  });
+
+  group('MapCamera scale and Matrix4 transform regression tests', () {
+    test('縮小倍率で buildTransform した行列は extractScale と getMaxScaleOnAxis の両方が縮小倍率を返す', () {
+      for (final scale in [0.25, 0.35, 0.5, 0.8, 1.0, 2.5]) {
+        final matrix = MapCamera.buildTransform(scale: scale, tx: -420.0, ty: -180.0);
+        expect(MapCamera.extractScale(matrix), closeTo(scale, 0.0001));
+        expect(matrix.getMaxScaleOnAxis(), closeTo(scale, 0.0001));
+        expect(matrix.storage[12], closeTo(-420.0, 0.0001));
+        expect(matrix.storage[13], closeTo(-180.0, 0.0001));
+      }
+    });
+
+    test('Z 軸が 1.0 の行列でも extractScale は縮小倍率を 1.0 に化けさせずに抽出する', () {
+      final legacyMatrix = Matrix4(
+        0.5, 0.0, 0.0, 0.0,
+        0.0, 0.5, 0.0, 0.0,
+        0.0, 0.0, 1.0, 0.0,
+        -600.0, -300.0, 0.0, 1.0,
+      );
+      // getMaxScaleOnAxis() は Z=1.0 の影響で 1.0 を返してしまうが、extractScale() は 0.5 を維持
+      expect(legacyMatrix.getMaxScaleOnAxis(), closeTo(1.0, 0.0001));
+      expect(MapCamera.extractScale(legacyMatrix), closeTo(0.5, 0.0001));
+    });
+
+    test('縮小状態での連続フレーム補間（buildTransform → extractScale）でスケールも主人公位置もズレない', () {
+      const initialScale = 0.45;
+      const viewW = 800.0;
+      const viewH = 600.0;
+      const playerX = 2000.0;
+      const playerY = 1500.0;
+
+      var matrix = MapCamera.buildTransform(
+        scale: initialScale,
+        tx: (viewW / 2) - playerX * initialScale,
+        ty: (viewH * 0.4) - playerY * initialScale,
+      );
+
+      // 10 フレーム連続でスケール読み戻し＋平行移動補間を繰り返す
+      const nextPlayerX = playerX + 32.0;
+      final startTx = matrix.storage[12];
+      final targetTx = (viewW / 2) - nextPlayerX * initialScale;
+      final targetTy = (viewH * 0.4) - playerY * initialScale;
+
+      for (int i = 1; i <= 10; i++) {
+        final t = i / 10.0;
+        final activeScale = MapCamera.extractScale(matrix);
+        final tx = startTx + (targetTx - startTx) * t;
+        matrix = MapCamera.buildTransform(scale: activeScale, tx: tx, ty: targetTy);
+      }
+
+      expect(MapCamera.extractScale(matrix), closeTo(initialScale, 0.0001));
+      expect(matrix.getMaxScaleOnAxis(), closeTo(initialScale, 0.0001));
+      // 最終フレームで主人公のスクリーン座標が画面中央に来ていること
+      final finalScreenX = nextPlayerX * MapCamera.extractScale(matrix) + matrix.storage[12];
+      final finalScreenY = playerY * MapCamera.extractScale(matrix) + matrix.storage[13];
+      expect(finalScreenX, closeTo(viewW / 2, 0.01));
+      expect(finalScreenY, closeTo(viewH * 0.4, 0.01));
+    });
+  });
 }
 

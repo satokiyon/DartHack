@@ -1825,6 +1825,12 @@ invoke_energy_boost(struct obj *obj)
         epboost = u.uenmax - u.uen;
     if (epboost) {
         u.uen += epboost;
+#if defined(ANDROID) || defined(FLUTTER_PORT)
+        if (program_state.in_moveloop && epboost > 0) {
+            flutter_anim_float_text(5 /* HEAL_PW */, (int) u.ux, (int) u.uy,
+                                    epboost, 0);
+        }
+#endif
         disp.botl = TRUE;
         You_feel("re-energized.");
     } else {

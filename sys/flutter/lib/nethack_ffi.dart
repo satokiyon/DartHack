@@ -10,7 +10,7 @@ typedef DisplayWindowCallback = Void Function(Int32 winId, Int32 blocking, Int32
 typedef DestroyWindowCallback = Void Function(Int32 winId);
 typedef CursCallback = Void Function(Int32 winId, Int32 x, Int32 y);
 typedef PutStrCallback = Void Function(Int32 winId, Int32 attr, Pointer<Utf8> msg);
-typedef PrintGlyphCallback = Void Function(Int32 winId, Int32 x, Int32 y, Int32 tile, Int32 ch, Int32 color, Int32 special, Int32 bktile);
+typedef PrintGlyphCallback = Void Function(Int32 winId, Int32 x, Int32 y, Int32 tile, Int32 ch, Int32 color, Int32 special, Int32 bktile, Int32 bkchar, Int32 bkcolor);
 typedef NotifyInputCallback = Void Function(Int32 requestId, Int32 inputState);
 
 // メニュー関連コールバック
@@ -64,6 +64,25 @@ typedef PermInventEventCallback = Void Function(
   Pointer<Utf8> payload,
 );
 
+typedef DartAnimEventCallback = Void Function(
+  Int32 turnId,
+  Int32 eventType,
+  Int32 entityId,
+  Int32 fromX,
+  Int32 fromY,
+  Int32 toX,
+  Int32 toY,
+  Int32 param1,
+  Int32 param2,
+  Int32 param3,
+);
+
+typedef SetAnimationSettingsFunc = Void Function(Int32 enabled, Int32 speedMode);
+typedef SetAnimationSettingsDart = void Function(int enabled, int speedMode);
+
+typedef SetFloatingTextEnabledFunc = Void Function(Int32 enabled);
+typedef SetFloatingTextEnabledDart = void Function(int enabled);
+
 typedef SetPermInventFunc = Void Function(Int32 enabled);
 typedef SetPermInventDart = void Function(int enabled);
 
@@ -94,6 +113,7 @@ final class FlutterCallbacksStruct extends Struct {
   external Pointer<NativeFunction<NewLevelRestCallback>> newLevelRestCb;
   external Pointer<NativeFunction<DartSoundEventCallback>> soundEventCb;
   external Pointer<NativeFunction<PermInventEventCallback>> permInventCb;
+  external Pointer<NativeFunction<DartAnimEventCallback>> animEventCb;
 }
 
 typedef RegisterCallbacksStructFunc = Void Function(Pointer<FlutterCallbacksStruct> cbs);
@@ -275,6 +295,8 @@ class NetHackFfi {
   late final RequestStatusOptionsChangeDart requestStatusOptionsChangeNative;
   late final SetPermInventDart setPermInventNative;
   late final TriggerItemActionDart triggerItemActionNative;
+  late final SetAnimationSettingsDart setAnimationSettingsNative;
+  late final SetFloatingTextEnabledDart setFloatingTextEnabledNative;
 
   NetHackFfi([String? langCode]) {
     final effectiveLang = langCode ?? NetHackCoreLoader.currentLanguage;
@@ -466,6 +488,38 @@ class NetHackFfi {
           .asFunction<TriggerItemActionDart>();
     } catch (e) {
       triggerItemActionNative = (_) {};
+    }
+
+    try {
+      setAnimationSettingsNative = _lib
+          .lookup<NativeFunction<SetAnimationSettingsFunc>>('SetAnimationSettingsFlutter')
+          .asFunction<SetAnimationSettingsDart>();
+    } catch (e) {
+      setAnimationSettingsNative = (_, _) {};
+    }
+
+    try {
+      setFloatingTextEnabledNative = _lib
+          .lookup<NativeFunction<SetFloatingTextEnabledFunc>>('SetFloatingTextEnabledFlutter')
+          .asFunction<SetFloatingTextEnabledDart>();
+    } catch (e) {
+      setFloatingTextEnabledNative = (_) {};
+    }
+  }
+
+  void setAnimationSettings(bool enabled, int speedMode) {
+    try {
+      setAnimationSettingsNative(enabled ? 1 : 0, speedMode);
+    } catch (e) {
+      debugPrint("Warning: Failed to set animation settings: $e");
+    }
+  }
+
+  void setFloatingTextEnabled(bool enabled) {
+    try {
+      setFloatingTextEnabledNative(enabled ? 1 : 0);
+    } catch (e) {
+      debugPrint("Warning: Failed to set floating text enabled: $e");
     }
   }
 

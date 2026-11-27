@@ -624,6 +624,13 @@ known_hitum(
         } else {
             nh_sound_melee_hit(&gy.youmonst, mon, weapon, uattk ? uattk->aatyp : 0);
         }
+#if defined(ANDROID) || defined(FLUTTER_PORT)
+        /* DartHack: 主人公の近接攻撃命中アニメーション通知 */
+        if (program_state.in_moveloop) {
+            flutter_anim_attack(1, 0, (int) u.ux, (int) u.uy,
+                                (int) gb.bhitpos.x, (int) gb.bhitpos.y, 1);
+        }
+#endif
         malive = hmon(mon, weapon, HMON_MELEE, dieroll);
         if (malive) {
             /* monster still alive */
@@ -1865,7 +1872,7 @@ hmon_hitmon(
                so we test for 1; 0 shouldn't be able to happen here... */
             && hmd.dmg > 0 && u.uconduct.weaphit <= 1)
             first_weapon_hit(obj);
-        mon->mhp -= hmd.dmg;
+        deduct_monster_hp(mon, hmd.dmg); /* DartHack */
     }
     /* adjustments might have made tmp become less than what
        a level-draining artifact has already done to max HP */
@@ -2484,7 +2491,7 @@ mhitm_ad_drli(
                 if (mdef->mhpmax > (int) mdef->m_lev)
                     mdef->mhpmax = (int) mdef->m_lev + 1;
             }
-            mdef->mhp -= mhm->damage;
+            deduct_monster_hp(mdef, mhm->damage); /* DartHack */
             /* !m_lev: level 0 monster is killed regardless of hit points
                rather than drop to level -1; note: some non-living creatures
                (golems, vortices) are subject to life-drain */
@@ -4881,7 +4888,7 @@ damageum(
         return mhm.hitflags;
 
     mdef->mstrategy &= ~STRAT_WAITFORU; /* in case player is very fast */
-    mdef->mhp -= mhm.damage;
+    deduct_monster_hp(mdef, mhm.damage); /* DartHack */
     if (DEADMONSTER(mdef)) {
         /* troll killed by Trollsbane won't auto-revive; FIXME? same when
            Trollsbane is wielded as primary and two-weaponing kills with
@@ -5202,7 +5209,7 @@ gulpum(struct monst *mdef, struct attack *mattk)
                 break;
             }
             end_engulf();
-            mdef->mhp -= dam;
+            deduct_monster_hp(mdef, dam); /* DartHack */
             if (DEADMONSTER(mdef)) {
                 killed(mdef);
                 if (DEADMONSTER(mdef)) /* not lifesaved */
@@ -5225,6 +5232,14 @@ missum(
     boolean wouldhavehit)
 {
     nh_sound_melee_miss(&gy.youmonst, mdef, mattk);
+#if defined(ANDROID) || defined(FLUTTER_PORT)
+    /* DartHack: 主人公の近接攻撃ミスアニメーション＆MISSテキスト通知（独立制御） */
+    if (program_state.in_moveloop && mdef) {
+        flutter_anim_attack(1, 0, (int) u.ux, (int) u.uy,
+                            (int) mdef->mx, (int) mdef->my, 0);
+        flutter_anim_float_text(3 /* MISS */, (int) mdef->mx, (int) mdef->my, 0, 0);
+    }
+#endif
 
     if (wouldhavehit) /* monk is missing due to penalty for wearing suit */
         Your("armor is rather cumbersome...");
@@ -6458,7 +6473,7 @@ light_hits_gremlin(struct monst *mon, int dmg)
     } else if (canseemon(mon)) {
         pline_mon(mon, "%s recoils from the light!", Monnam(mon));
     }
-    mon->mhp -= dmg;
+    deduct_monster_hp(mon, dmg); /* DartHack */
     wake_nearto(mon->mx, mon->my, 30);
     if (DEADMONSTER(mon)) {
         if (svc.context.mon_moving)
