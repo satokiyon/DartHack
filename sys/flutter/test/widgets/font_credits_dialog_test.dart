@@ -72,6 +72,14 @@ void main() {
     expect(find.text('Font Licenses & Credits'), findsOneWidget);
     expect(find.text('List of authors and licenses for fonts bundled with DartHack.'), findsOneWidget);
 
+    // 美咲ゴシックを含め、英語モード時はすべて英語表記で日本語が混在しないこと
+    expect(find.text('Misaki Gothic'), findsOneWidget);
+    expect(find.text('Free Software'), findsOneWidget);
+    expect(find.text('License: Free Software (Permissive)'), findsOneWidget);
+    expect(find.textContaining('美咲ゴシック'), findsNothing);
+    expect(find.textContaining('自由利用'), findsNothing);
+    expect(find.textContaining('フリーソフトウェア'), findsNothing);
+
     // 閉じるアイコンで閉じること
     await tester.tap(find.byIcon(Icons.close));
     await tester.pumpAndSettle();

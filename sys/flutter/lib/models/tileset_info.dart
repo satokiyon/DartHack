@@ -10,6 +10,8 @@ class TilesetInfo {
   final bool isBuiltIn;
   final String? localFilePath;
   final bool isTransparent;
+  final String license;
+  final bool isModifiedForTransparency;
 
   const TilesetInfo({
     required this.id,
@@ -22,6 +24,8 @@ class TilesetInfo {
     this.isBuiltIn = true,
     this.localFilePath,
     this.isTransparent = false,
+    this.license = '',
+    this.isModifiedForTransparency = false,
   });
 
   /// アスペクト比 (tileWidth / tileHeight)
@@ -40,6 +44,8 @@ class TilesetInfo {
       'isBuiltIn': isBuiltIn,
       'localFilePath': localFilePath,
       'isTransparent': isTransparent,
+      'license': license,
+      'isModifiedForTransparency': isModifiedForTransparency,
     };
   }
 
@@ -56,6 +62,8 @@ class TilesetInfo {
       isBuiltIn: json['isBuiltIn'] as bool? ?? false,
       localFilePath: json['localFilePath'] as String?,
       isTransparent: json['isTransparent'] as bool? ?? false,
+      license: json['license'] as String? ?? '',
+      isModifiedForTransparency: json['isModifiedForTransparency'] as bool? ?? false,
     );
   }
 
@@ -70,6 +78,9 @@ class TilesetInfo {
       url: 'https://nethackwiki.com/wiki/Tileset',
       assetPath: 'assets/tiles/default_16x16.webp',
       isBuiltIn: true,
+      isTransparent: true,
+      license: 'NGPL',
+      isModifiedForTransparency: true,
     ),
     TilesetInfo(
       id: 'nevanda_32x32',
@@ -80,16 +91,22 @@ class TilesetInfo {
       url: 'https://nethackwiki.com/wiki/Nevanda',
       assetPath: 'assets/tiles/nevanda_32x32.webp',
       isBuiltIn: true,
+      isTransparent: true,
+      license: 'Community (NetHackWiki)',
+      isModifiedForTransparency: true,
     ),
     TilesetInfo(
       id: 'pixelhack_32x32',
       displayName: 'PixelHack (32x32)',
       tileWidth: 32,
       tileHeight: 32,
-      author: 'John Shaw (PixelHack)',
+      author: 'samuel (Scunah)',
       url: 'https://pixelhack.blogspot.com/',
       assetPath: 'assets/tiles/pixelhack_32x32.webp',
       isBuiltIn: true,
+      isTransparent: true,
+      license: 'Freeware / Community',
+      isModifiedForTransparency: true,
     ),
     TilesetInfo(
       id: 'zeldhack_32x32',
@@ -100,6 +117,9 @@ class TilesetInfo {
       url: 'https://lspixel.itch.io/zeldhack',
       assetPath: 'assets/tiles/zeldhack_32x32.webp',
       isBuiltIn: true,
+      isTransparent: true,
+      license: 'CC BY 4.0',
+      isModifiedForTransparency: true,
     ),
     TilesetInfo(
       id: 'kevintamtiles_64x64',
@@ -111,6 +131,8 @@ class TilesetInfo {
       assetPath: 'assets/tiles/kevintamtiles_64x64.webp',
       isBuiltIn: true,
       isTransparent: true,
+      license: 'NGPL',
+      isModifiedForTransparency: false,
     ),
     TilesetInfo(
       id: 'abigaba_32x32',
@@ -121,16 +143,9 @@ class TilesetInfo {
       url: 'https://nethackwiki.com/wiki/Abigaba_tiles',
       assetPath: 'assets/tiles/abigaba_32x32.webp',
       isBuiltIn: true,
-    ),
-    TilesetInfo(
-      id: 'geoduck_15x25',
-      displayName: 'Geoduck (15x25)',
-      tileWidth: 15,
-      tileHeight: 25,
-      author: 'Geoduck',
-      url: 'http://www.geoduckthings.net/nhack/nhack.html',
-      assetPath: 'assets/tiles/geoduck_15x25.webp',
-      isBuiltIn: true,
+      isTransparent: true,
+      license: 'Community (NetHackWiki)',
+      isModifiedForTransparency: true,
     ),
   ];
 

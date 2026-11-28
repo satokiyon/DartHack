@@ -8,9 +8,18 @@ void main() {
       final pixelhack = TilesetInfo.findById('pixelhack_32x32');
       expect(pixelhack.aspectRatio, closeTo(1.0, 0.001));
 
-      final geoduck = TilesetInfo.findById('geoduck_15x25');
-      expect(geoduck.aspectRatio, closeTo(15.0 / 25.0, 0.001));
-      expect(geoduck.aspectRatio, closeTo(0.6, 0.001));
+      const nonSquare = TilesetInfo(
+        id: 'custom_15x25',
+        displayName: 'Custom (15x25)',
+        tileWidth: 15,
+        tileHeight: 25,
+        author: 'User',
+        url: '',
+        assetPath: '',
+        isBuiltIn: false,
+      );
+      expect(nonSquare.aspectRatio, closeTo(15.0 / 25.0, 0.001));
+      expect(nonSquare.aspectRatio, closeTo(0.6, 0.001));
     });
 
     test('TilesetInfo toJson and fromJson roundtrip', () {
@@ -25,6 +34,8 @@ void main() {
         isBuiltIn: false,
         localFilePath: '/path/to/custom.png',
         isTransparent: true,
+        license: 'CC BY 4.0',
+        isModifiedForTransparency: true,
       );
 
       final json = custom.toJson();
@@ -37,9 +48,11 @@ void main() {
       expect(restored.isBuiltIn, false);
       expect(restored.localFilePath, '/path/to/custom.png');
       expect(restored.isTransparent, true);
+      expect(restored.license, 'CC BY 4.0');
+      expect(restored.isModifiedForTransparency, true);
       expect(restored.aspectRatio, closeTo(32.0 / 48.0, 0.001));
 
-      // 既存データの互換性（isTransparent キーが存在しない場合は false）
+      // 既存データの互換性（isTransparent / license / isModifiedForTransparency が未定義の場合）
       final legacyJson = {
         'id': 'legacy_tile',
         'displayName': 'Legacy Tile',
@@ -49,17 +62,33 @@ void main() {
       };
       final fromLegacy = TilesetInfo.fromJson(legacyJson);
       expect(fromLegacy.isTransparent, false);
+      expect(fromLegacy.license, '');
+      expect(fromLegacy.isModifiedForTransparency, false);
     });
 
-    test('Built-in kevintam is transparent, pixelhack is not', () {
+    test('All 6 built-in tilesets are transparent and Geoduck falls back to default', () {
+      expect(TilesetInfo.allTilesets.length, 6);
+      for (final tileset in TilesetInfo.allTilesets) {
+        expect(tileset.isBuiltIn, true);
+        expect(tileset.isTransparent, true, reason: '${tileset.id} should be transparent');
+        expect(tileset.license.isNotEmpty, true, reason: '${tileset.id} should have license info');
+      }
+
+      // KevinTam は元から透過のため透過化改変フラグは false、その他5種は true
       final kevin = TilesetInfo.findById('kevintamtiles_64x64');
-      expect(kevin.isTransparent, true);
+      expect(kevin.isModifiedForTransparency, false);
+      expect(kevin.license, 'NGPL');
 
       final pixel = TilesetInfo.findById('pixelhack_32x32');
-      expect(pixel.isTransparent, false);
+      expect(pixel.author, 'samuel (Scunah)');
+      expect(pixel.isModifiedForTransparency, true);
+
+      // 除外された Geoduck ID はデフォルト (pixelhack_32x32) に安全フォールバックする
+      final fallback = TilesetInfo.findById('geoduck_15x25');
+      expect(fallback.id, 'pixelhack_32x32');
     });
 
-    test('getMapCellSize correctly scales non-square tiles', () {
+    test('getMapCellSize correctly scales square tiles', () {
       final manager = TilesetManager.instance;
 
       // 正方形タイル: 32x32
@@ -70,14 +99,13 @@ void main() {
       expect(sizePixelhack.width, closeTo(32.0, 0.001));
       expect(sizePixelhack.height, closeTo(32.0, 0.001));
 
-      // 縦長タイル (Geoduck 15x25): 比率 0.6
-      // cellH = 32.0, cellW = 32.0 * (15 / 25) = 19.2
-      final sizeGeoduck = manager.getMapCellSize(
-        tilesetId: 'geoduck_15x25',
+      // 正方形タイル: 64x64 (アスペクト比 1.0)
+      final sizeKevin = manager.getMapCellSize(
+        tilesetId: 'kevintamtiles_64x64',
         baseHeight: 32.0,
       );
-      expect(sizeGeoduck.width, closeTo(19.2, 0.001));
-      expect(sizeGeoduck.height, closeTo(32.0, 0.001));
+      expect(sizeKevin.width, closeTo(32.0, 0.001));
+      expect(sizeKevin.height, closeTo(32.0, 0.001));
     });
   });
 }

@@ -1647,6 +1647,14 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String tilesetLicenseLabel(String license) {
+    return 'License: $license';
+  }
+
+  @override
+  String get tilesetTransparencyModifiedBadge => 'Modified (Transparent BG)';
+
+  @override
   String get delete => 'Delete';
 
   @override

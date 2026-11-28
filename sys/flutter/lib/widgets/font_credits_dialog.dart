@@ -6,11 +6,14 @@ import 'package:darthack/l10n/app_localizations.dart';
 class FontCreditEntry {
   final String id;
   final String name;
+  final String? nameEn;
   final String fileName;
   final String author;
   final String authorEn;
   final String license;
+  final String? licenseEn;
   final String shortLicense;
+  final String? shortLicenseEn;
   final Color licenseColor;
   final String url;
   final String descriptionJa;
@@ -19,11 +22,14 @@ class FontCreditEntry {
   const FontCreditEntry({
     required this.id,
     required this.name,
+    this.nameEn,
     required this.fileName,
     required this.author,
     required this.authorEn,
     required this.license,
+    this.licenseEn,
     required this.shortLicense,
+    this.shortLicenseEn,
     required this.licenseColor,
     required this.url,
     required this.descriptionJa,
@@ -76,11 +82,14 @@ class FontCreditsData {
     FontCreditEntry(
       id: 'MisakiGothic',
       name: '美咲ゴシック (Misaki Gothic)',
+      nameEn: 'Misaki Gothic',
       fileName: 'misaki_gothic.ttf',
       author: 'Copyright (C) 2002-2021 門真 なむ (Num Kadoma)',
       authorEn: 'Copyright (C) 2002-2021 Num Kadoma',
       license: '自由利用 (フリーソフトウェア)',
+      licenseEn: 'Free Software (Permissive)',
       shortLicense: '自由利用',
+      shortLicenseEn: 'Free Software',
       licenseColor: Color(0xFF66BB6A), // Green
       url: 'https://littlelimit.net/misaki.htm',
       descriptionJa: '門真 なむ 氏 (Little Limit) 作成の 8×8 ドット超小型日本語ビットマップフォントです。改変・再配布・商業利用が自由です。',
@@ -190,6 +199,9 @@ class FontCreditsDialog extends StatelessWidget {
                 separatorBuilder: (context, index) => const SizedBox(height: 12),
                 itemBuilder: (context, index) {
                   final entry = FontCreditsData.entries[index];
+                  final name = isEn ? (entry.nameEn ?? entry.name) : entry.name;
+                  final license = isEn ? (entry.licenseEn ?? entry.license) : entry.license;
+                  final shortLicense = isEn ? (entry.shortLicenseEn ?? entry.shortLicense) : entry.shortLicense;
                   final author = isEn ? entry.authorEn : entry.author;
                   final description = isEn ? entry.descriptionEn : entry.descriptionJa;
 
@@ -212,7 +224,7 @@ class FontCreditsDialog extends StatelessWidget {
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Text(
-                                    entry.name,
+                                    name,
                                     style: const TextStyle(
                                       fontWeight: FontWeight.bold,
                                       fontSize: 15,
@@ -244,7 +256,7 @@ class FontCreditsDialog extends StatelessWidget {
                                 ),
                               ),
                               child: Text(
-                                entry.shortLicense,
+                                shortLicense,
                                 style: TextStyle(
                                   fontSize: 10,
                                   fontWeight: FontWeight.bold,
@@ -257,7 +269,7 @@ class FontCreditsDialog extends StatelessWidget {
                         const SizedBox(height: 8),
                         // ライセンス詳細
                         Text(
-                          l10n.fontCreditsLicense(entry.license),
+                          l10n.fontCreditsLicense(license),
                           style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w500, color: Colors.white),
                         ),
                         const SizedBox(height: 4),

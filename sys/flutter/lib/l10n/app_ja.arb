@@ -622,6 +622,13 @@
       "aspect": { "type": "String" }
     }
   },
+  "tilesetLicenseLabel": "ライセンス: {license}",
+  "@tilesetLicenseLabel": {
+    "placeholders": {
+      "license": { "type": "String" }
+    }
+  },
+  "tilesetTransparencyModifiedBadge": "背景透過化済み",
   "delete": "削除",
   "cameraFollowMode": "カメラ追従モード",
   "cameraModeCenter": "常時センタリング (主人公追従)",

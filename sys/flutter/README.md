@@ -18,7 +18,7 @@ NetHack 5.0 (日本語版 / 英語版) に **Flutter / Dart** でUIを実装す�
    - スマートフォン（Android）でのタッチ・ジェスチャー操作に加え、PC（Windows デスクトップ）環境にもネイティブ対応。UCRT 互換・堅牢なセーブ終了処理を備え、環境を問わず安定動作します。
 
 3. **多彩なタイルセット選択 & 透過2層描画**:
-   - 伝統的な 16x16 タイルに加え、Nevanda (32x32)、PixelHack (32x32)、Geoduck (15x25) など複数のタイルセットを動的に切り替え可能。
+   - 伝統的な 16x16 タイルに加え、Nevanda (32x32)、PixelHack (32x32)、ZeldHack (32x32)、KevinTam (64x64)、Abigaba (32x32) の全6種の透過タイルセットを動的に切り替え可能（外部カスタムタイルセットのインポートにも対応）。
    - 透過タイルセット使用時は C コアの `back_to_glyph` と連動し、背景地形とキャラクター/アイテムを重ね合わせた自然な2層描画を実現しています。
 
 4. **ゲーム内スポイラー & ガイド機能**:
@@ -133,7 +133,7 @@ sys/flutter/
 │   │   ├── en/                  # 英語版データ (data, oracles, rumors 等)
 │   │   └── jp/                  # 日本語版データ (data_jp, oracles_jp 等)
 │   ├── sounds/                  # 効果音・BGM・環境音 (OGG/Opus ファイル配置場所)
-│   ├── tiles/                   # タイルセット (16x16, Nevanda, PixelHack, Geoduck 等)
+│   ├── tiles/                   # タイルセット (16x16, Nevanda, PixelHack, ZeldHack, KevinTam, Abigaba)
 │   ├── images/                  # 背景・演出用画像
 │   └── icon/                    # アプリアイコン
 │

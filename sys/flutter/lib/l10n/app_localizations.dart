@@ -3128,6 +3128,18 @@ abstract class AppLocalizations {
   /// **'比率: {aspect}'**
   String tilesetAspectLabel(String aspect);
 
+  /// No description provided for @tilesetLicenseLabel.
+  ///
+  /// In ja, this message translates to:
+  /// **'ライセンス: {license}'**
+  String tilesetLicenseLabel(String license);
+
+  /// No description provided for @tilesetTransparencyModifiedBadge.
+  ///
+  /// In ja, this message translates to:
+  /// **'背景透過化済み'**
+  String get tilesetTransparencyModifiedBadge;
+
   /// No description provided for @delete.
   ///
   /// In ja, this message translates to:

@@ -621,6 +621,13 @@
       "aspect": { "type": "String" }
     }
   },
+  "tilesetLicenseLabel": "License: {license}",
+  "@tilesetLicenseLabel": {
+    "placeholders": {
+      "license": { "type": "String" }
+    }
+  },
+  "tilesetTransparencyModifiedBadge": "Modified (Transparent BG)",
   "delete": "Delete",
   "cameraFollowMode": "Camera follow mode",
   "cameraModeCenter": "Always center on hero",

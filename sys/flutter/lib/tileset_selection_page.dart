@@ -391,6 +391,45 @@ class _TilesetSelectionPageState extends State<TilesetSelectionPage> {
                             ],
                           ),
 
+                          // ライセンス表記および透過化改変注記（内蔵タイルの場合）
+                          if (t.isBuiltIn && (t.license.isNotEmpty || t.isModifiedForTransparency)) ...[
+                            const SizedBox(height: 6),
+                            Wrap(
+                              spacing: 8,
+                              runSpacing: 4,
+                              crossAxisAlignment: WrapCrossAlignment.center,
+                              children: [
+                                if (t.license.isNotEmpty)
+                                  Text(
+                                    l10n.tilesetLicenseLabel(t.license),
+                                    style: const TextStyle(
+                                      fontSize: 12,
+                                      color: Colors.white60,
+                                    ),
+                                  ),
+                                if (t.isModifiedForTransparency)
+                                  Container(
+                                    padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                    decoration: BoxDecoration(
+                                      color: Colors.tealAccent.withValues(alpha: 0.14),
+                                      borderRadius: BorderRadius.circular(4),
+                                      border: Border.all(
+                                        color: Colors.tealAccent.withValues(alpha: 0.55),
+                                        width: 0.8,
+                                      ),
+                                    ),
+                                    child: Text(
+                                      l10n.tilesetTransparencyModifiedBadge,
+                                      style: const TextStyle(
+                                        fontSize: 10,
+                                        color: Colors.tealAccent,
+                                      ),
+                                    ),
+                                  ),
+                              ],
+                            ),
+                          ],
+
                           // URL行（内蔵タイルの場合のみ）
                           if (t.isBuiltIn && t.url.isNotEmpty) ...[
                             const SizedBox(height: 6),

@@ -1613,6 +1613,14 @@ class AppLocalizationsJa extends AppLocalizations {
   }
 
   @override
+  String tilesetLicenseLabel(String license) {
+    return 'ライセンス: $license';
+  }
+
+  @override
+  String get tilesetTransparencyModifiedBadge => '背景透過化済み';
+
+  @override
   String get delete => '削除';
 
   @override
