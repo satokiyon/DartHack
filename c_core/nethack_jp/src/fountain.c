@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-19. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-28. */
 /* $NHDT-Header: NetHack 5.0 fountain.c 2026/06/20_22:26:43 NetHack-5.0:1.123 $ */
 /*      Copyright Scott R. Turner, srt@ucla, 10/27/86 */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -213,7 +213,7 @@ dryup(coordxy x, coordxy y, boolean isyou)
             return;
         }
         if (isyou && wizard) {
-            if (y_n("泉を干上がらせる?") == 'n')
+            if (y_n("泉を干上がらせますか?") == 'n')
                 return;
         }
         /* FIXME: sight-blocking clouds should use block_point() when

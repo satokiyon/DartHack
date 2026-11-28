@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-19. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-28. */
 /* $NHDT-Header: NetHack 5.0 wield.c 2026/06/20_22:26:43 NetHack-5.0:1.126 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2009. */
@@ -429,7 +429,7 @@ dowield(void)
         /* offer to split stack if multiple are quivered */
         if (uquiver->quan > 1L && inv_cnt(FALSE) < invlet_basic
                                     && splittable(uquiver)) {
-            Sprintf(qbuf, "%ld本の%sを構えている。1本だけ装備するか?",
+            Sprintf(qbuf, "%ld本の%sを構えている. 1本だけ装備しますか?",
                     uquiver->quan, simpleonames(uquiver));
             switch (ynq(qbuf)) {
             case 'q':
@@ -442,11 +442,11 @@ dowield(void)
             default:
                 break;
             }
-            Strcpy(qbuf, "代わりに全部装備するか?");
+            Strcpy(qbuf, "代わりに全部装備しますか?");
         } else {
             boolean use_plural = (is_plural(uquiver) || pair_of(uquiver));
 
-            Sprintf(qbuf, "%sを構えている。代わりに%sを装備するか?",
+            Sprintf(qbuf, "%sを構えている. 代わりに%sを装備しますか?",
                     !use_plural ? "それ" : "それら",
                     !use_plural ? "それ" : "それら");
         }
@@ -596,7 +596,7 @@ doquiver_core(const char *verb) /* "ready" or "fire" */
         /* offer to split stack if wielding more than 1 */
         if (uwep->quan > 1L && inv_cnt(FALSE) < invlet_basic
                                     && splittable(uwep)) {
-            Sprintf(qbuf, "%ld個の%sを装備している。%ld個を矢筒に準備するか?",
+            Sprintf(qbuf, "%ld個の%sを装備している. %ld個を矢筒に準備しますか?",
                 uwep->quan, simpleonames(uwep), uwep->quan - 1L);
             switch (ynq(qbuf)) {
             case 'q':
@@ -609,9 +609,9 @@ doquiver_core(const char *verb) /* "ready" or "fire" */
             default:
                 break;
             }
-            Strcpy(qbuf, "代わりにすべてを矢筒に準備するか?");
+            Strcpy(qbuf, "代わりにすべてを矢筒に準備しますか?");
         } else {
-            Sprintf(qbuf, "%sを装備している。代わりに矢筒に準備するか?",
+            Sprintf(qbuf, "%sを装備している. 代わりに矢筒に準備しますか?",
                     simpleonames(uwep));
         }
         /* require confirmation to ready the main weapon */
@@ -630,7 +630,7 @@ doquiver_core(const char *verb) /* "ready" or "fire" */
     } else if (newquiver == uswapwep) {
         if (uswapwep->quan > 1L && inv_cnt(FALSE) < invlet_basic
             && splittable(uswapwep)) {
-            Sprintf(qbuf, "%s%ld個の%sを装備している。%ld個を矢筒に準備するか?",
+            Sprintf(qbuf, "%s%ld個の%sを装備している. %ld個を矢筒に準備しますか?",
                 u.twoweap ? "二刀流で" : "副武器として",
                     uswapwep->quan, simpleonames(uswapwep),
                     uswapwep->quan - 1L);
@@ -645,9 +645,9 @@ doquiver_core(const char *verb) /* "ready" or "fire" */
             default:
                 break;
             }
-            Strcpy(qbuf, "代わりにすべてを矢筒に準備するか?");
+            Strcpy(qbuf, "代わりにすべてを矢筒に準備しますか?");
         } else {
-            Sprintf(qbuf, "%sを%s装備している。代わりに矢筒に準備するか?",
+            Sprintf(qbuf, "%sを%s装備している. 代わりに矢筒に準備しますか?",
                     simpleonames(uswapwep),
                     u.twoweap ? "二刀流で" : "副武器として");
         }

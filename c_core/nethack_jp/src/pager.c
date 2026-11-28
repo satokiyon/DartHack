@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-24. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-28. */
 /* $NHDT-Header: NetHack 5.0 pager.c 2026/06/20_22:26:43 NetHack-5.0:1.304 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2018. */
@@ -1505,7 +1505,7 @@ checkfile(
                     Strcpy(disptext, entrytext);
                     jp_translate_screen_desc(disptext);
                     Snprintf(question, sizeof question,
-                             "\"%s\"の詳細を見る?", disptext);
+                             "\"%s\"の詳細を見ますか?", disptext);
                     if (y_n(question) == 'y')
                         yes_to_moreinfo = TRUE;
                 }
@@ -2284,7 +2284,7 @@ do_look(int mode, coord *click_cc)
                          clr, "視認済み・記憶済みの刻印すべて",
                          MENU_ITEMFLAGS_NONE);
             }
-            end_menu(win, "何を調べる?");
+            end_menu(win, "何を調べますか?");
             if (select_menu(win, PICK_ONE, &pick_list) > 0) {
                 i = pick_list->item.a_char;
                 free((genericptr_t) pick_list);
@@ -2325,7 +2325,7 @@ do_look(int mode, coord *click_cc)
           }
         case '?':
             from_screen = FALSE;
-            getlin("何を指定する? (シンボルまたは単語)", out_str);
+            getlin("何を指定しますか? (シンボルまたは単語)", out_str);
             if (strcmp(out_str, " ")) /* keep single space as-is */
                 /* remove leading and trailing whitespace and
                    condense consecutive internal whitespace */
@@ -2830,7 +2830,7 @@ do_supplemental_info(
                 Strcpy(disptext, entrytext);
                 jp_translate_screen_desc(disptext);
                 Snprintf(question, sizeof question,
-                         "\"%s\"の詳細を見る?", disptext);
+                         "\"%s\"の詳細を見ますか?", disptext);
                 if (y_n(question) == 'y')
                 yes_to_moreinfo = TRUE;
             }
@@ -3226,7 +3226,7 @@ dowhatdoes(void)
 #if defined(UNIX) || defined(VMS)
     introff(); /* disables ^C but not ^\ */
 #endif
-    q = yn_function("どのコマンド?", (char *) 0, '\0', TRUE);
+    q = yn_function("どのコマンドですか?", (char *) 0, '\0', TRUE);
 #ifdef ALTMETA
     if (q == '\033' && iflags.altmeta) {
         /* in an ideal world, we would know whether another keystroke

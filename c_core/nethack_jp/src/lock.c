@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-19. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-28. */
 /* $NHDT-Header: NetHack 5.0 lock.c 2026/11/02_21:05:17 NetHack-5.0:1.155 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2011. */
@@ -98,7 +98,7 @@ picklock(void)
                 You("罠を見つけた!");
             gx.xlock.box->tknown = 1;
         }
-        if (y_n("罠の解除を試す?") == 'y') {
+        if (y_n("罠の解除を試みますか?") == 'y') {
             const char *what;
             boolean alreadyunlocked;
 
@@ -465,7 +465,7 @@ pick_lock(
                 if (autounlock && (flags.autounlock & AUTOUNLOCK_UNTRAP) != 0
                     && could_untrap(FALSE, TRUE)
                     && (c = otmp->tknown ? (otmp->otrapped ? 'y' : 'n')
-                            : ynq(safe_qbuf(qbuf, "", "に罠がないか調べる?",
+                            : ynq(safe_qbuf(qbuf, "", "に罠がないか調べますか?",
                                           otmp, yname, ysimple_name, "これ")))
                        != 'n') {
                     if (c == 'q')
@@ -599,7 +599,7 @@ pick_lock(
         default:
             if ((flags.autounlock & AUTOUNLOCK_UNTRAP) != 0
                 && could_untrap(FALSE, FALSE)
-                && (c = ynq("この扉に罠がないか調べる?")) != 'n') {
+                && (c = ynq("この扉に罠がないか調べますか?")) != 'n') {
                 if (c == 'q')
                     return PICKLOCK_DID_NOTHING;
                 /* c == 'y' */
@@ -879,7 +879,7 @@ doopen_indir(coordxy x, coordxy y)
                                 (struct obj *) 0) ? ECMD_TIME : ECMD_OK;
             } else if ((flags.autounlock & AUTOUNLOCK_KICK) != 0
                        && !u.usteed /* kicking is different when mounted */
-                      && ynq("蹴る?") == 'y') {
+                      && ynq("蹴りますか?") == 'y') {
                 cmdq_add_ec(CQ_CANNED, dokick);
                 cmdq_add_dir(CQ_CANNED,
                              sgn(cc.x - u.ux), sgn(cc.y - u.uy), 0);

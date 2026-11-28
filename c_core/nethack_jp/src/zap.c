@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-24. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-28. */
 /* $NHDT-Header: NetHack 5.0 zap.c 2026/06/20_16:31:15 NetHack-5.0:1.601 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2013. */
@@ -6394,7 +6394,7 @@ wish_history_menu(char *buf)
         }
     }
 
-    end_menu(win, "何を願う?");
+    end_menu(win, "何を願いますか?");
     npick = select_menu(win, PICK_ONE, &picks);
     destroy_nhwindow(win);
     if (npick > 0) {
@@ -6426,7 +6426,7 @@ makewish(void)
     if (flags.verbose)
         You("アイテムを願うことができる.");
  retry:
-    Strcpy(promptbuf, "何を願う");
+    Strcpy(promptbuf, "何を願いますか");
     if (iflags.cmdassist && tries > 0)
         Strcat(promptbuf, " ('help' と入力すると説明)");
     Strcat(promptbuf, "?");

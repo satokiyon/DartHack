@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-27. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-28. */
 /* $NHDT-Header: NetHack 5.0 decl.c 2026/10/18_12:54:26 NetHack-5.0:1.374 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2009. */
@@ -65,7 +65,7 @@ const struct c_common_strings c_common_strings =
         { "何も起こらない.",
             "何も起こらないようだ.",
             "もう十分試した!",
-            "それを%sするのはばかげている.",
+            "それを%sのはばかげている.",
             "一瞬身震いした.",
       "何か",
       "何か",

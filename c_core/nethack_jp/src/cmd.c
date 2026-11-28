@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-19. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-28. */
 /* $NHDT-Header: NetHack 5.0 cmd.c 2026/09/30_14:47:34 NetHack-5.0:1.788 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2013. */
@@ -981,7 +981,7 @@ enter_explore_mode(void)
           pline("注意!  探索モードに入ると%sへ戻れません.",
               oldmode);
         if (paranoid_query(ParanoidQuit,
-                   "探索モードに入るか?")) {
+                   "探索モードに入りますか?")) {
             discover = TRUE;
             wizard = FALSE;
             clear_nhwindow(WIN_MESSAGE);
@@ -2361,9 +2361,9 @@ handler_rebind_keys_add(boolean keyfirst)
              MENU_ITEMFLAGS_NONE);
     }
     if (key)
-        Sprintf(buf, "キー '%s' を何のコマンドに割り当てる?", key2txt(key, buf2));
+        Sprintf(buf, "キー '%s' をどのコマンドに割り当てますか?", key2txt(key, buf2));
     else
-        Sprintf(buf, "何のコマンドを割り当てる?");
+        Sprintf(buf, "どのコマンドを割り当てますか?");
     end_menu(win, buf);
     npick = select_menu(win, PICK_ONE, &picks);
     destroy_nhwindow(win);
@@ -4266,7 +4266,7 @@ help_dir(
         ctrl = (sym - 'A') + 1; /* 0-27 (note: 28-31 aren't applicable) */
         if ((explain = dowhatdoes_core(ctrl, buf2)) != 0
             && (!strchr(wiz_only_list, sym) || wizard)) {
-            Sprintf(buf, "^%c%s を使おうとしていたか?", sym,
+            Sprintf(buf, "^%c%s を使おうとしましたか?", sym,
                     strchr(wiz_only_list, sym) ? ""
                         : " (Guidebook に記載された通り)");
             putstr(win, 0, buf);
@@ -5421,7 +5421,7 @@ dotravel(void)
         }
         iflags.getloc_filter = gfilt;
     } else {
-        pline("どこへ移動したいか?");
+        pline("どこへ移動しますか?");
         if (getpos(&cc, TRUE, "移動先の目的地") < 0) {
             /* user pressed ESC */
             iflags.getloc_travelmode = FALSE;

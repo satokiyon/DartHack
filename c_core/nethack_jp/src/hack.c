@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-24. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-28. */
 /* $NHDT-Header: NetHack 5.0 hack.c 2026/06/20_16:30:50 NetHack-5.0:1.512 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Derek S. Ray, 2015. */
@@ -2558,7 +2558,7 @@ avoid_trap_andor_region(coordxy x, coordxy y)
         /* we don't override confirmation for poison resistance since the
            region also hinders hero's vision even if/when no damage is done */
     ) {
-        Snprintf(qbuf, sizeof qbuf, "本当にその%sの雲へ入るか?",
+        Snprintf(qbuf, sizeof qbuf, "本当にその%sの雲へ入りますか?",
              (reg_damg(newreg) > 0) ? "毒ガス" : "蒸気");
         if (!paranoid_query(ParanoidConfirm, upstart(qbuf))) {
             nomul(0);
@@ -2583,7 +2583,7 @@ avoid_trap_andor_region(coordxy x, coordxy y)
         int traptype = (Hallucination ? rnd(TRAPNUM - 1) : (int) trap->ttyp);
         boolean into = into_vs_onto(traptype);
 
-        Snprintf(qbuf, sizeof qbuf, "本当にその%sの%sへ進むか?",
+        Snprintf(qbuf, sizeof qbuf, "本当にその%sの%sへ進みますか?",
                jp_trapname_for_display(traptype, FALSE),
              into ? "中" : "上");
         /* handled like paranoid_confirm:pray; when paranoid_confirm:trap

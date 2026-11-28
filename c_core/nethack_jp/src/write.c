@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-19. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-28. */
 /* $NHDT-Header: NetHack 5.0 write.c 2026/10/31_22:59:35 NetHack-5.0:1.57 $ */
 /* Copyright (c) Michael Allison 2024. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -125,7 +125,7 @@ dowrite(struct obj *pen)
     makeknown(SCR_BLANK_PAPER);
 
     /* what to write */
-    Sprintf(qbuf, "どんな%sを書くか?", typeword);
+    Sprintf(qbuf, "どんな%sを書きますか?", typeword);
     getlin(qbuf, namebuf);
     (void) mungspaces(namebuf); /* remove any excess whitespace */
     if (namebuf[0] == '\033' || !namebuf[0])

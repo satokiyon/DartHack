@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-24. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-28. */
 /* $NHDT-Header: NetHack 5.0 potion.c 2026/06/20_22:26:43 NetHack-5.0:1.290 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2013. */
@@ -548,7 +548,7 @@ dodrink(void)
         if (IS_FOUNTAIN(levl[u.ux][u.uy].typ)
             /* not as low as floor level but similar restrictions apply */
             && can_reach_floor(FALSE)) {
-            if (y_n("噴水から飲むか?") == 'y') {
+            if (y_n("噴水から飲みますか?") == 'y') {
                 drinkfountain();
                 return ECMD_TIME;
             }
@@ -558,7 +558,7 @@ dodrink(void)
         if (IS_SINK(levl[u.ux][u.uy].typ)
             /* not as low as floor level but similar restrictions apply */
             && can_reach_floor(FALSE)) {
-            if (y_n("流しから飲むか?") == 'y') {
+            if (y_n("流しから飲みますか?") == 'y') {
                 drinksink();
                 return ECMD_TIME;
             }
@@ -566,7 +566,7 @@ dodrink(void)
         }
         /* Or are you surrounded by water? */
         if (Underwater && !u.uswallow) {
-            if (y_n("周囲の水を飲むか?") == 'y') {
+            if (y_n("周囲の水を飲みますか?") == 'y') {
                 pline("この水の中に何が住んでいるか知っているか?");
                 return ECMD_TIME;
             }
