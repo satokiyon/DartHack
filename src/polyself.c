@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-19. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-28. */
 /* $NHDT-Header: NetHack 5.0 polyself.c 2026/06/20_22:26:43 NetHack-5.0:1.235 $ */
 /*      Copyright (C) 1987, 1988, 1989 by Ken Arromdee */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1765,9 +1765,9 @@ dogaze(void)
                 You("%sを見つめるのを避けた.", y_monnam(mtmp));
             } else {
                 if (flags.confirm && mtmp->mpeaceful && !Confusion) {
-                    Sprintf(qbuf, "本当に%sを%sする?",
+                    Sprintf(qbuf, "本当に%sを%sか?",
                             l_monnam(mtmp),
-                            (adtyp == AD_CONF) ? "混乱" : "攻撃");
+                            (adtyp == AD_CONF) ? "混乱させます" : "攻撃します");
                     if (y_n(qbuf) != 'y')
                         continue;
                 }

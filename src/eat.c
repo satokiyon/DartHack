@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-24. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-28. */
 /* $NHDT-Header: NetHack 5.0 eat.c 2026/07/31_10:25:58 NetHack-5.0:1.358 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
@@ -3892,7 +3892,8 @@ floorfood(
                 Sprintf(qbuf, "そこに%sがある; それを%sか?",
                         jp_corpse_xname(otmp, (const char *) 0,
                                         CXN_SINGULAR | CXN_ARTICLE),
-                        offering ? "捧げます" : "食べます");
+                        offering ? "捧げます"
+                        : (corpsecheck == 2) ? "缶詰にします" : "食べます");
             } else {
                 /* "There is <an object> here; <verb> it?" or
                    "There are <N objects> here; <verb> one?" */
@@ -3901,7 +3902,7 @@ floorfood(
                         one ? (offering ? "それを捧げます" : "それを食べます")
                             : (offering ? "1つ捧げます" : "1つ食べます"));
                 (void) safe_qbuf(qbuf, qbuf, qsfx, otmp, doname, ansimpleoname,
-                                 one ? something : (const char *) "things");
+                                 one ? something : (const char *) "品物");
             }
             if ((c = yn_function(qbuf, ynqchars, 'n', TRUE)) == 'y')
                 return  otmp;
@@ -3926,7 +3927,9 @@ floorfood(
     }
     if (otmp && corpsecheck && !(offering && otmp->oclass == AMULET_CLASS)) {
         if (otmp->otyp != CORPSE || (corpsecheck == 2 && !tinnable(otmp))) {
-            You_cant("%sことはできない!", verb);
+            You_cant("それを%sことはできない!",
+                     offering ? "捧げる"
+                     : (corpsecheck == 2) ? "缶詰にする" : "食べる");
             otmp = (struct obj *) 0;
         }
     }

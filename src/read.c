@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-24. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-28. */
 /* $NHDT-Header: NetHack 5.0 read.c 2026/07/04_18:17:43 NetHack-5.0:1.337 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
@@ -789,7 +789,7 @@ doread(void)
            scroll didn't come from bones, ask for confirmation */
         if (!u.uconduct.literate) {
             if (!scroll->spe && y_n(
-                 "これを読むと\"非識字\"の行いを破る。 それでも読むか?"
+                 "これを読むと\"非識字\"の行いを破ります. それでも読みますか?"
                                    ) != 'y')
                 return ECMD_OK;
         }
@@ -2110,7 +2110,7 @@ seffect_fire(struct obj **sobjp)
             if (!already_known)
                 pline("これは火炎の巻物だ!");
             dam *= 5;
-            pline("爆発の中心をどこにする?");
+            pline("爆発の中心をどこにしますか?");
             getpos_sethilite(display_stinking_cloud_positions,
                              can_center_cloud);
             (void) getpos(&cc, TRUE, "狙う場所");
@@ -3293,8 +3293,8 @@ do_stinking_cloud(struct obj *sobj, boolean mention_stinking)
 {
     coord cc;
 
-    pline(mention_stinking ? "悪臭雲の中心をどこにする?"
-                           : "雲の中心をどこにする?");
+    pline(mention_stinking ? "悪臭雲の中心をどこにしますか?"
+                           : "雲の中心をどこにしますか?");
     cc.x = u.ux;
     cc.y = u.uy;
     getpos_sethilite(display_stinking_cloud_positions, can_center_cloud);

@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-24. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-28. */
 /* $NHDT-Header: NetHack 5.0 do.c 2026/10/17_14:49:13 NetHack-5.0:1.416 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Derek S. Ray, 2015. */
@@ -1075,7 +1075,7 @@ menu_drop(int retry)
                            & ECMD_TIME) != 0) ? 1 : 0;
     } else {
         /* should coordinate with perm invent, maybe not show worn items */
-        n = query_objlist("何を捨てる?", &gi.invent,
+        n = query_objlist("何を落としますか?", &gi.invent,
                           (USE_INVLET | INVORDER_SORT | INCLUDE_VENOM),
                           &pick_list, PICK_ANY,
                           all_categories ? allow_all : allow_category);
@@ -1249,7 +1249,7 @@ dodown(void)
     if (on_level(&valley_level, &u.uz) && !u.uevent.gehennom_entered) {
         You("ゲヘナムの上に立っている.");
         pline("口にできないほどの残虐さと害悪が下に潜んでいた.");
-        if (y_n("本当に入るつもりか?") != 'y')
+        if (y_n("本当に入りますか?") != 'y')
             return ECMD_OK;
         pline("そうなのだ.");
         u.uevent.gehennom_entered = 1; /* don't ask again */
@@ -1268,7 +1268,7 @@ dodown(void)
             char qbuf[QBUFSZ];
 
             You("そこへは簡単に収まらない.");
-            Sprintf(qbuf, "無理に押し込もうとするか?");
+            Sprintf(qbuf, "無理に押し込みますか?");
             if (y_n(qbuf) == 'y') {
                 if (!rn2(3)) {
                     squeezed = TRUE;
@@ -1336,7 +1336,7 @@ doup(void)
     if (ledger_no(&u.uz) == 1) {
         if (iflags.debug_fuzzer)
             return ECMD_OK;
-        if (y_n("警告: もう戻れない!  それでも上るか?") != 'y')
+        if (y_n("警告: もう戻れません!  それでも上りますか?") != 'y')
             return ECMD_OK;
     }
     if (!next_to_u()) {

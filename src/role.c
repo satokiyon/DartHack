@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-21. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-28. */
 /* $NHDT-Header: NetHack 5.0 role.c 2026/06/20_22:26:43 NetHack-5.0:1.113 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985-1999. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
@@ -1817,7 +1817,7 @@ build_plselection_prompt(
     char *buf, int buflen,
     int rolenum, int racenum, int gendnum, int alignnum)
 {
-    const char *defprompt = "キャラクターを自動選択する? [ynaq] ";
+    const char *defprompt = "キャラクターを自動選択しますか? [ynaq] ";
     int num_post_attribs = 0;
     nhUse(rolenum), nhUse(racenum), nhUse(gendnum), nhUse(alignnum);
 
@@ -3010,7 +3010,7 @@ genl_player_setup(int screenheight)
         any.a_int = -1;
         add_menu(win, &nul_glyphinfo, &any, 'q', 0,
                  ATR_NONE, clr, "終了", MENU_ITEMFLAGS_NONE);
-        Sprintf(pbuf, "この内容でよい? [yn%sq]", iflags.renameallowed ? "a" : "");
+        Sprintf(pbuf, "この内容でよろしいですか? [yn%sq]", iflags.renameallowed ? "a" : "");
         end_menu(win, pbuf);
         n = select_menu(win, PICK_ONE, &selected);
         /* [pick-one menus with a preselected entry behave oddly...] */

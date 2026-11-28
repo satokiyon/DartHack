@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-19. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-28. */
 /* $NHDT-Header: NetHack 5.0 teleport.c 2026/06/20_16:31:09 NetHack-5.0:1.250 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2011. */
@@ -880,7 +880,7 @@ scrolltele(struct obj *scroll)
             Strcpy(whobuf, "あなた");
             if (u.usteed)
                 Sprintf(eos(whobuf), "と%s", mon_nam(u.usteed));
-            pline("%sをどこへテレポートさせる?", whobuf);
+            pline("%sをどこへテレポートさせますか?", whobuf);
             if (scroll)
                 learnscroll(scroll);
             cc.x = u.ux;
@@ -1930,7 +1930,7 @@ control_mon_tele(
     if (!wizard || !iflags.mon_telecontrol)
         return FALSE;
 
-    pline("%s @ <%d,%d> をどこへテレポートする?",
+    pline("%s @ <%d,%d> をどこへテレポートしますか?",
           noit_mon_nam(mon), mon->mx, mon->my);
     /* getpos '?' will show "Move the cursor to <where to teleport Foo>:" */
     Sprintf(tcbuf, "%sをテレポートさせる場所", noit_mon_nam(mon));
@@ -1940,7 +1940,7 @@ control_mon_tele(
               : goodpos(cc_p->x, cc_p->y, mon, rlocflags))
             return TRUE;
         if (!iflags.debug_fuzzer) {
-            Sprintf(tcbuf, "<%d,%d> は不適切な場所と判断されたが、強行する?",
+            Sprintf(tcbuf, "<%d,%d> は不適切な場所と判断されましたが、強行しますか?",
                     mon->mx, mon->my);
             if (y_n(tcbuf) == 'y')
                 return TRUE;

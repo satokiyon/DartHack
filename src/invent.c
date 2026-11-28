@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-21. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-28. */
 /* $NHDT-Header: NetHack 5.0 invent.c 2026/06/20 16:30:52 NetHack-5.0:1.569 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Derek S. Ray, 2015. */
@@ -11,51 +11,70 @@ staticfn char *loot_xname(struct obj *);
 staticfn int invletter_value(char);
 staticfn int QSORTCALLBACK sortloot_cmp(const genericptr, const genericptr);
 staticfn const char *drop_english_article(const char *);
-staticfn const char *action_label_jp(const char *);
+staticfn const char *action_verb_jp(const char *);
+staticfn boolean action_takes_ni_jp(const char *);
 staticfn const char *action_prompt_jp(const char *);
 staticfn const char *action_missing_jp(const char *);
 staticfn const char *inv_class_name_core(char, boolean);
 
+/* NetHackJP: 動詞キーを自然な日本語の終止形へ変換する */
 staticfn const char *
-action_label_jp(const char *word)
+action_verb_jp(const char *word)
 {
-    if (!strcmp(word, "name") || !strcmp(word, "call")) return "名付け";
-    if (!strcmp(word, "identify")) return "識別";
-    if (!strcmp(word, "adjust")) return "整理";
-    if (!strcmp(word, "split")) return "分割";
-    if (!strcmp(word, "drop")) return "落とし";
-    if (!strcmp(word, "open")) return "開け";
-    if (!strcmp(word, "sacrifice")) return "捧げ";
-    if (!strcmp(word, "put in")) return "入れ";
-    if (!strcmp(word, "take out")) return "取り出し";
-    if (!strcmp(word, "wear") || !strcmp(word, "put on")) return "装着";
-    if (!strcmp(word, "remove") || !strcmp(word, "take off")) return "取り外し";
-    if (!strcmp(word, "wield")) return "装備";
-    if (!strcmp(word, "ready")) return "準備";
-    if (!strcmp(word, "write with") || !strcmp(word, "write on")) return "書き";
-    if (!strcmp(word, "read")) return "読書";
-    if (!strcmp(word, "zap")) return "使用";
-    if (!strcmp(word, "invoke")) return "発動";
-    if (!strcmp(word, "charge")) return "充填";
-    if (!strcmp(word, "rub") || !strcmp(word, "rub the royal jelly on")) return "こすり";
-    if (!strcmp(word, "grease")) return "油塗り";
-    if (!strcmp(word, "disarm")) return "解除";
-    if (!strcmp(word, "eat")) return "食事";
-    if (!strcmp(word, "drink") || !strcmp(word, "quaff")) return "飲用";
-    if (!strcmp(word, "dip")) return "浸し";
-    if (!strcmp(word, "destroy")) return "破壊";
-    if (!strcmp(word, "throw")) return "投擲";
-    if (!strcmp(word, "apply")) return "使用";
-    if (!strcmp(word, "loot")) return "あさり";
-    if (!strcmp(word, "stash")) return "隠し";
-    if (!strcmp(word, "tip")) return "ひっくり返し";
-    if (!strcmp(word, "fire")) return "射撃";
-    if (!strcmp(word, "travel")) return "移動";
-    if (!strcmp(word, "kick")) return "蹴り";
-    if (!strcmp(word, "glance")) return "見回し";
-    if (!strcmp(word, "search")) return "探索";
-    if (!strcmp(word, "pickup")) return "拾い上げ";
-    return "操作";
+    if (!word) return "操作する";
+    if (strstr(word, "浸す") || strstr(word, "浸し")) return "浸す";
+    if (strstr(word, "こすり")) return "こすりつける";
+    if (!strcmp(word, "name") || !strcmp(word, "call")) return "名付ける";
+    if (!strcmp(word, "identify")) return "識別する";
+    if (!strcmp(word, "adjust")) return "整理する";
+    if (!strcmp(word, "split")) return "分割する";
+    if (!strcmp(word, "drop")) return "落とす";
+    if (!strcmp(word, "open")) return "開ける";
+    if (!strcmp(word, "sacrifice") || !strcmp(word, "offer")) return "捧げる";
+    if (!strcmp(word, "put in")) return "入れる";
+    if (!strcmp(word, "take out")) return "取り出す";
+    if (!strcmp(word, "wear") || !strcmp(word, "put on")) return "装着する";
+    if (!strcmp(word, "remove") || !strcmp(word, "take off")) return "取り外す";
+    if (!strcmp(word, "wield")) return "装備する";
+    if (!strcmp(word, "ready")) return "準備する";
+    if (!strcmp(word, "write with") || !strcmp(word, "write on")) return "書く";
+    if (!strcmp(word, "read")) return "読む";
+    if (!strcmp(word, "zap") || !strcmp(word, "apply")) return "使う";
+    if (!strcmp(word, "invoke")) return "発動する";
+    if (!strcmp(word, "charge")) return "充填する";
+    if (!strcmp(word, "rub")) return "こする";
+    if (!strcmp(word, "rub the royal jelly on")) return "ロイヤルゼリーを塗る";
+    if (!strcmp(word, "grease")) return "油を塗る";
+    if (!strcmp(word, "disarm")) return "解除する";
+    if (!strcmp(word, "eat")) return "食べる";
+    if (!strcmp(word, "drink") || !strcmp(word, "quaff")) return "飲む";
+    if (!strcmp(word, "dip")) return "浸す";
+    if (!strcmp(word, "tin")) return "缶詰にする";
+    if (!strcmp(word, "destroy")) return "破壊する";
+    if (!strcmp(word, "throw")) return "投げる";
+    if (!strcmp(word, "loot")) return "あさる";
+    if (!strcmp(word, "stash")) return "しまう";
+    if (!strcmp(word, "tip")) return "ひっくり返す";
+    if (!strcmp(word, "fire")) return "射撃する";
+    if (!strcmp(word, "travel")) return "移動する";
+    if (!strcmp(word, "kick")) return "蹴る";
+    if (!strcmp(word, "glance")) return "見回す";
+    if (!strcmp(word, "search")) return "探索する";
+    if (!strcmp(word, "pickup")) return "拾い上げる";
+    return "操作する";
+}
+
+/* NetHackJP: 目的語の助詞に「に」をとる動詞かどうかを判定する */
+staticfn boolean
+action_takes_ni_jp(const char *word)
+{
+    if (!word)
+        return FALSE;
+    return (!strcmp(word, "write on")
+            || !strcmp(word, "grease")
+            || !strcmp(word, "rub the royal jelly on")
+            || !strcmp(word, "name")
+            || !strcmp(word, "call"));
 }
 
 staticfn const char *
@@ -1821,35 +1840,13 @@ taking_off(const char *action)
     return !strcmp(action, "take off") || !strcmp(action, "remove");
 }
 
+/* NetHackJP: 英語動詞の切り貼りを避け、日本語動詞終止形で自然な文を組み立てる */
 staticfn void
 mime_action(const char *word)
 {
-    char buf[BUFSZ];
-    char *bp, *pfx, *sfx;
-
-    Strcpy(buf, word);
-    bp = pfx = sfx = (char *) 0;
-
-    if ((bp = strstr(buf, " on the ")) != 0) {
-        /* rub on the stone[s] */
-        *bp = '\0';
-        sfx = (bp + 1); /* "something <sfx>" */
-    }
-    if ((!strncmp(buf, "rub the ", 8) && strstr(buf + 8, " on"))
-        || (!strncmp(buf, "dip ", 4) && strstr(buf + 4, " into"))) {
-        /* "rub the royal jelly on" -> "rubbing the royal jelly on", or
-           "dip <foo> into" => "dipping <foo> into" */
-        buf[3] = '\0';
-        pfx = &buf[3 + 1]; /* "<pfx> something" */
-    }
-    if ((bp = strstr(buf, " or ")) != 0) {
-        *bp = '\0';
-        bp = (rn2(2) ? buf : (bp + 4));
-    } else
-        bp = buf;
-
-    You("何かを%s%s%sするふりをした%s%s.", bp,
-        pfx ? " " : "", pfx ? pfx : "", sfx ? " " : "", sfx ? sfx : "");
+    You("何か%s%sふりをした.",
+        action_takes_ni_jp(word) ? "に" : "を",
+        action_verb_jp(word));
 }
 
 /* getobj callback that allows any object - but not hands. */
@@ -2097,7 +2094,7 @@ getobj(
             long tmpcnt = 0L;
 
             if (!allowcnt) {
-                pline("このコマンドでは数量を指定できなかった.");
+                pline("このコマンドでは数量を指定できない.");
                 continue;
             }
             ilet = get_count(NULL, ilet, LARGEST_INT, &tmpcnt, GC_SAVEHIST);
@@ -2175,7 +2172,9 @@ getobj(
                than one invent slot of gold and picking the non-'$' one */
             || (otmp && otmp->oclass == COIN_CLASS)) {
             if (otmp && obj_ok(otmp) <= GETOBJ_EXCLUDE) {
-                You("金貨には%sできない.", action_label_jp(word));
+                You("金貨%s%sことはできない.",
+                    action_takes_ni_jp(word) ? "に" : "を",
+                    action_verb_jp(word));
                 return (struct obj *) 0;
             }
             /*
@@ -2203,12 +2202,18 @@ getobj(
                 return (struct obj *) 0;
             coins = (otmp->oclass == COIN_CLASS);
             if (cnt > 1L && (!coins || cnt > otmp->quan)) {
-                if (cnt > otmp->quan)
-                    You("%ld%s%sしか持っていない.", otmp->quan,
-                        (!coins && otmp->quan > 1L) ? "、そして" : "",
-                        (!coins && otmp->quan > 1L) ? only_one : "");
-                else
-                    You("%s.", only_one);
+                if (cnt > otmp->quan) {
+                    if (!coins && otmp->quan > 1L)
+                        You("%ld個しか持っていないし、%sだ.",
+                            otmp->quan, only_one);
+                    else if (coins)
+                        You("%ld%sしか持っていない.",
+                            otmp->quan, currency(otmp->quan));
+                    else
+                        You("%ld個しか持っていない.", otmp->quan);
+                } else {
+                    You("%sだ.", only_one);
+                }
                 continue;
             }
         }
@@ -2227,7 +2232,7 @@ getobj(
                 return (struct obj *) 0;
             continue;
         } else if (cnt < 0L || otmp->quan < cnt) {
-            You("そんなに持っていない!  持っているのは%ldだけだった.", otmp->quan);
+            You("そんなに持っていない!  持っているのは%ld個だけだ.", otmp->quan);
             if (gi.in_doagain)
                 return (struct obj *) 0;
             continue;
@@ -2293,7 +2298,7 @@ silly_thing(const char *word,
             || (otmp->otyp == FAKE_AMULET_OF_YENDOR && !otmp->known)))
         pline_The("護符は変なあだ名で呼ばれるのを好まない.");
     else
-        pline(silly_thing_to, action_label_jp(word));
+        pline(silly_thing_to, action_verb_jp(word));
 }
 
 RESTORE_WARNING_FORMAT_NONLITERAL
@@ -2473,7 +2478,7 @@ ggetobj(const char *word, int (*fn)(OBJ_P), int mx,
             if (strchr(extra_removeables, oc_of_sym)) {
                 ; /* skip rest of takeoff checks */
             } else if (!strchr(removeables, oc_of_sym)) {
-                pline("適用できなかった.");
+                pline("該当しない.");
                 return 0;
             } else if (oc_of_sym == ARMOR_CLASS && !wearing_armor()) {
                 noarmor(FALSE);
@@ -2625,7 +2630,7 @@ askchain(
                    class of objects is involved, so prefix the first
                    object being queried here with an explanation why */
                 if (take_out || put_in)
-                    Sprintf(qpfx, "%s: ", action_label_jp(word));
+                    Sprintf(qpfx, "%s: ", take_out ? "取り出す" : "入れる");
                 first = FALSE;
             }
             (void) safe_qbuf(qbuf, qpfx, "?", otmp,
@@ -2824,12 +2829,12 @@ staticfn void
 menu_identify(int id_limit)
 {
     menu_item *pick_list;
-    int n, i, tryct = 5;
+    int n, i, first = 1, tryct = 5;
     char buf[BUFSZ];
     /* assumptions:  id_limit > 0 and at least one unID'd item is present */
 
     while (id_limit) {
-        Sprintf(buf, "最初の持ち物を識別する?" );
+        Strcpy(buf, first ? "何を識別しますか?" : "次に何を識別しますか?");
         n = query_objlist(buf, &gi.invent, (SIGNAL_NOMENU | SIGNAL_ESCAPE
                                            | USE_INVLET | INVORDER_SORT),
                           &pick_list, PICK_ANY, not_fully_identified);
@@ -2842,16 +2847,17 @@ menu_identify(int id_limit)
             free((genericptr_t) pick_list);
             if (id_limit)
                 wait_synch(); /* Before we loop to pop open another menu */
+            first = 0;
         } else if (n == -2) { /* player used ESC to quit menu */
             break;
         } else if (n == -1) { /* no eligible items found */
-            pline("以上.");
+            pline("以上だ.");
             break;
         } else if (!--tryct) { /* stop re-prompting */
             pline1(thats_enough_tries);
             break;
         } else { /* try again */
-            pline("持ち物を選んで. 取り消すには ESC を使うこと.");
+            pline("持ち物を選んでください. 取り消すには ESC を押してください.");
         }
     }
 }
@@ -2924,7 +2930,7 @@ identify_pack(
     int n, unid_cnt = count_unidentified(gi.invent);
 
     if (!unid_cnt) {
-        You("持ち物の%sをすでに識別していた.",
+        You("持ち物の%sをすでに識別している.",
             !learning_id ? "すべて" : "残り全部");
     } else if (!id_limit || id_limit >= unid_cnt) {
         /* identify everything */
@@ -3446,7 +3452,7 @@ display_pickinv(
             gotsomething = TRUE;
         } else {
             any.a_obj = &wizid_fakeobj;
-            Sprintf(prompt, "恒久識別する対象を選んでほしい");
+            Sprintf(prompt, "恒久識別する対象を選んでください");
             /* wiz_identify stuffed the wiz_identify command character (^I)
                into iflags.override_ID for our use as an accelerator;
                it could be ambiguous if player has assigned a letter to
@@ -3521,8 +3527,8 @@ display_pickinv(
                 const char *handpart = jp_body_part_plural(HAND);
 
                 formattedobj = (char *) 0;
-                Sprintf(barehands, "%s %s (武器なし)",
-                    uarmg ? "手袋付きの" : "素手の", handpart);
+                Sprintf(barehands, "%s%s (武器なし)",
+                    uarmg ? "手袋越しの" : "素手の", handpart);
                 add_menu(win, &nul_glyphinfo, &any, ilet, 0,
                          ATR_NONE, clr, barehands, MENU_ITEMFLAGS_NONE);
             } else {
@@ -4454,20 +4460,20 @@ look_here(
             pline1(fbuf);
         read_engr_at(u.ux, u.uy); /* Eric Backus */
         if (obj_cnt == 1 && otmp->quan == 1L)
-            There("%sの物体がある.", picked_some ? "別の1つ" : "1つ");
+            There(picked_some ? "ほかにもう1つ品物がある." : "品物が1つある.");
         else
-            There("%sの物体が%sある.",
+            There("%s品物が%sある.",
+                  picked_some ? "ほかにも" : "",
                   (obj_cnt == 2) ? "2つ"
-                  : (obj_cnt < 5) ? "少数"
-                    : (obj_cnt < 10) ? "いくつか"
-                      : "多数",
-                  picked_some ? "さらに" : "");
+                  : (obj_cnt < 5) ? "いくつか"
+                    : (obj_cnt < 10) ? "いくつも"
+                      : "多数");
         for (; otmp; otmp = otmp->nexthere)
             if (otmp->otyp == CORPSE && will_feel_cockatrice(otmp, FALSE)) {
                                 pline("%s%s.",
                                             jp_corpse_xname(otmp, (const char *) 0, CXN_ARTICLE),
                                             poly_when_stoned(gy.youmonst.data) ? "がある"
-                                            : "がある。うかつに触れると危険だ");
+                                            : "がある. うかつに触れると危険だ");
                 feel_cockatrice(otmp, FALSE);
                 break;
             }
@@ -4739,7 +4745,7 @@ doprgold(void)
     } else {
         long total = umoney + hmoney;
         if (total)
-            You("合計で%ld%sを持っていた.", total, currency(total));
+            You("合計で%ld%sを持っている.", total, currency(total));
         else
             You("お金を持っていない.");
     }
@@ -4801,7 +4807,7 @@ noarmor(boolean report_uskin)
             while ((p[1] = p[8]) != '\0')
                 ++p;
 
-        You("鎧は着けていないが、%sが皮膚に埋まっていた.",
+        You("鎧は着けていないが、%sが皮膚に埋まっている.",
             uskinname);
     }
 }
@@ -4960,7 +4966,7 @@ doprinuse(void)
             break;
         }
     if (!ct)
-        You("身に着けても装備してもいなかった.");
+        You("何も身に着けても装備してもいない.");
     else
         (void) dispinv_with_action((char *) 0, TRUE, NULL);
     return ECMD_OK;
@@ -5368,9 +5374,9 @@ doorganize_core(struct obj *obj)
 
     /* get 'to' slot to use as destination */
     if (!splitting)
-        Strcpy(qbuf, "スロット文字を調整");
+        Strcpy(qbuf, "スロット文字を調整:");
     else /* note: splitting->quan is the amount being left in original slot */
-        Sprintf(qbuf, "%ld個を分割", obj->quan);
+        Sprintf(qbuf, "%ld個を分割:", obj->quan);
     Sprintf(eos(qbuf), " 移動先はどこにしますか [%s]%s?", lets,
             gi.invent ? " (?で使用中の文字を表示)" : "");
     for (trycnt = 1; ; ++trycnt) {
@@ -5631,21 +5637,20 @@ cinv_doname(struct obj *obj)
     /* 'result' is an obuf[] but might point into the middle (&buf[PREFIX])
        rather than the beginning and we don't have access to that;
        assume that there is at least QBUFSZ available when reusing it */
+    /* NetHackJP: 日本語表記（施錠された/解錠された）に合わせて「罠付き」を挿入する */
     if (obj->otrapped
         && !(Is_box(obj) && obj->tknown && obj->dknown)
-        && strlen(result) + sizeof "trapped " <= QBUFSZ) {
-        /* obj->lknown has been set before calling us so either "locked" or
-           "unlocked" should always be present (for a trapped container) */
-        char *p = strstri(result, " locked"),
-             *q = strstri(result, " unlocked");
+        && !strstr(result, "罠付き")
+        && strlen(result) + sizeof "罠付き" <= QBUFSZ) {
+        char *p = strstr(result, "施錠された"),
+             *q = strstr(result, "解錠された");
 
         if (p && (!q || p < q))
-            (void) strsubst(p, " locked ", " trapped locked ");
+            (void) strsubst(p, "施錠された", "罠付き施錠された");
         else if (q)
-            (void) strsubst(q, " unlocked ", " trapped unlocked ");
-        /* might need to change "an" to "a"; when no BUC is present,
-           "an unlocked" yielded "an trapped unlocked" above */
-        (void) strsubst(result, "an trapped ", "a trapped ");
+            (void) strsubst(q, "解錠された", "罠付き解錠された");
+        else
+            (void) strsubst(result, "", "罠付き");
     }
     return result;
 }
@@ -5656,18 +5661,10 @@ cinv_ansimpleoname(struct obj *obj)
 {
     char *result = ansimpleoname(obj);
 
-    /* result is an obuf[] so we know this will always fit */
-    if (obj->otrapped) {
-        if (strncmp(result, "a ", 2))
-            (void) strsubst(result, "a ", "a trapped ");
-        else if (strncmp(result, "an ", 3))
-            (void) strsubst(result, "an ", "an trapped ");
-        /* unique container? nethack doesn't have any */
-        else if (strncmp(result, "the ", 4))
-            (void) strsubst(result, "the ", "the trapped ");
-        /* no leading article at all? shouldn't happen with ansimpleoname() */
-        else
-            (void) strsubst(result, "", "trapped "); /* insert at beginning */
+    /* NetHackJP: 日本語名に「罠付き」が未付与なら先頭へ補う */
+    if (obj->otrapped && !strstr(result, "罠付き")
+        && strlen(result) + sizeof "罠付き" <= QBUFSZ) {
+        (void) strsubst(result, "", "罠付き");
     }
     return result;
 }
@@ -5738,7 +5735,7 @@ display_binventory(coordxy x, coordxy y, boolean as_if_seen)
         if (!obj->nexthere) {
             boolean more_than_1 = is_plural(obj);
 
-            There("%sの下に%sがある.", seen_liquid, doname(obj));
+            pline("%sの下に%sがある.", seen_liquid, doname(obj));
             n2 = 1;
             /* "pair of boots" is singular but "beneath it" sounds strange */
             if (pair_of(obj))

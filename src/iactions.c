@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-04. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-28. */
 /* $NHDT-Header: NetHack 5.0 iactions.c 2026/06/20_22:26:43 NetHack-5.0:1.6 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Pasi Kallinen, 2026. */
@@ -667,7 +667,7 @@ itemactions(struct obj *otmp)
             || (could_twoweap(gy.youmonst.data) && !uarms
                 && uwep && MAYBETWOWEAPON(uwep)
                 && uswapwep && MAYBETWOWEAPON(uswapwep)))) {
-        Sprintf(buf, "二刀流を%sにする", u.twoweap ? "解除" : "有効");
+        Strcpy(buf, u.twoweap ? "二刀流を解除する" : "二刀流を有効にする");
         ia_addmenu(win, IA_TWOWEAPON, 'X', buf);
     }
 

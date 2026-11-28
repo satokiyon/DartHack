@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-19. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-28. */
 /* $NHDT-Header: NetHack 5.0 shk.c 2026/10/18_12:54:26 NetHack-5.0:1.329 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
@@ -2309,7 +2309,7 @@ dopayobj(
          *  'a' to buy the rest without asking, 'q' to just stop.
          */
 
-        Sprintf(qsfx, "で%ld%s。支払うか?", ltmp, currency(ltmp));
+        Sprintf(qsfx, "で%ld%s. 支払いますか?", ltmp, currency(ltmp));
         (void) safe_qbuf(qbuf, (char *) 0, qsfx, obj,
                          (quan == 1L) ? Doname2 : doname, ansimpleoname,
                  (quan == 1L) ? "それ" : "それら");
@@ -4179,7 +4179,7 @@ sellobj(
                         : "",
                     obj->unpaid ? "未払いの" : "");
             one = !ltmp ? (yourc == 1L) : (obj->quan == 1L && !cltmp);
-            Sprintf(qsfx, "%sを買い取ると言っている。%sを売るか?",
+            Sprintf(qsfx, "%sを買い取ると言っている. %sを売りますか?",
                     (cltmp && ltmp)
                         ? (only_partially_your_contents
                                ? ((yourc == 1L) ? "と中の品"

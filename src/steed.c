@@ -1,4 +1,4 @@
-/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-24. */
+/* Modified by NetHackJP contributor @satokiyon; latest change date: 2026-11-28. */
 /* $NHDT-Header: NetHack 5.0 steed.c 2026/06/20_16:31:08 NetHack-5.0:1.138 $ */
 /* Copyright (c) Kevin Hugo, 1998-1999. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -231,7 +231,7 @@ mount_steed(
         char qbuf[QBUFSZ];
 
         legs_in_no_shape("riding", FALSE);
-        Sprintf(qbuf, "%sの傷を治すか?",
+        Sprintf(qbuf, "%sの傷を治しますか?",
             ((HWounded_legs & BOTH_SIDES) == BOTH_SIDES)
                 ? "両脚"
                 : "片脚");
